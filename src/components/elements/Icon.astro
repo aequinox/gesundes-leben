@@ -1,0 +1,31 @@
+---
+import { Icon as AstroIcon } from "astro-icon/components";
+
+export interface Props {
+  name: "archive" | "search" | "moon" | "sun";
+  id?: string;
+  active?: boolean;
+}
+
+const { name, id, active = false } = Astro.props;
+
+const iconMap = {
+  archive: "tabler:archive",
+  search: "tabler:search",
+  moon: "tabler:moon",
+  sun: "tabler:sun",
+} as const;
+---
+
+<AstroIcon
+  name={iconMap[name]}
+  id={id}
+  class:list={[
+    "icon",
+    active && "!stroke-skin-accent",
+    id?.includes("moon") && "dark:hidden",
+    id?.includes("sun") && "hidden dark:block",
+  ]}
+  width="24"
+  height="24"
+/>
