@@ -1,0 +1,43 @@
+---
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { Icon } from "astro-icon/components";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  author: CollectionEntry<"authors">;
+  size?: "sm" | "lg";
+  classes?: string;
+}
+
+const { author, size = "sm", classes = "" }: Props = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+{
+  author && (
+    // Only display author on medium and larger screens
+    <div class="hidden sm:flex">
+      <span class="opacity-80" aria-hidden="true">
+        {" "}
+        |{" "}
+      </span>
+
+      <div class:list={["items-center space-x-1 opacity-80", classes.trim()]}>
+        <Icon
+          name="tabler:user"
+          class:list={[
+            "inline-block fill-skin-base",
+            size === "sm" ? "h-5 w-5" : "scale-100",
+          ]}
+        />
+        <span class:list={["italic", size === "sm" ? "text-sm" : "text-base"]}>
+          <span class="sr-only">&nbsp;{t("author.from")}&nbsp;</span>
+          <a href={`/author/${author.slug}`}>{author.data.name}</a>
+        </span>
+      </div>
+    </div>
+  )
+}
+<style></style>

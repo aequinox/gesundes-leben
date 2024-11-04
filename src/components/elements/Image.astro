@@ -1,0 +1,148 @@
+---
+import type { GetImageResult, ImageMetadata } from "astro";
+import { getImage, Picture } from "astro:assets";
+
+type Props = {
+  src: string | ImageMetadata;
+  // src will be ImageMetadata type in case you use an image from your content and string in case you use some external image
+  alt: string;
+  title?: string;
+};
+
+const { src: srcProp, alt, title: titleProp }: Props = Astro.props;
+const controlChar: string | undefined = titleProp?.charAt(0);
+const directionMap: Record<string, string> = {
+  ">": "right",
+  "<": "left",
+  "|": "center",
+};
+
+const controlMap: Record<string, string> = {
+  _: "full-width",
+};
+
+const directionFromMap = controlChar && directionMap[controlChar];
+const controlFromMap = controlChar && controlMap[controlChar];
+
+const direction: string = directionFromMap || "center";
+const control = controlFromMap || "";
+
+const title =
+  directionFromMap || controlFromMap ? titleProp?.slice(1) : titleProp;
+
+const src: ImageMetadata | GetImageResult =
+  typeof srcProp === "string"
+    ? await getImage({
+        src: srcProp,
+        format: "webp",
+        widths: [400, 800, 1200],
+        sizes: "(max-width: 1200px) 100vw, 1200px",
+        quality: 80,
+        inferSizes: true,
+      })
+    : (srcProp as ImageMetadata);
+---
+
+<figure
+  class="relative mx-auto"
+  data-aos={direction === "left"
+    ? "fade-right"
+    : direction === "right"
+      ? "fade-left"
+      : "fade-up"}
+>
+  <div
+    class="relative max-w-content before:absolute before:left-0 before:right-0 before:top-0 before:z-10 before:h-full before:w-full before:bg-gradient-to-t before:from-skin-fill before:to-transparent before:opacity-10"
+  >
+    {
+      typeof src === "string" ? (
+        <img
+          {src}
+          alt={alt}
+          class:list={[
+            "relative",
+            direction === "left"
+              ? "float-left mr-8"
+              : direction === "right"
+                ? "float-right ml-8"
+                : "mx-auto",
+            control === "full-width" ? "max-w-content" : "max-w-[50%]",
+          ]}
+        />
+      ) : (
+        <Picture
+          src={src as ImageMetadata}
+          widths={[400, 800, 1200]}
+          sizes="(max-width: 1200px) 100vw, 1200px"
+          formats={["avif", "webp"]}
+          {alt}
+          class:list={[
+            "relative mb-6 h-full rounded-sm border-none object-contain shadow-lg md:mb-4 md:object-cover",
+            direction === "left"
+              ? "float-left mr-8"
+              : direction === "right"
+                ? "float-right ml-8"
+                : "mx-auto w-full",
+            control === "full-width"
+              ? "w-full max-w-content"
+              : "md:max-w-[50%] lg:max-w-[33%]",
+          ]}
+        />
+      )
+    }
+  </div>
+  <figcaption
+    class:list={[
+      "absolute inset-x-0 clear-both flex",
+      direction === "left"
+        ? "left-0"
+        : direction === "right"
+          ? "right-0"
+          : "left-0 right-0 -my-6",
+    ]}
+  >
+    {
+      title && (
+        <p
+          class:list={[
+            direction === "left"
+              ? "ml-4 mr-auto"
+              : direction === "right"
+                ? "ml-auto mr-4"
+                : "mx-auto",
+            "100 z-10 -mt-6 rounded-sm bg-skin-card px-3 py-2 text-sm text-skin-base drop-shadow-2xl",
+          ]}
+        >
+          {title}
+        </p>
+      )
+    }
+  </figcaption>
+</figure>
+<!-- {
+  title && (
+    <div class="mb-4 hidden items-end justify-center md:flex">
+      <figcaption class="text-sm">{title}</figcaption>
+    </div>
+  )
+} -->
+
+<!-- <style lang="postcss">
+  img:nth-of-type(even) {
+   @apply float-right ml-8;
+}
+
+img:nth-of-type(odd) {
+    @apply float-left mr-8;
+}
+img[src*="#left"] {
+    @apply mr-auto max-w-[50%] pl-0 pr-4;
+  }
+  img[src*="#right"] {
+    @apply mr-auto max-w-[50%] pl-0;
+  }
+  img[src*="#center"] {
+    display: block;
+    margin: auto;
+  }
+</style> -->

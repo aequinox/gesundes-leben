@@ -1,0 +1,465 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/sections/Header.astro";
+import Footer from "@/components/sections/Footer.astro";
+import Tag from "@/components/elements/Tag.astro";
+import { type CollectionEntry } from "astro:content";
+import { slugifyStr } from "@/utils/slugify";
+import ShareLinks from "@/components/socials/ShareLinks.astro";
+import { SITE } from "@/config";
+import Image from "@/components/elements/Image.astro";
+import Blockquote from "@/components/elements/Blockquote.astro";
+import { getLangFromUrl, useTranslations } from "i18n/utils";
+import { Picture } from "astro:assets";
+import ArticleMeta from "@/components/partials/ArticleMeta.astro";
+import Paragraph from "@/components/elements/Paragraph.astro";
+import { getAuthorEntry } from "@/utils/getAuthor";
+
+interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+interface LayoutProps {
+  title: string;
+  author: string;
+  heroImage: any;
+  description: string;
+  pubDatetime: Date;
+  modDatetime?: Date;
+  canonicalURL?: string;
+  ogImage: string;
+  scrollSmooth: boolean;
+}
+
+const { post } = Astro.props;
+
+const {
+  data: {
+    title,
+    author,
+    heroImage,
+    description,
+    ogImage,
+    canonicalURL,
+    pubDatetime,
+    modDatetime,
+    categories,
+    tags,
+  },
+} = post;
+
+const authorEntry = await getAuthorEntry(author);
+
+// const favorites = post.data.favorites
+//   ? await getEntries(post.data.favorites)
+//   : undefined;
+
+const { Content } = await post.render();
+
+const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
+const ogUrl = new URL(
+  ogImageUrl ?? `/posts/${slugifyStr(title)}.png`,
+  Astro.url.origin
+).href;
+
+const layoutProps: LayoutProps = {
+  title: `${title} | ${SITE.title}`,
+  author: authorEntry?.data.name,
+  heroImage,
+  description,
+  pubDatetime,
+  modDatetime,
+  canonicalURL,
+  ogImage: ogUrl,
+  scrollSmooth: true,
+};
+
+const components = { img: Image, blockquote: Blockquote, p: Paragraph };
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<Layout {...layoutProps}>
+  <div
+    class="progress-container fixed top-0 z-20 block h-1 w-full bg-transparent 2xl:hidden"
+    role="progressbar"
+    aria-label="Reading progress"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-valuenow="0"
+  >
+    <div
+      id="progress-top"
+      class="h-1 w-0 rounded-full bg-gradient-to-r from-skin-accent/50 to-skin-accent"
+    >
+    </div>
+  </div>
+
+  <Header />
+
+  <div class="relative mx-auto grid max-w-content grid-cols-12 gap-8">
+    <div class="col-span-12 mx-auto flex w-full max-w-content px-2">
+      <button
+        class="focus-outline mb-2 mt-8 flex items-center gap-2 hover:opacity-75"
+        onclick="(() => (history.length === 1) ? window.location = '/' : history.back())()"
+        aria-label={t("nav.back")}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
+          ></path>
+        </svg>
+        <span>{t("nav.back")}</span>
+      </button>
+    </div>
+
+    <main id="main-content" class="col-span-12 2xl:col-span-8 3xl:col-span-9">
+      <div class="mb-2 flex flex-wrap text-xs uppercase">
+        {
+          categories &&
+            categories.map((category: string) => (
+              <div
+                transition:name={slugifyStr(title + category)}
+                class="mb-1 mr-[0.125rem] inline-flex items-center text-sm font-medium text-skin-accent after:[&:not(:last-child)]:ml-[0.125rem] after:[&:not(:last-child)]:content-['|']"
+              >
+                {category}
+              </div>
+            ))
+        }
+      </div>
+
+      <h1
+        transition:name={slugifyStr(title)}
+        class="mb-4 text-xl font-semibold lg:text-3xl"
+      >
+        {title}
+      </h1>
+
+      <ArticleMeta post={post} withAuthor={true} />
+
+      {
+        heroImage && (
+          <Picture
+            class="mx-auto mt-4 aspect-video"
+            src={heroImage.src}
+            alt={heroImage.alt}
+            decoding="async"
+            loading={"eager"}
+            widths={[400, 800, 1200, 1600]}
+            sizes="(max-width: 800px) 400px, (max-width: 1200px) 800px, (max-width: 1600px) 1200px, 1600px"
+            formats={["avif", "webp"]}
+            fallbackFormat="png"
+            transition:name={slugifyStr(title + "-heroImage")}
+          />
+        )
+      }
+      {
+        /* Alternative Picture component with animations
+      <Picture
+        class="mx-auto mt-4 aspect-video"
+        src={heroImage.src}
+        alt={heroImage.alt}
+        decoding="async"
+        loading={"eager"}
+        widths={[400, 800, 1200, 1600]}
+        sizes="(max-width: 800px) 400px, (max-width: 1200px) 800px, (max-width: 1600px) 1200px, 1600px"
+        formats={["avif", "webp"]}
+        fallbackFormat="png"
+        transition:name={slugifyStr(title + "-heroImage")}
+        data-aos="fade-zoom-in"
+        data-aos-easing="ease-in-back"
+        data-aos-delay="300"
+        data-aos-offset="0"
+      /> */
+      }
+
+      <article id="article" class="prose mx-auto mt-6 max-w-content">
+        <Content components={components} />
+      </article>
+
+      <ul class="my-8 flex flex-wrap gap-2" role="list" aria-label="Tags">
+        {tags.map((tag: string) => <Tag tag={slugifyStr(tag)} tagName={tag} />)}
+      </ul>
+
+      <div
+        class="flex flex-col-reverse items-center justify-between gap-6 sm:flex-row-reverse sm:items-end sm:gap-4"
+      >
+        <button
+          id="back-to-top"
+          class="focus-outline flex items-center gap-2 whitespace-nowrap py-1 hover:opacity-75"
+          aria-label={t("nav.backToTop")}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="rotate-90"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
+            ></path>
+          </svg>
+          <span>{t("nav.backToTop")}</span>
+        </button>
+
+        <ShareLinks />
+      </div>
+    </main>
+
+    <aside
+      class="sticky top-24 hidden self-start rounded 2xl:col-span-4 2xl:block 3xl:col-span-3"
+      aria-label="Table of contents"
+    >
+      <div
+        id="progress-mobile"
+        class="fixed left-0 top-0 h-2 w-full bg-gradient-to-r from-orange-400/30 to-orange-400 md:hidden"
+        role="progressbar"
+        aria-label="Reading progress mobile"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+      >
+      </div>
+      <div id="pin" class="hidden md:block">
+        <div class="mx-4 overflow-hidden">
+          <div
+            id="progress-aside"
+            class="h-px w-full bg-gradient-to-r from-skin-accent/50 to-skin-accent"
+            role="progressbar"
+            aria-label="Reading progress sidebar"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+          >
+          </div>
+        </div>
+        <nav
+          id="toc"
+          class="mx-4 rounded-sm bg-skin-card/30 px-2 py-4 drop-shadow-lg"
+          aria-label="Table of contents"
+        >
+          <p class="mb-2 text-pretty font-medium">{t("toc.title")}</p>
+          <ul
+            class="space-y-2 text-pretty text-sm transition duration-300 ease-in-out"
+            role="list"
+          >
+          </ul>
+        </nav>
+      </div>
+    </aside>
+  </div>
+  <Footer />
+</Layout>
+
+<script>
+  interface HeadingElement extends HTMLElement {
+    id: string;
+    tagName: string;
+    childNodes: NodeListOf<ChildNode>;
+  }
+
+  interface ProgressBar extends HTMLElement {
+    style: CSSStyleDeclaration;
+    setAttribute(name: string, value: string): void;
+  }
+
+  class TableOfContents {
+    private observer: IntersectionObserver;
+    private article: HTMLElement | null;
+    private tocList: HTMLUListElement | null;
+    private headings: NodeListOf<HeadingElement> | undefined;
+
+    constructor() {
+      this.article = document.querySelector<HTMLElement>("#article");
+      this.tocList = document.querySelector<HTMLUListElement>("#toc ul");
+      this.headings =
+        this.article?.querySelectorAll<HeadingElement>("h2, h3, h4, h5, h6");
+
+      this.observer = new IntersectionObserver(
+        this.handleIntersection.bind(this),
+        {
+          root: null,
+          rootMargin: "10px",
+          threshold: 0.1,
+        }
+      );
+
+      this.initialize();
+    }
+
+    private handleIntersection(entries: IntersectionObserverEntry[]): void {
+      const visibleHeading = entries.find(entry => entry.isIntersecting);
+      if (visibleHeading) {
+        this.setSelectedLinkById(visibleHeading.target.id);
+      }
+    }
+
+    private setSelectedLinkById(selectedId: string | null): void {
+      const listItems = document.querySelectorAll<HTMLLIElement>("#toc li");
+      listItems.forEach(item => item.classList.remove("selected"));
+
+      if (!selectedId) return;
+
+      const selectedLink = document.querySelector<HTMLAnchorElement>(
+        `#toc a[href="#${selectedId}"]`
+      );
+      const listItem = selectedLink?.parentElement as HTMLLIElement | null;
+      listItem?.classList.add("selected");
+    }
+
+    private createSvgElement(): SVGElement {
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.classList.add("w-0", "h-0", "flex-none", "text-skin-accent");
+      svg.setAttribute("fill", "none");
+      svg.setAttribute("viewBox", "0 0 24 24");
+      svg.setAttribute("stroke-width", "2");
+      svg.setAttribute("stroke", "currentColor");
+      svg.setAttribute("aria-hidden", "true");
+      svg.innerHTML =
+        '<path stroke-linecap="round" stroke-linejoin="round" d="m12.75 15 3-3m0 0-3-3m3 3h-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path>';
+      return svg;
+    }
+
+    private createLink(heading: HeadingElement): HTMLAnchorElement {
+      const link = document.createElement("a");
+      link.href = `#${heading.id}`;
+      // link.textContent = heading.textContent ?? "";
+      link.textContent = heading.childNodes[0].nodeValue;
+      return link;
+    }
+
+    private createListItem(heading: HeadingElement): HTMLLIElement {
+      const listItem = document.createElement("li");
+      listItem.className = `toc-level-${heading.tagName.toLowerCase()}`;
+
+      const svg = this.createSvgElement();
+      const link = this.createLink(heading);
+
+      listItem.appendChild(svg);
+      listItem.appendChild(link);
+
+      return listItem;
+    }
+
+    private initialize(): void {
+      if (!this.tocList || !this.headings) return;
+
+      Array.from(this.headings)
+        .slice(1)
+        .forEach(heading => {
+          const listItem = this.createListItem(heading);
+          this.tocList?.appendChild(listItem);
+          this.observer.observe(heading);
+        });
+
+      window.addEventListener("beforeunload", () => {
+        this.observer.disconnect();
+      });
+    }
+  }
+
+  class ScrollProgress {
+    private progressBars: NodeListOf<ProgressBar>;
+    private article: HTMLElement | null;
+
+    constructor() {
+      this.progressBars = document.querySelectorAll<ProgressBar>(
+        "#progress-top, #progress-aside, #progress-mobile"
+      );
+      this.article = document.querySelector("article");
+    }
+
+    public update(): void {
+      if (!this.progressBars.length) return;
+
+      const { top, height } = this.article?.getBoundingClientRect() || {};
+      const progress =
+        !top || !height ? 0 : Math.min(100, (window.scrollY / height) * 100);
+
+      this.progressBars.forEach(bar => {
+        bar.style.width = `${progress}%`;
+        bar.setAttribute("aria-valuenow", progress.toString());
+      });
+    }
+  }
+
+  class BackToTopButton {
+    private button: HTMLElement | null;
+
+    constructor() {
+      this.button = document.getElementById("back-to-top");
+      this.initialize();
+    }
+
+    private initialize(): void {
+      this.button?.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    }
+  }
+
+  // const addDataAttributeToSections = () => {
+  //   document
+  //     .querySelectorAll("section")
+  //     .forEach(section => section.setAttribute("data-aos", "fade-up"));
+  // };
+
+  document.addEventListener("astro:page-load", () => {
+    const scrollProgress = new ScrollProgress();
+    window.addEventListener("scroll", () => scrollProgress.update());
+
+    new TableOfContents();
+    new BackToTopButton();
+    // addDataAttributeToSections();
+  });
+</script>
+
+<style is:global lang="postcss">
+  main {
+    @apply mx-auto w-full max-w-content px-4 pb-12;
+  }
+  /* select alternating items starting with the second item */
+
+  #toc {
+    li {
+      @apply flex items-center text-sm leading-6 opacity-80;
+      transition: all 300ms var(--transition-cubic);
+      &.selected {
+        @apply opacity-90 text-skin-accent;
+        svg {
+          @apply mr-1 h-5 w-5;
+        }
+      }
+      svg {
+        @apply h-0 w-0;
+        transition:
+          height 400ms var(--transition-cubic),
+          width 400ms var(--transition-cubic);
+      }
+    }
+    .toc-level-h2 {
+      @apply ml-4;
+    }
+
+    .toc-level-h3 {
+      @apply ml-6;
+    }
+
+    .toc-level-h4 {
+      @apply ml-8;
+    }
+  }
+
+  /* summary {
+    @apply 2xl:hidden;
+  } */
+</style>

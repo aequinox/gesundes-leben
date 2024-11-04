@@ -1,0 +1,44 @@
+---
+import { Icon } from 'astro-icon/components';
+import { formattedDateTime } from "@/utils/getFormattedDate";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import type { DateTimeInput } from "@/types/datetime";
+
+interface Props extends DateTimeInput {
+  size?: "sm" | "lg";
+  classes?: string;
+}
+
+const {
+  pubDatetime,
+  modDatetime,
+  size = "sm",
+  classes = "",
+}: Props = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const { dt, date, time } = formattedDateTime({ pubDatetime, modDatetime });
+const updated = modDatetime ? modDatetime > pubDatetime : false;
+const iconName = `tabler:calendar-${updated ? "time" : "month"}`;
+---
+
+<div class:list={["flex items-center space-x-2 opacity-80", classes.trim()]}>
+  <Icon
+    name={iconName}
+    class:list={[
+      "inline-block h-6 w-6 fill-skin-base",
+      size === "sm" ? "scale-90" : "scale-100",
+    ]}
+  />
+  <!-- </svg> -->
+
+  <span class:list={["italic", size === "sm" ? "text-sm" : "text-base"]}>
+    <!-- {updated ? 'Updated:' : 'Published:'} -->
+    <time datetime={dt.toISOString()}>{date}</time>
+    <span aria-hidden="true"> | </span>
+    <span class="sr-only">&nbsp;{t("datetime.at")}&nbsp;</span>
+    <span class="text-nowrap">{time}</span>
+  </span>
+</div>

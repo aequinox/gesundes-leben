@@ -5,7 +5,6 @@ import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import type { NavigationLink } from "@/data/navigation";
 import { LOGO_IMAGE, SITE } from "@/config";
 import Icon from "@/components/elements/Icon.astro";
-import type { ui } from "@/i18n/ui";
 
 export interface Props {
   activeNav?: NavigationLink;
@@ -58,7 +57,9 @@ const ACTION_BUTTONS: ActionButton[] = [
   role="banner"
 >
   <div class="mx-auto max-w-7xl px-4">
-    <div class="relative flex w-full items-start justify-between p-4 md:items-center md:py-4">
+    <div
+      class="relative flex w-full items-start justify-between p-4 md:items-center md:py-4"
+    >
       <!-- Logo -->
       <a
         id="logo"
@@ -82,11 +83,7 @@ const ACTION_BUTTONS: ActionButton[] = [
       </a>
 
       <!-- Navigation Menu -->
-      <nav
-        id="nav-menu"
-        class="flex-grow"
-        aria-label={t("nav.mainNavigation")}
-      >
+      <nav id="nav-menu" class="flex-grow" aria-label={t("nav.mainNavigation")}>
         <input
           type="checkbox"
           id="nav-toggle"
@@ -107,21 +104,20 @@ const ACTION_BUTTONS: ActionButton[] = [
 
         <ul id="menu-items" class="menu-items" role="menubar">
           {/* Navigation Links */}
-          {NAV_LINKS.map(({ href, key, label }) => (
-            <li role="none">
-              <a
-                href={href}
-                class:list={[
-                  "nav-link",
-                  activeNav === key && "active"
-                ]}
-                role="menuitem"
-                aria-current={activeNav === key ? "page" : undefined}
-              >
-                {label}
-              </a>
-            </li>
-          ))}
+          {
+            NAV_LINKS.map(({ href, key, label }) => (
+              <li role="none">
+                <a
+                  href={href}
+                  class:list={["nav-link", activeNav === key && "active"]}
+                  role="menuitem"
+                  aria-current={activeNav === key ? "page" : undefined}
+                >
+                  {label}
+                </a>
+              </li>
+            ))
+          }
 
           {/* Action Buttons */}
           <div
@@ -129,33 +125,39 @@ const ACTION_BUTTONS: ActionButton[] = [
             role="group"
             aria-label={t("nav.additionalActions")}
           >
-            {ACTION_BUTTONS.map(({ href, key, label, icon, showTextOnMobile }) => (
-              <li role="none">
-                <LinkButton
-                  href={href}
-                  className={`action-button ${activeNav === key ? "active" : ""}`}
-                  ariaLabel={label}
-                  title={label}
-                >
-                  <Icon name={icon} active={activeNav === key} />
-                  <span
-                    class:list={[
-                      showTextOnMobile ? "sm:sr-only" : "sr-only",
-                      activeNav === key && "active"
-                    ]}
-                  >
-                    {label}
-                  </span>
-                </LinkButton>
-              </li>
-            ))}
+            {
+              ACTION_BUTTONS.map(
+                ({ href, key, label, icon, showTextOnMobile }) => (
+                  <li role="none">
+                    <LinkButton
+                      href={href}
+                      className={`action-button ${activeNav === key ? "active" : ""}`}
+                      ariaLabel={label}
+                      title={label}
+                    >
+                      <Icon name={icon} active={activeNav === key} />
+                      <span
+                        class:list={[
+                          showTextOnMobile ? "sm:sr-only" : "sr-only",
+                          activeNav === key && "active",
+                        ]}
+                      >
+                        {label}
+                      </span>
+                    </LinkButton>
+                  </li>
+                )
+              )
+            }
 
             {/* Theme Toggle */}
-            {SITE.lightAndDarkMode && (
-              <li role="none">
-                <ThemeToggle lang={lang} />
-              </li>
-            )}
+            {
+              SITE.lightAndDarkMode && (
+                <li role="none">
+                  <ThemeToggle lang={lang} />
+                </li>
+              )
+            }
           </div>
         </ul>
       </nav>
@@ -240,18 +242,18 @@ const ACTION_BUTTONS: ActionButton[] = [
 </style>
 
 <script>
-// Add scroll listener for navbar shrink effect
-const navbar = document.getElementById('navbar');
-const SCROLL_THRESHOLD = 50;
+  // Add scroll listener for navbar shrink effect
+  const navbar = document.getElementById("navbar");
+  const SCROLL_THRESHOLD = 50;
 
-function updateNavbarStyle() {
-  if (window.scrollY > SCROLL_THRESHOLD) {
-    navbar?.classList.add('nav-shrink');
-  } else {
-    navbar?.classList.remove('nav-shrink');
+  function updateNavbarStyle() {
+    if (window.scrollY > SCROLL_THRESHOLD) {
+      navbar?.classList.add("nav-shrink");
+    } else {
+      navbar?.classList.remove("nav-shrink");
+    }
   }
-}
 
-window.addEventListener('scroll', updateNavbarStyle, { passive: true });
-document.addEventListener('astro:after-swap', updateNavbarStyle);
+  window.addEventListener("scroll", updateNavbarStyle, { passive: true });
+  document.addEventListener("astro:after-swap", updateNavbarStyle);
 </script>
