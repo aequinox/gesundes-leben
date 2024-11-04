@@ -1,4 +1,3 @@
-// @ts-check
 import { defineConfig } from 'astro/config';
 
 import mdx from '@astrojs/mdx';
@@ -11,6 +10,9 @@ import { SITE } from './src/config';
 export default defineConfig({
   site: SITE.website,
   integrations: [
+    tailwind({
+      applyBaseStyles: false,
+    }),
     mdx(), 
     sitemap(), 
     icon({
@@ -29,7 +31,5 @@ export default defineConfig({
         ],
       },
     }),
-    tailwind({
-      applyBaseStyles: false,
-    })]
+    ]
 });

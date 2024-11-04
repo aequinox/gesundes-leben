@@ -1,0 +1,53 @@
+{
+  "folders": [
+    {
+      "path": ".",
+    },
+  ],
+  "settings": {
+    "files.associations": {
+      "*.css": "tailwindcss",
+      "*.scss": "tailwindcss",
+    },
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.tabCompletion": "on",
+    "files.autoSave": "afterDelay",
+    "prettier.documentSelectors": [
+      "**/*.svelte"
+    ],
+    "[svelte]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
+    "[astro]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[mdx]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.wordWrap": "on",
+      "editor.wordWrapColumn": 120
+    },
+    "vscode-yaml-sort.sortOnSave": 0,
+    "vscode-yaml-sort.customSortKeywords_1": [
+      "id",
+      "title",
+      "author",
+      "heroImage",
+      "pubDatetime",
+      "modDatetime",
+      "slug",
+      "description",
+      "group",
+      "categories",
+      "tags",
+      "draft",
+      "featured",
+    ],
+    "[svg]": {
+      "editor.defaultFormatter": "jock.svg"
+    },
+  },
+}

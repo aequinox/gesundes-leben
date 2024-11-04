@@ -67,7 +67,7 @@ const t = useTranslations(lang);
           id="menu-items"
           class="ml-auto hidden rounded-lg border-2 border-skin-inverted bg-skin-base/95 md:flex md:border-none md:bg-transparent"
         >
-          <!-- <li>
+          <li>
             <a href="/posts/" class={activeNav === "posts" ? "active" : ""}>
               {t("nav.posts")}
             </a>
@@ -97,7 +97,7 @@ const t = useTranslations(lang);
             <a href="/about/" class={activeNav === "about" ? "active" : ""}>
               {t("nav.about")}
             </a>
-          </li> -->
+          </li>
           {
             SITE.showArchives && (
               <li>
@@ -184,21 +184,11 @@ const t = useTranslations(lang);
   nav {
     @apply flex w-full flex-col items-center md:ml-2 md:flex-row md:justify-end md:space-x-4 md:py-0;
     ul {
-      @apply mt-4 grid w-44 grid-cols-2 grid-rows-4 gap-x-2 gap-y-2 md:ml-0 md:mt-0 md:w-auto md:gap-x-5 md:gap-y-0;
+      @apply mt-4 flex w-44 flex-col md:mt-0 md:w-auto md:flex-row md:items-center md:space-x-4;
       li {
-        @apply col-span-2 flex items-center justify-center;
+        @apply flex items-center justify-center;
         a {
           @apply w-full px-4 py-3 text-center font-medium hover:text-skin-accent md:my-0 md:px-2 md:py-1;
-        }
-        &:nth-last-child(2) a {
-          @apply w-auto;
-        }
-        &:nth-last-child(2) a {
-          @apply w-auto;
-        }
-        &:nth-last-child(1),
-        &:nth-last-child(2) {
-          @apply col-span-1;
         }
       }
     }
