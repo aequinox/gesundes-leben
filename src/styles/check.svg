@@ -1,0 +1,12 @@
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" fill="none"></path>
+  <polyline points="22 4 12 14.01 9 11.01" fill="none"></polyline>
+</svg>
+
+<!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+  class="fill-current text-skin-accent stroke-skin-accent">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" >
+    <path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0" />
+    <path d="m9 12l2 2l4-4" />
+  </g>
+</svg> -->

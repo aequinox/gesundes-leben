@@ -1,0 +1,212 @@
+@import url("fonts.css");
+@import "aos/dist/aos.css"; /* AOS styles */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/** Color Property	    Definition & Usage
+    --color-fill	      Primary color of the website. Usually the main background.
+    --color-text-base	  Secondary color of the website. Usually the text color.
+    --color-accent	    Accent color of the website. Link color, hover color etc.
+    --color-card	      Card, scrollbar and code background color (like this).
+    --color-card-muted  Card and scrollbar background color for hover state etc.
+    --color-border	    Border color. Especially used in horizontal row (hr)
+**/
+
+@layer base {
+  html {
+    scroll-padding-top: 4rem;
+  }
+
+  :root,
+  html[data-theme="light"] {
+    --transition-cubic: cubic-bezier(0.165, 0.84, 0.44, 1);
+    /* oklch(99% 0.005 145); */
+    --color-fill: 99% 0.005 145;
+    /* oklch(27% 0.002 325); */
+    --color-text-base: 27% 0.002 325;
+    /* oklch(57% 0.002 325); */
+    --color-muted: 77% 0.002 325;
+    /* oklch(56% 0.224 352); */
+    /* --color-accent: 56% 0.224 352; */
+    /* oklch(51.9% 0.13 244.7); */
+    --color-accent: 51.9% 0.13 244.7;
+    /* oklch(93.7% 0.003 17.2); */
+    --color-card: 92.3% 0 0;
+    /* oklch(92.3% 0 0); */
+    --color-card-muted: 84.5% 0 0;
+    /* oklch(84.5% 0 0); */
+    --color-border: 93.7% 0.003 17.2;
+    /* okLCH(70% 0.3 142) okLCH(80% 0.2 130) oklch(53% 0.3 135); */
+    --color-pro: 70% 0.3 142;
+    /* okLCH(60% 0.3 29) okLCH(80% 0.2 20) oklch(53% 0.3 27); */
+    --color-contra: 60% 0.3 29;
+    /* okLCH(85% 0.2 100) okLCH(80% 0.2 260) oklch(53% 0.3 9.2); */
+    --color-question-time: 85% 0.2 100;
+  }
+  html[data-theme="dark"] {
+    --transition-cubic: cubic-bezier(0.165, 0.84, 0.44, 1);
+    /* oklch(27.2% 0.031 268.9); */
+    --color-fill: 27.2% 0.031 268.9;
+    /* oklch(95% 0.008 264.5); */
+    --color-text-base: 95% 0.008 264.5;
+    /* oklch(45% 0.008 264.5); */
+    --color-muted: 45% 0.008 264.5;
+    /* oklch(56% 0.224 352); */
+    /* --color-accent: 56% 0.224 352; */
+    /* oklch(70.1% 0.201 44.8); */
+    --color-accent: 70.1% 0.201 44.8;
+    /* oklch(37.3% 0.059 269.3); */
+    --color-card: 37.3% 0.059 269.3;
+    /* oklch(43.6% 0.127 43.3); */
+    --color-card-muted: 43.6% 0.127 43.3;
+    /* oklch(52.9% 0.142 47.6); */
+    --color-border: 52.9% 0.142 47.6;
+    /* okLCH(60% 0.3 142) oklch(79.5% 0.157 154.7); */
+    --color-pro: 60% 0.3 142;
+    /* okLCH(70% 0.3 29) oklch(70.4% 0.187 23.2); */
+    --color-contra: 70% 0.3 29;
+    /* okLCH(75% 0.2 100) oklch(89.5% 0.139 90.9); */
+    --color-question-time: 75% 0.2 100;
+  }
+  #sun-svg,
+  html[data-theme="dark"] #moon-svg {
+    display: none;
+  }
+  #moon-svg,
+  html[data-theme="dark"] #sun-svg {
+    display: block;
+  }
+  body {
+    @apply flex min-h-[100svh] flex-col bg-skin-fill font-sans text-skin-base selection:bg-skin-accent selection:bg-opacity-70 selection:text-skin-inverted;
+  }
+  section,
+  footer {
+    @apply mx-auto max-w-content snap-start scroll-mt-12;
+  }
+  a {
+    @apply outline-2 outline-offset-1 outline-skin-fill focus-visible:no-underline focus-visible:outline-dashed;
+  }
+  svg {
+    @apply inline-block h-6 w-6 fill-skin-base group-hover:fill-skin-accent;
+  }
+  svg.icon-tabler {
+    @apply inline-block h-6 w-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110;
+  }
+  /* .prose { */
+  /* @apply prose-headings:!mb-3 prose-headings:!text-skin-base prose-h2:!font-normal prose-h2:first-of-type:!mt-6 prose-h3:!font-semibold prose-h3:italic prose-p:!text-skin-base prose-a:!text-skin-base prose-a:!decoration-skin-accent prose-a:underline-offset-4 hover:prose-a:text-skin-accent hover:prose-a:!decoration-wavy prose-blockquote:!border-l-skin-accent prose-blockquote:border-opacity-0 prose-blockquote:opacity-80 prose-strong:!text-skin-base prose-code:rounded prose-code:bg-skin-card prose-code:bg-opacity-75 prose-code:p-1 prose-code:before:!content-none prose-code:after:!content-none prose-ol:!text-skin-base prose-ul:overflow-x-clip prose-ul:!text-skin-base prose-li:marker:!text-skin-accent prose-table:text-skin-base prose-th:border prose-th:border-skin-line prose-td:border prose-td:border-skin-line prose-hr:!border-skin-line; */
+  /* @apply prose-headings:!mb-3 prose-headings:!text-skin-base prose-h2:!font-normal prose-h3:!font-semibold prose-h2:first-of-type:2xl:!hidden prose-h2:first-of-type:!mt-6 prose-h3:italic prose-p:!text-skin-base prose-a:!text-skin-base prose-a:!decoration-skin-accent prose-a:underline-offset-4 hover:prose-a:text-skin-accent hover:prose-a:!decoration-wavy prose-blockquote:!border-l-skin-accent prose-blockquote:border-opacity-0 prose-blockquote:opacity-80 prose-strong:!text-skin-base prose-code:rounded prose-code:bg-skin-card prose-code:bg-opacity-75 prose-code:p-1 prose-code:before:!content-none prose-code:after:!content-none prose-ol:!text-skin-base prose-ul:overflow-x-clip prose-ul:!text-skin-base prose-li:marker:!text-skin-accent prose-table:text-skin-base prose-th:border prose-th:border-skin-line prose-td:border prose-td:border-skin-line prose-hr:!border-skin-line; */
+  /* @apply prose-headings:!mb-3 prose-headings:!text-skin-base prose-h3:italic prose-p:!text-skin-base prose-a:!text-skin-base prose-a:!decoration-skin-accent prose-a:underline-offset-4 hover:prose-a:text-skin-accent hover:prose-a:!decoration-wavy prose-blockquote:!border-l-skin-accent prose-blockquote:border-opacity-50 prose-blockquote:opacity-80 prose-figcaption:!-mt-6 prose-figcaption:!text-skin-base prose-figcaption:opacity-70 prose-strong:!text-skin-base prose-code:rounded prose-code:bg-skin-card prose-code:bg-opacity-75 prose-code:p-1 prose-code:before:!content-none prose-code:after:!content-none prose-ol:!text-skin-base prose-ul:overflow-x-clip prose-ul:!text-skin-base prose-li:marker:!text-skin-accent prose-table:text-skin-base prose-th:border prose-th:border-skin-line prose-td:border prose-td:border-skin-line prose-img:!my-2 prose-img:mx-auto prose-img:border-2 prose-img:border-skin-line prose-hr:!border-skin-line; */
+  /* } */
+
+  .prose {
+    @apply prose-headings:!mb-3 prose-headings:!text-skin-base prose-h2:!font-normal prose-h2:first-of-type:!mt-6 prose-h3:!font-semibold prose-h3:italic prose-p:!text-skin-base prose-a:!text-skin-base prose-a:!decoration-skin-accent prose-a:underline-offset-4 hover:prose-a:text-skin-accent hover:prose-a:!decoration-wavy prose-blockquote:!border-l-skin-accent prose-blockquote:border-opacity-0 prose-blockquote:opacity-80 prose-strong:!text-skin-base prose-code:rounded prose-code:bg-skin-card prose-code:bg-opacity-75 prose-code:p-1 prose-code:before:!content-none prose-code:after:!content-none prose-ol:!text-skin-base prose-ul:overflow-x-clip prose-ul:!text-skin-base prose-li:marker:!text-skin-accent prose-table:text-skin-base prose-th:border prose-th:border-skin-line prose-td:border prose-td:border-skin-line prose-hr:!border-skin-line;
+    /* @apply prose-headings:!mb-3 prose-headings:!text-skin-base prose-h2:!font-normal prose-h2:first-of-type:!mt-6 prose-h3:!font-semibold prose-h3:italic prose-p:!text-skin-base prose-a:!text-skin-base prose-a:!decoration-skin-accent prose-a:underline-offset-4 hover:prose-a:text-skin-accent hover:prose-a:!decoration-wavy prose-blockquote:!border-l-skin-accent prose-blockquote:border-opacity-0 prose-blockquote:opacity-80 prose-strong:!text-skin-base prose-code:rounded prose-code:bg-skin-card prose-code:bg-opacity-75 prose-code:p-1 prose-code:before:!content-none prose-code:after:!content-none prose-ul:!list-image-[url("./check.svg")] prose-ul:overflow-x-clip prose-ul:!text-skin-base prose-li:marker:!text-skin-accent prose-table:text-skin-base prose-th:border prose-th:border-skin-line prose-td:border prose-td:border-skin-line prose-hr:!border-skin-line; */
+    /* @apply prose-headings:!mb-3 prose-headings:!text-skin-base prose-h2:!font-normal prose-h3:!font-semibold prose-h2:first-of-type:2xl:!hidden prose-h2:first-of-type:!mt-6 prose-h3:italic prose-p:!text-skin-base prose-a:!text-skin-base prose-a:!decoration-skin-accent prose-a:underline-offset-4 hover:prose-a:text-skin-accent hover:prose-a:!decoration-wavy prose-blockquote:!border-l-skin-accent prose-blockquote:border-opacity-0 prose-blockquote:opacity-80 prose-strong:!text-skin-base prose-code:rounded prose-code:bg-skin-card prose-code:bg-opacity-75 prose-code:p-1 prose-code:before:!content-none prose-code:after:!content-none prose-ol:!text-skin-base prose-ul:overflow-x-clip prose-ul:!text-skin-base prose-li:marker:!text-skin-accent prose-table:text-skin-base prose-th:border prose-th:border-skin-line prose-td:border prose-td:border-skin-line prose-hr:!border-skin-line; */
+    /* @apply prose-headings:!mb-3 prose-headings:!text-skin-base prose-h3:italic prose-p:!text-skin-base prose-a:!text-skin-base prose-a:!decoration-skin-accent prose-a:underline-offset-4 hover:prose-a:text-skin-accent hover:prose-a:!decoration-wavy prose-blockquote:!border-l-skin-accent prose-blockquote:border-opacity-50 prose-blockquote:opacity-80 prose-figcaption:!-mt-6 prose-figcaption:!text-skin-base prose-figcaption:opacity-70 prose-strong:!text-skin-base prose-code:rounded prose-code:bg-skin-card prose-code:bg-opacity-75 prose-code:p-1 prose-code:before:!content-none prose-code:after:!content-none prose-ol:!text-skin-base prose-ul:overflow-x-clip prose-ul:!text-skin-base prose-li:marker:!text-skin-accent prose-table:text-skin-base prose-th:border prose-th:border-skin-line prose-td:border prose-td:border-skin-line prose-img:!my-2 prose-img:mx-auto prose-img:border-2 prose-img:border-skin-line prose-hr:!border-skin-line; */
+  }
+  .prose a {
+    @apply break-words hover:!text-skin-accent;
+  }
+  /* .prose ul {
+    @apply list-image-[url("assets/check.svg")];
+  } */
+  .prose thead th:first-child,
+  tbody td:first-child,
+  tfoot td:first-child {
+    padding-left: 0.5714286em;
+  }
+  .prose h2#table-of-contents {
+    @apply mb-2;
+  }
+  .prose details {
+    /* @apply open:bg-skin-inverted/5 open:ring-1 open:ring-skin-accent open:shadow-lg p-6 rounded-lg; */
+    @apply inline-block transform cursor-pointer select-none rounded-md text-skin-base delay-150 duration-300 ease-in-out open:bg-skin-card/25 open:p-4 open:text-skin-accent open:ring open:ring-skin-accent/50;
+    ul {
+      @apply mx-2 list-inside;
+    }
+  }
+
+  /* .prose ul {
+    @apply list-none text-skin-base;
+  }
+
+  .prose ul li {
+    @apply relative mb-4 ml-2;
+    &:before {
+      @apply absolute -left-6 text-2xl text-skin-accent content-['\2713'];
+    }
+  } */
+
+  .prose summary {
+    /* @apply select-none text-sm font-semibold leading-6 text-gray-900 dark:text-white; */
+    @apply focus-outline select-none text-sm font-semibold leading-6;
+  }
+  .prose h2#table-of-contents + p {
+    @apply hidden;
+  }
+
+  .hash {
+    @apply font-semibold text-skin-accent;
+    &::before {
+      content: "#";
+    }
+  }
+  /* ===== scrollbar ===== */
+  html {
+    overflow-y: scroll;
+  }
+
+  /* width */
+  ::-webkit-scrollbar {
+    @apply w-3;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    @apply bg-skin-fill;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    @apply bg-skin-card;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-skin-card-muted;
+  }
+
+  /* ===== Code Blocks & Syntax Highlighting ===== */
+  pre:has(code) {
+    @apply border border-skin-line;
+  }
+  code,
+  blockquote {
+    word-wrap: break-word;
+  }
+
+  pre > code {
+    white-space: pre;
+  }
+
+  /* Apply Dark Theme (if multi-theme specified) */
+  html[data-theme="dark"] pre:has(code),
+  html[data-theme="dark"] pre:has(code) span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+    font-style: var(--shiki-dark-font-style) !important;
+    font-weight: var(--shiki-dark-font-weight) !important;
+    text-decoration: var(--shiki-dark-text-decoration) !important;
+  }
+}
+
+@layer components {
+  .display-none {
+    @apply hidden;
+  }
+  .focus-outline {
+    @apply outline-2 outline-offset-1 outline-skin-fill focus-visible:no-underline focus-visible:outline-dashed;
+  }
+}
