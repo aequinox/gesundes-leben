@@ -1,6 +1,6 @@
 ---
 import LinkButton from "@/components/elements/LinkButton.astro";
-import { getLangFromUrl, useTranslations } from "i18n/utils";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import type { NavigationLink } from "@/data/navigation";
 import { LOGO_IMAGE, SITE } from "@/config";
 
@@ -67,7 +67,7 @@ const t = useTranslations(lang);
           id="menu-items"
           class="ml-auto hidden rounded-lg border-2 border-skin-inverted bg-skin-base/95 md:flex md:border-none md:bg-transparent"
         >
-          <li>
+          <!-- <li>
             <a href="/posts/" class={activeNav === "posts" ? "active" : ""}>
               {t("nav.posts")}
             </a>
@@ -97,7 +97,7 @@ const t = useTranslations(lang);
             <a href="/about/" class={activeNav === "about" ? "active" : ""}>
               {t("nav.about")}
             </a>
-          </li>
+          </li> -->
           {
             SITE.showArchives && (
               <li>
@@ -252,42 +252,39 @@ const t = useTranslations(lang);
 
 <script>
   function toggleNav() {
-    // Toggle menu
-    // const menuBtn = document.querySelector(".hamburger-menu");
     const menuBtn = document.getElementById("hamburger-menu");
     const menuIcon = document.querySelector(".menu-icon");
-    const menuItems = document.querySelector("#menu-items");
+    const menuItems = document.getElementById("menu-items");
 
-    menuBtn?.addEventListener("click", () => {
-      const menuExpanded = menuBtn.getAttribute("aria-expanded") === "true";
-      menuIcon?.classList.toggle("is-active");
-      menuBtn.setAttribute("aria-expanded", menuExpanded ? "false" : "true");
-      menuBtn.setAttribute(
-        "aria-label",
-        menuExpanded ? "Open Menu" : "Close Menu"
-      );
-      menuItems?.classList.toggle("hidden");
-    });
+    if (menuBtn && menuIcon && menuItems) {
+      menuBtn.addEventListener("click", () => {
+        const menuExpanded = menuBtn.getAttribute("aria-expanded") === "true";
+        menuIcon.classList.toggle("is-active");
+        menuBtn.setAttribute("aria-expanded", menuExpanded ? "false" : "true");
+        menuBtn.setAttribute(
+          "aria-label",
+          menuExpanded ? "Open Menu" : "Close Menu"
+        );
+        menuItems.classList.toggle("hidden");
+      });
+      //Initially hide the menu
+      menuItems.classList.add("hidden");
+    }
   }
 
   toggleNav();
-
-  // Runs on view transitions navigation
   document.addEventListener("astro:after-swap", toggleNav);
 
-  //
   const navbar = document.getElementById("navbar");
   const logo = document.getElementById("logo");
 
   window.addEventListener("scroll", () => {
-    if (!navbar || !logo) return;
-
-    if (window.scrollY > 64) {
-      navbar.classList.add("nav-shrink");
-      // logo.classList.remove("scale-105");
-    } else {
-      navbar.classList.remove("nav-shrink");
-      // logo.classList.add("scale-105");
+    if (navbar && logo) {
+      if (window.scrollY > 64) {
+        navbar.classList.add("nav-shrink");
+      } else {
+        navbar.classList.remove("nav-shrink");
+      }
     }
   });
 </script>

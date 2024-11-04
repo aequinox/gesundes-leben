@@ -135,47 +135,6 @@ const structuredData = {
 
     <script is:inline src="/toggle-theme.js"></script>
 
-    <!-- animate on scroll script -->
-    <!-- <script>
-      import { gsap } from "gsap";
-      import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-      gsap.registerPlugin(ScrollTrigger);
-
-      gsap.config({
-        nullTargetWarn: false,
-      });
-
-      //ani directions
-      function aniDirection(selector: string, direction: string) {
-        let aniItems = document.querySelectorAll(selector);
-
-        if (aniItems.length > 0) {
-          aniItems.forEach(item => {
-            gsap.from(item, {
-              scrollTrigger: {
-                trigger: item,
-                start: "top 85%",
-                markers: true,
-              },
-              duration: 0.75,
-              y: direction === "up" ? 40 : direction === "down" ? -40 : 0,
-              x: direction === "left" ? 40 : direction === "right" ? -40 : 0,
-              ease: "power2.inOut",
-              opacity: 0,
-              stagger: 0.2,
-              filter: "blur(4px)",
-            });
-          });
-        }
-      }
-
-      aniDirection(".ani-up", "up");
-      aniDirection(".ani-down", "down");
-      aniDirection(".ani-left", "left");
-      aniDirection(".ani-right", "right");
-    </script> -->
-
     <script>
       import { aosInit } from "@/utils/aos";
       // runs on initial page load
@@ -185,53 +144,10 @@ const structuredData = {
         aosInit();
       });
     </script>
-    <!-- <script>
-      const observer = new IntersectionObserver(
-        entries => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("in-view");
-            } else {
-              entry.target.classList.remove("in-view");
-            }
-          });
-        },
-        {
-          rootMargin: "0px",
-          threshold: [0.1],
-        }
-      );
-
-      const paragraphs = document.querySelectorAll("p");
-
-      paragraphs.forEach(paragraph => {
-        observer.observe(paragraph);
-      });
-      // });
-    </script> -->
   </head>
+  
   <body class="min-h-screen scroll-smooth bg-skin-fill font-sans antialiased">
     <slot />
     <SizeIndicator />
   </body>
 </html>
-
-<!-- <style is:global lang="postcss">
-  :root {
-    --animation-duration: 500ms;
-    --distance: 100px !default;
-  }
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-      transform: translate3d(0, var(--distance), 0);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  .in-view {
-    animation: fadeIn 500ms ease-in-out 1s 1 normal running forwards;
-  }
-</style> -->
