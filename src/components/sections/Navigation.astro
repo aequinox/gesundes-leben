@@ -1,43 +1,40 @@
 ---
 import LinkButton from "@/components/elements/LinkButton.astro";
+import ThemeToggle from "@/components/elements/ThemeToggle.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import type { NavigationLink } from "@/data/navigation";
 import { LOGO_IMAGE, SITE } from "@/config";
 import Icon from "@/components/elements/Icon.astro";
+import type { ui } from "@/i18n/ui";
 
 export interface Props {
-  /** The currently active navigation link */
   activeNav?: NavigationLink;
 }
 
 const { activeNav } = Astro.props;
-
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-// Navigation links configuration
-const NAV_LINKS = [
-  { href: "/posts/", key: "posts" as const, label: t("nav.posts") },
-  {
-    href: "/categories/",
-    key: "categories" as const,
-    label: t("nav.categories"),
-  },
-  { href: "/tags/", key: "tags" as const, label: t("nav.tags") },
-  { href: "/glossary/", key: "glossary" as const, label: t("nav.glossary") },
-  { href: "/about/", key: "about" as const, label: t("nav.about") },
-];
-
-interface ActionButton {
+interface NavLink {
   href: string;
   key: NavigationLink;
   label: string;
+}
+
+const NAV_LINKS: NavLink[] = [
+  { href: "/posts/", key: "posts", label: t("nav.posts") },
+  { href: "/categories/", key: "categories", label: t("nav.categories") },
+  { href: "/tags/", key: "tags", label: t("nav.tags") },
+  { href: "/glossary/", key: "glossary", label: t("nav.glossary") },
+  { href: "/about/", key: "about", label: t("nav.about") },
+];
+
+interface ActionButton extends NavLink {
   icon: "archive" | "search";
   showTextOnMobile: boolean;
 }
 
-// Action buttons configuration
-const ACTION_BUTTONS = [
+const ACTION_BUTTONS: ActionButton[] = [
   SITE.showArchives && {
     href: "/archives/",
     key: "archives",
@@ -57,13 +54,11 @@ const ACTION_BUTTONS = [
 
 <header
   id="navbar"
-  class="sticky top-0 z-20 w-full backdrop-blur-md transition-all duration-200 ease-in-out"
+  class="sticky top-0 z-20 w-full backdrop-blur-md transition-all duration-200"
   role="banner"
 >
-  <div class="nav-container">
-    <div
-      class="relative flex w-full items-start justify-between p-4 md:items-center md:py-4"
-    >
+  <div class="mx-auto max-w-7xl px-4">
+    <div class="relative flex w-full items-start justify-between p-4 md:items-center md:py-4">
       <!-- Logo -->
       <a
         id="logo"
@@ -87,7 +82,11 @@ const ACTION_BUTTONS = [
       </a>
 
       <!-- Navigation Menu -->
-      <nav id="nav-menu" aria-label="Main navigation">
+      <nav
+        id="nav-menu"
+        class="flex-grow"
+        aria-label={t("nav.mainNavigation")}
+      >
         <input
           type="checkbox"
           id="nav-toggle"
@@ -97,9 +96,9 @@ const ACTION_BUTTONS = [
         <label
           for="nav-toggle"
           class="nav-toggle-label"
-          aria-label="Toggle navigation menu"
+          aria-label={t("nav.toggleMenu")}
         >
-          <span class="hamburger" aria-hidden="true">
+          <span class="hamburger">
             <span class="line"></span>
             <span class="line"></span>
             <span class="line"></span>
@@ -108,71 +107,55 @@ const ACTION_BUTTONS = [
 
         <ul id="menu-items" class="menu-items" role="menubar">
           {/* Navigation Links */}
-          {
-            NAV_LINKS.map(({ href, key, label }) => (
-              <li role="none">
-                <a
-                  href={href}
-                  class={activeNav === key ? "active" : ""}
-                  role="menuitem"
-                  aria-current={activeNav === key ? "page" : undefined}
-                >
-                  {label}
-                </a>
-              </li>
-            ))
-          }
+          {NAV_LINKS.map(({ href, key, label }) => (
+            <li role="none">
+              <a
+                href={href}
+                class:list={[
+                  "nav-link",
+                  activeNav === key && "active"
+                ]}
+                role="menuitem"
+                aria-current={activeNav === key ? "page" : undefined}
+              >
+                {label}
+              </a>
+            </li>
+          ))}
 
           {/* Action Buttons */}
           <div
             class="action-buttons"
             role="group"
-            aria-label="Additional actions"
+            aria-label={t("nav.additionalActions")}
           >
-            {
-              ACTION_BUTTONS.map(
-                ({ href, key, label, icon, showTextOnMobile }) => (
-                  <li role="none">
-                    <LinkButton
-                      href={href}
-                      className={`focus-outline flex justify-center p-3 sm:p-1 ${
-                        activeNav === key ? "active" : ""
-                      }`}
-                      ariaLabel={label}
-                      title={label}
-                    >
-                      <Icon name={icon} active={activeNav === key} />
-                      <span
-                        class:list={[
-                          showTextOnMobile ? "sm:sr-only" : "sr-only",
-                          activeNav === key && "active",
-                        ]}
-                      >
-                        {label}
-                      </span>
-                    </LinkButton>
-                  </li>
-                )
-              )
-            }
-
-            {/* Theme Toggle Button */}
-            {
-              SITE.lightAndDarkMode && (
-                <li role="none">
-                  <button
-                    id="theme-btn"
-                    class="focus-outline p-3 md:p-1"
-                    title={t("nav.themeToggle")}
-                    aria-label="auto"
-                    aria-live="polite"
+            {ACTION_BUTTONS.map(({ href, key, label, icon, showTextOnMobile }) => (
+              <li role="none">
+                <LinkButton
+                  href={href}
+                  className={`action-button ${activeNav === key ? "active" : ""}`}
+                  ariaLabel={label}
+                  title={label}
+                >
+                  <Icon name={icon} active={activeNav === key} />
+                  <span
+                    class:list={[
+                      showTextOnMobile ? "sm:sr-only" : "sr-only",
+                      activeNav === key && "active"
+                    ]}
                   >
-                    <Icon name="moon" id="moon-svg" />
-                    <Icon name="sun" id="sun-svg" />
-                  </button>
-                </li>
-              )
-            }
+                    {label}
+                  </span>
+                </LinkButton>
+              </li>
+            ))}
+
+            {/* Theme Toggle */}
+            {SITE.lightAndDarkMode && (
+              <li role="none">
+                <ThemeToggle lang={lang} />
+              </li>
+            )}
           </div>
         </ul>
       </nav>
@@ -181,32 +164,56 @@ const ACTION_BUTTONS = [
 </header>
 
 <style>
-  /* Navigation Toggle */
+  /* Base Styles */
   .nav-toggle {
     @apply hidden;
   }
 
   .nav-toggle-label {
-    @apply self-end p-2 outline-2 outline-offset-1 outline-skin-fill focus-visible:no-underline focus-visible:outline-dashed md:hidden cursor-pointer;
+    @apply cursor-pointer self-end p-2 outline-2 outline-offset-1 outline-skin-fill 
+           focus-visible:no-underline focus-visible:outline-dashed md:hidden;
   }
 
   /* Menu Items */
   .menu-items {
-    @apply hidden absolute right-4 left-4 top-full mt-2 p-2 rounded-lg border-2 border-skin-inverted bg-skin-fill/95 shadow-lg
-    md:flex md:static md:mt-0 md:p-0 md:border-none md:shadow-none md:bg-transparent;
+    @apply absolute right-4 left-4 top-full mt-2 hidden rounded-lg border-2 
+           border-skin-inverted bg-skin-fill/95 p-2 shadow-lg
+           md:static md:flex md:border-none md:bg-transparent md:p-0 md:shadow-none;
   }
 
   .nav-toggle:checked ~ .menu-items {
     @apply flex flex-col;
   }
 
+  /* Navigation Links */
+  .nav-link {
+    @apply w-full px-4 py-3 text-center font-medium hover:text-skin-accent md:my-0 md:px-2 md:py-1;
+  }
+
+  .nav-link.active {
+    @apply underline decoration-wavy decoration-2 underline-offset-4;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    @apply grid w-full grid-cols-3 gap-2 md:contents;
+  }
+
+  .action-button {
+    @apply flex justify-center p-3 sm:p-1;
+  }
+
+  .action-button.active :global(svg) {
+    @apply fill-skin-accent;
+  }
+
   /* Hamburger Menu */
   .hamburger {
-    @apply flex flex-col justify-between w-6 h-5;
+    @apply flex h-5 w-6 flex-col justify-between;
   }
 
   .hamburger .line {
-    @apply block w-full h-0.5 bg-current transition-transform duration-300 ease-in-out;
+    @apply block h-0.5 w-full bg-current transition-transform duration-300 ease-in-out;
   }
 
   .nav-toggle:checked ~ .nav-toggle-label .hamburger .line:nth-child(1) {
@@ -223,40 +230,28 @@ const ACTION_BUTTONS = [
 
   /* Navigation Layout */
   nav {
-    @apply flex flex-col items-center w-full md:ml-2 md:flex-row md:justify-end md:space-x-4 md:py-0;
-  }
-
-  nav ul li {
-    @apply flex items-center justify-center;
-  }
-
-  nav ul li a {
-    @apply w-full px-4 py-3 text-center font-medium hover:text-skin-accent md:my-0 md:px-2 md:py-1;
-  }
-
-  nav a.active {
-    @apply underline decoration-wavy decoration-2 underline-offset-4;
-  }
-
-  nav a.active svg {
-    @apply fill-skin-accent;
-  }
-
-  nav button {
-    @apply p-1;
-  }
-
-  nav button svg {
-    @apply h-6 w-6 fill-skin-base hover:fill-skin-accent scale-125 hover:rotate-12 md:scale-100;
+    @apply flex w-full flex-col items-center md:ml-2 md:flex-row md:justify-end md:space-x-4 md:py-0;
   }
 
   /* Navigation Shrink Effect */
-  .nav-shrink {
+  :global(.nav-shrink) {
     @apply h-14 bg-skin-fill/75 shadow-lg;
   }
-
-  /* Action Buttons */
-  .action-buttons {
-    @apply grid grid-cols-3 gap-2 w-full md:contents;
-  }
 </style>
+
+<script>
+// Add scroll listener for navbar shrink effect
+const navbar = document.getElementById('navbar');
+const SCROLL_THRESHOLD = 50;
+
+function updateNavbarStyle() {
+  if (window.scrollY > SCROLL_THRESHOLD) {
+    navbar?.classList.add('nav-shrink');
+  } else {
+    navbar?.classList.remove('nav-shrink');
+  }
+}
+
+window.addEventListener('scroll', updateNavbarStyle, { passive: true });
+document.addEventListener('astro:after-swap', updateNavbarStyle);
+</script>

@@ -1,0 +1,86 @@
+---
+import Icon from "./Icon.astro";
+import { useTranslations } from "@/i18n/utils";
+import type { ui } from "@/i18n/ui";
+
+interface Props {
+  lang: keyof typeof ui;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<button
+  id="theme-btn"
+  class="focus-outline p-3 md:p-1 h-6 w-6 fill-skin-base hover:fill-skin-accent scale-125 hover:rotate-12 md:scale-100"
+  title={t("nav.themeToggle")}
+  aria-label="auto"
+  aria-live="polite"
+>
+  <Icon name="moon" id="moon-svg" />
+  <Icon name="sun" id="sun-svg" />
+</button>
+
+<!-- <style>
+  button {
+    @apply p-1;
+  }
+
+  button :global(svg) {
+    @apply h-6 w-6 fill-skin-base hover:fill-skin-accent scale-125 hover:rotate-12 md:scale-100;
+  }
+</style> -->
+
+<script>
+  // Set initial theme
+  const getPreferredTheme = (): "light" | "dark" => {
+    const currentTheme = localStorage.getItem("theme") as
+      | "light"
+      | "dark"
+      | null;
+    if (currentTheme) return currentTheme;
+
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  };
+
+  let theme = getPreferredTheme();
+
+  const updateTheme = () => {
+    const root = document.documentElement;
+    const themeBtn = document.getElementById("theme-btn");
+
+    root.setAttribute("data-theme", theme);
+    themeBtn?.setAttribute("aria-label", theme);
+
+    // Update meta theme color
+    const bgColor = getComputedStyle(document.body).backgroundColor;
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", bgColor);
+  };
+
+  // Initialize theme
+  updateTheme();
+
+  // Handle theme toggle click
+  document.getElementById("theme-btn")?.addEventListener("click", () => {
+    theme = theme === "light" ? "dark" : "light";
+    localStorage.setItem("theme", theme);
+    updateTheme();
+  });
+
+  // Handle system theme changes
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", ({ matches: isDark }) => {
+      theme = isDark ? "dark" : "light";
+      localStorage.setItem("theme", theme);
+      updateTheme();
+    });
+
+  // Handle Astro view transitions
+  document.addEventListener("astro:after-swap", updateTheme);
+</script>

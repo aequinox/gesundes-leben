@@ -1,4 +1,3 @@
-
 import type socialIcons from "@/assets/socialIcons";
 
 export type SocialPlatform = keyof typeof socialIcons;
@@ -42,8 +41,8 @@ export const SITE: Site = {
   postPerIndex: 4,
   postPerPage: 6,
   scheduledPostMargin: 15 * 60 * 1000, // 15 minutes
-  showArchives: true,
-  showSearch: true,
+  showArchives: false,
+  showSearch: false,
 };
 
 export const LOCALE = {
