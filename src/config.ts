@@ -23,6 +23,7 @@ type Site = {
   postPerPage: number;
   scheduledPostMargin: number;
   showArchives?: boolean;
+  showSearch?: boolean;
   editPost?: {
     url?: URL["href"];
     text?: string;
@@ -42,6 +43,7 @@ export const SITE: Site = {
   postPerPage: 6,
   scheduledPostMargin: 15 * 60 * 1000, // 15 minutes
   showArchives: true,
+  showSearch: true,
 };
 
 export const LOCALE = {

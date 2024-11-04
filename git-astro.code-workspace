@@ -1,29 +1,27 @@
 {
   "folders": [
     {
-      "path": ".",
-    },
+      "path": "."
+    }
   ],
   "settings": {
     "files.associations": {
       "*.css": "tailwindcss",
-      "*.scss": "tailwindcss",
+      "*.scss": "tailwindcss"
     },
     "editor.codeActionsOnSave": {
-      "source.fixAll": "explicit",
+      "source.fixAll": "explicit"
     },
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true,
     "editor.tabCompletion": "on",
     "files.autoSave": "afterDelay",
-    "prettier.documentSelectors": [
-      "**/*.svelte"
-    ],
+    "prettier.documentSelectors": ["**/*.svelte"],
     "[svelte]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[astro]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
+      "editor.defaultFormatter": "astro-build.astro-vscode"
     },
     "[mdx]": {
       "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -44,10 +42,10 @@
       "categories",
       "tags",
       "draft",
-      "featured",
+      "featured"
     ],
     "[svg]": {
       "editor.defaultFormatter": "jock.svg"
-    },
-  },
+    }
+  }
 }

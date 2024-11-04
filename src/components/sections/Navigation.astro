@@ -37,36 +37,19 @@ const t = useTranslations(lang);
         }
       </a>
       <nav id="nav-menu">
-        <button
-          id="hamburger-menu"
-          class="self-end p-2 outline-2 outline-offset-1 outline-skin-fill focus-visible:no-underline focus-visible:outline-dashed md:hidden"
-          aria-label="Open Menu"
-          aria-expanded="false"
-          aria-controls="menu-items"
+        <input type="checkbox" id="nav-toggle" class="nav-toggle" />
+        <label
+          for="nav-toggle"
+          class="nav-toggle-label"
+          aria-label="Toggle Menu"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="menu-icon h-6 w-6 scale-125 fill-skin-base"
-          >
-            <line x1="7" y1="12" x2="21" y2="12" class="line"></line>
-            <line x1="3" y1="6" x2="21" y2="6" class="line"></line>
-            <line x1="12" y1="18" x2="21" y2="18" class="line"></line>
-            <line x1="18" y1="6" x2="6" y2="18" class="close"></line>
-            <line x1="6" y1="6" x2="18" y2="18" class="close"></line>
-          </svg>
-        </button>
-        <ul
-          id="menu-items"
-          class="ml-auto hidden rounded-lg border-2 border-skin-inverted bg-skin-base/95 md:flex md:border-none md:bg-transparent"
-        >
+          <span class="hamburger">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+          </span>
+        </label>
+        <ul id="menu-items" class="menu-items">
           <li>
             <a href="/posts/" class={activeNav === "posts" ? "active" : ""}>
               {t("nav.posts")}
@@ -133,25 +116,26 @@ const t = useTranslations(lang);
               </li>
             )
           }
-          <li>
-            <LinkButton
-              href="/search/"
-              className={`focus-outline p-3 md:p-1 ${
-                activeNav === "search" ? "active" : ""
-              } flex`}
-              ariaLabel={t("nav.search")}
-              title={t("nav.search")}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="scale-125 md:scale-100"
-                ><path
-                  d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z"
-                ></path>
-              </svg>
-              <span class="sr-only">{t("nav.search")}</span>
-            </LinkButton>
-          </li>
+          {
+            SITE.showSearch && (
+              <li>
+                <LinkButton
+                  href="/search/"
+                  className={`focus-outline flex justify-center p-3 sm:p-1`}
+                  ariaLabel={t("nav.search")}
+                  title={t("nav.search")}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="scale-125 md:scale-100"
+                  >
+                    <path d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z" />
+                  </svg>
+                  <span class="sr-only">{t("nav.search")}</span>
+                </LinkButton>
+              </li>
+            )
+          }
           {
             SITE.lightAndDarkMode && (
               <li>
@@ -178,23 +162,59 @@ const t = useTranslations(lang);
   </div>
 </div>
 
-<!-- <Hr /> -->
-
 <style>
+  .nav-toggle {
+    @apply hidden;
+  }
+
+  .nav-toggle-label {
+    @apply self-end p-2 outline-2 outline-offset-1 outline-skin-fill focus-visible:no-underline focus-visible:outline-dashed md:hidden cursor-pointer;
+  }
+
+  .menu-items {
+    @apply hidden absolute right-4 left-4 top-full mt-2 p-2 rounded-lg border-2 border-skin-inverted bg-skin-fill/95 shadow-lg
+    md:flex md:static md:mt-0 md:p-0 md:border-none md:shadow-none md:bg-transparent;
+  }
+
+  .nav-toggle:checked ~ .menu-items {
+    @apply flex flex-col;
+  }
+
+  .hamburger {
+    @apply flex flex-col justify-between w-6 h-5;
+  }
+
+  .hamburger .line {
+    @apply block w-full h-0.5 bg-current transition-transform duration-300 ease-in-out;
+  }
+
+  .nav-toggle:checked ~ .nav-toggle-label .hamburger .line:nth-child(1) {
+    @apply translate-y-[9px] rotate-45;
+  }
+
+  .nav-toggle:checked ~ .nav-toggle-label .hamburger .line:nth-child(2) {
+    @apply opacity-0;
+  }
+
+  .nav-toggle:checked ~ .nav-toggle-label .hamburger .line:nth-child(3) {
+    @apply -translate-y-[9px] -rotate-45;
+  }
+
   nav {
     @apply flex w-full flex-col items-center md:ml-2 md:flex-row md:justify-end md:space-x-4 md:py-0;
-    ul {
-      @apply mt-4 flex w-44 flex-col md:mt-0 md:w-auto md:flex-row md:items-center md:space-x-4;
-      li {
-        @apply flex items-center justify-center;
-        a {
-          @apply w-full px-4 py-3 text-center font-medium hover:text-skin-accent md:my-0 md:px-2 md:py-1;
-        }
+
+    ul li {
+      @apply flex items-center justify-center;
+
+      a {
+        @apply w-full px-4 py-3 text-center font-medium hover:text-skin-accent md:my-0 md:px-2 md:py-1;
       }
     }
+
     a.active {
       @apply underline decoration-wavy decoration-2 underline-offset-4;
     }
+
     a.active svg {
       @apply fill-skin-accent;
     }
@@ -202,6 +222,7 @@ const t = useTranslations(lang);
     button {
       @apply p-1;
     }
+
     button svg {
       @apply h-6 w-6 fill-skin-base hover:fill-skin-accent;
     }
@@ -209,72 +230,13 @@ const t = useTranslations(lang);
 
   #theme-btn {
     @apply p-3 md:p-1;
+
     svg {
       @apply scale-125 hover:rotate-12 md:scale-100;
     }
   }
 
-  .menu-icon {
-    line {
-      @apply transition-opacity duration-300 ease-in-out;
-    }
-    .close {
-      opacity: 0;
-    }
-    &.is-active .line {
-      @apply opacity-0;
-    }
-    &.is-active .close {
-      @apply opacity-100;
-    }
-  }
-
-  .hamburger-menu {
-    @apply self-end p-2 md:hidden;
-    svg {
-      @apply h-6 w-6 scale-125 fill-skin-base;
-    }
-  }
   .nav-shrink {
     @apply h-14 bg-skin-fill/75 shadow-lg;
   }
 </style>
-
-<script>
-  function toggleNav() {
-    const menuBtn = document.getElementById("hamburger-menu");
-    const menuIcon = document.querySelector(".menu-icon");
-    const menuItems = document.getElementById("menu-items");
-
-    if (menuBtn && menuIcon && menuItems) {
-      menuBtn.addEventListener("click", () => {
-        const menuExpanded = menuBtn.getAttribute("aria-expanded") === "true";
-        menuIcon.classList.toggle("is-active");
-        menuBtn.setAttribute("aria-expanded", menuExpanded ? "false" : "true");
-        menuBtn.setAttribute(
-          "aria-label",
-          menuExpanded ? "Open Menu" : "Close Menu"
-        );
-        menuItems.classList.toggle("hidden");
-      });
-      //Initially hide the menu
-      menuItems.classList.add("hidden");
-    }
-  }
-
-  toggleNav();
-  document.addEventListener("astro:after-swap", toggleNav);
-
-  const navbar = document.getElementById("navbar");
-  const logo = document.getElementById("logo");
-
-  window.addEventListener("scroll", () => {
-    if (navbar && logo) {
-      if (window.scrollY > 64) {
-        navbar.classList.add("nav-shrink");
-      } else {
-        navbar.classList.remove("nav-shrink");
-      }
-    }
-  });
-</script>
