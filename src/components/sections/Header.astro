@@ -1,0 +1,26 @@
+---
+// import { getLangFromUrl, useTranslations } from "i18n/utils";
+import Navigation from "@/components/sections/Navigation.astro";
+import type { NavigationLink } from "@/data/navigation";
+
+export interface Props {
+  activeNav?: NavigationLink;
+}
+
+const { activeNav } = Astro.props;
+
+// const lang = getLangFromUrl(Astro.url);
+// const t = useTranslations(lang);
+---
+
+<header class="sticky top-0 z-10 w-full">
+  <!-- <a id="skip-to-content" href="#main-content">{t("nav.skipToContent")}</a> -->
+
+  <Navigation activeNav={activeNav} />
+</header>
+
+<style lang="postcss">
+  #skip-to-content {
+    @apply absolute -top-full left-16 z-50 bg-skin-accent px-3 py-2 text-skin-inverted transition-all focus:top-4;
+  }
+</style>
