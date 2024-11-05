@@ -31,6 +31,13 @@
     "@types/aos": "^3.0.7",
     "aos": "^2.3.4",
     "astro-icon": "^1.1.2",
+    "hast-util-to-string": "^3.0.1",
+    "mdast-util-to-string": "^4.0.0",
+    "reading-time": "^1.5.0",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-slug": "^6.0.0",
+    "remark-collapse": "^0.1.2",
+    "remark-toc": "^9.0.0",
     "satori": "^0.11.3",
     "slugify": "^1.6.6"
   }

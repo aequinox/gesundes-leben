@@ -4,18 +4,33 @@ import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
 import icon from "astro-icon";
-import { SITE } from "./src/config";
-
 import react from "@astrojs/react";
+// import remarkToc from "remark-toc";
+
+import { SITE } from "./src/config";
+// import { remarkPlugins } from "./src/utils/remarkPlugins";
+// import { rehypePlugins } from "./src/utils/rehypePlugins";
 
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,
+  markdown: {
+    // remarkPlugins: remarkPlugins,
+    // rehypePlugins: rehypePlugins,
+    // shikiConfig: {
+    //   // For more themes, visit https://shiki.style/themes
+    //   themes: {
+    //     light: "min-light",
+    //     dark: "night-owl",
+    //   },
+    //   wrap: true,
+    // },
+  },
   integrations: [
     tailwind({
       applyBaseStyles: false,
     }),
-    mdx(),
+    mdx(/*{ remarkPlugins: [remarkToc],}*/),
     sitemap(),
     icon({
       include: {
@@ -35,6 +50,7 @@ export default defineConfig({
     }),
     react(),
   ],
+
   vite: {
     optimizeDeps: {
       exclude: ["@resvg/resvg-js"],
