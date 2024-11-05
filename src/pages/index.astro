@@ -3,22 +3,18 @@ import Layout from "@/layouts/Layout.astro";
 
 import Header from "@/components/sections/Header.astro";
 import Footer from "@/components/sections/Footer.astro";
-// import LinkButton from "@/components/ui/buttons/LinkButton.astro";
-// import Hr from "@/components/ui/elements/Hr.astro";
-// import Socials from "@/components/ui/socials/Socials.astro";
-// import { SITE, SOCIALS } from "@/data/config";
-// import Card from "@/components/ui/cards/Card.astro";
-// import getSortedPosts from "@/utils/getSortedPosts";
-// import { getCollection } from "astro:content";
-// import BlogFilter from "@/components/sections/filter/BlogFilter.astro";
-import { SOCIALS } from "@/config";
+import getSortedPosts from "@/utils/getSortedPosts";
+import { getCollection } from "astro:content";
+import { SITE, SOCIALS } from "@/config";
 import Hr from "@/components/elements/Hr.astro";
+import BlogFilter from "@/components/filter/BlogFilter.astro";
+import Card from "@/components/sections/Card.astro";
 
-// const posts = await getCollection("blog");
+const posts = await getCollection("blog");
 
-// const sortedPosts = await getSortedPosts(posts);
-// const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
-// const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
+const sortedPosts = await getSortedPosts(posts);
+const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
+const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
 
 const socialCount = SOCIALS.filter(social => social.active).length;
 ---
@@ -91,13 +87,13 @@ const socialCount = SOCIALS.filter(social => social.active).length;
       }
     </section>
 
-    <!-- <Hr /> -->
+    <Hr />
 
-    <!-- <BlogFilter /> -->
+    <BlogFilter />
 
     <!-- <BlogFilter client:visible /> -->
 
-    <!-- {
+    {
       featuredPosts.length > 0 && (
         <section id="featured">
           <h2>Ausgewählte Artikel</h2>
@@ -127,7 +123,7 @@ const socialCount = SOCIALS.filter(social => social.active).length;
           </section>
         </Fragment>
       )
-    } -->
+    }
 
     <Hr />
 

@@ -1,0 +1,157 @@
+---
+import { Icon } from "astro-icon/components";
+
+export type Identifier = "pro" | "contra" | "question-time";
+
+interface Group {
+  name: Identifier;
+  title: string;
+  icon: string;
+  link: string;
+  slogan: string;
+  position?: string;
+}
+
+const groups: Record<Identifier, Group> = {
+  pro: {
+    name: "pro",
+    title: "Pro",
+    icon: "tabler:thumb-up",
+    link: "/pro/",
+    slogan: "Über alles, was deine Gesundheit stärkt, sie erhält und fördert",
+    position: "left",
+  },
+  contra: {
+    name: "contra",
+    title: "Kontra",
+    icon: "tabler:thumb-down",
+    link: "/kontra/",
+    slogan: "Über alles, was deine Gesundheit schwächt und du meiden solltest",
+    position: "right",
+  },
+  "question-time": {
+    name: "question-time",
+    title: "Frage-Zeiten",
+    icon: "tabler:question-mark",
+    link: "/fragezeiten/",
+    slogan: "Über Wissenswertes, Wissenschaftliches und Lesenswertes",
+    position: "middle",
+  },
+};
+
+type Props = {
+  groupType: Identifier;
+};
+
+const { groupType }: Props = Astro.props;
+const { title, icon, slogan, position } = groups[groupType];
+// const { title, icon, link, slogan } = groups[groupType];
+---
+
+<!-- border-pro/50 border-contra/50 border-question-time/50 --><!-- border-pro/90 border-contra/90 border-question-time/90 -->
+<button
+  class:list={[
+    "group-selector group transition-all delay-100 duration-300 ease-in-out",
+    position,
+  ]}
+  id={`${groupType}-group`}
+>
+  <!-- <a href={link}> -->
+  <div
+    class:list={[
+      "h-full rounded-sm border-2 border-solid p-6 text-center text-lg transition delay-100 duration-300 ease-in-out",
+      `${groupType}-card`,
+    ]}
+  >
+    <div class="group-type-icon hidden group-hover:-translate-y-1 md:block">
+      <div
+        class:list={[
+          "inline-block max-w-full items-start justify-center overflow-hidden rounded-full border-4 border-solid bg-skin-fill p-3",
+          `group-hover:border-${groupType}/90`,
+          `border-${groupType}/50`,
+        ]}
+      >
+        <Icon
+          name={icon}
+          class:list={[
+            "bg-skin h-10 w-10 text-xl text-skin-accent",
+            `${groupType}-icon`,
+          ]}
+        />
+      </div>
+    </div>
+    <div class="cursor-pointer">
+      <h2
+        class="text-skin mb-3 mt-1 text-4xl font-semibold capitalize leading-8"
+      >
+        {title}
+      </h2>
+      <p class="text-skin">{slogan}</p>
+    </div>
+  </div>
+  <!-- </a> -->
+</button>
+
+<!-- <script is:inline define:vars={{ groupType }}>
+  document.addEventListener("astro:page-load", () => {
+    const button = document.getElementById(`${groupType}-group`);
+
+    button.addEventListener("click", () => {
+      const blogGrid = document.getElementById("article-grid");
+      const articleCards = blogGrid.querySelectorAll(".article-card");
+
+      articleCards.forEach(card => {
+        card.classList.toggle("show", true);
+      });
+
+      articleCards.forEach(card => {
+        const shouldShow = card.dataset.group === groupType;
+        card.classList.toggle("hide", !shouldShow);
+        card.classList.toggle("show", shouldShow);
+      });
+    });
+  });
+</script> -->
+
+<style lang="postcss">
+
+  .group-type-icon {
+    @apply -mt-16 mb-5 max-w-full cursor-pointer leading-none text-skin-fill transition delay-150 duration-500 group-hover:scale-105;
+  }
+
+  .pro-card {
+    @apply border-none bg-gradient-to-t from-10% via-30% to-transparent to-95% from-pro via-pro;
+  }
+
+  .contra-card {
+    @apply border-none bg-gradient-to-t from-10% via-30% to-transparent to-95% from-contra via-contra;
+  }
+
+  .question-time-card {
+    @apply border-none bg-gradient-to-t from-10% via-30% to-transparent to-95% from-question-time via-question-time;
+  }
+
+  .pro-icon {
+    @apply text-pro;
+  }
+
+  .contra-icon {
+    @apply text-contra;
+  }
+
+  .question-time-icon {
+    @apply text-question-time;
+  }
+
+  .middle {
+    @apply order-2;
+  }
+
+  .left {
+    @apply order-1;
+  }
+
+  .right {
+    @apply order-3;
+  }
+</style>

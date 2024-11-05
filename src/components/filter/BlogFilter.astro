@@ -1,0 +1,225 @@
+---
+import { CATEGORIES } from "@/data/taxonomies";
+import getSortedPosts from "@/utils/getSortedPosts";
+import { getCollection } from "astro:content";
+import Card from "../sections/Card.astro";
+import GroupSelector, {
+  type Identifier,
+} from "@/components/sections/GroupSelector.astro";
+
+const allGroups: Identifier[] = ["pro", "question-time", "contra"];
+const allCategories = ["Alle", ...CATEGORIES];
+
+const posts = await getCollection("blog");
+const sortedPosts = await getSortedPosts(posts);
+const usedCategories: string[] = [
+  "Alle",
+  ...new Set(sortedPosts.map(post => post.data.categories).flat()),
+];
+---
+
+<!-- <section id="featured">
+          <h2>Ausgewählte Artikel</h2>
+          <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2"></div> -->
+<section
+  id="category-filter"
+  class="articles mx-auto max-w-content"
+  transition:name="articles-filter"
+>
+  <!-- <h2 class="pb-6 text-2xl font-semibold tracking-wide">
+    Artikel nach Kategorien
+  </h2> -->
+
+  <div
+    id="group-selectors"
+    class="mx-auto mt-4 grid max-w-content grid-cols-1 gap-8 p-6 md:mt-12 md:grid-cols-3"
+  >
+    {allGroups.map(group => <GroupSelector groupType={group} />)}
+  </div>
+
+  <!-- <GroupSelectors /> -->
+
+  <div class="mb-4 flex flex-wrap justify-center" id="category-buttons">
+    {
+      allCategories.map(category => (
+        <button
+          disabled={!usedCategories.includes(category)}
+          class="category-button hover:text-skin my-2 mr-2 transform rounded border border-skin-accent bg-skin-fill px-4 py-2 text-sm hover:scale-105 hover:bg-skin-accent focus:outline-none focus:ring-2 focus:ring-skin-accent active:bg-skin-accent disabled:opacity-50 disabled:hover:transform-none disabled:hover:bg-skin-fill"
+          data-category={category}
+        >
+          {category}
+        </button>
+      ))
+    }
+  </div>
+
+  <div
+    class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+    id="article-grid"
+  >
+    {
+      sortedPosts.map((post, index) => (
+        <Card {post} loading={index < 6 ? "eager" : "lazy"} />
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  // import { gsap } from "gsap";
+
+  // const timeline = gsap.timeline();
+
+  // timeline
+  //   .from("#pro-group", { duration: 2, opacity: 0, scale: 0 })
+  //   .to(
+  //     "#pro-group",
+  //     { duration: 1, opacity: 1, scale: 1, ease: "power1.inOut" },
+  //     "+=0.5"
+  //   );
+
+  const allGroups: Array<"pro" | "question-time" | "contra"> = [
+    "pro",
+    "question-time",
+    "contra",
+  ];
+
+  document.addEventListener("astro:page-load", () => {
+    const articleGrid = document.getElementById("article-grid") as HTMLElement;
+    const articleCards = Array.from(
+      articleGrid.querySelectorAll(".article-card")
+    ) as HTMLElement[];
+
+    const categoryButtons = Array.from(
+      document.querySelectorAll(".category-button")
+    ) as HTMLElement[];
+
+    const groupSelectors = Array.from(
+      document.querySelectorAll(".group-selector")
+    ) as HTMLElement[];
+
+    /**
+     * Orders the group selectors based on the given clicked selector.
+     *
+     * @param {HTMLElement} clickedSelector - The clicked group selector.
+     */
+    const orderGroupSelectors = (clickedSelector: HTMLElement): void => {
+      const clickedIndex = groupSelectors.indexOf(clickedSelector);
+
+      groupSelectors.forEach((selector, i) => {
+        selector.classList.toggle(
+          "left",
+          (i + 1) % groupSelectors.length === clickedIndex
+        );
+        selector.classList.toggle("middle", i === clickedIndex);
+        selector.classList.toggle(
+          "right",
+          i !== clickedIndex && (i + 1) % groupSelectors.length !== clickedIndex
+        );
+      });
+    };
+
+    const handleGroupClick = (
+      clickedSelector: HTMLElement,
+      group: "pro" | "question-time" | "contra"
+    ) => {
+      orderGroupSelectors(clickedSelector);
+
+      for (const card of articleCards) {
+        card.classList.toggle("hide", card.dataset.group !== group);
+        card.toggleAttribute("data-aos", card.dataset.group !== group);
+        card.classList.toggle("show", card.dataset.group === group);
+        card.toggleAttribute("data-aos", card.dataset.group === group);
+      }
+
+      // timeline
+      //   .from(".order-2", {
+      //     duration: 0.3,
+      //     opacity: 0,
+      //     scale: 0,
+      //     id: `${group}-group`,
+      //     ease: "power1.inOut",
+      //     repeat: 1,
+      //     yoyo: true,
+
+      //   })
+      //   .to(
+      //     ".order-2",
+      //     { duration: 1, opacity: 1, scale: 1, ease: "power1.inOut" },
+      //     "+=0.5"
+      //   )
+      //   .to(
+      //     ".order-1",
+      //     { duration: 1, xPercent: 100, ease: "power1.inOut" },
+      //     "+=0.5"
+      //   );
+    };
+
+    const handleCategoryClick = (category: string) => {
+      articleCards.forEach(card => {
+        const shouldShow =
+          category === "Alle" ||
+          card.dataset.categories?.split("|").includes(category);
+        card.classList.toggle("hide", !shouldShow);
+        card.classList.toggle("show", shouldShow);
+      });
+    };
+
+    allGroups.forEach(group => {
+      const button = document.getElementById(`${group}-group`) as HTMLElement;
+      button.addEventListener("click", function () {
+        handleGroupClick(this, group);
+      });
+    });
+
+    categoryButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        const category = button.dataset.category as string;
+        handleCategoryClick(category);
+      });
+    });
+  });
+</script>
+
+<!-- <script is:inline define:vars={{ allGroups }}>
+  document.addEventListener("astro:page-load", () => {
+    const articleGrid = document.getElementById("article-grid");
+    const articleCards = Array.from(
+      articleGrid.querySelectorAll(".article-card")
+    );
+
+    const categoryButtons = Array.from(
+      document.querySelectorAll(".category-button")
+    );
+
+    const handleGroupClick = group => {
+      articleCards.forEach(card => {
+        const shouldShow = card.dataset.group === group;
+        card.classList.toggle("hide", !shouldShow);
+        card.classList.toggle("show", shouldShow);
+      });
+    };
+
+    const handleCategoryClick = category => {
+      articleCards.forEach(card => {
+        const shouldShow =
+          category === "Alle" ||
+          card.dataset.categories.split("|").includes(category);
+        card.classList.toggle("hide", !shouldShow);
+        card.classList.toggle("show", shouldShow);
+      });
+    };
+
+    allGroups.forEach(group => {
+      const button = document.getElementById(`${group}-group`);
+      button.addEventListener("click", () => handleGroupClick(group));
+    });
+
+    categoryButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        const category = button.dataset.category;
+        handleCategoryClick(category);
+      });
+    });
+  });
+</script> -->
