@@ -1,0 +1,217 @@
+---
+id: b84aa3a1-15af-42df-b404-880afda7071b
+title: Components Test Page
+author: kai-renner
+slug: components_test_page
+description: Welche körperlichen Ursachen einer Depression zugrunde liegen können … und was die Wissenschaft dazu sagt.
+heroImage:
+  src: ./2024-07-17-die-koerperlichkeit-der-depression/images/die_koerperlichkeit_der_depression.png
+  alt: test1
+pubDatetime: 2024-08-12T19:45:39Z
+modDatetime: 2024-11-01T14:27:57Z
+draft: false
+featured: false
+group: fragezeiten
+categories:
+  - Lifestyle & Psyche
+  - Wissenschaftliches
+tags:
+  - Darmflora
+  - Depression
+  - Ganzheitlich
+  - Hormone
+  - Mangel
+  - Psychologie
+  - Stress
+  - Trauma
+  - Vitamin D
+favorites:
+  Double: ["natugena-zink-komplex", "rubini-edelholunder"]
+  Single: ["vitamin-d-test"]
+  Triple: ["natugena-zink-komplex", "mikrobiom-plus", "rubini-edelholunder"]
+---
+
+import Accordion from "@/components/sections/Accordion.astro";
+import Favorites from "@/components/sections/Favorites.astro";
+import CallToAction from "@/components/sections/CallToAction.astro";
+import Features from "@/components/sections/Features.astro";
+import ContentBlock from "@/components/sections/Content.astro";
+import DepressionImage from "./2024-07-17-die-koerperlichkeit-der-depression/images/die_koerperlichkeit_der_depression.png";
+import { Image } from "astro:assets";
+import Button from "@/components/elements/Button.astro";
+
+## Inhaltsverzeichnis
+
+## Components
+
+<div class="flex flex-wrap gap-2">
+<Button type="button" variant="default" icon="tabler:home">
+  Default
+</Button>
+
+<Button type="button" variant="accented" icon="tabler:exclamation-circle">
+  Accented
+</Button>
+
+<Button type="button" variant="muted" icon="tabler:eye-off">
+  Muted
+</Button>
+
+<Button variant="link" icon="tabler:link">
+  Link
+</Button>
+</div>
+
+<ContentBlock
+  title="Testing the Title"
+  subtitle="Testting the Subtitle"
+  tagline="Testing the Content Component's Tagline"
+  columns={1}
+  isAfterContent={true}
+  isReversed={true}
+  items={[
+    {
+      title: "High level of customization",
+      description: `Tailor the template effortlessly to match your brand's identity and requirements, making your website distinct and saving you time.`,
+    },
+    {
+      title: "Multiple layout possibilities",
+      description:
+        "Explore various layout options to find the structure that best presents your content, enhancing user engagement and navigation.",
+    },
+  ]}
+>
+  <Fragment slot="image">
+    <Image
+      src={DepressionImage}
+      alt="A very cool penguin!"
+      class="h-full object-cover object-center rounded-l-md p-0 m-0"
+    />
+  </Fragment>
+
+  <Fragment slot="content">
+    Ensure your online presence truly represents you.
+  </Fragment>
+</ContentBlock>
+
+<Features
+  id="features"
+  tagline="Features"
+  title="What you get with AstroWind"
+  subtitle="One of the most professional and comprehensive templates currently on the market. Most starred & forked Astro theme in 2022."
+  items={[
+    {
+      title: "Astro + Tailwind CSS Integration",
+      description:
+        "A seamless integration between two great frameworks that offer high productivity, performance and versatility.",
+      icon: "tabler:brand-tailwind",
+    },
+    {
+      title: "Ready-to-use Components",
+      description:
+        "Widgets made with Tailwind CSS ready to be used in Marketing Websites, SaaS, Blogs, Personal Profiles, Small Business...",
+      icon: "tabler:components",
+    },
+    {
+      title: "Best Practices",
+      description:
+        "Creating secure, efficient, and user-friendly websites that deliver exceptional experiences and lasting value.",
+      icon: "tabler:list-check",
+    },
+    {
+      title: "Excellent Page Speed",
+      description:
+        "Having a good page speed impacts organic search ranking, improves user experience (UI/UX) and increase conversion rates.",
+      icon: "tabler:rocket",
+    },
+    {
+      title: "Search Engine Optimization (SEO)",
+      description:
+        "SEO lies in its ability to enhance a website's visibility, driving organic traffic and enabling it to reach a wider audience.",
+      icon: "tabler:arrows-right-left",
+    },
+    {
+      title: "Open to new ideas and contributions",
+      description:
+        "Embracing a culture that is open to new ideas and contributions is integral fostering innovation, collaboration, and a dynamic user experience.",
+      icon: "tabler:bulb",
+    },
+  ]}
+/>
+
+## Call to Action Variants
+
+### Call to Action Variant "link"
+
+<CallToAction
+    actions={[
+      {
+        variant: "link",
+        text: "Get template",
+        href: "https://github.com/onwidget/astrowind",
+        target: "_blank",
+        icon: "tabler:download",
+      },
+    ]}
+  >
+    <Fragment slot="title">
+      Call to Action Variant: link
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      Whether you're in business, design, or education, our templates are here to elevate your projects.
+    </Fragment>
+
+</CallToAction>
+  
+### Call to Action Variant "muted"
+
+<CallToAction
+  actions={[
+    {
+      variant: "muted",
+      text: "Go home!",
+      href: "/",
+      icon: "tabler:home",
+    },
+    {
+      variant: "accented",
+      text: "Start exploring",
+      href: "/",
+      icon: "tabler:armchair",
+    },
+  ]}
+  title="Call to Action Variant: muted"
+  subtitle="Whether you're in business, design, or education, our templates are here to elevate your projects."
+  tagline="Start exploring!"
+  isAfterContent={true}
+  isReversed={true}
+/>
+
+## Favorites
+
+### Favorites - Single
+
+<Favorites data={frontmatter.favorites} id="Single" />
+
+### Favorites - Double
+
+<Favorites data={frontmatter.favorites} id="Double" >
+
+Bei Dauereinnahme von Zink bitte beachten!
+
+Zink ist ein essenzielles Spurenelement, das für viele Funktionen im Körper wichtig ist, darunter das Immunsystem, die Wundheilung und die DNA-Synthese. Eine langfristige Einnahme von Zink in hohen Dosen kann jedoch negative Auswirkungen haben. Hier sind einige Gründe:
+
+- **Kupfermangel**: Hohe Zinkdosen können die Aufnahme von Kupfer beeinträchtigen, was zu einem Kupfermangel führen kann. Kupfer ist ebenfalls ein essenzielles Spurenelement und spielt eine Rolle bei der Bildung roter Blutkörperchen und der Aufrechterhaltung der Nervenzellen.
+- **Verringerte Immunfunktion**: Obwohl Zink für ein funktionierendes Immunsystem wichtig ist, kann eine Überdosierung die Immunfunktion tatsächlich beeinträchtigen.
+- **Magen-Darm-Beschwerden**: Zu viel Zink kann zu Übelkeit, Erbrechen, Durchfall und Bauchschmerzen führen.
+- **Beeinträchtigung der Cholesterinwerte**: Hohe Dosen von Zink können auch das Gleichgewicht der Lipide im Blut stören, was langfristig das Risiko für Herz-Kreislauf-Erkrankungen erhöhen kann.
+- **Interaktion mit Medikamenten**: Zink kann mit bestimmten Medikamenten interagieren, wie [Antibiotika](https://gesundheit-in-tuebingen.de/vitaminraeuber-antibiotika/) und Diuretika, und deren Wirksamkeit beeinträchtigen.
+
+Daher ist es wichtig, Zinkpräparate nur in Absprache mit einem Arzt oder Heilpraktiker einzunehmen und die empfohlene tägliche Dosis nicht zu überschreiten.
+
+</Favorites>
+
+### Favorites - Triple
+
+<Favorites data={frontmatter.favorites} id="Triple" />

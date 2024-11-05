@@ -1,0 +1,205 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import { Icon } from "astro-icon/components";
+import Button from "@/components/elements/Button.astro";
+
+type Props = {
+  data?: Record<string, string[]>;
+  id?: string;
+};
+
+const { data, id }: Props = Astro.props;
+
+const favorites: CollectionEntry<"favorites">[] = await getCollection(
+  "favorites",
+  ({ id: favoriteId }: CollectionEntry<"favorites">) =>
+    data && id ? data[id]?.includes(favoriteId) : false
+);
+const categoryIcon = (category: string) => {
+  switch (category) {
+    case "Basis":
+      return "tabler:shield";
+    case "Premium":
+      return "tabler:shield-check";
+    case "Profi":
+      return "tabler:shield-star";
+  }
+};
+const categoryColor = (category: string) => {
+  switch (category) {
+    case "Basis":
+      return "text-skin-accent/50";
+    case "Premium":
+      return "text-skin-accent/75";
+    case "Profi":
+      return "text-skin-accent";
+  }
+};
+
+const favoritesCount = favorites.length;
+---
+
+<section data-aos="fade-up" class="-mx-4 rounded-md">
+  <div class="tab px-4">
+    <input type="checkbox" name="favorites" id={`favorites-${id}`} />
+    <label
+      for={`favorites-${id}`}
+      class="tab__label my-4 items-center rounded-md border-t-4 border-t-skin-accent bg-gradient-to-b from-skin-card/50 via-skin-card/70 to-transparent px-4 py-2 text-lg text-skin-base"
+    >
+      {
+        favoritesCount > 1
+          ? `Unsere Favoriten zum Thema ${id}`
+          : `Unser Favorit zum Thema ${id}`
+      }
+    </label>
+    <div class="tab__content mx-auto bg-skin-base">
+      <p class="xl:text-lg">
+        Wir werben für Partner und Produkte, von denen wir überzeugt sind und
+        mit denen wir in der Praxis ausgezeichnete Erfahrungen gemacht haben.
+        Das bedeutet, diese entsprechen hohen Standards bezüglich Qualität,
+        Preis-Leistungs-Verhältnis, therapeutisch wirksamer Dosierung, Reinheit
+        und Nachhaltigkeit. Die Einnahmen, die wir durch manche der Empfehlungen
+        erzielen, kommen dem Blog zugute. <b>#weildueswertbist</b>
+      </p>
+      <div
+        class:list={[
+          "my-6 grid grid-cols-1 justify-items-center gap-8 px-[18px] text-skin-base sm:-mx-4 xl:mt-12",
+          favoritesCount === 1
+            ? "sm:grid-cols-1"
+            : favoritesCount === 2
+              ? "md:grid-cols-2"
+              : "md:grid-cols-2 lg:grid-cols-3",
+        ]}
+      >
+        {
+          favorites &&
+            favorites.map(({ data: { category, name, descriptions, url } }) => {
+              return (
+                <div
+                  class:list={[
+                    "flex h-full w-full flex-col justify-between rounded-md p-8 font-medium shadow-md ring-skin-accent/50 hover:ring-2",
+                    favoritesCount === 1
+                      ? "w-full md:w-1/2 lg:w-1/3 xl:w-1/4"
+                      : "sm:w-full",
+                  ]}
+                >
+                  <div>
+                    <div class="flex items-center justify-between text-xl underline decoration-skin-accent/40 underline-offset-8">
+                      {name}
+                      {category && (
+                        <Icon
+                          name={categoryIcon(category)}
+                          aria-hidden="true"
+                          class:list={["h-7 w-7", categoryColor(category)]}
+                        />
+                      )}
+                    </div>
+
+                    <ul class="-ml-8 list-inside list-none">
+                      {descriptions.length > 0 &&
+                        descriptions.map((description: string) => (
+                          <li class="flex items-center">
+                            <span>
+                              <Icon
+                                name="tabler:circle-check"
+                                aria-hidden="true"
+                                class:list={["mr-2 h-5 w-5 text-skin-accent"]}
+                              />
+                            </span>
+                            {description}
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="default"
+                    icon="tabler:link"
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="mt-auto"
+                    text={`Zum ${category ? category.toUpperCase() : ""} Produkt`}
+                  />
+                </div>
+              );
+            })
+        }
+      </div>
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style lang="css">
+  /* Core styles/functionality */
+  .tab {
+    input {
+      @apply absolute z-[-1] opacity-0;
+
+      &:checked ~ .tab__content {
+        animation: flipdown 0.5s ease both;
+        @apply h-full max-h-full;
+      }
+      &:checked + .tab__label::after {
+        @apply mr-6 rotate-[270deg];
+      }
+      /* Arrow animation */
+      &:not(:checked) + .tab__label:hover::after {
+        @apply translate-y-1;
+      }
+    }
+    label {
+      @apply justify-between;
+      &::after {
+        @apply h-4 w-4 rotate-90 text-skin-base transition-all duration-300 ease-in-out content-['\276F'];
+      }
+    }
+  }
+
+  .tab__content {
+    @apply h-0 max-h-0 overflow-hidden transition-all duration-300 ease-in-out xl:mx-12;
+    & p {
+      @apply m-0;
+    }
+  }
+
+  /* Visual styles */
+  .tab__label,
+  .tab__close {
+    @apply flex cursor-pointer justify-between text-skin-base;
+  }
+
+  .tab__close {
+    @apply justify-end px-4 py-2 text-xs;
+  }
+
+  #favorites-title {
+    @apply mt-4 !important;
+  }
+  /* Animation */
+
+  @keyframes flipdown {
+    0% {
+      opacity: 0;
+      transform-origin: top center;
+      transform: rotateX(-90deg);
+    }
+    5% {
+      opacity: 1;
+    }
+    80% {
+      transform: rotateX(8deg);
+    }
+    83% {
+      transform: rotateX(6deg);
+    }
+    92% {
+      transform: rotateX(-3deg);
+    }
+    100% {
+      transform-origin: top center;
+      transform: rotateX(0deg);
+    }
+  }
+</style>

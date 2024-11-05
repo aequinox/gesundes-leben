@@ -1,0 +1,46 @@
+---
+type Props = {
+  title: string;
+  author: string;
+  description: string;
+};
+
+const { title, author, description }: Props = Astro.props;
+import bookCover from "@/assets/images/book-cover.png"; // Image is 1600x900
+import { Picture } from "astro:assets";
+---
+
+<section
+  class="mx-auto max-w-content overflow-hidden rounded-xl shadow-md md:max-w-[75%]"
+>
+  <div class="grid w-full grid-cols-6">
+    <div class="col-span-2 w-[1/3] overflow-hidden p-0">
+      <Picture
+        src={bookCover}
+        formats={["avif", "webp"]}
+        alt="A description of my image."
+        class="h-full object-cover"
+      />
+    </div>
+
+    <div class="col-span-4 p-8">
+      <div
+        class="mb-2 text-sm font-semibold uppercase tracking-wide text-skin-accent"
+      >
+        Buchtipp
+      </div>
+      <a
+        href="#"
+        class="mt-1 block text-lg font-medium leading-tight text-black hover:underline"
+        >{title}</a
+      >
+      <p class="mt-2 text-skin-card">{description}</p>
+      <div class="mt-4">
+        <span class="font-semibold text-skin-card">Autor:</span>
+        <span class="text-skin-card-muted">{author}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style></style>

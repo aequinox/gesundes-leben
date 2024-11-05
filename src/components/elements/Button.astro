@@ -1,0 +1,86 @@
+---
+import { Icon } from "astro-icon/components";
+import type { CallToActionVariant } from "../../types/components";
+import type { HTMLAttributes } from "astro/types";
+
+export interface Props extends HTMLAttributes<"a"> {
+  /** Visual style variant of the button */
+  variant?: CallToActionVariant;
+  /** Button/link text content */
+  text?: string;
+  /** Icon identifier from astro-icon */
+  icon?: string;
+  /** Additional CSS classes */
+  class?: string;
+  /** HTML button type */
+  type?: "button" | "submit" | "reset";
+}
+
+const {
+  variant = "default",
+  text,
+  icon,
+  class: className = "",
+  type,
+  target,
+  ...rest
+}: Props = Astro.props;
+
+const content = text || (await Astro.slots.render("default"));
+
+const variants: Record<CallToActionVariant, string> = {
+  default: "btn-default",
+  accented: "btn-accented",
+  muted: "btn-muted",
+  link: "cursor-pointer hover:text-skin-base",
+};
+---
+
+{
+  type === "button" || type === "submit" || type === "reset" ? (
+    <button
+      type={type}
+      class:list={["not-prose btn", variants[variant], className]}
+      {...rest}
+    >
+      <div class="flex items-center justify-center">
+        {icon && <Icon name={icon} class="mr-1.5 h-5 w-5" />}
+        <Fragment set:html={content} />
+      </div>
+    </button>
+  ) : (
+    <a
+      class:list={["not-prose", variants[variant], className]}
+      {...(target ? { target, rel: "noopener noreferrer" } : {})}
+      {...rest}
+    >
+      <div class="flex items-center justify-center">
+        {icon && <Icon name={icon} class="mr-1.5 h-5 w-5" />}
+        <Fragment set:html={content} />
+      </div>
+    </a>
+  )
+}
+
+<style>
+  a,
+  .btn {
+    @apply mb-2 me-2 flex items-center px-4 py-2 text-center text-sm font-medium text-skin-base;
+    p {
+      @apply text-base;
+    }
+  }
+
+  .btn {
+    @apply rounded-lg bg-gradient-to-b shadow-sm focus:outline-none focus:ring-4 focus:ring-skin-accent;
+  }
+  .btn-default {
+    @apply from-skin-inverted/80 via-skin-inverted/90 to-skin-inverted text-skin-inverted shadow-skin-inverted/50 hover:bg-skin-inverted hover:bg-skin-inverted/90 focus:ring-skin-inverted;
+  }
+  .btn-accented {
+    @apply from-skin-accent/80 via-skin-accent/90 to-skin-accent text-skin-inverted shadow-skin-accent/50 hover:bg-skin-accent hover:bg-skin-accent/90 focus:ring-skin-accent dark:text-skin-base;
+  }
+  .btn-muted {
+    @apply from-skin-muted/80 via-skin-muted/90 to-skin-muted text-skin-base shadow-skin-muted/50 hover:bg-skin-muted hover:bg-skin-muted/90 focus:ring-skin-muted;
+  }
+</style>

@@ -1,0 +1,113 @@
+---
+import { Icon } from "astro-icon/components";
+import type { ItemGrid as Props } from "@/types/components";
+import Button from "@/components/elements/Button.astro";
+
+const {
+  items = [],
+  columns,
+  defaultIcon = "",
+  classes = {},
+}: Props = Astro.props;
+
+const {
+  container: containerClass = "",
+  panel: panelClass = "",
+  title: titleClass = "",
+  description: descriptionClass = "",
+  icon: defaultIconClass = "text-primary",
+  action: actionClass = "",
+} = classes;
+---
+
+{
+  items && (
+    <div
+      class:list={[
+        "not-prose mx-auto grid gap-8 text-skin-base md:gap-y-12",
+        columns === 4
+          ? "sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+          : columns === 3
+            ? "sm:grid-cols-2 lg:grid-cols-3"
+            : columns === 2
+              ? "sm:grid-cols-2"
+              : "",
+        containerClass,
+      ]}
+    >
+      {items.map(
+        ({
+          title,
+          description,
+          icon,
+          callToAction,
+          classes: itemClasses = {},
+        }) => (
+          <div>
+            <div
+              class:list={[
+                "flex max-w-md flex-row",
+                panelClass,
+                itemClasses?.panel,
+              ]}
+            >
+              <div class="flex justify-center">
+                {(icon || defaultIcon) && (
+                  <Icon
+                    name={icon || defaultIcon}
+                    class:list={[
+                      "mr-2 h-7 w-7 rtl:ml-2",
+                      defaultIconClass,
+                      itemClasses?.icon,
+                    ]}
+                  />
+                )}
+              </div>
+              <div class="mt-0.5">
+                {title && (
+                  <h3
+                    class:list={[
+                      "text-xl font-bold",
+                      titleClass,
+                      itemClasses?.title,
+                    ]}
+                  >
+                    {title}
+                  </h3>
+                )}
+                {description && (
+                  <p
+                    class:list={[
+                      "text-skin-base/50",
+                      title ? "mt-3" : "",
+                      descriptionClass,
+                      itemClasses?.description,
+                    ]}
+                    set:html={description}
+                  />
+                )}
+                {callToAction && (
+                  <div
+                    class:list={[
+                      title || description ? "mt-3" : "",
+                      actionClass,
+                      itemClasses?.actionClass,
+                    ]}
+                  >
+                    <Button variant="link" {...callToAction} />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )
+      )}
+    </div>
+  )
+}
+
+<!-- <style lang="css">
+  h3 {
+    @apply mt-0 !important;
+  }
+</style> -->

@@ -1,0 +1,90 @@
+---
+import type {
+  CallToAction,
+  Widget,
+  CSSClassesObject,
+} from "@/types/components";
+import Button from "@/components/elements/Button.astro";
+import Headline from "@/components/sections/Headline.astro";
+
+interface Props extends Widget {
+  /** Main title text */
+  title?: string;
+  /** Secondary subtitle text */
+  subtitle?: string;
+  /** Small text above the title */
+  tagline?: string;
+  /** Primary call to action */
+  callToAction?: CallToAction;
+  /** Multiple call to action buttons */
+  actions?: string | CallToAction[];
+  /** CSS classes for styling */
+  classes?: CSSClassesObject;
+}
+
+const {
+  title = await Astro.slots.render("title"),
+  subtitle = await Astro.slots.render("subtitle"),
+  tagline = await Astro.slots.render("tagline"),
+  actions = await Astro.slots.render("actions"),
+  id,
+  classes = {},
+}: Props = Astro.props;
+
+// Type guard to check if action is CallToAction
+const isCallToAction = (
+  action: string | CallToAction
+): action is CallToAction => {
+  return (
+    typeof action !== "string" && action !== null && typeof action === "object"
+  );
+};
+---
+
+<section class="not-prose relative scroll-mt-[72px]" id={id}>
+  <div
+    class:list={[
+      "relative mx-auto max-w-7xl px-4 py-4 text-skin-base md:px-6 md:py-8 lg:py-12",
+      "mx-auto max-w-content",
+      classes.container,
+    ]}
+  >
+    <div
+      class="mx-auto max-w-3xl rounded-md border border-skin-card bg-skin-card/10 p-6 text-center shadow-xl"
+    >
+      <Headline
+        title={title}
+        subtitle={subtitle}
+        tagline={tagline}
+        classes={{
+          container: "mb-0 md:mb-0",
+          title:
+            "text-4xl md:text-4xl font-bold tracking-tighter mb-4 font-heading leading-snug md:leading-tight",
+          subtitle: "text-xl text-skin-muted",
+        }}
+      />
+      {
+        actions && (
+          <div class="m-auto mt-6 flex max-w-xs flex-col flex-nowrap gap-4 sm:max-w-md sm:flex-row sm:justify-center">
+            {Array.isArray(actions) ? (
+              actions.map((action) => (
+                <div class="flex w-full sm:w-auto">
+                  {isCallToAction(action) ? (
+                    <Button
+                      {...action}
+                      class={`w-full sm:mb-0 ${action.class ?? ""}`}
+                    />
+                  ) : (
+                    <Fragment set:html={action} />
+                  )}
+                </div>
+              ))
+            ) : (
+              <Fragment set:html={actions} />
+            )}
+          </div>
+        )
+      }
+    </div>
+  </div>
+</section>

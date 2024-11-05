@@ -1,0 +1,40 @@
+---
+import type { Features as Props } from "@/types/components";
+
+import Headline from "./Headline.astro";
+import ItemGrid from "./ItemGrid.astro";
+
+const {
+  title = await Astro.slots.render("title"),
+  subtitle = await Astro.slots.render("subtitle"),
+  tagline = await Astro.slots.render("tagline"),
+  items = [],
+  columns = 2,
+  defaultIcon,
+  id,
+  classes = {},
+}: Props = Astro.props;
+
+const isString = (value: any): value is string => typeof value === 'string';
+
+---
+
+<section id={id} class={`max-w-5xl ${classes?.container ?? ""}`}>
+  <Headline
+    title={title}
+    subtitle={subtitle}
+    tagline={tagline}
+    classes={isString(classes?.headline) ? {container: classes?.headline} : classes?.headline ?? {}}
+  />
+  <ItemGrid
+    items={items}
+    columns={columns}
+    defaultIcon={defaultIcon}
+    classes={{
+      container: "",
+      title: "md:text-xl",
+      icon: "text-white bg-skin-accent rounded-full w-10 h-10 p-2 md:w-12 md:h-12 md:p-3 mr-4",
+      ...(isString(classes?.items) ? {container: classes?.items} : (classes?.items ?? {})),
+    }}
+  />
+</section>

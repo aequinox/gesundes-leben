@@ -1,0 +1,83 @@
+---
+import { Icon } from "astro-icon/components";
+
+interface Props {
+  title: string;
+  classes?: string;
+}
+
+const { title, classes } = Astro.props as Props;
+---
+
+<div class={`accordion group relative divide-y divide-skin-line/10 ${classes}`}>
+  <button
+    class="accordion-button flex w-full flex-1 items-center justify-between gap-2 py-3 text-left text-xl font-medium text-skin-base transition hover:text-skin-accent/75"
+    type="button"
+    id={`${title} accordion menu button`}
+    aria-expanded="false"
+    aria-controls={`${title} Akkordion Menü Inhalt`}
+  >
+    {title}
+    <Icon
+      name="tabler:chevron-down"
+      aria-hidden="true"
+      class="accordion-chevron h-7 w-7 shrink-0 transition-transform"
+    />
+  </button>
+  <div
+    id={`${title} accordion menu content`}
+    aria-labelledby={`${title} accordion menu button`}
+    class="accordion-content h-0 overflow-hidden transition-all duration-300 ease-in-out sm:px-4"
+  >
+    <p
+      class="prose mb-4 mt-1 max-w-full text-base font-normal text-skin-base transition-[height]"
+    >
+      <slot />
+    </p>
+  </div>
+</div>
+
+<script>
+  function accordionSetup() {
+    document.querySelectorAll(".accordion").forEach(accordionMenu => {
+      const accordionButton = accordionMenu.querySelector(".accordion-button");
+      const accordionChevron =
+        accordionMenu.querySelector(".accordion-chevron");
+      const accordionContent = accordionMenu.querySelector(
+        ".accordion-content"
+      ) as HTMLElement;
+
+      if (accordionButton && accordionContent && accordionChevron) {
+        accordionButton.addEventListener("click", () => {
+          const expanded = !accordionMenu.classList.toggle("active");
+          accordionButton.setAttribute("aria-expanded", String(expanded));
+          if (accordionContent) {
+            accordionContent.style.maxHeight = expanded
+              ? `${accordionContent.scrollHeight}px`
+              : "0px";
+          }
+          accordionChevron.classList.toggle("rotate-180", expanded);
+        });
+      }
+    });
+  }
+
+  accordionSetup();
+  document.addEventListener("astro:after-swap", accordionSetup);
+</script>
+
+<style lang="css">
+  .accordion.active .accordion-content {
+    max-height: 100%;
+  }
+
+  .accordion-content {
+    transition: max-height 0.3s ease-in-out;
+  }
+  .accordion-chevron {
+    transition: transform 0.3s ease-in-out;
+  }
+  .accordion.active .accordion-chevron {
+    transform: rotate(180deg);
+  }
+</style>
