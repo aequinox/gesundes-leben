@@ -1,0 +1,42 @@
+#!/usr/bin/env sh
+echo "Running pre-commit hook"
+
+# Get the list of modified markdown files
+files=$(git diff --cached --name-status | awk '/^M.*\.mdx$/ {print $2}')
+
+# Loop through each file
+for file in $files; do
+  echo "Checking $file"
+  # Get the front matter
+  frontmatter=$(awk -v RS='---' 'NR==2{print}' "$file")
+
+  # Check if id exists
+  id=$(echo "$frontmatter" | awk '/^id: /{print $2}')
+
+  # If id doesn't exist, generate a UUID and add it
+  if [ -z "$id" ]; then
+    uuid=$(uuidgen)
+    echo "Adding id to $file"
+    sed -i "1a id: $uuid" "$file"
+    git add "$file"
+  fi
+
+  # Get the draft status
+  draft=$(echo "$frontmatter" | awk '/^draft: /{print $2}')
+
+  # Check the draft status and update the file accordingly
+  if [ "$draft" = "false" ]; then
+    echo "$file modDateTime updated"
+    sed -i "/---.*/,/---.*/s/^modDatetime:.*$/modDatetime: $(date -u "+%Y-%m-%dT%H:%M:%SZ")/" "$file"
+    git add "$file"
+  elif [ "$draft" = "first" ]; then
+    echo "First release of $file, draft set to false and modDateTime removed"
+    sed -i "/---.*/,/---.*/s/^modDatetime:.*$/modDatetime:/" "$file"
+    sed -i "/---.*/,/---.*/s/^draft:.*$/draft: false/" "$file"
+    git add "$file"
+  fi
+done
+
+git update-index --again
+
+bun run lint-staged

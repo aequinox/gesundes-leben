@@ -7,7 +7,12 @@
     "start": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "sync": "astro sync",
+    "astro": "astro",
+    "format:check": "prettier --check . --plugin=prettier-plugin-astro",
+    "format": "prettier --write . --plugin=prettier-plugin-astro --plugin prettier-plugin-tailwindcss",
+    "lint": "eslint .",
+    "prepare": "husky"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -32,7 +37,11 @@
     "aos": "^2.3.4",
     "astro-icon": "^1.1.2",
     "hast-util-to-string": "^3.0.1",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
     "mdast-util-to-string": "^4.0.0",
+    "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-tailwindcss": "^0.6.8",
     "reading-time": "^1.5.0",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-slug": "^6.0.0",
