@@ -18,26 +18,17 @@ const usedCategories: string[] = [
 ];
 ---
 
-<!-- <section id="featured">
-          <h2>Ausgewählte Artikel</h2>
-          <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2"></div> -->
 <section
   id="category-filter"
   class="articles mx-auto max-w-content"
   transition:name="articles-filter"
 >
-  <!-- <h2 class="pb-6 text-2xl font-semibold tracking-wide">
-    Artikel nach Kategorien
-  </h2> -->
-
   <div
     id="group-selectors"
     class="mx-auto mt-4 grid max-w-content grid-cols-1 gap-8 p-6 md:mt-12 md:grid-cols-3"
   >
     {allGroups.map(group => <GroupSelector groupType={group} />)}
   </div>
-
-  <!-- <GroupSelectors /> -->
 
   <div class="mb-4 flex flex-wrap justify-center" id="category-buttons">
     {
@@ -66,18 +57,6 @@ const usedCategories: string[] = [
 </section>
 
 <script>
-  // import { gsap } from "gsap";
-
-  // const timeline = gsap.timeline();
-
-  // timeline
-  //   .from("#pro-group", { duration: 2, opacity: 0, scale: 0 })
-  //   .to(
-  //     "#pro-group",
-  //     { duration: 1, opacity: 1, scale: 1, ease: "power1.inOut" },
-  //     "+=0.5"
-  //   );
-
   const allGroups: Array<"pro" | "question-time" | "contra"> = [
     "pro",
     "question-time",
@@ -98,11 +77,6 @@ const usedCategories: string[] = [
       document.querySelectorAll(".group-selector")
     ) as HTMLElement[];
 
-    /**
-     * Orders the group selectors based on the given clicked selector.
-     *
-     * @param {HTMLElement} clickedSelector - The clicked group selector.
-     */
     const orderGroupSelectors = (clickedSelector: HTMLElement): void => {
       const clickedIndex = groupSelectors.indexOf(clickedSelector);
 
@@ -131,28 +105,6 @@ const usedCategories: string[] = [
         card.classList.toggle("show", card.dataset.group === group);
         card.toggleAttribute("data-aos", card.dataset.group === group);
       }
-
-      // timeline
-      //   .from(".order-2", {
-      //     duration: 0.3,
-      //     opacity: 0,
-      //     scale: 0,
-      //     id: `${group}-group`,
-      //     ease: "power1.inOut",
-      //     repeat: 1,
-      //     yoyo: true,
-
-      //   })
-      //   .to(
-      //     ".order-2",
-      //     { duration: 1, opacity: 1, scale: 1, ease: "power1.inOut" },
-      //     "+=0.5"
-      //   )
-      //   .to(
-      //     ".order-1",
-      //     { duration: 1, xPercent: 100, ease: "power1.inOut" },
-      //     "+=0.5"
-      //   );
     };
 
     const handleCategoryClick = (category: string) => {
@@ -180,46 +132,3 @@ const usedCategories: string[] = [
     });
   });
 </script>
-
-<!-- <script is:inline define:vars={{ allGroups }}>
-  document.addEventListener("astro:page-load", () => {
-    const articleGrid = document.getElementById("article-grid");
-    const articleCards = Array.from(
-      articleGrid.querySelectorAll(".article-card")
-    );
-
-    const categoryButtons = Array.from(
-      document.querySelectorAll(".category-button")
-    );
-
-    const handleGroupClick = group => {
-      articleCards.forEach(card => {
-        const shouldShow = card.dataset.group === group;
-        card.classList.toggle("hide", !shouldShow);
-        card.classList.toggle("show", shouldShow);
-      });
-    };
-
-    const handleCategoryClick = category => {
-      articleCards.forEach(card => {
-        const shouldShow =
-          category === "Alle" ||
-          card.dataset.categories.split("|").includes(category);
-        card.classList.toggle("hide", !shouldShow);
-        card.classList.toggle("show", shouldShow);
-      });
-    };
-
-    allGroups.forEach(group => {
-      const button = document.getElementById(`${group}-group`);
-      button.addEventListener("click", () => handleGroupClick(group));
-    });
-
-    categoryButtons.forEach(button => {
-      button.addEventListener("click", () => {
-        const category = button.dataset.category;
-        handleCategoryClick(category);
-      });
-    });
-  });
-</script> -->

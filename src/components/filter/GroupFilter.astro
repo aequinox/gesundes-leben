@@ -2,15 +2,10 @@
 import getSortedPosts from "@/utils/getSortedPosts";
 import { getCollection } from "astro:content";
 
-// import { fade } from "astro:transitions";
-
 const posts = await getCollection("blog");
 const sortedPosts = await getSortedPosts(posts);
 ---
 
-<!-- <section id="featured">
-          <h2>Ausgewählte Artikel</h2>
-          <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2"></div> -->
 <section
   id="group-filter"
   class="articles mx-auto max-w-content"
