@@ -64,7 +64,7 @@ const ogUrl = new URL(
 
 const layoutProps: LayoutProps = {
   title: `${title} | ${SITE.title}`,
-  author: authorEntry?.data.name,
+  author: authorEntry?.data.name || SITE.author,
   heroImage,
   description,
   pubDatetime,

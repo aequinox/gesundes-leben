@@ -1,13 +1,12 @@
 import { SITE } from "@/config";
 
-
-interface GetPaginationProps<T> {
+export interface PaginationProps<T> {
   posts: T[];
   page: string | number;
   isIndex?: boolean;
 }
 
-export interface Pagination<T> {
+export interface PaginationResult<T> {
   totalPages: number;
   currentPage: number;
   paginatedPosts: T[];
@@ -22,16 +21,20 @@ const generatePagination = <T extends { id: string | number }>({
   posts,
   page,
   isIndex = false,
-}: GetPaginationProps<T>): Pagination<T> => {
+}: PaginationProps<T>): PaginationResult<T> => {
   const totalPages = Math.ceil(posts.length / SITE.postPerPage);
-  const currentPage = isIndex ? 1 : Number(page) || 1; // Default to page 1 if page is invalid
+  const currentPage = isIndex ? 1 : Number(page) || 1;
 
-  const startPost = (currentPage - 1) * SITE.postPerPage;
-  const paginatedPosts = posts.slice(startPost, startPost + SITE.postPerPage);
+  // Ensure currentPage is within valid range
+  const validatedPage = Math.max(1, Math.min(currentPage, totalPages));
+
+  const startPost = (validatedPage - 1) * SITE.postPerPage;
+  const endPost = startPost + SITE.postPerPage;
+  const paginatedPosts = posts.slice(startPost, endPost);
 
   return {
     totalPages,
-    currentPage,
+    currentPage: validatedPage,
     paginatedPosts,
   };
 };

@@ -6,6 +6,7 @@ import getSortedPosts from "@/utils/getSortedPosts";
 import getPageNumbers from "@/utils/getPageNumbers";
 import getPagination from "@/utils/getPagination";
 import getPostsWithRT from "@/utils/getPostsWithRT";
+import type { Pagination } from "@/types/pagination";
 
 export interface Props {
   post: CollectionEntry<"blog">;
@@ -35,7 +36,7 @@ const posts = await getCollection("blog");
 
 const sortedPosts = await getSortedPosts(posts);
 
-const pagination = getPagination({
+const pagination: Pagination<CollectionEntry<"blog">> = getPagination({
   posts: sortedPosts,
   page: slug,
 });

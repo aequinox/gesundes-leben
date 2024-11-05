@@ -5,9 +5,8 @@ import loadGoogleFonts, { type FontOptions } from "@/utils/loadGoogleFont";
 import { getAuthorEntry } from "../getAuthor";
 
 export default async (post: CollectionEntry<"blog">) => {
-  const { data } = await getAuthorEntry(post.data.author);
-
-  post.data.author = (data?.name as string) || SITE.author;
+  const authorEntry = await getAuthorEntry(post.data.author);
+  const authorName = authorEntry?.data?.name || SITE.author;
 
   return satori(
     <div
@@ -88,7 +87,7 @@ export default async (post: CollectionEntry<"blog">) => {
                 "
               </span>
               <span style={{ overflow: "hidden", fontWeight: "bold" }}>
-                {post.data.author}
+                {authorName}
               </span>
             </span>
 
@@ -104,7 +103,7 @@ export default async (post: CollectionEntry<"blog">) => {
       height: 630,
       embedFont: true,
       fonts: (await loadGoogleFonts(
-        post.data.title + post.data.author + SITE.title + "by"
+        post.data.title + authorName + SITE.title + "by"
       )) as FontOptions[],
     }
   );
