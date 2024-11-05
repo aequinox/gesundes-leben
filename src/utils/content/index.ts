@@ -1,9 +1,9 @@
-import { AuthorUtils } from './authors';
-import { PostUtils } from './posts';
-import { GlossaryUtils } from './glossary';
-import { FavoriteUtils } from './favorites';
+import { AuthorUtils } from "./authors";
+import { PostUtils } from "./posts";
+import { GlossaryUtils } from "./glossary";
+import { FavoriteUtils } from "./favorites";
 
-export * from './types';
+export * from "./types";
 
 /**
  * Content Management System
@@ -11,7 +11,7 @@ export * from './types';
  */
 export class ContentManager {
   private static instance: ContentManager;
-  
+
   public readonly authors = AuthorUtils;
   public readonly posts = PostUtils;
   public readonly glossary = GlossaryUtils;

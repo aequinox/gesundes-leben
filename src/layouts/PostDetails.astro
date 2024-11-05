@@ -31,7 +31,7 @@ interface LayoutProps {
   scrollSmooth: boolean;
 }
 
-const { post } = Astro.props;
+const { post }: Props = Astro.props;
 
 const {
   data: {
@@ -264,11 +264,13 @@ const t = useTranslations(lang);
   interface HeadingElement extends HTMLElement {
     id: string;
     tagName: string;
+    /* eslint-disable no-undef */
     childNodes: NodeListOf<ChildNode>;
   }
 
   interface ProgressBar extends HTMLElement {
     style: CSSStyleDeclaration;
+    /* eslint-disable no-unused-vars */
     setAttribute(name: string, value: string): void;
   }
 

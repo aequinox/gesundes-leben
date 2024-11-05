@@ -1,4 +1,4 @@
-import type { Properties, Element, Root} from "hast";
+import type { Properties, Element, Root } from "hast";
 
 export interface HeadingWrapperProps {
   readonly tagName: string;

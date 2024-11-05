@@ -22,11 +22,11 @@ export const formattedDateTime = ({
   const modDate = modDatetime ? new Date(modDatetime) : null;
 
   if (isNaN(pubDate.getTime())) {
-    throw new Error('Invalid publication date');
+    throw new Error("Invalid publication date");
   }
 
   if (modDate && isNaN(modDate.getTime())) {
-    throw new Error('Invalid modification date');
+    throw new Error("Invalid modification date");
   }
 
   // Use modification date if it exists and is newer than publication date
@@ -60,9 +60,9 @@ export const formattedDateTime = ({
  */
 export const formatDate = (date: string | Date): string => {
   const dt = new Date(date);
-  
+
   if (isNaN(dt.getTime())) {
-    throw new Error('Invalid date');
+    throw new Error("Invalid date");
   }
 
   return dt.toLocaleDateString(LOCALE.langTag, {
@@ -80,9 +80,9 @@ export const formatDate = (date: string | Date): string => {
  */
 export const formatTime = (date: string | Date): string => {
   const dt = new Date(date);
-  
+
   if (isNaN(dt.getTime())) {
-    throw new Error('Invalid date');
+    throw new Error("Invalid date");
   }
 
   return dt.toLocaleTimeString(LOCALE.langTag, {

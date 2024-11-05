@@ -1,4 +1,4 @@
-export type Theme = 'light' | 'dark';
+export type Theme = "light" | "dark";
 
 export interface ThemeConfig {
   storageKey: string;
@@ -7,9 +7,9 @@ export interface ThemeConfig {
 }
 
 const DEFAULT_CONFIG: ThemeConfig = {
-  storageKey: 'theme',
-  defaultTheme: 'light',
-  systemPreferenceQuery: '(prefers-color-scheme: dark)'
+  storageKey: "theme",
+  defaultTheme: "light",
+  systemPreferenceQuery: "(prefers-color-scheme: dark)",
 };
 
 /**
@@ -43,13 +43,15 @@ export class ThemeManager {
    * Gets the user's preferred theme
    */
   public getPreferredTheme(): Theme {
-    if (typeof window === 'undefined') return this.config.defaultTheme;
+    if (typeof window === "undefined") return this.config.defaultTheme;
 
-    const storedTheme = localStorage.getItem(this.config.storageKey) as Theme | null;
+    const storedTheme = localStorage.getItem(
+      this.config.storageKey
+    ) as Theme | null;
     if (storedTheme) return storedTheme;
 
     return window.matchMedia(this.config.systemPreferenceQuery).matches
-      ? 'dark'
+      ? "dark"
       : this.config.defaultTheme;
   }
 
@@ -57,7 +59,7 @@ export class ThemeManager {
    * Updates the meta theme color based on current theme
    */
   private updateMetaThemeColor(): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     const body = document.body;
     if (!body) return;
@@ -67,7 +69,7 @@ export class ThemeManager {
 
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', bgColor);
+      metaThemeColor.setAttribute("content", bgColor);
     }
   }
 
@@ -75,13 +77,13 @@ export class ThemeManager {
    * Reflects the current theme preference in the DOM
    */
   private reflectPreference(): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
-    document.firstElementChild?.setAttribute('data-theme', this.currentTheme);
-    
-    const themeButton = document.querySelector('#theme-btn');
+    document.firstElementChild?.setAttribute("data-theme", this.currentTheme);
+
+    const themeButton = document.querySelector("#theme-btn");
     if (themeButton) {
-      themeButton.setAttribute('aria-label', this.currentTheme);
+      themeButton.setAttribute("aria-label", this.currentTheme);
     }
 
     this.updateMetaThemeColor();
@@ -100,7 +102,7 @@ export class ThemeManager {
    * Toggles between light and dark themes
    */
   public toggleTheme(): void {
-    const newTheme: Theme = this.currentTheme === 'light' ? 'dark' : 'light';
+    const newTheme: Theme = this.currentTheme === "light" ? "dark" : "light";
     this.setTheme(newTheme);
   }
 
@@ -109,7 +111,7 @@ export class ThemeManager {
    */
   private handleSystemThemeChange(event: MediaQueryListEvent): void {
     if (!localStorage.getItem(this.config.storageKey)) {
-      const newTheme: Theme = event.matches ? 'dark' : 'light';
+      const newTheme: Theme = event.matches ? "dark" : "light";
       this.setTheme(newTheme);
     }
   }
@@ -119,7 +121,10 @@ export class ThemeManager {
    */
   public cleanup(): void {
     if (this.mediaQuery) {
-      this.mediaQuery.removeEventListener('change', this.handleSystemThemeChange);
+      this.mediaQuery.removeEventListener(
+        "change",
+        this.handleSystemThemeChange
+      );
     }
   }
 
@@ -127,23 +132,23 @@ export class ThemeManager {
    * Initializes theme functionality
    */
   public initThemeFeature(): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     // Set initial preference
     this.reflectPreference();
 
     // Add click handler to theme toggle button
-    const themeBtn = document.querySelector('#theme-btn');
+    const themeBtn = document.querySelector("#theme-btn");
     if (themeBtn) {
-      themeBtn.addEventListener('click', () => this.toggleTheme());
+      themeBtn.addEventListener("click", () => this.toggleTheme());
     }
 
     // Watch for system theme changes
     this.mediaQuery = window.matchMedia(this.config.systemPreferenceQuery);
-    this.mediaQuery.addEventListener('change', this.handleSystemThemeChange);
+    this.mediaQuery.addEventListener("change", this.handleSystemThemeChange);
 
     // Handle Astro view transitions
-    document.addEventListener('astro:after-swap', () => {
+    document.addEventListener("astro:after-swap", () => {
       this.reflectPreference();
     });
   }
@@ -153,7 +158,7 @@ export class ThemeManager {
 export const themeManager = ThemeManager.getInstance();
 
 // Initialize theme on load
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.onload = () => {
     themeManager.initThemeFeature();
   };

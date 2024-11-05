@@ -12,8 +12,10 @@ const sortPostsByDate = async (
 ): Promise<CollectionEntry<"blog">[]> => {
   return contentManager.posts.updateReadingTimes(
     posts.sort((a, b) => {
-      return new Date(b.data.modDatetime || b.data.pubDatetime).getTime() -
-        new Date(a.data.modDatetime || a.data.pubDatetime).getTime();
+      return (
+        new Date(b.data.modDatetime || b.data.pubDatetime).getTime() -
+        new Date(a.data.modDatetime || a.data.pubDatetime).getTime()
+      );
     })
   );
 };

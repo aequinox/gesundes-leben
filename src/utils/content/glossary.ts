@@ -21,25 +21,29 @@ export class GlossaryUtils {
    * Sorts glossary entries alphabetically by title
    */
   public static sortByTitle(entries: Glossary[]): Glossary[] {
-    return [...entries].sort((a, b) => 
-      a.data.title.localeCompare(b.data.title, undefined, { sensitivity: 'base' })
+    return [...entries].sort((a, b) =>
+      a.data.title.localeCompare(b.data.title, undefined, {
+        sensitivity: "base",
+      })
     );
   }
 
   /**
    * Retrieves all glossary entries with optional sorting
    */
-  public static async getAllEntries(options: {
-    sortBy?: 'date' | 'title';
-  } = {}): Promise<Glossary[]> {
-    const { sortBy = 'title' } = options;
+  public static async getAllEntries(
+    options: {
+      sortBy?: "date" | "title";
+    } = {}
+  ): Promise<Glossary[]> {
+    const { sortBy = "title" } = options;
     try {
-      const entries = await getCollection('glossary');
-      return sortBy === 'date' 
+      const entries = await getCollection("glossary");
+      return sortBy === "date"
         ? GlossaryUtils.sortByDate(entries)
         : GlossaryUtils.sortByTitle(entries);
     } catch (error) {
-      console.error('Error fetching glossary entries:', error);
+      console.error("Error fetching glossary entries:", error);
       return [];
     }
   }
@@ -47,12 +51,14 @@ export class GlossaryUtils {
   /**
    * Retrieves a single glossary entry by slug
    */
-  public static async getEntry(slug: string): Promise<Glossary | undefined | null> {
+  public static async getEntry(
+    slug: string
+  ): Promise<Glossary | undefined | null> {
     try {
-      const entry = await getEntry('glossary', slug);
+      const entry = await getEntry("glossary", slug);
       return entry || null;
     } catch (error) {
-      console.error('Error fetching glossary entry:', error);
+      console.error("Error fetching glossary entry:", error);
       return null;
     }
   }
@@ -60,7 +66,9 @@ export class GlossaryUtils {
   /**
    * Retrieves entries by author
    */
-  public static async getEntriesByAuthor(authorSlug: string): Promise<Glossary[]> {
+  public static async getEntriesByAuthor(
+    authorSlug: string
+  ): Promise<Glossary[]> {
     const entries = await GlossaryUtils.getAllEntries();
     return entries.filter(async entry => {
       const entryAuthor = await AuthorUtils.getAuthorEntry(entry.data.author);
@@ -74,15 +82,14 @@ export class GlossaryUtils {
   public static async searchEntries(query: string): Promise<Glossary[]> {
     const entries = await GlossaryUtils.getAllEntries();
     const searchTerm = query.toLowerCase();
-    
+
     return entries.filter(async entry => {
       const { title } = entry.data;
       const rendered = await entry.render();
       const content = rendered.toString().toLowerCase();
-      
+
       return (
-        title.toLowerCase().includes(searchTerm) ||
-        content.includes(searchTerm)
+        title.toLowerCase().includes(searchTerm) || content.includes(searchTerm)
       );
     });
   }
@@ -90,7 +97,9 @@ export class GlossaryUtils {
   /**
    * Groups entries by first letter of title
    */
-  public static async getEntriesByAlphabet(): Promise<Record<string, Glossary[]>> {
+  public static async getEntriesByAlphabet(): Promise<
+    Record<string, Glossary[]>
+  > {
     const entries = await GlossaryUtils.getAllEntries();
     const grouped: Record<string, Glossary[]> = {};
 
@@ -113,15 +122,21 @@ export class GlossaryUtils {
   /**
    * Gets related entries based on title similarity
    */
-  public static async getRelatedEntries(entry: Glossary, limit = 5): Promise<Glossary[]> {
+  public static async getRelatedEntries(
+    entry: Glossary,
+    limit = 5
+  ): Promise<Glossary[]> {
     const allEntries = await GlossaryUtils.getAllEntries();
     const currentTitle = entry.data.title.toLowerCase();
-    
+
     return allEntries
       .filter(e => e.id !== entry.id)
       .map(e => ({
         entry: e,
-        similarity: GlossaryUtils.calculateSimilarity(currentTitle, e.data.title.toLowerCase())
+        similarity: GlossaryUtils.calculateSimilarity(
+          currentTitle,
+          e.data.title.toLowerCase()
+        ),
       }))
       .sort((a, b) => b.similarity - a.similarity)
       .slice(0, limit)
@@ -134,7 +149,9 @@ export class GlossaryUtils {
   private static calculateSimilarity(str1: string, str2: string): number {
     const len1 = str1.length;
     const len2 = str2.length;
-    const matrix: number[][] = Array(len1 + 1).fill(null).map(() => Array(len2 + 1).fill(null));
+    const matrix: number[][] = Array(len1 + 1)
+      .fill(null)
+      .map(() => Array(len2 + 1).fill(null));
 
     for (let i = 0; i <= len1; i++) matrix[i][0] = i;
     for (let j = 0; j <= len2; j++) matrix[0][j] = j;

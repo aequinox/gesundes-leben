@@ -15,8 +15,7 @@ const {
   classes = {},
 }: Props = Astro.props;
 
-const isString = (value: any): value is string => typeof value === 'string';
-
+const isString = (value: any): value is string => typeof value === "string";
 ---
 
 <section id={id} class={`max-w-5xl ${classes?.container ?? ""}`}>
@@ -24,7 +23,9 @@ const isString = (value: any): value is string => typeof value === 'string';
     title={title}
     subtitle={subtitle}
     tagline={tagline}
-    classes={isString(classes?.headline) ? {container: classes?.headline} : classes?.headline ?? {}}
+    classes={isString(classes?.headline)
+      ? { container: classes?.headline }
+      : (classes?.headline ?? {})}
   />
   <ItemGrid
     items={items}
@@ -34,7 +35,9 @@ const isString = (value: any): value is string => typeof value === 'string';
       container: "",
       title: "md:text-xl",
       icon: "text-white bg-skin-accent rounded-full w-10 h-10 p-2 md:w-12 md:h-12 md:p-3 mr-4",
-      ...(isString(classes?.items) ? {container: classes?.items} : (classes?.items ?? {})),
+      ...(isString(classes?.items)
+        ? { container: classes?.items }
+        : (classes?.items ?? {})),
     }}
   />
 </section>

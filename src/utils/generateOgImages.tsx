@@ -6,12 +6,14 @@ import siteOgImage from "./og-templates/site";
 export interface OgImageOptions {
   width?: number;
   height?: number;
-  fitTo?: {
-    mode: 'original';
-  } | {
-    mode: 'width' | 'height';
-    value: number;
-  };
+  fitTo?:
+    | {
+        mode: "original";
+      }
+    | {
+        mode: "width" | "height";
+        value: number;
+      };
   background?: string;
   font?: {
     loadSystemFonts: boolean;
@@ -24,15 +26,15 @@ const DEFAULT_OPTIONS: Required<OgImageOptions> = {
   width: 1200,
   height: 630,
   fitTo: {
-    mode: 'width',
-    value: 1200
+    mode: "width",
+    value: 1200,
   },
-  background: '#ffffff',
+  background: "#ffffff",
   font: {
     loadSystemFonts: true,
     fontFiles: [],
-    defaultFontFamily: 'Arial'
-  }
+    defaultFontFamily: "Arial",
+  },
 };
 
 /**
@@ -42,15 +44,18 @@ const DEFAULT_OPTIONS: Required<OgImageOptions> = {
  * @returns PNG buffer
  * @throws {Error} If SVG conversion fails
  */
-function svgBufferToPngBuffer(svg: string, options: Partial<OgImageOptions> = {}): Buffer {
+function svgBufferToPngBuffer(
+  svg: string,
+  options: Partial<OgImageOptions> = {}
+): Buffer {
   try {
     const mergedOptions = {
       ...DEFAULT_OPTIONS,
       ...options,
       font: {
         ...DEFAULT_OPTIONS.font,
-        ...options.font
-      }
+        ...options.font,
+      },
     };
 
     const resvg = new Resvg(svg, {
@@ -60,12 +65,14 @@ function svgBufferToPngBuffer(svg: string, options: Partial<OgImageOptions> = {}
         loadSystemFonts: mergedOptions.font.loadSystemFonts,
         fontFiles: mergedOptions.font.fontFiles,
         defaultFontFamily: mergedOptions.font.defaultFontFamily,
-      }
+      },
     });
 
     return resvg.render().asPng();
   } catch (error) {
-    throw new Error(`Failed to convert SVG to PNG: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to convert SVG to PNG: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
   }
 }
 
@@ -85,7 +92,9 @@ export async function generateOgImageForPost(
     const svg = await postOgImage(post);
     return svgBufferToPngBuffer(svg, options);
   } catch (error) {
-    throw new Error(`Failed to generate post OG image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to generate post OG image: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
   }
 }
 
@@ -103,7 +112,9 @@ export async function generateOgImageForSite(
     const svg = await siteOgImage();
     return svgBufferToPngBuffer(svg, options);
   } catch (error) {
-    throw new Error(`Failed to generate site OG image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to generate site OG image: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
   }
 }
 
@@ -115,10 +126,10 @@ export async function generateOgImageForSite(
  */
 export function validateImageDimensions(width?: number, height?: number): void {
   if (width && (width < 200 || width > 2000)) {
-    throw new Error('Width must be between 200 and 2000 pixels');
+    throw new Error("Width must be between 200 and 2000 pixels");
   }
   if (height && (height < 200 || height > 2000)) {
-    throw new Error('Height must be between 200 and 2000 pixels');
+    throw new Error("Height must be between 200 and 2000 pixels");
   }
 }
 
@@ -128,15 +139,17 @@ export function validateImageDimensions(width?: number, height?: number): void {
  * @returns Complete validated options
  * @throws {Error} If options are invalid
  */
-export function createOgImageOptions(options: Partial<OgImageOptions> = {}): Required<OgImageOptions> {
+export function createOgImageOptions(
+  options: Partial<OgImageOptions> = {}
+): Required<OgImageOptions> {
   validateImageDimensions(options.width, options.height);
-  
+
   return {
     ...DEFAULT_OPTIONS,
     ...options,
     font: {
       ...DEFAULT_OPTIONS.font,
-      ...options.font
-    }
+      ...options.font,
+    },
   };
 }

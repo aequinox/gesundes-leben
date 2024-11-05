@@ -8,13 +8,15 @@ export class AuthorUtils {
   /**
    * Retrieves an author entry by slug or author reference
    */
-  public static async getAuthorEntry(author: string | { slug: string }): Promise<Author | undefined | null> {
+  public static async getAuthorEntry(
+    author: string | { slug: string }
+  ): Promise<Author | undefined | null> {
     try {
-      const slug = typeof author === 'string' ? author : author.slug;
-      const entry = await getEntry('authors', slug);
+      const slug = typeof author === "string" ? author : author.slug;
+      const entry = await getEntry("authors", slug);
       return entry || null;
     } catch (error) {
-      console.error('Error fetching author:', error);
+      console.error("Error fetching author:", error);
       return null;
     }
   }
@@ -24,9 +26,9 @@ export class AuthorUtils {
    */
   public static async getAllAuthors(): Promise<Author[]> {
     try {
-      return await getCollection('authors');
+      return await getCollection("authors");
     } catch (error) {
-      console.error('Error fetching authors:', error);
+      console.error("Error fetching authors:", error);
       return [];
     }
   }
@@ -42,7 +44,9 @@ export class AuthorUtils {
   /**
    * Maps author references to full author data
    */
-  public static async resolveAuthors(authors: (string | { slug: string })[]): Promise<(Author | null)[]> {
+  public static async resolveAuthors(
+    authors: (string | { slug: string })[]
+  ): Promise<(Author | null)[]> {
     const resolved = await Promise.all(
       authors.map(async author => {
         const entry = await AuthorUtils.getAuthorEntry(author);

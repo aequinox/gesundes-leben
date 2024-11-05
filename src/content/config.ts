@@ -70,46 +70,43 @@ const favorites = defineCollection({
 const blog = defineCollection({
   type: "content",
   schema: ({ image }) =>
-    z
-      .object({
-        title: z.string(),
-        author: z.union([z.string(), reference("authors")]).default(SITE.author),
-        heroImage: z.object({
-          src: image(),
-          alt: z.string(),
-        }),
-        pubDatetime: z.coerce.date(),
-        modDatetime: z.coerce.date().optional(), //.nullable(),
-        featured: z.boolean().optional(),
-        draft: z.boolean().default(false),
-        tags: z.array(z.string()).default(["others"]),
-        categories: z.array(z.enum(CATEGORIES)),
-        group: z.enum(GROUPS),
-        favorites: z
-          .record(z.string(), z.array(reference("favorites")))
-          .optional(),
-        ogImage: image()
-          .refine(img => img.width >= 1200 && img.height >= 630, {
-            message: "OpenGraph image must be at least 1200 X 630 pixels!",
-          })
-          .or(z.string())
-          .optional(),
-        description: z.string(),
-        canonicalURL: z.string().optional(),
-        readingTime: z.number().optional(),
-        // references: z.array(reference("references")).optional(),
-      })
-      // .transform(obj => {
-      //   // Add draft tag
-      //   if (obj.draft == true) {
-      //     obj.tags.push("Drafts");
-      //   } else if (obj.pubDatetime > new Date()) {
-      //     obj.tags.push("Scheduled");
-      //   }
-      //   return obj;
-      // }),
+    z.object({
+      title: z.string(),
+      author: z.union([z.string(), reference("authors")]).default(SITE.author),
+      heroImage: z.object({
+        src: image(),
+        alt: z.string(),
+      }),
+      pubDatetime: z.coerce.date(),
+      modDatetime: z.coerce.date().optional(), //.nullable(),
+      featured: z.boolean().optional(),
+      draft: z.boolean().default(false),
+      tags: z.array(z.string()).default(["others"]),
+      categories: z.array(z.enum(CATEGORIES)),
+      group: z.enum(GROUPS),
+      favorites: z
+        .record(z.string(), z.array(reference("favorites")))
+        .optional(),
+      ogImage: image()
+        .refine(img => img.width >= 1200 && img.height >= 630, {
+          message: "OpenGraph image must be at least 1200 X 630 pixels!",
+        })
+        .or(z.string())
+        .optional(),
+      description: z.string(),
+      canonicalURL: z.string().optional(),
+      readingTime: z.number().optional(),
+      // references: z.array(reference("references")).optional(),
+    }),
+  // .transform(obj => {
+  //   // Add draft tag
+  //   if (obj.draft == true) {
+  //     obj.tags.push("Drafts");
+  //   } else if (obj.pubDatetime > new Date()) {
+  //     obj.tags.push("Scheduled");
+  //   }
+  //   return obj;
+  // }),
 });
-
-
 
 export const collections = { authors, blog, favorites, glossary };

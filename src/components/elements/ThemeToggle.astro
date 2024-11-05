@@ -7,13 +7,13 @@ interface Props {
   lang: keyof typeof ui;
 }
 
-const { lang } = Astro.props;
+const { lang }: Props = Astro.props;
 const t = useTranslations(lang);
 ---
 
 <button
   id="theme-btn"
-  class="focus-outline p-3 md:p-1 h-6 w-6 fill-skin-base hover:fill-skin-accent scale-125 hover:rotate-12 md:scale-100"
+  class="focus-outline h-6 w-6 scale-125 fill-skin-base p-3 hover:rotate-12 hover:fill-skin-accent md:scale-100 md:p-1"
   title={t("nav.themeToggle")}
   aria-label="auto"
   aria-live="polite"

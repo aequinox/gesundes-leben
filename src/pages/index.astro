@@ -20,7 +20,7 @@ import Hr from "@/components/elements/Hr.astro";
 // const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
 // const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
 
-const socialCount = SOCIALS.filter((social) => social.active).length;
+const socialCount = SOCIALS.filter(social => social.active).length;
 ---
 
 <Layout>

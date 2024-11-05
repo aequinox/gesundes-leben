@@ -9,45 +9,62 @@ import { FlatCompat } from "@eslint/eslintrc";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
+  baseDirectory: __dirname,
+  recommendedConfig: js.configs.recommended,
+  allConfig: js.configs.all,
 });
 
-export default [{
+export default [
+  {
     ignores: [
-        ".astro",
-        "**/.husky",
-        "**/.vscode",
-        "**/node_modules",
-        "**/public",
-        "**/dist",
-        "**/.yarn",
+      ".astro",
+      "**/.husky",
+      "**/.vscode",
+      "**/node_modules",
+      "**/public",
+      "**/dist",
+      "**/.yarn",
     ],
-}, ...compat.extends("eslint:recommended", "plugin:astro/recommended"), {
+  },
+  ...compat.extends("eslint:recommended", "plugin:astro/recommended"),
+  {
     languageOptions: {
-        globals: {
-            ...globals.node,
-            ...globals.browser,
-        },
+      globals: {
+        ...globals.node,
+        ...globals.browser,
+      },
 
-        parser: tsParser,
-        ecmaVersion: "2023",
-        sourceType: "module",
+      parser: tsParser,
+      ecmaVersion: "latest",
+      sourceType: "module",
     },
-}, {
+  },
+  {
     files: ["**/*.astro"],
 
     languageOptions: {
-        parser: parser,
-        ecmaVersion: 5,
-        sourceType: "script",
+      parser: parser,
+      ecmaVersion: 5,
+      sourceType: "script",
 
-        parserOptions: {
-            parser: "@typescript-eslint/parser",
-            extraFileExtensions: [".astro"],
-        },
+      parserOptions: {
+        parser: "@typescript-eslint/parser",
+        extraFileExtensions: [".astro"],
+      },
     },
 
-    rules: {},
-}];
+    rules: {
+      "no-unused-vars": [
+        "warn",
+        {
+          vars: "all",
+          args: "after-used",
+          caughtErrors: "all",
+          ignoreRestSiblings: false,
+          reportUsedIgnorePattern: false,
+        },
+      ],
+      "no-undef": "off",
+    },
+  },
+];

@@ -99,11 +99,11 @@ export function refreshAOS(): void {
  */
 export function debouncedRefreshAOS(delay = 100): void {
   let timeoutId: NodeJS.Timeout | undefined;
-  
+
   if (timeoutId) {
     clearTimeout(timeoutId);
   }
-  
+
   timeoutId = setTimeout(() => {
     AOS.refresh();
   }, delay);

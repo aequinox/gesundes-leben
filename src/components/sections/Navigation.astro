@@ -172,15 +172,12 @@ const ACTION_BUTTONS: ActionButton[] = [
   }
 
   .nav-toggle-label {
-    @apply cursor-pointer self-end p-2 outline-2 outline-offset-1 outline-skin-fill 
-           focus-visible:no-underline focus-visible:outline-dashed md:hidden;
+    @apply cursor-pointer self-end p-2 outline-2 outline-offset-1 outline-skin-fill focus-visible:no-underline focus-visible:outline-dashed md:hidden;
   }
 
   /* Menu Items */
   .menu-items {
-    @apply absolute right-4 left-4 top-full mt-2 hidden rounded-lg border-2 
-           border-skin-inverted bg-skin-fill/95 p-2 shadow-lg
-           md:static md:flex md:border-none md:bg-transparent md:p-0 md:shadow-none;
+    @apply absolute left-4 right-4 top-full mt-2 hidden rounded-lg border-2 border-skin-inverted bg-skin-fill/95 p-2 shadow-lg md:static md:flex md:border-none md:bg-transparent md:p-0 md:shadow-none;
   }
 
   .nav-toggle:checked ~ .menu-items {

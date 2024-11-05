@@ -1,9 +1,4 @@
-import type {
-  Root,
-  RootContent,
-  Node,
-  Parent
-} from "mdast";
+import type { Root, RootContent, Node, Parent } from "mdast";
 
 export interface RemarkContext {
   readonly data: {

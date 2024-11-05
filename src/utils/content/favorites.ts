@@ -9,8 +9,8 @@ export class FavoriteUtils {
    * Sorts favorites by name
    */
   public static sortByName(favorites: Favorite[]): Favorite[] {
-    return [...favorites].sort((a, b) => 
-      a.data.name.localeCompare(b.data.name, undefined, { sensitivity: 'base' })
+    return [...favorites].sort((a, b) =>
+      a.data.name.localeCompare(b.data.name, undefined, { sensitivity: "base" })
     );
   }
 
@@ -19,9 +19,9 @@ export class FavoriteUtils {
    */
   public static sortByCategory(favorites: Favorite[]): Favorite[] {
     const categoryPriority: Record<string, number> = {
-      'Profi': 3,
-      'Premium': 2,
-      'Basis': 1
+      Profi: 3,
+      Premium: 2,
+      Basis: 1,
     };
 
     return [...favorites].sort((a, b) => {
@@ -34,17 +34,19 @@ export class FavoriteUtils {
   /**
    * Retrieves all favorites with optional sorting
    */
-  public static async getAllFavorites(options: {
-    sortBy?: 'name' | 'category';
-  } = {}): Promise<Favorite[]> {
-    const { sortBy = 'name' } = options;
+  public static async getAllFavorites(
+    options: {
+      sortBy?: "name" | "category";
+    } = {}
+  ): Promise<Favorite[]> {
+    const { sortBy = "name" } = options;
     try {
-      const favorites = await getCollection('favorites');
-      return sortBy === 'category'
+      const favorites = await getCollection("favorites");
+      return sortBy === "category"
         ? FavoriteUtils.sortByCategory(favorites)
         : FavoriteUtils.sortByName(favorites);
     } catch (error) {
-      console.error('Error fetching favorites:', error);
+      console.error("Error fetching favorites:", error);
       return [];
     }
   }
@@ -52,12 +54,14 @@ export class FavoriteUtils {
   /**
    * Retrieves a single favorite by slug
    */
-  public static async getFavorite(slug: string): Promise<Favorite | undefined | null> {
+  public static async getFavorite(
+    slug: string
+  ): Promise<Favorite | undefined | null> {
     try {
-      const favorite = await getEntry('favorites', slug);
+      const favorite = await getEntry("favorites", slug);
       return favorite || null;
     } catch (error) {
-      console.error('Error fetching favorite:', error);
+      console.error("Error fetching favorite:", error);
       return null;
     }
   }
@@ -65,7 +69,9 @@ export class FavoriteUtils {
   /**
    * Retrieves favorites by category
    */
-  public static async getFavoritesByCategory(category: 'Basis' | 'Premium' | 'Profi'): Promise<Favorite[]> {
+  public static async getFavoritesByCategory(
+    category: "Basis" | "Premium" | "Profi"
+  ): Promise<Favorite[]> {
     const favorites = await FavoriteUtils.getAllFavorites();
     return favorites.filter(favorite => favorite.data.category === category);
   }
@@ -73,27 +79,32 @@ export class FavoriteUtils {
   /**
    * Retrieves favorites by manufacturer
    */
-  public static async getFavoritesByManufacturer(manufacturer: string): Promise<Favorite[]> {
+  public static async getFavoritesByManufacturer(
+    manufacturer: string
+  ): Promise<Favorite[]> {
     const favorites = await FavoriteUtils.getAllFavorites();
-    return favorites.filter(favorite => 
-      favorite.data.manufacturer.toLowerCase() === manufacturer.toLowerCase()
+    return favorites.filter(
+      favorite =>
+        favorite.data.manufacturer.toLowerCase() === manufacturer.toLowerCase()
     );
   }
 
   /**
    * Groups favorites by category
    */
-  public static async getFavoritesByCategories(): Promise<Record<string, Favorite[]>> {
-    const favorites = await FavoriteUtils.getAllFavorites({ sortBy: 'name' });
+  public static async getFavoritesByCategories(): Promise<
+    Record<string, Favorite[]>
+  > {
+    const favorites = await FavoriteUtils.getAllFavorites({ sortBy: "name" });
     const grouped: Record<string, Favorite[]> = {
-      'Profi': [],
-      'Premium': [],
-      'Basis': [],
-      'Uncategorized': []
+      Profi: [],
+      Premium: [],
+      Basis: [],
+      Uncategorized: [],
     };
 
     favorites.forEach(favorite => {
-      const category = favorite.data.category || 'Uncategorized';
+      const category = favorite.data.category || "Uncategorized";
       grouped[category].push(favorite);
     });
 
@@ -103,8 +114,10 @@ export class FavoriteUtils {
   /**
    * Groups favorites by manufacturer
    */
-  public static async getFavoritesByManufacturers(): Promise<Record<string, Favorite[]>> {
-    const favorites = await FavoriteUtils.getAllFavorites({ sortBy: 'name' });
+  public static async getFavoritesByManufacturers(): Promise<
+    Record<string, Favorite[]>
+  > {
+    const favorites = await FavoriteUtils.getAllFavorites({ sortBy: "name" });
     const grouped: Record<string, Favorite[]> = {};
 
     favorites.forEach(favorite => {
@@ -130,7 +143,9 @@ export class FavoriteUtils {
       return (
         name.toLowerCase().includes(searchTerm) ||
         manufacturer.toLowerCase().includes(searchTerm) ||
-        descriptions.some((desc: string) => desc.toLowerCase().includes(searchTerm))
+        descriptions.some((desc: string) =>
+          desc.toLowerCase().includes(searchTerm)
+        )
       );
     });
   }

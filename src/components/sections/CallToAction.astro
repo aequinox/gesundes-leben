@@ -67,7 +67,7 @@ const isCallToAction = (
         actions && (
           <div class="m-auto mt-6 flex max-w-xs flex-col flex-nowrap gap-4 sm:max-w-md sm:flex-row sm:justify-center">
             {Array.isArray(actions) ? (
-              actions.map((action) => (
+              actions.map(action => (
                 <div class="flex w-full sm:w-auto">
                   {isCallToAction(action) ? (
                     <Button

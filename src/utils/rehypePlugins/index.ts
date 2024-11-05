@@ -57,7 +57,7 @@ const autolinkConfig: AutolinkConfig = {
     h(`div.heading-wrapper.level-${tagName}`, {
       tabIndex: -1,
     }),
-  content: (heading) => [
+  content: heading => [
     h(`span.anchor-icon`, {
       ariaHidden: "true",
     } satisfies AnchorIconProperties),

@@ -10,7 +10,9 @@ export interface SlugifyOptions {
 }
 
 export type SlugifyInput = string | readonly string[];
-export type SlugifyOutput<T> = T extends readonly string[] ? readonly string[] : string;
+export type SlugifyOutput<T> = T extends readonly string[]
+  ? readonly string[]
+  : string;
 
 const DEFAULT_OPTIONS: SlugifyOptions = {
   replacement: "-",
@@ -28,9 +30,12 @@ const DEFAULT_OPTIONS: SlugifyOptions = {
  * @returns The slugified string.
  * @throws {Error} If input string is empty or invalid.
  */
-export const slugifyStr = (str: string, options: Partial<SlugifyOptions> = {}): string => {
-  if (!str || typeof str !== 'string') {
-    throw new Error('Invalid input: string required');
+export const slugifyStr = (
+  str: string,
+  options: Partial<SlugifyOptions> = {}
+): string => {
+  if (!str || typeof str !== "string") {
+    throw new Error("Invalid input: string required");
   }
   return slugifier(str.trim(), { ...DEFAULT_OPTIONS, ...options });
 };
@@ -47,7 +52,7 @@ export const slugifyAll = (
   options: Partial<SlugifyOptions> = {}
 ): readonly string[] => {
   if (!Array.isArray(arr)) {
-    throw new Error('Invalid input: array required');
+    throw new Error("Invalid input: array required");
   }
   return arr.map(str => slugifyStr(str, options));
 };
@@ -74,7 +79,7 @@ export const slugify = <T extends SlugifyInput>(
  * @returns True if the slug is valid, false otherwise.
  */
 export const isValidSlug = (slug: string): boolean => {
-  if (!slug || typeof slug !== 'string') return false;
+  if (!slug || typeof slug !== "string") return false;
   const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
   return slugRegex.test(slug);
 };
@@ -85,7 +90,10 @@ export const isValidSlug = (slug: string): boolean => {
  * @param options - Optional configuration for slugify.
  * @returns A valid slug.
  */
-export const ensureSlug = (str: string, options: Partial<SlugifyOptions> = {}): string => {
+export const ensureSlug = (
+  str: string,
+  options: Partial<SlugifyOptions> = {}
+): string => {
   if (isValidSlug(str)) return str;
   return slugifyStr(str, options);
 };
@@ -96,12 +104,15 @@ export const ensureSlug = (str: string, options: Partial<SlugifyOptions> = {}): 
  * @param options - Optional configuration for slugify.
  * @returns A combined slug.
  */
-export const combineSlug = (parts: string[], options: Partial<SlugifyOptions> = {}): string => {
+export const combineSlug = (
+  parts: string[],
+  options: Partial<SlugifyOptions> = {}
+): string => {
   if (!Array.isArray(parts) || parts.length === 0) {
-    throw new Error('Invalid input: non-empty array required');
+    throw new Error("Invalid input: non-empty array required");
   }
   return parts
     .map(part => slugifyStr(part, options))
     .filter(Boolean)
-    .join('-');
+    .join("-");
 };

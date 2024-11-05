@@ -31,7 +31,7 @@ export class PostUtils {
     const { includeDrafts = false, includeScheduled = false } = options;
     const now = new Date();
 
-    return posts.filter((post) => {
+    return posts.filter(post => {
       if (!includeDrafts && post.data.draft) return false;
       if (!includeScheduled && post.data.pubDatetime > now) return false;
       return true;
@@ -64,7 +64,7 @@ export class PostUtils {
    */
   public static async getFeaturedPosts(): Promise<Blog[]> {
     const posts = await PostUtils.getAllPosts();
-    return posts.filter((post) => post.data.featured);
+    return posts.filter(post => post.data.featured);
   }
 
   /**
@@ -72,7 +72,7 @@ export class PostUtils {
    */
   public static async getPostsByTag(tag: string): Promise<Blog[]> {
     const posts = await PostUtils.getAllPosts();
-    return posts.filter((post) => post.data.tags.includes(tag));
+    return posts.filter(post => post.data.tags.includes(tag));
   }
 
   /**
@@ -80,7 +80,7 @@ export class PostUtils {
    */
   public static async getPostsByCategory(category: Category): Promise<Blog[]> {
     const posts = await PostUtils.getAllPosts();
-    return posts.filter((post) => post.data.categories.includes(category));
+    return posts.filter(post => post.data.categories.includes(category));
   }
 
   /**
@@ -88,7 +88,7 @@ export class PostUtils {
    */
   public static async getPostsByGroup(group: string): Promise<Blog[]> {
     const posts = await PostUtils.getAllPosts();
-    return posts.filter((post) => post.data.group === group);
+    return posts.filter(post => post.data.group === group);
   }
 
   /**
@@ -96,7 +96,7 @@ export class PostUtils {
    */
   public static async getPostsByAuthor(authorSlug: string): Promise<Blog[]> {
     const posts = await PostUtils.getAllPosts();
-    return posts.filter(async (post) => {
+    return posts.filter(async post => {
       const postAuthor = await AuthorUtils.getAuthorEntry(post.data.author);
       return postAuthor?.slug === authorSlug;
     });
@@ -120,7 +120,7 @@ export class PostUtils {
    */
   public static async updateReadingTimes(posts: Blog[]): Promise<Blog[]> {
     return Promise.all(
-      posts.map(async (post) => {
+      posts.map(async post => {
         if (!post.data.readingTime) {
           const rendered = await post.render();
           const content = rendered.toString();
