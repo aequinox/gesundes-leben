@@ -41,8 +41,8 @@ export const SITE: Site = {
   postPerIndex: 4,
   postPerPage: 6,
   scheduledPostMargin: 15 * 60 * 1000, // 15 minutes
-  showArchives: false,
-  showSearch: false,
+  showArchives: true,
+  showSearch: true,
 };
 
 export const LOCALE = {

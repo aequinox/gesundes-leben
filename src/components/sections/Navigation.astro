@@ -4,7 +4,8 @@ import ThemeToggle from "@/components/elements/ThemeToggle.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import type { NavigationLink } from "@/data/navigation";
 import { LOGO_IMAGE, SITE } from "@/config";
-import Icon from "@/components/elements/Icon.astro";
+import MenuIcon from "@/components/elements/Icon.astro";
+import { Icon } from "astro-icon/components";
 
 export interface Props {
   activeNav?: NavigationLink;
@@ -51,16 +52,124 @@ const ACTION_BUTTONS: ActionButton[] = [
 ].filter((button): button is ActionButton => Boolean(button));
 ---
 
-<header
+<div
+  class="mx-auto flex w-full max-w-content items-start justify-between py-4 text-skin-base md:items-center md:pb-4 md:pt-4"
+>
+  <!-- Logo -->
+  <a
+    id="logo"
+    href="/"
+    class="logo scale-105 whitespace-nowrap"
+    aria-label={SITE.title}
+  >
+    {
+      LOGO_IMAGE.enable ? (
+        <img
+          src={`/assets/${LOGO_IMAGE.svg ? "logo.svg" : "logo.png"}`}
+          alt={SITE.title}
+          width={LOGO_IMAGE.width}
+          height={LOGO_IMAGE.height}
+          loading="eager"
+        />
+      ) : (
+        SITE.title
+      )
+    } - NEW
+  </a>
+  <nav
+    class="flex w-full flex-grow flex-col items-center md:ml-2 md:flex-row md:justify-end md:pb-0 md:pt-0"
+    aria-label={t("nav.mainNavigation")}
+  >
+    <input
+      type="checkbox"
+      id="nav-toggle"
+      class="nav-toggle"
+      aria-hidden="true"
+    />
+    <label
+      for="nav-toggle"
+      class="nav-toggle-label"
+      aria-label={t("nav.toggleMenu")}
+    >
+      <!-- <Icon name="tabler:menu-2" class="h-8 w-8" /> -->
+      <span class="hamburger">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </span>
+    </label>
+    <ul id="menu-items" class="menu-items" role="menubar">
+      {
+        NAV_LINKS.map(({ href, key, label }) => (
+          <li
+            role="none"
+            class="col-span-2 flex items-center justify-center font-medium"
+          >
+            <a
+              href={href}
+              class:list={[
+                "px-2 py-1 text-center hover:text-skin-accent hover:underline hover:decoration-wavy hover:decoration-2 hover:underline-offset-4",
+                activeNav === key && "active",
+              ]}
+              role="menuitem"
+              aria-current={activeNav === key ? "page" : undefined}
+            >
+              {label}
+            </a>
+          </li>
+        ))
+      }
+      {/* Action Buttons */}
+      <div
+        class="action-buttons"
+        role="group"
+        aria-label={t("nav.additionalActions")}
+      >
+        {
+          ACTION_BUTTONS.map(({ href, key, label, icon, showTextOnMobile }) => (
+            <li role="none">
+              <LinkButton
+                href={href}
+                className={`action-button ${activeNav === key ? "active" : ""}`}
+                ariaLabel={label}
+                title={label}
+              >
+                <MenuIcon name={icon} active={activeNav === key} />
+                <span
+                  class:list={[
+                    showTextOnMobile ? "sm:sr-only" : "sr-only",
+                    activeNav === key && "active",
+                  ]}
+                >
+                  {label}
+                </span>
+              </LinkButton>
+            </li>
+          ))
+        }
+        {/* Theme Toggle */}
+      </div>
+      {
+        SITE.lightAndDarkMode && (
+          <li role="none" class="">
+            <ThemeToggle lang={lang} />
+          </li>
+        )
+      }
+    </ul>
+  </nav>
+</div>
+<!--  -->
+
+<!-- <div
   id="navbar"
   class="sticky top-0 z-20 w-full backdrop-blur-md transition-all duration-200"
   role="banner"
 >
-  <div class="mx-auto max-w-7xl px-4">
+  <div class="mx-auto max-w-content">
     <div
-      class="relative flex w-full items-start justify-between p-4 md:items-center md:py-4"
+      class="relative flex w-full items-start justify-between md:items-center md:py-4"
     >
-      <!-- Logo -->
       <a
         id="logo"
         href="/"
@@ -82,7 +191,6 @@ const ACTION_BUTTONS: ActionButton[] = [
         }
       </a>
 
-      <!-- Navigation Menu -->
       <nav id="nav-menu" class="flex-grow" aria-label={t("nav.mainNavigation")}>
         <input
           type="checkbox"
@@ -135,7 +243,7 @@ const ACTION_BUTTONS: ActionButton[] = [
                       ariaLabel={label}
                       title={label}
                     >
-                      <Icon name={icon} active={activeNav === key} />
+                      <MenuIcon name={icon} active={activeNav === key} />
                       <span
                         class:list={[
                           showTextOnMobile ? "sm:sr-only" : "sr-only",
@@ -163,9 +271,16 @@ const ACTION_BUTTONS: ActionButton[] = [
       </nav>
     </div>
   </div>
-</header>
+</div> -->
 
 <style>
+  a.active,
+  a.hover {
+    @apply underline decoration-wavy decoration-2 underline-offset-4;
+  }
+  a.active svg {
+    @apply fill-skin-accent;
+  }
   /* Base Styles */
   .nav-toggle {
     @apply hidden;
@@ -177,7 +292,7 @@ const ACTION_BUTTONS: ActionButton[] = [
 
   /* Menu Items */
   .menu-items {
-    @apply absolute left-4 right-4 top-full mt-2 hidden rounded-lg border-2 border-skin-inverted bg-skin-fill/95 p-2 shadow-lg md:static md:flex md:border-none md:bg-transparent md:p-0 md:shadow-none;
+    @apply absolute left-4 right-4 top-full ml-auto mt-2 hidden list-none grid-cols-2 grid-rows-4 gap-x-5 rounded-lg border-2 border-skin-inverted bg-skin-fill/95 p-2 text-base shadow-lg md:static md:ml-4 md:mr-0 md:flex md:items-center md:border-none md:bg-transparent md:p-0 md:shadow-none;
   }
 
   .nav-toggle:checked ~ .menu-items {
@@ -186,7 +301,7 @@ const ACTION_BUTTONS: ActionButton[] = [
 
   /* Navigation Links */
   .nav-link {
-    @apply w-full px-4 py-3 text-center font-medium hover:text-skin-accent md:my-0 md:px-2 md:py-1;
+    @apply mb-2 w-full px-4 py-3 text-center font-medium hover:text-skin-accent md:my-0 md:px-2 md:py-1;
   }
 
   .nav-link.active {
@@ -228,9 +343,9 @@ const ACTION_BUTTONS: ActionButton[] = [
   }
 
   /* Navigation Layout */
-  nav {
+  /* nav {
     @apply flex w-full flex-col items-center md:ml-2 md:flex-row md:justify-end md:space-x-4 md:py-0;
-  }
+  } */
 
   /* Navigation Shrink Effect */
   :global(.nav-shrink) {
