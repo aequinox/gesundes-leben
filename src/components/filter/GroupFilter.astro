@@ -1,9 +1,5 @@
 ---
-import getSortedPosts from "@/utils/getSortedPosts";
-import { getCollection } from "astro:content";
 
-const posts = await getCollection("blog");
-const sortedPosts = await getSortedPosts(posts);
 ---
 
 <section

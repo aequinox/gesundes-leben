@@ -7,16 +7,6 @@ files=$(git diff --cached --name-status | awk '/^M.*\.mdx$/ {print $2}')
 # Loop through each file
 for file in $files; do
   echo "Checking $file"
-  # Get the content excluding frontmatter
-  content=$(awk '/^---/{f=1;next}/^---/{f=0;next}f' "$file")
-
-  # Remove markdown formatting for more accurate word count
-  content=$(echo "$content" | sed -e 's/^[[:space:]]*//;s/[[:space:]]*$//;s/[[:punct:]]//g;s/\s+/ /g')
-
-  # Calculate reading time (more accurate)
-  word_count=$(echo "$content" | wc -w)
-  reading_time=$(( (word_count + 199) / 200 )) # Round up
-
   # Get the front matter
   frontmatter=$(awk -v RS='---' 'NR==2{print}' "$file")
 
@@ -45,10 +35,6 @@ for file in $files; do
     sed -i "/---.*/,/---.*/s/^draft:.*$/draft: false/" "$file"
     git add "$file"
   fi
-
-  # Update frontmatter with reading time
-  sed -i "/---.*/,/---.*/s/^readingTime:.*$/readingTime: $reading_time/" "$file"
-  git add "$file"
 done
 
 git update-index --again
