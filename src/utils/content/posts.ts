@@ -2,6 +2,9 @@ import { getCollection } from "astro:content";
 import { AuthorUtils } from "./authors";
 import type { Blog } from "./types";
 import type { Category } from "@/data/taxonomies";
+import readingTime from "reading-time";
+import { fromMarkdown } from "mdast-util-from-markdown";
+import { toString } from "mdast-util-to-string";
 
 /**
  * Post-related utility functions
@@ -107,12 +110,17 @@ export class PostUtils {
    * @param content Post content
    * @param wordsPerMinute Average reading speed (default: 200)
    */
-  public static calculateReadingTime(
-    content: string,
-    wordsPerMinute = 200
-  ): number {
-    const words = content.trim().split(/\s+/).length;
-    return Math.ceil(words / wordsPerMinute);
+  public static calculateReadingTime(content: string): number | undefined {
+    if (!content || !content.length) return undefined;
+    try {
+      const { minutes } = readingTime(toString(fromMarkdown(content)));
+      if (minutes && minutes > 0) {
+        return Math.ceil(minutes);
+      }
+      return undefined;
+    } catch (e) {
+      return undefined;
+    }
   }
 
   /**
@@ -122,9 +130,7 @@ export class PostUtils {
     return Promise.all(
       posts.map(async post => {
         if (!post.data.readingTime) {
-          const rendered = await post.render();
-          const content = rendered.toString();
-          post.data.readingTime = PostUtils.calculateReadingTime(content);
+          post.data.readingTime = PostUtils.calculateReadingTime(post.body);
         }
         return post;
       })

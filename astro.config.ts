@@ -8,14 +8,15 @@ import react from "@astrojs/react";
 // import remarkToc from "remark-toc";
 
 import { SITE } from "./src/config";
-// import { remarkPlugins } from "./src/utils/remarkPlugins";
+import { remarkPlugins } from "./src/utils/remarkPlugins";
 // import { rehypePlugins } from "./src/utils/rehypePlugins";
 
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,
   markdown: {
-    // remarkPlugins: remarkPlugins,
+    // remarkPlugins: [remarkReadingTime],
+    remarkPlugins: remarkPlugins,
     // rehypePlugins: rehypePlugins,
     // shikiConfig: {
     //   // For more themes, visit https://shiki.style/themes

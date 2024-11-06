@@ -1,12 +1,12 @@
 import type { RemarkPlugins } from "astro";
 import remarkCollapse from "remark-collapse";
 import remarkToc from "remark-toc";
-import { remarkReadingTime } from "./remark-reading-time";
 import remarkSectionize from "./sectionize";
-import { replaceRelativeLinks } from "./remark-img-links";
+// import { replaceRelativeLinks } from "./remark-img-links";
+// import { remarkReadingTime } from "./remark-reading-time";
 
 export const remarkPlugins: RemarkPlugins = [
-  remarkReadingTime,
+  // remarkReadingTime,
   [
     remarkToc,
     {
@@ -24,5 +24,5 @@ export const remarkPlugins: RemarkPlugins = [
     },
   ],
   remarkSectionize,
-  replaceRelativeLinks({ prefixUrl: "/assets/images" }),
+  // replaceRelativeLinks({ prefixUrl: "/assets/images" }),
 ];

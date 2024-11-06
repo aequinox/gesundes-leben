@@ -120,7 +120,8 @@ const t = useTranslations(lang);
       </button>
     </div>
 
-    <main id="main-content" class="col-span-12 2xl:col-span-8 3xl:col-span-9">
+    <!-- <main id="main-content" class="col-span-12 2xl:col-span-8 3xl:col-span-9"> -->
+    <main id="main-content" class="col-span-12 2xl:col-span-8">
       <div class="mb-2 flex flex-wrap text-xs uppercase">
         {
           categories &&
@@ -215,8 +216,12 @@ const t = useTranslations(lang);
       </div>
     </main>
 
-    <aside
+    <!-- <aside
       class="sticky top-24 hidden self-start rounded 2xl:col-span-4 2xl:block 3xl:col-span-3"
+      aria-label="Table of contents"
+    > -->
+    <aside
+      class="sticky top-24 hidden self-start rounded 2xl:col-span-4 2xl:block"
       aria-label="Table of contents"
     >
       <div
