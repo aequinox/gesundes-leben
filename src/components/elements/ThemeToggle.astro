@@ -13,7 +13,7 @@ const t = useTranslations(lang);
 
 <button
   id="theme-btn"
-  class="focus-outline hover:fill-skin-accentmd:scale-100 h-6 w-6 scale-125 fill-skin-base p-3 hover:rotate-12 hover:text-skin-accent md:p-1"
+  class="fill-skin-base p-3 hover:rotate-12 hover:text-skin-accent md:p-1"
   title={t("nav.themeToggle")}
   aria-label="auto"
   aria-live="polite"
@@ -21,16 +21,6 @@ const t = useTranslations(lang);
   <Icon name="moon" id="moon-svg" />
   <Icon name="sun" id="sun-svg" />
 </button>
-
-<!-- <style>
-  button {
-    @apply p-1;
-  }
-
-  button :global(svg) {
-    @apply h-6 w-6 fill-skin-base hover:fill-skin-accent scale-125 hover:rotate-12 md:scale-100;
-  }
-</style> -->
 
 <script>
   // Set initial theme
