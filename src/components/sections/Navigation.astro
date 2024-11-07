@@ -23,8 +23,10 @@ interface NavLink {
 
 const NAV_LINKS: NavLink[] = [
   { href: "/posts/", key: "posts", label: t("nav.posts") },
+  /*
   { href: "/categories/", key: "categories", label: t("nav.categories") },
   { href: "/tags/", key: "tags", label: t("nav.tags") },
+   */
   { href: "/glossary/", key: "glossary", label: t("nav.glossary") },
   { href: "/about/", key: "about", label: t("nav.about") },
 ];
@@ -466,6 +468,10 @@ const ACTION_BUTTONS: ActionButton[] = [
       &.is-active .close {
         @apply opacity-100;
       }
+
+      &.is-active #menu-items {
+        @apply absolute left-0 top-full z-10 w-full origin-top bg-skin-fill/90 backdrop-blur-md backdrop-brightness-150 transition-transform duration-300 ease-in-out md:relative;
+      }
     }
 
     .hamburger-menu {
@@ -476,6 +482,43 @@ const ACTION_BUTTONS: ActionButton[] = [
     }
     .nav-shrink {
       @apply h-14 bg-skin-fill/75 shadow-lg;
+    }
+    .menu-items {
+      @apply ml-auto hidden rounded-lg border-2 border-skin-inverted bg-skin-base/95 md:flex md:border-none md:bg-transparent;
+    }
+    /* Added styles for overlay */
+
+    /* #menu-items {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: white;
+      border: 1px solid #ccc;
+      z-index: 1000;
+      transform-origin: top;
+      transform: scaleY(0);
+      transition: transform 0.3s ease-in-out;
+    }
+
+    #menu-items.hidden {
+      transform: scaleY(0);
+    }
+
+    #menu-items.not-hidden {
+      transform: scaleY(1);
+    }
+
+    #menu-items a {
+      display: block;
+      padding: 1rem;
+      text-decoration: none;
+      color: #333;
+    } */
+
+    /* Style the content to prevent it from being hidden */
+    main {
+      z-index: 1; /* Ensure content is below the menu */
     }
   </style>
 
