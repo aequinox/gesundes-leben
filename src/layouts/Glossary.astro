@@ -1,0 +1,46 @@
+---
+import Footer from "@/components/sections/Footer.astro";
+import GlossaryCard from "@/components/sections/GlossaryCard.astro";
+import Header from "@/components/sections/Header.astro";
+import Pagination from "@/components/sections/Pagination.astro";
+import { SITE } from "@/config";
+import type { CollectionEntry } from "astro:content";
+import Layout from "./Layout.astro";
+import Main from "./Main.astro";
+
+export interface Props {
+  title?: string;
+  currentPage: number;
+  totalPages: number;
+  paginatedPosts: CollectionEntry<"glossary">[];
+}
+
+const {
+  title: propTitle,
+  currentPage,
+  totalPages,
+  paginatedPosts,
+} = Astro.props;
+const title = propTitle
+  ? `${propTitle} | ${SITE.title}`
+  : `Posts | ${SITE.title}`;
+const pageTitle = propTitle ? propTitle : "Alle Glossareinträge";
+---
+
+<Layout title={title}>
+  <Header activeNav="glossary" />
+  <Main pageTitle={pageTitle} pageDesc="All the glossary entries I've posted.">
+    <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+      {paginatedPosts.map(post => <GlossaryCard {post} />)}
+    </div>
+  </Main>
+
+  <Pagination
+    {currentPage}
+    {totalPages}
+    prevUrl={`/glossary${currentPage - 1 !== 1 ? "/" + (currentPage - 1) : ""}/`}
+    nextUrl={`/glossary/${currentPage + 1}/`}
+  />
+
+  <Footer noMarginTop={totalPages > 1} />
+</Layout>

@@ -1,0 +1,14 @@
+---
+import Posts from "@layouts/Posts.astro";
+import getPagination from "@utils/getPagination";
+import { getAllPostsByGroup } from "@utils/getPostsBy";
+
+const posts = await getAllPostsByGroup("kontra");
+const pagination = getPagination({
+  posts: posts,
+  page: 1,
+  isIndex: true,
+});
+---
+
+<Posts title="Kontra Artikel" {...pagination} />

@@ -1,0 +1,49 @@
+---
+import { type CollectionEntry } from "astro:content";
+
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import Card from "@/components/sections/Card.astro";
+import Footer from "@/components/sections/Footer.astro";
+import Header from "@/components/sections/Header.astro";
+import Pagination from "@/components/sections/Pagination.astro";
+import { SITE } from "@/config";
+import Layout from "./Layout.astro";
+import Main from "./Main.astro";
+
+export interface Props {
+  currentPage: number;
+  totalPages: number;
+  paginatedPosts: CollectionEntry<"blog">[];
+  tag: string;
+  tagName: string;
+}
+
+const { currentPage, totalPages, paginatedPosts, tag, tagName } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<Layout title={`Tag: ${tagName} | ${SITE.title}`}>
+  <Header activeNav="tags" />
+  <Main
+    pageTitle={[`Tag:`, `${tagName}`]}
+    titleTransition={tag}
+    pageDesc={`${t("articles.withTag")} "${tagName}".`}
+  >
+    <h1 slot="title" transition:name={tag}>{`Tag:${tagName}`}</h1>
+    <ul>
+      {paginatedPosts.map(post => <Card {post} withHeroImage={false} />)}
+    </ul>
+  </Main>
+
+  <Pagination
+    {currentPage}
+    {totalPages}
+    prevUrl={`/tags/${tag}${
+      currentPage - 1 !== 1 ? "/" + (currentPage - 1) : ""
+    }/`}
+    nextUrl={`/tags/${tag}/${currentPage + 1}/`}
+  />
+
+  <Footer noMarginTop={totalPages > 1} />
+</Layout>
