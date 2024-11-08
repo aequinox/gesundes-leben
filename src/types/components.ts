@@ -1,20 +1,28 @@
+/**
+ * Component type definitions for the UI system.
+ * @module components
+ */
+
 import type { ImageMetadata } from "astro";
-import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { HTMLAttributes } from "astro/types";
 
-// CSS Classes Types
+// CSS Types
+/** CSS class value type */
 export type CSSClassValue = boolean | undefined;
-export interface CSSClassesObject {
+
+/** CSS classes object structure */
+export interface CSSClassesObject extends Record<string, string | undefined> {
   container?: string;
   title?: string;
   subtitle?: string;
   content?: string;
-  [key: string]: string | undefined;
 }
+
+/** CSS classes type */
 export type CSSClasses = CSSClassesObject;
-// export type CSSClasses = string | CSSClassesObject;
 
 // Widget Types
+/** Available widget background styles */
 export const WIDGET_BACKGROUNDS = [
   "default",
   "alternate",
@@ -22,412 +30,362 @@ export const WIDGET_BACKGROUNDS = [
   "secondary",
   "dark",
 ] as const;
+
+/** Widget background type */
 export type WidgetBackground = (typeof WIDGET_BACKGROUNDS)[number];
 
+/** Base widget properties */
 export interface Widget {
   /** Unique identifier */
-  id?: string;
-  /** Whether to use dark mode styling */
-  isDark?: boolean;
+  readonly id?: string;
+  /** Dark mode flag */
+  readonly isDark?: boolean;
   /** Background style */
-  bg?: WidgetBackground;
+  readonly bg?: WidgetBackground;
   /** Additional CSS classes */
-  classes?: CSSClasses;
-}
-
-// Post Types
-export interface Post {
-  /** A unique ID number that identifies a post. */
-  id: string;
-  /** A post's unique slug – part of the post's URL based on its name */
-  slug: string;
-  /** The full URL path to the post */
-  permalink: string;
-  /** The date when the post was first published */
-  publishDate: Date;
-  /** The date when the post was last modified */
-  updateDate?: Date;
-  /** The title of the post */
-  title: string;
-  /** Optional summary of post content */
-  excerpt?: string;
-  /** Featured image for the post */
-  image?: ImageMetadata | string;
-  /** The primary category the post belongs to */
-  category?: Taxonomy;
-  /** Tags associated with the post */
-  tags?: Taxonomy[];
-  /** The author of the post */
-  author?: string;
-  /** Additional metadata for SEO and social sharing */
-  metadata?: MetaData;
-  /** Whether the post is in draft status */
-  draft?: boolean;
-  /** The post's content as an Astro component */
-  Content?: AstroComponentFactory;
-  /** The post's content as a string */
-  content?: string;
-  /** Estimated reading time in minutes */
-  readingTime?: number;
-}
-
-export interface Taxonomy {
-  /** URL-friendly identifier */
-  slug: string;
-  /** Display name */
-  title: string;
-}
-
-// Metadata Types
-export interface MetaData {
-  /** Page title for SEO */
-  title?: string;
-  /** Whether to ignore the site's title template */
-  ignoreTitleTemplate?: boolean;
-  /** Canonical URL */
-  canonical?: string;
-  /** Robot directives */
-  robots?: MetaDataRobots;
-  /** Meta description */
-  description?: string;
-  /** Open Graph metadata */
-  openGraph?: MetaDataOpenGraph;
-  /** Twitter metadata */
-  twitter?: MetaDataTwitter;
-}
-
-export interface MetaDataRobots {
-  index?: boolean;
-  follow?: boolean;
-}
-
-export interface MetaDataImage {
-  /** Image URL */
-  url: string;
-  /** Image width in pixels */
-  width?: number;
-  /** Image height in pixels */
-  height?: number;
-}
-
-export interface MetaDataOpenGraph {
-  /** Page URL */
-  url?: string;
-  /** Site name */
-  siteName?: string;
-  /** Open Graph images */
-  images?: Array<MetaDataImage>;
-  /** Content locale */
-  locale?: string;
-  /** Open Graph type */
-  type?: string;
-}
-
-export interface MetaDataTwitter {
-  /** Twitter handle */
-  handle?: string;
-  /** Twitter site */
-  site?: string;
-  /** Twitter card type */
-  cardType?: string;
+  readonly classes?: CSSClasses;
 }
 
 // Media Types
+/** Valid image source types */
 export type ImageSource = string | ImageMetadata;
 
+/** Image configuration */
 export interface Image {
   /** Image source URL or metadata */
-  src: ImageSource;
+  readonly src: ImageSource;
   /** Alt text for accessibility */
-  alt: string;
+  readonly alt: string;
+  /** Optional width */
+  readonly width?: number;
+  /** Optional height */
+  readonly height?: number;
+  /** Optional loading strategy */
+  readonly loading?: "lazy" | "eager";
 }
 
+/** Video configuration */
 export interface Video {
   /** Video source URL */
-  src: string;
+  readonly src: string;
   /** Video MIME type */
-  type?: string;
+  readonly type?: string;
+  /** Autoplay flag */
+  readonly autoplay?: boolean;
+  /** Loop flag */
+  readonly loop?: boolean;
+  /** Muted flag */
+  readonly muted?: boolean;
+  /** Controls flag */
+  readonly controls?: boolean;
 }
 
 // Component Types
+/** Headline component properties */
 export interface Headline {
   /** Main title text */
-  title: string;
+  readonly title: string;
   /** Secondary subtitle text */
-  subtitle?: string;
+  readonly subtitle?: string;
   /** Small text above the title */
-  tagline?: string;
+  readonly tagline?: string;
   /** Additional CSS classes */
-  classes?: CSSClasses;
+  readonly classes?: CSSClasses;
 }
 
+/** Social media link configuration */
 export interface Social {
   /** Icon identifier */
-  icon: string;
+  readonly icon: string;
   /** Link URL */
-  href: string;
+  readonly href: string;
+  /** Link label */
+  readonly label?: string;
+  /** Open in new tab flag */
+  readonly newTab?: boolean;
 }
 
+/** Team member configuration */
 export interface TeamMember {
   /** Member's name */
-  name: string;
+  readonly name: string;
   /** Member's job title */
-  job: string;
+  readonly job: string;
   /** Member's photo */
-  image?: Image;
+  readonly image?: Image;
   /** Social media links */
-  socials?: Array<Social>;
+  readonly socials?: readonly Social[];
   /** Brief description */
-  description?: string;
+  readonly description?: string;
   /** Additional CSS classes */
-  classes?: CSSClasses;
+  readonly classes?: CSSClasses;
 }
 
+/** Statistics item configuration */
 export interface Stat {
   /** Numerical or text value */
-  amount: number | string;
+  readonly amount: number | string;
   /** Label for the stat */
-  title: string;
+  readonly title: string;
   /** Optional icon identifier */
-  icon?: string;
+  readonly icon?: string;
+  /** Optional prefix */
+  readonly prefix?: string;
+  /** Optional suffix */
+  readonly suffix?: string;
 }
 
+/** Generic item configuration */
 export interface Item {
   /** Item title */
-  title: string;
+  readonly title: string;
   /** Item description */
-  description?: string;
+  readonly description?: string;
   /** Icon identifier */
-  icon?: string;
+  readonly icon?: string;
   /** Additional CSS classes */
-  classes?: CSSClasses;
+  readonly classes?: CSSClasses;
   /** Call to action button */
-  callToAction?: CallToAction;
+  readonly callToAction?: CallToAction;
   /** Associated image */
-  image?: Image;
+  readonly image?: Image;
 }
 
+/** Price plan configuration */
 export interface Price {
   /** Plan name */
-  title: string;
+  readonly title: string;
   /** Short description */
-  subtitle?: string;
+  readonly subtitle?: string;
   /** Detailed description */
-  description?: string;
+  readonly description?: string;
   /** Price amount */
-  price: number | string;
+  readonly price: number | string;
   /** Billing period */
-  period?: string;
+  readonly period?: string;
   /** Feature list */
-  items?: Array<Item>;
+  readonly items?: readonly Item[];
   /** Call to action button */
-  callToAction?: CallToAction;
+  readonly callToAction?: CallToAction;
   /** Whether to show a ribbon */
-  hasRibbon?: boolean;
+  readonly hasRibbon?: boolean;
   /** Ribbon text */
-  ribbonTitle?: string;
+  readonly ribbonTitle?: string;
 }
 
+/** Testimonial configuration */
 export interface Testimonial {
   /** Testimonial title */
-  title: string;
+  readonly title: string;
   /** Testimonial content */
-  testimonial: string;
+  readonly testimonial: string;
   /** Author name */
-  name: string;
+  readonly name: string;
   /** Author job title */
-  job?: string;
+  readonly job?: string;
   /** Author photo */
-  image?: ImageSource;
+  readonly image?: ImageSource;
+  /** Rating (1-5) */
+  readonly rating?: 1 | 2 | 3 | 4 | 5;
 }
 
-export interface Textarea {
+/** Form textarea configuration */
+export interface Textarea extends HTMLAttributes<"textarea"> {
   /** Input label */
-  label: string;
+  readonly label: string;
   /** Field name */
-  name: string;
+  readonly name: string;
   /** Placeholder text */
-  placeholder?: string;
+  readonly placeholder?: string;
   /** Number of rows */
-  rows?: number;
+  readonly rows?: number;
+  /** Required flag */
+  readonly required?: boolean;
 }
 
+/** Disclaimer configuration */
 export interface Disclaimer {
   /** Disclaimer text */
-  label: string;
+  readonly label: string;
+  /** Additional CSS classes */
+  readonly classes?: CSSClasses;
 }
 
 // Call to Action Types
+/** Available call to action variants */
 export const CALL_TO_ACTION_VARIANTS = [
   "default",
   "accented",
   "muted",
   "link",
 ] as const;
+
+/** Call to action variant type */
 export type CallToActionVariant = (typeof CALL_TO_ACTION_VARIANTS)[number];
 
+/** Available button types */
 export const BUTTON_TYPES = ["button", "submit", "reset"] as const;
+
+/** Button type */
 export type ButtonType = (typeof BUTTON_TYPES)[number];
 
+/** Call to action configuration */
 export interface CallToAction extends HTMLAttributes<"a"> {
   /** Visual style variant */
-  variant?: CallToActionVariant;
+  readonly variant?: CallToActionVariant;
   /** Button text */
-  text?: string;
+  readonly text?: string;
   /** Icon identifier */
-  icon?: string;
+  readonly icon?: string;
   /** Additional CSS classes */
-  class?: string;
+  readonly class?: string;
   /** HTML button type */
-  type?: ButtonType;
+  readonly type?: ButtonType;
+  /** Open in new tab flag */
+  readonly newTab?: boolean;
 }
 
 // Grid Types
+/** Item grid configuration */
 export interface ItemGrid {
   /** Grid items */
-  items: Array<Item>;
+  readonly items: readonly Item[];
   /** Number of columns */
-  columns?: 1 | 2 | 3 | 4;
+  readonly columns?: 1 | 2 | 3 | 4;
   /** Default icon for items */
-  defaultIcon?: string;
+  readonly defaultIcon?: string;
   /** Additional CSS classes */
-  classes?: CSSClasses;
+  readonly classes?: CSSClasses;
 }
 
+/** Collapse configuration */
 export interface Collapse {
   /** Expanded state icon */
-  iconUp: string;
+  readonly iconUp: string;
   /** Collapsed state icon */
-  iconDown: string;
+  readonly iconDown: string;
   /** Collapsible items */
-  items: Array<Item>;
+  readonly items: readonly Item[];
   /** Number of columns */
-  columns?: 1 | 2 | 3 | 4;
+  readonly columns?: 1 | 2 | 3 | 4;
   /** Additional CSS classes */
-  classes?: CSSClasses;
+  readonly classes?: CSSClasses;
 }
 
 // Section Types
+/** Hero section configuration */
 export interface Hero
   extends Omit<Headline, "classes">,
     Omit<Widget, "isDark" | "classes"> {
   /** Main content */
-  content?: string;
+  readonly content?: string;
   /** Call to action buttons */
-  actions?: string | CallToAction[];
+  readonly actions?: string | readonly CallToAction[];
   /** Hero image */
-  image?: ImageSource;
+  readonly image?: ImageSource;
 }
 
+/** Team section configuration */
 export interface Team extends Omit<Headline, "classes">, Widget {
   /** Team members */
-  team: Array<TeamMember>;
+  readonly team: readonly TeamMember[];
 }
 
+/** Stats section configuration */
 export interface Stats extends Omit<Headline, "classes">, Widget {
   /** Statistics to display */
-  stats: Array<Stat>;
+  readonly stats: readonly Stat[];
 }
 
+/** Pricing section configuration */
 export interface Pricing extends Omit<Headline, "classes">, Widget {
   /** Pricing plans */
-  prices: Array<Price>;
+  readonly prices: readonly Price[];
 }
 
+/** Testimonials section configuration */
 export interface Testimonials extends Omit<Headline, "classes">, Widget {
   /** Customer testimonials */
-  testimonials: Array<Testimonial>;
+  readonly testimonials: readonly Testimonial[];
   /** Call to action button */
-  callToAction?: CallToAction;
+  readonly callToAction?: CallToAction;
 }
 
+/** Brands section configuration */
 export interface Brands extends Omit<Headline, "classes">, Widget {
   /** Icon identifiers */
-  icons?: Array<string>;
+  readonly icons?: readonly string[];
   /** Brand images */
-  images?: Array<Image>;
+  readonly images?: readonly Image[];
 }
 
+/** Features section configuration */
 export interface Features extends Omit<Headline, "classes">, Widget {
   /** Feature image */
-  image?: ImageSource;
+  readonly image?: ImageSource;
   /** Feature video */
-  video?: Video;
+  readonly video?: Video;
   /** Feature items */
-  items?: Array<Item>;
+  readonly items?: readonly Item[];
   /** Number of columns */
-  columns?: 1 | 2 | 3 | 4;
+  readonly columns?: 1 | 2 | 3 | 4;
   /** Default icon for items */
-  defaultIcon?: string;
+  readonly defaultIcon?: string;
   /** Primary call to action */
-  callToAction1?: CallToAction;
+  readonly callToAction1?: CallToAction;
   /** Secondary call to action */
-  callToAction2?: CallToAction;
+  readonly callToAction2?: CallToAction;
   /** Whether to reverse layout */
-  isReversed?: boolean;
+  readonly isReversed?: boolean;
   /** Whether content comes before */
-  isBeforeContent?: boolean;
+  readonly isBeforeContent?: boolean;
   /** Whether content comes after */
-  isAfterContent?: boolean;
+  readonly isAfterContent?: boolean;
 }
 
+/** FAQs section configuration */
 export interface Faqs extends Omit<Headline, "classes">, Widget {
   /** Expanded state icon */
-  iconUp: string;
+  readonly iconUp: string;
   /** Collapsed state icon */
-  iconDown: string;
+  readonly iconDown: string;
   /** FAQ items */
-  items: Array<Item>;
+  readonly items: readonly Item[];
   /** Number of columns */
-  columns?: 1 | 2 | 3 | 4;
+  readonly columns?: 1 | 2 | 3 | 4;
 }
 
+/** Steps section configuration */
 export interface Steps extends Omit<Headline, "classes">, Widget {
   /** Step items */
-  items: Array<{
-    title: string;
-    description?: string;
-    icon?: string;
-    classes?: CSSClasses;
-  }>;
+  readonly items: readonly {
+    readonly title: string;
+    readonly description?: string;
+    readonly icon?: string;
+    readonly classes?: CSSClasses;
+  }[];
   /** Call to action */
-  callToAction?: string | CallToAction;
+  readonly callToAction?: string | CallToAction;
   /** Associated image */
-  image?: ImageSource;
+  readonly image?: ImageSource;
   /** Whether to reverse layout */
-  isReversed?: boolean;
+  readonly isReversed?: boolean;
 }
 
-// export interface Content extends Omit<Headline, "classes">, Widget {
+/** Content section configuration */
 export interface Content extends Headline, Widget {
   /** Main content */
-  content?: string;
+  readonly content?: string;
   /** Content image */
-  image?: ImageSource;
+  readonly image?: ImageSource;
   /** Content items */
-  items?: Array<Item>;
+  readonly items?: readonly Item[];
   /** Number of columns */
-  columns?: 1 | 2 | 3 | 4;
+  readonly columns?: 1 | 2 | 3 | 4;
   /** Whether to reverse layout */
-  isReversed?: boolean;
+  readonly isReversed?: boolean;
   /** Whether content comes after */
-  isAfterContent?: boolean;
+  readonly isAfterContent?: boolean;
   /** Call to action */
-  callToAction?: CallToAction;
+  readonly callToAction?: CallToAction;
 }
-// export interface Content extends Omit<Headline, "classes">, Widget {
-//   /** Main content */
-//   content?: string;
-//   /** Content image */
-//   image?: ImageSource;
-//   /** Content items */
-//   items?: Array<Item>;
-//   /** Number of columns */
-//   columns?: 1 | 2 | 3 | 4;
-//   /** Whether to reverse layout */
-//   isReversed?: boolean;
-//   /** Whether content comes after */
-//   isAfterContent?: boolean;
-//   /** Call to action */
-//   callToAction?: CallToAction;
-// }

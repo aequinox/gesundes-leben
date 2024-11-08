@@ -5,6 +5,7 @@ import type {
   SRLabelProperties,
   AnchorIconProperties,
   AutolinkConfig,
+  AutolinkBehavior,
 } from "@/types/rehype";
 
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
@@ -52,7 +53,7 @@ const createSROnlyLabel = (text: string) => {
  * Configuration for rehype-autolink-headings plugin
  */
 const autolinkConfig: AutolinkConfig = {
-  behavior: "append",
+  behavior: "append" as AutolinkBehavior,
   group: ({ tagName }) =>
     h(`div.heading-wrapper.level-${tagName}`, {
       tabIndex: -1,
