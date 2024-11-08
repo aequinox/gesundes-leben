@@ -1,49 +1,66 @@
 import { LOCALE } from "@/config";
 import { Icon } from "astro-icon/components";
 
+/**
+ * Component props interface with strict typing
+ */
 interface Props {
+  /** Reading time in minutes */
   readingTime?: number;
+  /** Size variant for the component */
   size?: "sm" | "lg";
+  /** Additional CSS classes */
   className?: string;
 }
 
-const localeStrings =
-  LOCALE.lang.toString() === "en"
-    ? {
-        readingTime: "Reading time: ",
-      }
-    : {
-        readingTime: "Lesezeit: ",
-      };
+/**
+ * Locale-specific strings for i18n
+ */
+const localeStrings = {
+  minutes: LOCALE.lang === "en" ? "minutes" : "Minuten",
+  readingTime: LOCALE.lang === "en" ? "reading time" : "Lesezeit",
+} as const;
 
+/**
+ * ReadingTime component that displays estimated reading time with an icon
+ */
 export default function ReadingTime({
   readingTime,
   size = "sm",
   className = "",
-}: Props) {
+}: Props): JSX.Element | null {
+  if (!readingTime) return null;
+
+  // Precompute classes for better performance
+  const iconClasses = {
+    "inline-block": true,
+    "fill-skin-base": true,
+    "h-5": size === "sm",
+    "w-5": size === "sm",
+    "scale-100": size !== "sm",
+    "min-w-[1.25rem]": true,
+  };
+
+  const textClasses = ["italic", size === "sm" ? "text-sm" : "text-base"].join(
+    " "
+  );
+
+  const ariaLabel = `${readingTime} ${localeStrings.minutes} ${localeStrings.readingTime}`;
+
   return (
-    <>
-      {readingTime && (
-        <div
-          className={`flex items-center space-x-1 opacity-80 ${className}`.trim()}
-        >
-          <Icon
-            name="tabler:clock"
-            class:list={{
-              "inline-block fill-skin-base": true,
-              "h-5 w-5": size === "sm",
-            }}
-          />
-          <span
-            className={`sr-only italic ${size === "sm" ? "text-sm" : "text-base"}`}
-          >
-            {localeStrings.readingTime}
-          </span>
-          <span className={`italic ${size === "sm" ? "text-sm" : "text-base"}`}>
-            {readingTime} Minuten
-          </span>
-        </div>
-      )}
-    </>
+    <div
+      className={`flex items-center gap-1 opacity-80 hover:opacity-100 transition-opacity ${className}`.trim()}
+      aria-label={ariaLabel}
+    >
+      <Icon
+        name="tabler:clock"
+        class:list={iconClasses}
+        aria-hidden="true"
+        role="presentation"
+      />
+      <span className={textClasses}>
+        {readingTime}&nbsp;{localeStrings.minutes}
+      </span>
+    </div>
   );
 }

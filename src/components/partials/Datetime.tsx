@@ -1,74 +1,37 @@
 import { LOCALE } from "@/config";
+import type { DateTimeInput } from "@/types/datetime";
+import { Icon } from "astro-icon/components";
 
-interface DatetimesProps {
-  pubDatetime: string | Date;
-  modDatetime: string | Date | undefined | null;
-}
-
-interface Props extends DatetimesProps {
+/**
+ * Component props interface with strict typing
+ */
+interface Props extends DateTimeInput {
+  /** Size variant for the component */
   size?: "sm" | "lg";
+  /** Additional CSS classes */
   className?: string;
 }
 
-const localeStrings =
-  LOCALE.lang.toString() === "en"
-    ? {
-        published: "Published: ",
-        updated: "Updated: ",
-        at: "at",
-      }
-    : {
-        published: "Veröffentlicht am ",
-        updated: "Aktualisiert am ",
-        at: "um",
-      };
+/**
+ * Locale-specific strings for i18n
+ */
+const localeStrings = {
+  published: LOCALE.lang === "en" ? "Published on" : "Veröffentlicht am",
+  updated: LOCALE.lang === "en" ? "Updated on" : "Aktualisiert am",
+  at: LOCALE.lang === "en" ? "at" : "um",
+} as const;
 
-export default function Datetime({
+/**
+ * Formats a datetime value according to the current locale
+ */
+const FormattedDatetime = ({
   pubDatetime,
   modDatetime,
-  size = "sm",
-  className = "",
-}: Props) {
-  return (
-    <div
-      className={`flex items-center space-x-2 opacity-80 ${className}`.trim()}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className={`${
-          size === "sm" ? "scale-90" : "scale-100"
-        } inline-block h-6 w-6 min-w-[1.375rem] fill-skin-base`}
-        aria-hidden="true"
-      >
-        <path d="M7 11h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"></path>
-        <path d="M5 22h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2h-2V2h-2v2H9V2H7v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zM19 8l.001 12H5V8h14z"></path>
-      </svg>
-      {modDatetime && modDatetime > pubDatetime ? (
-        <span
-          className={`sr-only italic ${size === "sm" ? "text-sm" : "text-base"}`}
-        >
-          {localeStrings.updated}
-        </span>
-      ) : (
-        <span
-          className={`sr-only italic ${size === "sm" ? "text-sm" : "text-base"}`}
-        >
-          {localeStrings.published}
-        </span>
-      )}
-      <span className={`italic ${size === "sm" ? "text-sm" : "text-base"}`}>
-        <FormattedDatetime
-          pubDatetime={pubDatetime}
-          modDatetime={modDatetime}
-        />
-      </span>
-    </div>
-  );
-}
-
-const FormattedDatetime = ({ pubDatetime, modDatetime }: DatetimesProps) => {
+}: DateTimeInput): JSX.Element => {
   const myDatetime = new Date(
-    modDatetime && modDatetime > pubDatetime ? modDatetime : pubDatetime
+    modDatetime && modDatetime > new Date(pubDatetime)
+      ? modDatetime
+      : pubDatetime
   );
 
   const date = myDatetime.toLocaleDateString(LOCALE.langTag, {
@@ -84,10 +47,68 @@ const FormattedDatetime = ({ pubDatetime, modDatetime }: DatetimesProps) => {
 
   return (
     <>
-      <time dateTime={myDatetime.toISOString()}>{date}</time>
-      <span aria-hidden="true"> | </span>
-      <span className="sr-only">&nbsp;{localeStrings.at}&nbsp;</span>
+      <time
+        dateTime={myDatetime.toISOString()}
+        title={myDatetime.toLocaleString(LOCALE.langTag)}
+      >
+        {date}
+      </time>
+      <span aria-hidden="true" className="select-none">
+        {" "}
+        |{" "}
+      </span>
+      <span className="sr-only">{localeStrings.at}</span>
       <span className="text-nowrap">{time}</span>
     </>
   );
 };
+
+/**
+ * Datetime component that displays a formatted date and time with an icon
+ */
+export default function Datetime({
+  pubDatetime,
+  modDatetime,
+  size = "sm",
+  className = "",
+}: Props): JSX.Element {
+  const isUpdated =
+    modDatetime && new Date(modDatetime) > new Date(pubDatetime);
+  const iconName = `tabler:calendar-${isUpdated ? "time" : "month"}`;
+  const ariaLabel = isUpdated ? localeStrings.updated : localeStrings.published;
+
+  // Precompute classes for better performance
+  const iconClasses = {
+    "inline-block": true,
+    "fill-skin-base": true,
+    "scale-90": size === "sm",
+    "scale-100": size !== "sm",
+    "h-6": true,
+    "w-6": true,
+    "min-w-[1.5rem]": true,
+  };
+
+  const textClasses = ["italic", size === "sm" ? "text-sm" : "text-base"].join(
+    " "
+  );
+
+  return (
+    <div
+      className={`flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity ${className}`.trim()}
+      aria-label={ariaLabel}
+    >
+      <Icon
+        name={iconName}
+        class:list={iconClasses}
+        aria-hidden="true"
+        role="presentation"
+      />
+      <span className={textClasses}>
+        <FormattedDatetime
+          pubDatetime={pubDatetime}
+          modDatetime={modDatetime}
+        />
+      </span>
+    </div>
+  );
+}

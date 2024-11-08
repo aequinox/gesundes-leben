@@ -4,16 +4,28 @@ import Datetime from "@/components/partials/Datetime.astro";
 import ReadingTime from "@/components/partials/ReadingTime.astro";
 import { getAuthorEntry } from "@/utils/getAuthor";
 import { slugifyStr } from "@/utils/slugify";
-import { type CollectionEntry } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 
+/**
+ * Type definitions for content collections
+ */
 type PostType = CollectionEntry<"blog"> | CollectionEntry<"glossary">;
 
+/**
+ * Component props interface with strict typing
+ */
 interface Props {
+  /** The post entry from the content collection */
   post: PostType;
+  /** Whether to show the datetime component */
   withDatetime?: boolean;
+  /** Whether to show the reading time component */
   withReadingTime?: boolean;
+  /** Whether to show the author component */
   withAuthor?: boolean;
+  /** Size variant for child components */
   size?: "sm" | "lg";
+  /** Additional CSS classes */
   classes?: string;
 }
 
@@ -28,7 +40,9 @@ const {
 
 const { title, author, pubDatetime, modDatetime } = post.data;
 
-// Type guard to check if post is a blog post with reading time
+/**
+ * Type guard to check if post is a blog post with reading time
+ */
 const isBlogPost = (post: PostType): post is CollectionEntry<"blog"> => {
   return post.collection === "blog";
 };
@@ -39,10 +53,16 @@ const readingTime = isBlogPost(post) ? post.data.readingTime : undefined;
 // Get author data asynchronously
 const authorEntry = await getAuthorEntry(author);
 
-// Generate unique transition names for animations
-const getTransitionName = (suffix: string) => slugifyStr(title + suffix);
+/**
+ * Generate unique transition names for view transitions API
+ * @param suffix - String to append to the title for uniqueness
+ */
+const getTransitionName = (suffix: string): string =>
+  slugifyStr(title + suffix);
 
-// Determine if we should show separators
+/**
+ * Determine separator visibility based on enabled components
+ */
 const showFirstSeparator = withDatetime && withReadingTime && readingTime;
 const showSecondSeparator =
   (withDatetime || (withReadingTime && readingTime)) &&
@@ -50,38 +70,41 @@ const showSecondSeparator =
   authorEntry;
 ---
 
-<div class:list={["flex flex-wrap items-center space-x-2", classes.trim()]}>
+<div
+  class:list={["flex flex-wrap items-center gap-2", classes.trim()]}
+  aria-label="Article metadata"
+>
   {
     withDatetime && (
-      <>
-        <Datetime
-          pubDatetime={pubDatetime}
-          modDatetime={modDatetime}
-          size={size}
-          transition:name={getTransitionName(pubDatetime.toString())}
-        />
-        {showFirstSeparator && (
-          <span class="opacity-80" aria-hidden="true">
-            |
-          </span>
-        )}
-      </>
+      <Datetime
+        pubDatetime={pubDatetime}
+        modDatetime={modDatetime}
+        size={size}
+        transition:name={getTransitionName(pubDatetime.toString())}
+      />
+    )
+  }
+  {
+    showFirstSeparator && (
+      <span class="opacity-80 select-none" aria-hidden="true">
+        |
+      </span>
     )
   }
   {
     withReadingTime && readingTime && (
-      <>
-        <ReadingTime
-          readingTime={readingTime}
-          size={size}
-          transition:name={getTransitionName(readingTime.toString())}
-        />
-        {showSecondSeparator && (
-          <span class="opacity-80" aria-hidden="true">
-            |
-          </span>
-        )}
-      </>
+      <ReadingTime
+        readingTime={readingTime}
+        size={size}
+        transition:name={getTransitionName(readingTime.toString())}
+      />
+    )
+  }
+  {
+    showSecondSeparator && (
+      <span class="opacity-80 select-none" aria-hidden="true">
+        |
+      </span>
     )
   }
   {

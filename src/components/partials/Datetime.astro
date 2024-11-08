@@ -4,8 +4,13 @@ import { formattedDateTime } from "@/utils/getFormattedDate";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import type { DateTimeInput } from "@/types/datetime";
 
+/**
+ * Component props interface with strict typing
+ */
 interface Props extends DateTimeInput {
+  /** Size variant for the component */
   size?: "sm" | "lg";
+  /** Additional CSS classes */
   classes?: string;
 }
 
@@ -20,25 +25,55 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
 const { dt, date, time } = formattedDateTime({ pubDatetime, modDatetime });
-const updated = modDatetime ? modDatetime > pubDatetime : false;
-const iconName = `tabler:calendar-${updated ? "time" : "month"}`;
+const isUpdated = modDatetime ? modDatetime > pubDatetime : false;
+const iconName = `tabler:calendar-${isUpdated ? "time" : "month"}`;
+
+// Precompute classes for better performance
+const iconClasses = [
+  "inline-block",
+  "fill-skin-base",
+  size === "sm" ? "scale-90" : "scale-100",
+  "h-6",
+  "w-6",
+  "min-w-[1.5rem]",
+];
+
+const textClasses = ["italic", size === "sm" ? "text-sm" : "text-base"];
+
+// Use language-specific aria labels
+const ariaLabel =
+  lang === "de"
+    ? isUpdated
+      ? "Aktualisiert am"
+      : "Veröffentlicht am"
+    : isUpdated
+      ? "Updated on"
+      : "Published on";
 ---
 
-<div class:list={["flex items-center space-x-2 opacity-80", classes.trim()]}>
+<div
+  class:list={[
+    "flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity",
+    classes.trim(),
+  ]}
+  aria-label={ariaLabel}
+>
   <Icon
     name={iconName}
-    class:list={[
-      "inline-block h-6 w-6 fill-skin-base",
-      size === "sm" ? "scale-90" : "scale-100",
-    ]}
+    class:list={iconClasses}
+    aria-hidden="true"
+    role="presentation"
   />
-  <!-- </svg> -->
 
-  <span class:list={["italic", size === "sm" ? "text-sm" : "text-base"]}>
-    <!-- {updated ? 'Updated:' : 'Published:'} -->
-    <time datetime={dt.toISOString()}>{date}</time>
-    <span aria-hidden="true"> | </span>
-    <span class="sr-only">&nbsp;{t("datetime.at")}&nbsp;</span>
+  <span class:list={textClasses}>
+    <time datetime={dt.toISOString()} title={dt.toLocaleString(lang)}>
+      {date}
+    </time>
+    <span aria-hidden="true" class="select-none">
+      {" "}
+      |{" "}
+    </span>
+    <span class="sr-only">{t("datetime.at")}</span>
     <span class="text-nowrap">{time}</span>
   </span>
 </div>
