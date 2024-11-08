@@ -1,43 +1,50 @@
 ---
 import { type CollectionEntry, getCollection } from "astro:content";
 import Glossary from "@/layouts/Glossary.astro";
-// import PostDetails from "@layouts/PostDetails.astro";
+import GlossaryDetails from "@/layouts/GlossaryDetails.astro";
 import getPageNumbers from "@/utils/getPageNumbers";
 import getPagination from "@/utils/getPagination";
 
 export interface Props {
-  post: CollectionEntry<"glossary">;
+  glossaryEntry: CollectionEntry<"glossary">;
 }
 
 export async function getStaticPaths() {
-  const posts: CollectionEntry<"glossary">[] = await getCollection("glossary");
+  const glossaryEntries: CollectionEntry<"glossary">[] =
+    await getCollection("glossary");
 
-  const postResult = posts.map(post => ({
-    params: { slug: post.slug },
-    props: { post },
+  const glossaryEntryResult = glossaryEntries.map(glossaryEntry => ({
+    params: { slug: glossaryEntry.slug },
+    props: { glossaryEntry },
   }));
 
-  const pagePaths = getPageNumbers(posts.length).map(pageNum => ({
+  const pagePaths = getPageNumbers(glossaryEntries.length).map(pageNum => ({
     params: { slug: String(pageNum) },
   }));
 
-  return [...postResult, ...pagePaths];
+  return [...glossaryEntryResult, ...pagePaths];
 }
 
 const { slug } = Astro.params;
-// const { post } = Astro.props;
+const { glossaryEntry } = Astro.props;
 
-const posts: CollectionEntry<"glossary">[] = await getCollection("glossary");
+const glossaryEntries: CollectionEntry<"glossary">[] =
+  await getCollection("glossary");
 
-const sortedPosts = posts.sort((a, b) =>
+const sortedGlossaryEntries = glossaryEntries.sort((a, b) =>
   a.data.title.localeCompare(b.data.title)
 );
 
 const pagination = getPagination({
-  posts: sortedPosts,
+  posts: sortedGlossaryEntries,
   page: slug,
 });
 ---
 
-<Glossary {...pagination} />
-<!-- {post ? <PostDetails post={post} /> : <Glossary {...pagination} />} -->
+{
+  glossaryEntry ? (
+    <GlossaryDetails glossaryEntry={glossaryEntry} />
+  ) : (
+    <Glossary {...pagination} />
+  )
+}

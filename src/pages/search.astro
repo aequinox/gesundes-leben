@@ -1,12 +1,13 @@
 ---
+import Footer from "@/components/sections/Footer.astro";
+import Header from "@/components/sections/Header.astro";
+import SearchBar from "@/components/sections/Search";
+import { SITE } from "@/config";
+import Layout from "@/layouts/Layout.astro";
+import Main from "@/layouts/Main.astro";
+import getSortedPosts from "@/utils/getSortedPosts";
 import { getCollection } from "astro:content";
-import { SITE } from "@data/config";
-import Layout from "@layouts/Layout.astro";
-import Main from "@layouts/Main.astro";
-import Header from "@components/sections/common/Header.astro";
-import Footer from "@components/sections/common/Footer.astro";
-import SearchBar from "@components/sections/Search";
-import getSortedPosts from "@utils/getSortedPosts";
+
 import { getLangFromUrl, useTranslations } from "i18n/utils";
 
 // Retrieve all published articles

@@ -1,6 +1,6 @@
 ---
 import "@/styles/base.css";
-import { ViewTransitions } from "astro:transitions";
+import { ClientRouter } from "astro:transitions";
 import SizeIndicator from "@/components/SizeIndicator.astro";
 import { SITE, LOCALE } from "@/config";
 
@@ -131,7 +131,7 @@ const structuredData = {
       )
     }
 
-    <ViewTransitions />
+    <ClientRouter />
 
     <script is:inline src="/toggle-theme.js"></script>
 

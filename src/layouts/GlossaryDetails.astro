@@ -1,0 +1,108 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/sections/Header.astro";
+import Footer from "@/components/sections/Footer.astro";
+import { type CollectionEntry } from "astro:content";
+import { slugifyStr } from "@/utils/slugify";
+import ShareLinks from "@/components/socials/ShareLinks.astro";
+import { SITE } from "@/config";
+import Image from "@/components/elements/Image.astro";
+import Blockquote from "@/components/elements/Blockquote.astro";
+import { getLangFromUrl, useTranslations } from "i18n/utils";
+import ArticleMeta from "@/components/partials/ArticleMeta.astro";
+import Paragraph from "@/components/elements/Paragraph.astro";
+import { getAuthorEntry } from "@/utils/getAuthor";
+
+interface Props {
+  glossaryEntry: CollectionEntry<"glossary">;
+}
+
+interface LayoutProps {
+  title: string;
+  author: string;
+  pubDatetime: Date;
+  modDatetime?: Date;
+  canonicalURL?: string;
+  scrollSmooth: boolean;
+}
+
+const { glossaryEntry }: Props = Astro.props;
+
+const {
+  data: { title, author, pubDatetime, modDatetime },
+} = glossaryEntry;
+
+const authorEntry = await getAuthorEntry(author);
+
+const { Content } = await glossaryEntry.render();
+
+const layoutProps: LayoutProps = {
+  title: `${title} | ${SITE.title}`,
+  author: authorEntry?.data.name || SITE.author,
+  pubDatetime,
+  modDatetime,
+  scrollSmooth: true,
+};
+
+const components = { img: Image, blockquote: Blockquote, p: Paragraph };
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<Layout {...layoutProps}>
+  <Header />
+
+  <div class="relative mx-auto grid max-w-content grid-cols-12 gap-8">
+    <div class="col-span-12 mx-auto flex w-full max-w-content px-2">
+      <main
+        id="main-content"
+        class="col-span-12 mx-auto w-full max-w-content px-4 pb-12"
+      >
+        <h1
+          transition:name={slugifyStr(title)}
+          class="mb-4 text-xl font-semibold lg:text-3xl"
+        >
+          {title}
+        </h1>
+
+        <ArticleMeta
+          post={glossaryEntry}
+          withAuthor={true}
+          withReadingTime={false}
+        />
+
+        <article id="article" class="prose mx-auto mt-6 max-w-content">
+          <Content components={components} />
+        </article>
+
+        <div
+          class="flex flex-col-reverse items-center justify-between gap-6 sm:flex-row-reverse sm:items-end sm:gap-4"
+        >
+          <button
+            id="back-to-top"
+            class="focus-outline flex items-center gap-2 whitespace-nowrap py-1 hover:opacity-75"
+            aria-label={t("nav.backToTop")}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="rotate-90"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
+              ></path>
+            </svg>
+            <span>{t("nav.backToTop")}</span>
+          </button>
+
+          <ShareLinks />
+        </div>
+      </main>
+    </div>
+  </div>
+  <Footer />
+</Layout>

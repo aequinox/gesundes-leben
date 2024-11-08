@@ -4,16 +4,16 @@ import type { Pagination } from "@/types/pagination";
 import getPagination from "@/utils/getPagination";
 import { getCollection, type CollectionEntry } from "astro:content";
 
-const posts = await getCollection("glossary");
+const glossaryEntries = await getCollection("glossary");
 
-const sortedPosts = [...posts].sort((a, b) =>
+const sortedGlossaryEntries = [...glossaryEntries].sort((a, b) =>
   a.data.title.localeCompare(b.data.title)
 );
 const pagination: Pagination<CollectionEntry<"glossary">> = getPagination({
-  posts: sortedPosts,
+  posts: sortedGlossaryEntries,
   page: 1,
   isIndex: true,
 });
 ---
 
-<Glossary {...pagination} />
+<Glossary {...pagination} title="Glossar" />

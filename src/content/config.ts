@@ -26,9 +26,9 @@ const glossary = defineCollection({
   type: "content",
   schema: z.object({
     title: z.string(),
-    author: reference("authors"),
+    author: z.union([z.string(), reference("authors")]).default(SITE.author),
     pubDatetime: z.coerce.date(),
-    modDatetime: z.coerce.date().optional().nullable(),
+    modDatetime: z.coerce.date().optional(),
   }),
 });
 

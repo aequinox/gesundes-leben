@@ -6,56 +6,90 @@ import { getAuthorEntry } from "@/utils/getAuthor";
 import { slugifyStr } from "@/utils/slugify";
 import { type CollectionEntry } from "astro:content";
 
-export interface Props {
-  post: CollectionEntry<"blog">;
+type PostType = CollectionEntry<"blog"> | CollectionEntry<"glossary">;
+
+interface Props {
+  post: PostType;
   withDatetime?: boolean;
   withReadingTime?: boolean;
   withAuthor?: boolean;
+  size?: "sm" | "lg";
+  classes?: string;
 }
 
 const {
   post,
   withDatetime = true,
-  withReadingTime = true,
+  withReadingTime = false,
   withAuthor = false,
+  size = "sm",
+  classes = "",
 }: Props = Astro.props;
 
-const { title, author, pubDatetime, modDatetime, readingTime } = post.data;
+const { title, author, pubDatetime, modDatetime } = post.data;
 
+// Type guard to check if post is a blog post with reading time
+const isBlogPost = (post: PostType): post is CollectionEntry<"blog"> => {
+  return post.collection === "blog";
+};
+
+// Get reading time only if it's a blog post
+const readingTime = isBlogPost(post) ? post.data.readingTime : undefined;
+
+// Get author data asynchronously
 const authorEntry = await getAuthorEntry(author);
+
+// Generate unique transition names for animations
+const getTransitionName = (suffix: string) => slugifyStr(title + suffix);
+
+// Determine if we should show separators
+const showFirstSeparator = withDatetime && withReadingTime && readingTime;
+const showSecondSeparator =
+  (withDatetime || (withReadingTime && readingTime)) &&
+  withAuthor &&
+  authorEntry;
 ---
 
-<div class="flex flex-wrap space-x-2 text-sm italic">
+<div class:list={["flex flex-wrap items-center space-x-2", classes.trim()]}>
   {
     withDatetime && (
       <>
         <Datetime
           pubDatetime={pubDatetime}
           modDatetime={modDatetime}
-          transition:name={slugifyStr(title + pubDatetime)}
+          size={size}
+          transition:name={getTransitionName(pubDatetime.toString())}
         />
-        {withReadingTime && (
+        {showFirstSeparator && (
           <span class="opacity-80" aria-hidden="true">
-            {" "}
-            |{" "}
+            |
           </span>
         )}
       </>
     )
   }
   {
-    withReadingTime && (
-      <ReadingTime
-        readingTime={readingTime}
-        transition:name={slugifyStr(title + readingTime)}
-      />
+    withReadingTime && readingTime && (
+      <>
+        <ReadingTime
+          readingTime={readingTime}
+          size={size}
+          transition:name={getTransitionName(readingTime.toString())}
+        />
+        {showSecondSeparator && (
+          <span class="opacity-80" aria-hidden="true">
+            |
+          </span>
+        )}
+      </>
     )
   }
   {
     withAuthor && authorEntry && (
       <Author
         author={authorEntry}
-        transition:name={slugifyStr(title + authorEntry.data.name)}
+        size={size}
+        transition:name={getTransitionName(authorEntry.data.name)}
       />
     )
   }

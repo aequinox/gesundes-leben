@@ -1,7 +1,7 @@
 ---
-import Posts from "@layouts/Posts.astro";
-import getPagination from "@utils/getPagination";
-import { getAllPostsByGroup } from "@utils/getPostsBy";
+import Posts from "@/layouts/Posts.astro";
+import getPagination from "@/utils/getPagination";
+import { getAllPostsByGroup } from "@/utils/getPostsBy";
 
 const posts = await getAllPostsByGroup("fragezeiten");
 const pagination = getPagination({
