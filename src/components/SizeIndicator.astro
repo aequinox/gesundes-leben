@@ -1,20 +1,51 @@
 ---
+/**
+ * A development-only component that displays the current breakpoint size
+ * Useful for responsive design development
+ */
 
+interface Props {
+  class?: string;
+}
+
+const { class: className }: Props = Astro.props;
 ---
 
 {
   import.meta.env.DEV && (
-    <div class="fixed bottom-0 right-0 z-50 flex w-[30px] items-center justify-center bg-gray-200 py-[2.5px] text-[12px] uppercase text-black sm:bg-red-200 md:bg-yellow-200 lg:bg-green-200 xl:bg-blue-200 2xl:bg-pink-200 3xl:bg-violet-200 4xl:bg-lime-200 5xl:bg-orange-200 6xl:bg-purple-200">
-      <span class="block sm:hidden">all</span>
-      <span class="hidden sm:block md:hidden">sm</span>
-      <span class="hidden md:block lg:hidden">md</span>
-      <span class="hidden lg:block xl:hidden">lg</span>
-      <span class="hidden xl:block 2xl:hidden">xl</span>
-      <span class="hidden 2xl:block 3xl:hidden">2xl</span>
-      <span class="hidden 3xl:block 4xl:hidden">3xl</span>
-      <span class="hidden 4xl:block 5xl:hidden">4xl</span>
-      <span class="hidden 5xl:block 6xl:hidden">5xl</span>
-      <span class="hidden 6xl:block">6xl</span>
+    <div
+      class:list={[
+        "fixed bottom-0 right-0 z-50 flex w-[30px] items-center justify-center py-[2.5px] text-[12px] uppercase text-black",
+        className,
+      ]}
+      role="status"
+      aria-label="Current viewport size indicator"
+    >
+      <span class="block bg-gray-200 sm:hidden">all</span>
+      <span class="hidden bg-red-200 sm:block md:hidden">sm</span>
+      <span class="hidden bg-yellow-200 md:block lg:hidden">md</span>
+      <span class="hidden bg-green-200 lg:block xl:hidden">lg</span>
+      <span class="hidden bg-blue-200 xl:block 2xl:hidden">xl</span>
+      <span class="hidden bg-pink-200 2xl:block 3xl:hidden">2xl</span>
+      <span class="hidden bg-violet-200 3xl:block 4xl:hidden">3xl</span>
+      <span class="hidden bg-lime-200 4xl:block 5xl:hidden">4xl</span>
+      <span class="hidden bg-orange-200 5xl:block 6xl:hidden">5xl</span>
+      <span class="hidden bg-purple-200 6xl:block">6xl</span>
     </div>
   )
 }
+
+<style>
+  /* Base styles */
+  div {
+    font-family: monospace;
+    letter-spacing: -0.5px;
+  }
+
+  /* Print styles - hide in print */
+  @media print {
+    div {
+      display: none;
+    }
+  }
+</style>

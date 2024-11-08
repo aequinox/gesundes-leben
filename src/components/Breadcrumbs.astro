@@ -1,59 +1,111 @@
 ---
-import { getLangFromUrl, useTranslations } from "i18n/utils";
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+
+interface Props {
+  class?: string;
+}
+
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+  isCurrentPage: boolean;
+}
+
+const { class: className }: Props = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-// Remove current url path and remove trailing slash if exists
+// Remove trailing slash and get clean path
 const currentUrlPath = Astro.url.pathname.replace(/\/+$/, "");
 
-// Get url array from path
-// eg: /tags/tailwindcss => ['tags', 'tailwindcss']
-const breadcrumbList = currentUrlPath.split("/").slice(1);
+// Split path into segments and remove empty entries
+const pathSegments = currentUrlPath.split("/").filter(Boolean);
 
-// if breadcrumb is Home > Posts > 1 <etc>
-// replace Posts with Posts (page number)
-breadcrumbList[0] === "posts" &&
-  breadcrumbList.splice(
-    0,
-    2,
-    `${t("nav.posts")} (${t("nav.page")} ${breadcrumbList[1] || 1})`
-  );
+/**
+ * Formats a breadcrumb label based on the segment and its context
+ */
+function formatBreadcrumbLabel(segment: string, index: number): string {
+  // Handle posts pagination
+  if (segment === "posts" && pathSegments[index + 1]) {
+    const pageNum = pathSegments[index + 1];
+    return `${t("nav.posts")} (${t("nav.page")} ${pageNum || 1})`;
+  }
 
-// if breadcrumb is Home > Tags > [tag] > [page] <etc>
-// replace [tag] > [page] with [tag] (page number)
-breadcrumbList[0] === "tags" &&
-  !isNaN(Number(breadcrumbList[2])) &&
-  breadcrumbList.splice(
-    1,
-    3,
-    `${breadcrumbList[1]} ${
-      Number(breadcrumbList[2]) === 1 ? "" : "(page " + breadcrumbList[2] + ")"
-    }`
-  );
+  // Handle tags pagination
+  if (
+    segment === "tags" &&
+    pathSegments[index + 1] &&
+    pathSegments[index + 2]
+  ) {
+    const tag = pathSegments[index + 1];
+    const pageNum = pathSegments[index + 2];
+    const pageIndicator =
+      Number(pageNum) === 1 ? "" : ` (${t("nav.page")} ${pageNum})`;
+    return `${decodeURIComponent(tag)}${pageIndicator}`;
+  }
+
+  // Default case: decode URI component for readable labels
+  return decodeURIComponent(segment);
+}
+
+/**
+ * Builds the breadcrumb items array with proper formatting and links
+ */
+function buildBreadcrumbItems(): BreadcrumbItem[] {
+  const items: BreadcrumbItem[] = [
+    {
+      label: t("nav.home"),
+      href: "/",
+      isCurrentPage: pathSegments.length === 0,
+    },
+  ];
+
+  let currentPath = "";
+
+  pathSegments.forEach((segment, index) => {
+    // Skip pagination numbers for posts and tags
+    if (
+      (pathSegments[index - 1] === "posts" && !isNaN(Number(segment))) ||
+      (pathSegments[index - 2] === "tags" && !isNaN(Number(segment)))
+    ) {
+      return;
+    }
+
+    currentPath += `/${segment}`;
+
+    items.push({
+      label: formatBreadcrumbLabel(segment, index),
+      href: index === pathSegments.length - 1 ? undefined : currentPath,
+      isCurrentPage: index === pathSegments.length - 1,
+    });
+  });
+
+  return items;
+}
+
+const breadcrumbItems = buildBreadcrumbItems();
 ---
 
-<nav class="breadcrumb" aria-label="breadcrumb">
+<nav class:list={["breadcrumb", className]} aria-label="breadcrumb">
   <ul>
-    <li>
-      <a href="/">{t("nav.home")}</a>
-      <span aria-hidden="true">&raquo;</span>
-    </li>
     {
-      breadcrumbList.map((breadcrumb, index) =>
-        index + 1 === breadcrumbList.length ? (
-          <li>
+      breadcrumbItems.map(item => (
+        <li>
+          {item.isCurrentPage ? (
             <span class="capitalize" aria-current="page">
-              {decodeURIComponent(breadcrumb)}
+              {item.label}
             </span>
-          </li>
-        ) : (
-          <li>
-            <a href={`/${breadcrumb}/`}>{breadcrumb}</a>
-            <span aria-hidden="true">&raquo;</span>
-          </li>
-        )
-      )
+          ) : (
+            <>
+              <a href={item.href} class="capitalize">
+                {item.label}
+              </a>
+              <span aria-hidden="true">&raquo;</span>
+            </>
+          )}
+        </li>
+      ))
     }
   </ul>
 </nav>
@@ -61,17 +113,27 @@ breadcrumbList[0] === "tags" &&
 <style lang="postcss">
   .breadcrumb {
     @apply mx-auto mb-1 mt-8 w-full max-w-content px-4;
+    
     ul {
+      @apply flex flex-wrap items-center gap-1;
+      
       li {
         @apply inline;
+        
         a {
-          @apply capitalize opacity-70;
+          @apply capitalize opacity-70 transition-opacity duration-200;
+          
+          &:hover {
+            @apply opacity-100;
+          }
         }
+        
         span {
           @apply opacity-70;
-        }
-        &:not(:last-child) a {
-          @apply hover:opacity-100;
+          
+          &[aria-current="page"] {
+            @apply opacity-100;
+          }
         }
       }
     }
