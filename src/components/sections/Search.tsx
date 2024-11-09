@@ -1,5 +1,12 @@
 import Fuse from "fuse.js";
-import { useEffect, useRef, useState, useMemo, type FormEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+  useCallback,
+  type FormEvent,
+} from "react";
 import type { CollectionEntry } from "astro:content";
 import Card from "@/components/sections/Card";
 
@@ -19,59 +26,52 @@ interface SearchResult {
   refIndex: number;
 }
 
-export default function SearchBar({ searchList }: Props) {
+export default function SearchBar({ searchList }: Props): JSX.Element {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [inputVal, setInputVal] = useState("");
+  const [inputVal, setInputVal] = useState<string>("");
   const [searchResults, setSearchResults] = useState<SearchResult[] | null>(
     null
   );
 
-  const handleChange = (e: FormEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((e: FormEvent<HTMLInputElement>): void => {
     setInputVal(e.currentTarget.value);
-  };
+  }, []);
 
-  const fuse = useMemo(
-    () =>
-      new Fuse(searchList, {
-        keys: ["title", "description"],
-        includeMatches: true,
-        minMatchCharLength: 2,
-        threshold: 0.5,
-      }),
-    [searchList]
-  );
+  const fuse = useMemo(() => {
+    return new Fuse<SearchItem>(searchList, {
+      keys: ["title", "description"],
+      includeMatches: true,
+      minMatchCharLength: 2,
+      threshold: 0.5,
+    });
+  }, [searchList]);
 
   useEffect(() => {
-    // if URL has search query,
-    // insert that search query in input field
     const searchUrl = new URLSearchParams(window.location.search);
     const searchStr = searchUrl.get("q");
     if (searchStr) setInputVal(searchStr);
 
-    // put focus cursor at the end of the string
-    setTimeout(function () {
-      inputRef.current!.selectionStart = inputRef.current!.selectionEnd =
-        searchStr?.length || 0;
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.selectionStart = inputRef.current.selectionEnd =
+          searchStr?.length ?? 0;
+      }
     }, 50);
   }, []);
 
   useEffect(() => {
-    // Add search result only if
-    // input value is more than one character
-    let inputResult = inputVal.length > 1 ? fuse.search(inputVal) : [];
+    const inputResult = inputVal.length > 1 ? fuse.search(inputVal) : [];
     setSearchResults(inputResult);
 
-    // Update search string in URL
+    const searchParams = new URLSearchParams(window.location.search);
     if (inputVal.length > 0) {
-      const searchParams = new URLSearchParams(window.location.search);
       searchParams.set("q", inputVal);
-      const newRelativePathQuery =
-        window.location.pathname + "?" + searchParams.toString();
+      const newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
       history.replaceState(history.state, "", newRelativePathQuery);
     } else {
       history.replaceState(history.state, "", window.location.pathname);
     }
-  }, [inputVal]);
+  }, [inputVal, fuse]);
 
   return (
     <>
@@ -90,7 +90,6 @@ export default function SearchBar({ searchList }: Props) {
           value={inputVal}
           onChange={handleChange}
           autoComplete="off"
-          // autoFocus
           ref={inputRef}
         />
       </label>
@@ -98,16 +97,15 @@ export default function SearchBar({ searchList }: Props) {
       {inputVal.length > 1 && (
         <div className="mt-8">
           Found {searchResults?.length}
-          {searchResults?.length && searchResults?.length === 1
-            ? " result"
-            : " results"}{" "}
-          for '{inputVal}'
+          {searchResults?.length === 1 ? " result" : " results"} for '{inputVal}
+          '
         </div>
       )}
 
       <ul>
         {searchResults &&
           searchResults.map(({ item, refIndex }) => (
+            // <p key={`${refIndex}-${item.slug}`}>{item.title}</p>
             <Card
               href={`/posts/${item.slug}/`}
               frontmatter={item.data}

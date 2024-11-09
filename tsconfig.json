@@ -1,13 +1,33 @@
 {
+  // Extend the base Astro strict TypeScript configuration
   "extends": "astro/tsconfigs/strict",
+
+  // Specify the files to include in the TypeScript project
   "include": [".astro/types.d.ts", "**/*"],
+
+  // Exclude the 'dist' directory from the TypeScript project
   "exclude": ["dist"],
+
   "compilerOptions": {
+    // Set the base directory for module resolution
     "baseUrl": "src",
+
+    // Specify JSX syntax with React JSX support
     "jsx": "react-jsx",
+    "jsxImportSource": "react",
+
+    // Target the latest ECMAScript version for output
+    "target": "ESNext",
+
+    // Use Node module resolution strategy
+    "moduleResolution": "node",
+
+    // Enable all strict type-checking options
+    "strict": true,
+
+    // Configure module path aliases for cleaner imports
     "paths": {
       "@/*": ["./*"]
-    },
-    "jsxImportSource": "react"
+    }
   }
 }

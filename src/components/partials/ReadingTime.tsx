@@ -1,5 +1,5 @@
 import { LOCALE } from "@/config";
-import { Icon } from "astro-icon/components";
+import { IconClock } from "@tabler/icons-react";
 
 /**
  * Component props interface with strict typing
@@ -49,12 +49,15 @@ export default function ReadingTime({
 
   return (
     <div
-      className={`flex items-center gap-1 opacity-80 hover:opacity-100 transition-opacity ${className}`.trim()}
+      className={`flex items-center gap-1 opacity-80 transition-opacity hover:opacity-100 icon-tabler ${className}`.trim()}
       aria-label={ariaLabel}
     >
-      <Icon
-        name="tabler:clock"
-        class:list={iconClasses}
+      <IconClock
+        stroke={2}
+        className={Object.entries(iconClasses)
+          .filter(([_, value]) => value)
+          .map(([key]) => key)
+          .join(" ")}
         aria-hidden="true"
         role="presentation"
       />

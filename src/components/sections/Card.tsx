@@ -1,8 +1,7 @@
 import { slugifyStr } from "@/utils/slugify";
-
 import type { CollectionEntry } from "astro:content";
-import ReadingTime from "@/components/partials/ReadingTime.astro";
-import Datetime from "@/components/partials/Datetime.astro";
+import ReadingTime from "@/components/partials/ReadingTime";
+import Datetime from "@/components/partials/Datetime";
 
 export interface Props {
   href?: string;

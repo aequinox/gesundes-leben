@@ -11,7 +11,10 @@ import { getCollection } from "astro:content";
 import { getLangFromUrl, useTranslations } from "i18n/utils";
 
 // Retrieve all published articles
-const posts = await getCollection("blog", ({ data }) => !data.draft);
+const posts = await getCollection(
+  "blog",
+  ({ data }: any): boolean => !data.draft
+);
 const sortedPosts = await getSortedPosts(posts);
 
 // List of items to search in

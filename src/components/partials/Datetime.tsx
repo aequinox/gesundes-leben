@@ -1,6 +1,6 @@
 import { LOCALE } from "@/config";
 import type { DateTimeInput } from "@/types/datetime";
-import { Icon } from "astro-icon/components";
+import { IconCalendarTime, IconCalendarMonth } from "@tabler/icons-react";
 
 /**
  * Component props interface with strict typing
@@ -10,6 +10,10 @@ interface Props extends DateTimeInput {
   size?: "sm" | "lg";
   /** Additional CSS classes */
   className?: string;
+  /** Publication datetime */
+  pubDatetime: string | Date;
+  /** Modification datetime */
+  modDatetime?: string | Date;
 }
 
 /**
@@ -74,19 +78,17 @@ export default function Datetime({
 }: Props): JSX.Element {
   const isUpdated =
     modDatetime && new Date(modDatetime) > new Date(pubDatetime);
-  const iconName = `tabler:calendar-${isUpdated ? "time" : "month"}`;
   const ariaLabel = isUpdated ? localeStrings.updated : localeStrings.published;
 
   // Precompute classes for better performance
-  const iconClasses = {
-    "inline-block": true,
-    "fill-skin-base": true,
-    "scale-90": size === "sm",
-    "scale-100": size !== "sm",
-    "h-6": true,
-    "w-6": true,
-    "min-w-[1.5rem]": true,
-  };
+  const iconClasses = [
+    "inline-block",
+    "fill-skin-basex bg-indigo-500",
+    size === "sm" ? "scale-90" : "scale-100",
+    "h-6",
+    "w-6",
+    "min-w-[1.5rem]",
+  ].join(" ");
 
   const textClasses = ["italic", size === "sm" ? "text-sm" : "text-base"].join(
     " "
@@ -94,15 +96,24 @@ export default function Datetime({
 
   return (
     <div
-      className={`flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity ${className}`.trim()}
+      className={`icon-tabler flex items-center gap-2 opacity-80 transition-opacity hover:opacity-100 ${className}`.trim()}
       aria-label={ariaLabel}
     >
-      <Icon
-        name={iconName}
-        class:list={iconClasses}
-        aria-hidden="true"
-        role="presentation"
-      />
+      {isUpdated ? (
+        <IconCalendarTime
+          stroke={2}
+          className={iconClasses}
+          aria-hidden="true"
+          role="presentation"
+        />
+      ) : (
+        <IconCalendarMonth
+          stroke={2}
+          className={iconClasses}
+          aria-hidden="true"
+          role="presentation"
+        />
+      )}
       <span className={textClasses}>
         <FormattedDatetime
           pubDatetime={pubDatetime}

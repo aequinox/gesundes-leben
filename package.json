@@ -37,6 +37,7 @@
     "@iconify-json/tabler": "^1.2.7",
     "@iconify/tailwind": "^1.1.3",
     "@resvg/resvg-js": "^2.6.2",
+    "@tabler/icons-react": "^3.21.0",
     "@tailwindcss/typography": "^0.5.15",
     "@types/aos": "^3.0.7",
     "@types/node": "^22.9.0",
