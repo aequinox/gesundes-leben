@@ -39,9 +39,9 @@ const ACTION_BUTTONS: ActionButton[] = [
   SITE.showArchives && {
     href: "/archives/",
     key: "archives",
-    label: "Archives",
+    label: t("nav.archives"),
     icon: "archive",
-    showTextOnMobile: true,
+    showTextOnMobile: false,
   },
   SITE.showSearch && {
     href: "/search/",
@@ -53,20 +53,12 @@ const ACTION_BUTTONS: ActionButton[] = [
 ].filter((button): button is ActionButton => Boolean(button));
 ---
 
-<div
-  id="navbar"
-  class="sticky top-0 z-20 w-full backdrop-blur-md transition-all duration-200 ease-in-out h-10"
->
-  <div class="nav-container">
-    <div
-      class="relative flex w-full items-start justify-between md:items-center md:py-4"
-    >
-      <!-- Logo -->
-      <a
-        id="logo"
-        href="/"
-        class="logo scale-105 whitespace-nowrap md:py-0 py-4"
-      >
+<header class="sticky top-0 z-20 w-full">
+  <nav
+    class="h-16 bg-skin-fill/75 backdrop-blur-md transition-all duration-200"
+  >
+    <div class="mx-auto flex h-16 w-full items-center justify-between">
+      <a href="/" class="flex h-16 items-center">
         {
           LOGO_IMAGE.enable ? (
             <img
@@ -81,10 +73,11 @@ const ACTION_BUTTONS: ActionButton[] = [
           )
         }
       </a>
-      <nav id="nav-menu">
+
+      <div class="flex items-center">
         <button
           id="hamburger-menu"
-          class="self-end p-2 outline-2 outline-offset-1 outline-skin-fill focus-visible:no-underline focus-visible:outline-dashed md:hidden py-4"
+          class="flex h-16 items-center p-2 md:hidden"
           aria-label="Open Menu"
           aria-expanded="false"
           aria-controls="menu-items"
@@ -99,7 +92,7 @@ const ACTION_BUTTONS: ActionButton[] = [
             stroke-width="1.5"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="menu-icon h-6 w-6 scale-125 fill-skin-base"
+            class="menu-icon h-6 w-6"
           >
             <line x1="7" y1="12" x2="21" y2="12" class="line"></line>
             <line x1="3" y1="6" x2="21" y2="6" class="line"></line>
@@ -108,276 +101,37 @@ const ACTION_BUTTONS: ActionButton[] = [
             <line x1="6" y1="6" x2="18" y2="18" class="close"></line>
           </svg>
         </button>
-        <ul
-          id="menu-items"
-          class="ml-auto hidden rounded-lg border-2 border-skin-inverted bg-skin-base/95 md:flex md:border-none md:bg-transparent"
-        >
-          {
-            NAV_LINKS.map(({ href, key, label }) => (
-              <li
-                role="none"
-                class="col-span-2 flex items-center justify-center font-medium"
-              >
-                <a
-                  href={href}
-                  class:list={[
-                    "px-2 py-1 text-center hover:text-skin-accent hover:underline hover:decoration-wavy hover:decoration-2 hover:underline-offset-4",
-                    activeNav === key && "active",
-                  ]}
-                  role="menuitem"
-                  aria-current={activeNav === key ? "page" : undefined}
-                >
-                  {label}
-                </a>
-              </li>
-            ))
-          }
-          {/* Action Buttons */}
-          <!-- <div
-            class="action-buttons"
-            role="group"
-            aria-label={t("nav.additionalActions")}
-          > -->
-          {
-            ACTION_BUTTONS.map(
-              ({ href, key, label, icon, showTextOnMobile }) => (
-                <li role="none">
-                  <LinkButton
-                    href={href}
-                    className={`action-button ${activeNav === key ? "active" : ""}`}
-                    ariaLabel={label}
-                    title={label}
-                  >
-                    <MenuIcon name={icon} active={activeNav === key} />
-                    <span
-                      class:list={[
-                        showTextOnMobile ? "sm:sr-only" : "sr-only",
-                        activeNav === key && "active",
-                      ]}
-                    >
-                      {label}
-                    </span>
-                  </LinkButton>
-                </li>
-              )
-            )
-          }
-          {/* Theme Toggle */}
-          {
-            SITE.lightAndDarkMode && (
-              <li role="none">
-                <ThemeToggle lang={lang} />
-                {/* <button
-                    id="theme-btn"
-                    class="focus-outline"
-                    title={t("nav.themeToggle")}
-                    aria-label="auto"
-                    aria-live="polite"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" id="moon-svg">
-                      <path d="M20.742 13.045a8.088 8.088 0 0 1-2.077.271c-2.135 0-4.14-.83-5.646-2.336a8.025 8.025 0 0 1-2.064-7.723A1 1 0 0 0 9.73 2.034a10.014 10.014 0 0 0-4.489 2.582c-3.898 3.898-3.898 10.243 0 14.143a9.937 9.937 0 0 0 7.072 2.93 9.93 9.93 0 0 0 7.07-2.929 10.007 10.007 0 0 0 2.583-4.491 1.001 1.001 0 0 0-1.224-1.224zm-2.772 4.301a7.947 7.947 0 0 1-5.656 2.343 7.953 7.953 0 0 1-5.658-2.344c-3.118-3.119-3.118-8.195 0-11.314a7.923 7.923 0 0 1 2.06-1.483 10.027 10.027 0 0 0 2.89 7.848 9.972 9.972 0 0 0 7.848 2.891 8.036 8.036 0 0 1-1.484 2.059z" />
-                    </svg>
-                    <svg xmlns="http://www.w3.org/2000/svg" id="sun-svg">
-                      <path d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2h-3zm17 0h3v2h-3zM4.219 18.363l2.12-2.122 1.415 1.414-2.12 2.122zM16.24 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.342 7.759 4.22 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z" />
-                    </svg>
-                  </button> */}
-              </li>
-            )
-          }
-          <!-- </div> -->
-        </ul>
-      </nav>
-    </div>
-  </div>
 
-  <!--  -->
-  <!-- <div
-    class="mx-auto flex w-full max-w-content items-start justify-between py-4 text-skin-base md:items-center md:pb-4 md:pt-4"
-  >
-    
-    <a
-      id="logo"
-      href="/"
-      class="logo scale-105 whitespace-nowrap"
-      aria-label={SITE.title}
-    >
-      {
-        LOGO_IMAGE.enable ? (
-          <img
-            src={`/assets/${LOGO_IMAGE.svg ? "logo.svg" : "logo.png"}`}
-            alt={SITE.title}
-            width={LOGO_IMAGE.width}
-            height={LOGO_IMAGE.height}
-            loading="eager"
-          />
-        ) : (
-          SITE.title
-        )
-      } - NEW
-    </a>
-    <nav
-      class="flex w-full flex-grow flex-col items-center md:ml-2 md:flex-row md:justify-end md:pb-0 md:pt-0"
-      aria-label={t("nav.mainNavigation")}
-    >
-      <input
-        type="checkbox"
-        id="nav-toggle"
-        class="nav-toggle"
-        aria-hidden="true"
-      />
-      <label
-        for="nav-toggle"
-        class="nav-toggle-label"
-        aria-label={t("nav.toggleMenu")}
-      >
-        < !-- <Icon name="tabler:menu-2" class="h-8 w-8" /> -- >
-        <span class="hamburger">
-          <span class="line"></span>
-          <span class="line"></span>
-          <span class="line"></span>
-        </span>
-      </label>
-      <ul id="menu-items" class="menu-items" role="menubar">
-        {
-          NAV_LINKS.map(({ href, key, label }) => (
-            <li
-              role="none"
-              class="col-span-2 flex items-center justify-center font-medium"
-            >
-              <a
-                href={href}
-                class:list={[
-                  "px-2 py-1 text-center hover:text-skin-accent hover:underline hover:decoration-wavy hover:decoration-2 hover:underline-offset-4",
-                  activeNav === key && "active",
-                ]}
-                role="menuitem"
-                aria-current={activeNav === key ? "page" : undefined}
-              >
-                {label}
-              </a>
-            </li>
-          ))
-        }
-        {/* Action Buttons */}
         <div
-          class="action-buttons"
-          role="group"
-          aria-label={t("nav.additionalActions")}
+          id="menu-items"
+          class="fixed right-4 top-16 hidden rounded-lg border-2 border-skin-line bg-skin-fill shadow-lg md:static md:flex md:border-none md:bg-transparent md:shadow-none"
         >
-          {
-            ACTION_BUTTONS.map(
-              ({ href, key, label, icon, showTextOnMobile }) => (
-                <li role="none">
-                  <LinkButton
-                    href={href}
-                    className={`action-button ${activeNav === key ? "active" : ""}`}
-                    ariaLabel={label}
-                    title={label}
-                  >
-                    <MenuIcon name={icon} active={activeNav === key} />
-                    <span
-                      class:list={[
-                        showTextOnMobile ? "sm:sr-only" : "sr-only",
-                        activeNav === key && "active",
-                      ]}
-                    >
-                      {label}
-                    </span>
-                  </LinkButton>
-                </li>
-              )
-            )
-          }
-          {/* Theme Toggle */}
-        </div>
-        {
-          SITE.lightAndDarkMode && (
-            <li role="none" class="">
-              <ThemeToggle lang={lang} />
-            </li>
-          )
-        }
-      </ul>
-    </nav>
-  </div> -->
-  <!--  -->
-
-  <!-- <div
-  id="navbar"
-  class="sticky top-0 z-20 w-full backdrop-blur-md transition-all duration-200"
-  role="banner"
->
-  <div class="mx-auto max-w-content">
-    <div
-      class="relative flex w-full items-start justify-between md:items-center md:py-4"
-    >
-      <a
-        id="logo"
-        href="/"
-        class="logo scale-105 whitespace-nowrap"
-        aria-label={SITE.title}
-      >
-        {
-          LOGO_IMAGE.enable ? (
-            <img
-              src={`/assets/${LOGO_IMAGE.svg ? "logo.svg" : "logo.png"}`}
-              alt={SITE.title}
-              width={LOGO_IMAGE.width}
-              height={LOGO_IMAGE.height}
-              loading="eager"
-            />
-          ) : (
-            SITE.title
-          )
-        }
-      </a>
-
-      <nav id="nav-menu" class="flex-grow" aria-label={t("nav.mainNavigation")}>
-        <input
-          type="checkbox"
-          id="nav-toggle"
-          class="nav-toggle"
-          aria-hidden="true"
-        />
-        <label
-          for="nav-toggle"
-          class="nav-toggle-label"
-          aria-label={t("nav.toggleMenu")}
-        >
-          <span class="hamburger">
-            <span class="line"></span>
-            <span class="line"></span>
-            <span class="line"></span>
-          </span>
-        </label>
-
-        <ul id="menu-items" class="menu-items" role="menubar">
-          {/* Navigation Links */}
-          {
-            NAV_LINKS.map(({ href, key, label }) => (
-              <li role="none">
-                <a
-                  href={href}
-                  class:list={["nav-link", activeNav === key && "active"]}
-                  role="menuitem"
-                  aria-current={activeNav === key ? "page" : undefined}
-                >
-                  {label}
-                </a>
-              </li>
-            ))
-          }
-
-          {/* Action Buttons */}
-          <div
-            class="action-buttons"
-            role="group"
-            aria-label={t("nav.additionalActions")}
+          <ul
+            class="grid w-44 grid-cols-2 grid-rows-4 gap-x-2 gap-y-2 p-4 md:flex md:w-auto md:grid-cols-none md:grid-rows-none md:items-center md:gap-x-5 md:gap-y-0 md:p-0"
           >
             {
-              ACTION_BUTTONS.map(
-                ({ href, key, label, icon, showTextOnMobile }) => (
-                  <li role="none">
+              NAV_LINKS.map(({ href, key, label }) => (
+                <li class="col-span-2 flex items-center justify-center">
+                  <a
+                    href={href}
+                    class:list={[
+                      "w-full px-4 py-3 text-center font-medium hover:text-skin-accent md:my-0 md:w-auto md:px-2 md:py-1",
+                      activeNav === key &&
+                        "text-skin-accent underline decoration-wavy decoration-2 underline-offset-4",
+                    ]}
+                    aria-current={activeNav === key ? "page" : undefined}
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))
+            }
+            <li
+              class="col-span-2 flex items-center justify-end gap-x-2 md:col-span-1"
+            >
+              {
+                ACTION_BUTTONS.map(
+                  ({ href, key, label, icon, showTextOnMobile }) => (
                     <LinkButton
                       href={href}
                       className={`action-button ${activeNav === key ? "active" : ""}`}
@@ -385,282 +139,65 @@ const ACTION_BUTTONS: ActionButton[] = [
                       title={label}
                     >
                       <MenuIcon name={icon} active={activeNav === key} />
-                      <span
-                        class:list={[
-                          showTextOnMobile ? "sm:sr-only" : "sr-only",
-                          activeNav === key && "active",
-                        ]}
-                      >
+                      <span class={showTextOnMobile ? "sm:sr-only" : "sr-only"}>
                         {label}
                       </span>
                     </LinkButton>
-                  </li>
+                  )
                 )
-              )
-            }
-
-            {/* Theme Toggle */}
-            {
-              SITE.lightAndDarkMode && (
-                <li role="none">
-                  <ThemeToggle lang={lang} />
-                </li>
-              )
-            }
-          </div>
-        </ul>
-      </nav>
+              }
+              {SITE.lightAndDarkMode && <ThemeToggle lang={lang} />}
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
-  </div>
-</div> -->
+  </nav>
+</header>
 
-  <style>
-    nav {
-      @apply flex w-full flex-col items-center md:ml-2 md:flex-row md:justify-end md:space-x-4 md:py-0;
-      ul {
-        @apply mt-4 grid w-44 grid-cols-2 grid-rows-4 gap-x-2 gap-y-2 md:ml-0 md:mt-0 md:w-auto md:gap-x-5 md:gap-y-0;
-        li {
-          @apply col-span-2 flex items-center justify-center;
-          a {
-            @apply w-full px-4 py-3 text-center font-medium hover:text-skin-accent md:my-0 md:px-2 md:py-1;
-          }
-          &:nth-last-child(2) a {
-            @apply w-auto;
-          }
-          &:nth-last-child(2) a {
-            @apply w-auto;
-          }
-          &:nth-last-child(1),
-          &:nth-last-child(2) {
-            @apply col-span-1;
-          }
-        }
-      }
-      a.active {
-        @apply underline decoration-wavy decoration-2 underline-offset-4;
-      }
-      a.active svg {
-        @apply fill-skin-accent;
-      }
-
-      button {
-        @apply p-1;
-      }
-      button svg {
-        @apply h-6 w-6 fill-skin-base hover:fill-skin-accent;
-      }
-    }
-
-    #theme-btn {
-      @apply p-3 md:p-1;
-      svg {
-        @apply scale-125 hover:rotate-12 md:scale-100;
-      }
-    }
-
-    .menu-icon {
-      line {
-        @apply transition-opacity duration-300 ease-in-out;
-      }
-      .close {
-        opacity: 0;
-      }
-      &.is-active .line {
-        @apply opacity-0;
-      }
-      &.is-active .close {
-        @apply opacity-100;
-      }
-
-      &.is-active #menu-items {
-        @apply absolute left-0 top-full z-10 w-full origin-top bg-skin-fill/90 backdrop-blur-md backdrop-brightness-150 transition-transform duration-300 ease-in-out md:relative;
-      }
-    }
-
-    .hamburger-menu {
-      @apply self-end p-2 md:hidden;
-      svg {
-        @apply h-6 w-6 scale-125 fill-skin-base;
-      }
-    }
-    .nav-shrink {
-      @apply h-14 bg-skin-fill/75 shadow-lg;
-    }
-    .menu-items {
-      @apply ml-auto hidden rounded-lg border-2 border-skin-inverted bg-skin-base/95 md:flex md:border-none md:bg-transparent;
-    }
-    /* Added styles for overlay */
-
-    /* #menu-items {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      width: 100%;
-      background-color: white;
-      border: 1px solid #ccc;
-      z-index: 1000;
-      transform-origin: top;
-      transform: scaleY(0);
-      transition: transform 0.3s ease-in-out;
-    }
-
-    #menu-items.hidden {
-      transform: scaleY(0);
-    }
-
-    #menu-items.not-hidden {
-      transform: scaleY(1);
-    }
-
-    #menu-items a {
-      display: block;
-      padding: 1rem;
-      text-decoration: none;
-      color: #333;
-    } */
-
-    /* Style the content to prevent it from being hidden */
-    main {
-      z-index: 1; /* Ensure content is below the menu */
-    }
-  </style>
-
-  <script>
-    function toggleNav() {
-      // Toggle menu
-      // const menuBtn = document.querySelector(".hamburger-menu");
-      const menuBtn = document.getElementById("hamburger-menu");
-      const menuIcon = document.querySelector(".menu-icon");
-      const menuItems = document.querySelector("#menu-items");
-
-      menuBtn?.addEventListener("click", () => {
-        const menuExpanded = menuBtn.getAttribute("aria-expanded") === "true";
-        menuIcon?.classList.toggle("is-active");
-        menuBtn.setAttribute("aria-expanded", menuExpanded ? "false" : "true");
-        menuBtn.setAttribute(
-          "aria-label",
-          menuExpanded ? "Open Menu" : "Close Menu"
-        );
-        menuItems?.classList.toggle("hidden");
-      });
-    }
-
-    toggleNav();
-
-    // Runs on view transitions navigation
-    document.addEventListener("astro:after-swap", toggleNav);
-
-    //
-    const navbar = document.getElementById("navbar");
-    const logo = document.getElementById("logo");
-
-    window.addEventListener("scroll", () => {
-      if (!navbar || !logo) return;
-
-      if (window.scrollY > 64) {
-        navbar.classList.add("nav-shrink");
-        // logo.classList.remove("scale-105");
-      } else {
-        navbar.classList.remove("nav-shrink");
-        // logo.classList.add("scale-105");
-      }
-    });
-  </script>
-
-  <!-- <style>
-  a.active,
-  a.hover {
-    @apply underline decoration-wavy decoration-2 underline-offset-4;
+<style>
+  .menu-icon .line {
+    @apply transition-opacity duration-200;
   }
-  a.active svg {
-    @apply fill-skin-accent;
+  .menu-icon .close {
+    @apply opacity-0 transition-opacity duration-200;
   }
-  /* Base Styles */
-  .nav-toggle {
-    @apply hidden;
-  }
-
-  .nav-toggle-label {
-    @apply cursor-pointer self-end p-2 outline-2 outline-offset-1 outline-skin-fill focus-visible:no-underline focus-visible:outline-dashed md:hidden;
-  }
-
-  /* Menu Items */
-  .menu-items {
-    @apply absolute left-4 right-4 top-full ml-auto mt-2 hidden list-none grid-cols-2 grid-rows-4 gap-x-5 rounded-lg border-2 border-skin-inverted bg-skin-fill/95 p-2 text-base shadow-lg md:static md:ml-4 md:mr-0 md:flex md:items-center md:border-none md:bg-transparent md:p-0 md:shadow-none;
-  }
-
-  .nav-toggle:checked ~ .menu-items {
-    @apply flex flex-col;
-  }
-
-  /* Navigation Links */
-  .nav-link {
-    @apply mb-2 w-full px-4 py-3 text-center font-medium hover:text-skin-accent md:my-0 md:px-2 md:py-1;
-  }
-
-  .nav-link.active {
-    @apply underline decoration-wavy decoration-2 underline-offset-4;
-  }
-
-  /* Action Buttons */
-  .action-buttons {
-    @apply grid w-full grid-cols-3 gap-2 md:contents;
-  }
-
-  .action-button {
-    @apply flex justify-center p-3 sm:p-1;
-  }
-
-  .action-button.active :global(svg) {
-    @apply fill-skin-accent;
-  }
-
-  /* Hamburger Menu */
-  .hamburger {
-    @apply flex h-5 w-6 flex-col justify-between;
-  }
-
-  .hamburger .line {
-    @apply block h-0.5 w-full bg-current transition-transform duration-300 ease-in-out;
-  }
-
-  .nav-toggle:checked ~ .nav-toggle-label .hamburger .line:nth-child(1) {
-    @apply translate-y-[9px] rotate-45;
-  }
-
-  .nav-toggle:checked ~ .nav-toggle-label .hamburger .line:nth-child(2) {
+  #hamburger-menu[aria-expanded="true"] .line {
     @apply opacity-0;
   }
-
-  .nav-toggle:checked ~ .nav-toggle-label .hamburger .line:nth-child(3) {
-    @apply -translate-y-[9px] -rotate-45;
+  #hamburger-menu[aria-expanded="true"] .close {
+    @apply opacity-100;
   }
 
-  /* Navigation Layout */
-  /* nav {
-    @apply flex w-full flex-col items-center md:ml-2 md:flex-row md:justify-end md:space-x-4 md:py-0;
-  } */
-
-  /* Navigation Shrink Effect */
-  :global(.nav-shrink) {
-    @apply h-14 bg-skin-fill/75 shadow-lg;
+  :global(.action-button) {
+    @apply flex items-center justify-center p-2 hover:text-skin-accent;
   }
-</style> -->
+  :global(.action-button.active) {
+    @apply text-skin-accent;
+  }
+  :global(.action-button svg) {
+    @apply h-6 w-6;
+  }
+</style>
 
-  <script>
-    // Add scroll listener for navbar shrink effect
-    const navbar = document.getElementById("navbar");
-    const SCROLL_THRESHOLD = 50;
+<script>
+  function toggleNav() {
+    const menuBtn = document.getElementById("hamburger-menu");
+    const menuItems = document.getElementById("menu-items");
 
-    function updateNavbarStyle() {
-      if (window.scrollY > SCROLL_THRESHOLD) {
-        navbar?.classList.add("nav-shrink");
-      } else {
-        navbar?.classList.remove("nav-shrink");
-      }
-    }
+    if (!menuBtn || !menuItems) return;
 
-    window.addEventListener("scroll", updateNavbarStyle, { passive: true });
-    document.addEventListener("astro:after-swap", updateNavbarStyle);
-  </script>
-</div>
+    menuBtn.addEventListener("click", () => {
+      const isExpanded = menuBtn.getAttribute("aria-expanded") === "true";
+      menuBtn.setAttribute("aria-expanded", (!isExpanded).toString());
+      menuBtn.setAttribute(
+        "aria-label",
+        isExpanded ? "Open Menu" : "Close Menu"
+      );
+      menuItems.classList.toggle("hidden");
+    });
+  }
+
+  toggleNav();
+  document.addEventListener("astro:after-swap", toggleNav);
+</script>

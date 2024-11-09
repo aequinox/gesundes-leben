@@ -24,6 +24,7 @@ type TranslationCategories = {
     back: string;
     backToTop: string;
     search: string;
+    archives: string;
     searchDescription: string;
     themeToggle: string;
     skipToContent: string;
@@ -86,6 +87,7 @@ export const ui: Record<Language, TranslationCategories> = {
       back: "Zurück",
       backToTop: "Zurück zum Anfang",
       search: "Suche",
+      archives: "Archive",
       searchDescription: "Suche nach einem Artikel ...",
       themeToggle: "Modus umschalten",
       skipToContent: "Zum Inhalt springen",
@@ -143,6 +145,7 @@ export const ui: Record<Language, TranslationCategories> = {
       back: "Go back",
       backToTop: "Back to top",
       search: "Search",
+      archives: "Archives",
       searchDescription: "Search any article ...",
       themeToggle: "Toggles light & dark mode",
       skipToContent: "Skip to content",
