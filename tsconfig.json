@@ -19,9 +19,6 @@
     // Target the latest ECMAScript version for output
     "target": "ESNext",
 
-    // Use Node module resolution strategy
-    "moduleResolution": "node",
-
     // Enable all strict type-checking options
     "strict": true,
 
