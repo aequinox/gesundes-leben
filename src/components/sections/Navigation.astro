@@ -55,14 +55,18 @@ const ACTION_BUTTONS: ActionButton[] = [
 
 <div
   id="navbar"
-  class="sticky top-0 z-20 w-full backdrop-blur-md transition-all duration-200 ease-in-out"
+  class="sticky top-0 z-20 w-full backdrop-blur-md transition-all duration-200 ease-in-out h-10"
 >
   <div class="nav-container">
     <div
-      class="relative flex w-full items-start justify-between p-4 md:items-center md:py-4"
+      class="relative flex w-full items-start justify-between md:items-center md:py-4"
     >
       <!-- Logo -->
-      <a id="logo" href="/" class="logo scale-105 whitespace-nowrap">
+      <a
+        id="logo"
+        href="/"
+        class="logo scale-105 whitespace-nowrap md:py-0 py-4"
+      >
         {
           LOGO_IMAGE.enable ? (
             <img
@@ -80,7 +84,7 @@ const ACTION_BUTTONS: ActionButton[] = [
       <nav id="nav-menu">
         <button
           id="hamburger-menu"
-          class="self-end p-2 outline-2 outline-offset-1 outline-skin-fill focus-visible:no-underline focus-visible:outline-dashed md:hidden"
+          class="self-end p-2 outline-2 outline-offset-1 outline-skin-fill focus-visible:no-underline focus-visible:outline-dashed md:hidden py-4"
           aria-label="Open Menu"
           aria-expanded="false"
           aria-controls="menu-items"
