@@ -14,18 +14,21 @@ export interface Props {
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
-
   const tags = getUniqueTags(posts);
 
-  return tags.flatMap(async ({ tag, tagName }) => {
-    const tagPosts = await getPostsByTag(posts, tag);
-    const totalPages = getPageNumbers(tagPosts.length);
+  const paths = await Promise.all(
+    tags.map(async ({ tag, tagName }) => {
+      const tagPosts = await getPostsByTag(posts, tag);
+      const totalPages = getPageNumbers(tagPosts.length);
 
-    return totalPages.map(page => ({
-      params: { tag, page },
-      props: { tag, tagName },
-    }));
-  });
+      return totalPages.map(page => ({
+        params: { tag, page: page.toString() },
+        props: { tag, tagName },
+      }));
+    })
+  );
+
+  return paths.flat();
 }
 
 const { page } = Astro.params;

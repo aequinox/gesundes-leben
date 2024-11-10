@@ -83,7 +83,7 @@ export default function Datetime({
   // Precompute classes for better performance
   const iconClasses = [
     "inline-block",
-    "fill-skin-basex bg-indigo-500",
+    "fill-skin-base",
     size === "sm" ? "scale-90" : "scale-100",
     "h-6",
     "w-6",
@@ -101,7 +101,8 @@ export default function Datetime({
     >
       {isUpdated ? (
         <IconCalendarTime
-          stroke={2}
+          stroke="text-skin-inverted"
+          strokeWidth={2}
           className={iconClasses}
           aria-hidden="true"
           role="presentation"
