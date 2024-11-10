@@ -44,6 +44,44 @@ const favorites = defineCollection({
 });
 
 /**
+ * Defines the schema for a books collection with various content properties.
+ *
+ * Schema Fields:
+ * - title: A string representing the book title
+ * - author: A string representing the book's author
+ * - description: A detailed description of the book
+ * - isbn: An optional ISBN number
+ * - url: An optional URL to purchase or learn more about the book
+ * - bookCover: An optional image for the book cover
+ * - publishYear: An optional publication year
+ * - rating: An optional rating from 1 to 5
+ * - category: An array of categories the book belongs to
+ * - featured: A boolean indicating if the book should be featured
+ */
+const books = defineCollection({
+  type: "data",
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      author: z.string(),
+      description: z.string(),
+      isbn: z.string().optional(),
+      url: z.string(),
+      bookCover: image().optional(),
+      publishYear: z.number().optional(),
+      rating: z.union([
+        z.literal(1),
+        z.literal(2),
+        z.literal(3),
+        z.literal(4),
+        z.literal(5),
+      ]),
+      category: z.array(z.string()).default(["Selbstentwicklung"]),
+      featured: z.boolean().default(false),
+    }),
+});
+
+/**
  * Defines the schema for a blog collection with various content properties.
  *
  * Schema Fields:
@@ -109,4 +147,4 @@ const blog = defineCollection({
   // }),
 });
 
-export const collections = { authors, blog, favorites, glossary };
+export const collections = { authors, blog, favorites, glossary, books };
