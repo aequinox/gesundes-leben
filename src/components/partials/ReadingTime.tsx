@@ -49,7 +49,7 @@ export default function ReadingTime({
 
   return (
     <div
-      className={`flex items-center gap-1 opacity-80 transition-opacity hover:opacity-100 icon-tabler ${className}`.trim()}
+      className={`icon-tabler flex items-center gap-1 opacity-80 transition-opacity hover:opacity-100 ${className}`.trim()}
       aria-label={ariaLabel}
     >
       <IconClock

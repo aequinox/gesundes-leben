@@ -33,7 +33,7 @@ const textClasses = ["italic", size === "sm" ? "text-sm" : "text-base"];
   readingTime && (
     <div
       class:list={[
-        "flex items-center gap-1 opacity-80 hover:opacity-100 transition-opacity",
+        "flex items-center gap-1 opacity-80 transition-opacity hover:opacity-100",
         classes.trim(),
       ]}
       aria-label={`${readingTime} ${t("readingTime.minutes")} ${lang === "en" ? "reading time" : "Lesezeit"}`}
