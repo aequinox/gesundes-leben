@@ -55,7 +55,7 @@ const ACTION_BUTTONS: ActionButton[] = [
 
 <header class="sticky top-0 z-20 w-full">
   <nav
-    class="h-16 bg-skin-fill/75 backdrop-blur-md transition-all duration-200"
+    class="nav-container h-16 bg-skin-fill/75 backdrop-blur-md transition-all duration-200"
   >
     <div class="mx-auto flex h-16 w-full items-center justify-between">
       <a href="/" class="flex h-16 items-center">
@@ -178,6 +178,15 @@ const ACTION_BUTTONS: ActionButton[] = [
   :global(.action-button svg) {
     @apply h-6 w-6;
   }
+
+  .nav-container {
+    @apply px-4 py-3 transition-all duration-200;
+    border-bottom: 2px solid transparent;
+  }
+
+  .nav-container.scrolled {
+    @apply border-b-2 border-skin-accent px-4 py-1;
+  }
 </style>
 
 <script>
@@ -198,6 +207,21 @@ const ACTION_BUTTONS: ActionButton[] = [
     });
   }
 
+  function handleScroll() {
+    const nav = document.querySelector(".nav-container");
+    if (!nav) return;
+
+    const scrollThreshold = window.innerHeight * 0.25; // 25% of viewport height
+    const isScrolled = window.scrollY > scrollThreshold;
+
+    nav.classList.toggle("scrolled", isScrolled);
+  }
+
+  // Initialize
   toggleNav();
+  handleScroll();
+
+  // Event listeners
   document.addEventListener("astro:after-swap", toggleNav);
+  window.addEventListener("scroll", handleScroll);
 </script>
