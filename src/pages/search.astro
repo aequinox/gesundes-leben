@@ -1,29 +1,30 @@
 ---
 import Footer from "@/components/sections/Footer.astro";
 import Header from "@/components/sections/Header.astro";
-import SearchBar from "@/components/sections/Search";
+// import SearchBar from "@/components/sections/Search";
 import { SITE } from "@/config";
 import Layout from "@/layouts/Layout.astro";
 import Main from "@/layouts/Main.astro";
-import getSortedPosts from "@/utils/getSortedPosts";
-import { getCollection } from "astro:content";
+// import getSortedPosts from "@/utils/getSortedPosts";
+// import { getCollection } from "astro:content";
+import SearchBar from "astro-pagefind/components/Search";
 
 import { getLangFromUrl, useTranslations } from "i18n/utils";
 
 // Retrieve all published articles
-const posts = await getCollection(
-  "blog",
-  ({ data }: any): boolean => !data.draft
-);
-const sortedPosts = await getSortedPosts(posts);
+// const posts = await getCollection(
+//   "blog",
+//   ({ data }: any): boolean => !data.draft
+// );
+// const sortedPosts = await getSortedPosts(posts);
 
 // List of items to search in
-const searchList = sortedPosts.map(({ data, slug }) => ({
-  title: data.title,
-  description: data.description,
-  data,
-  slug,
-}));
+// const searchList = sortedPosts.map(({ data, slug }) => ({
+//   title: data.title,
+//   description: data.description,
+//   data,
+//   slug,
+// }));
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -31,8 +32,67 @@ const t = useTranslations(lang);
 
 <Layout title={`${t("nav.search")} | ${SITE.title}`}>
   <Header activeNav="search" />
+  <!-- <link href="/pagefind/pagefind-ui.css" rel="stylesheet" /> -->
+  <!-- <script is:inline src="/pagefind/pagefind-ui.js"></script> -->
   <Main pageTitle={t("nav.search")} pageDesc={t("nav.searchDescription")}>
-    <SearchBar client:load searchList={searchList} />
+    <SearchBar
+      id="search"
+      className="pagefind-ui"
+      uiOptions={{ showImages: false }}
+    />
+    <!-- <SearchBar client:load searchList={searchList} /> -->
   </Main>
   <Footer />
 </Layout>
+
+<style is:global>
+  nav {
+    display: grid;
+    place-items: center;
+  }
+
+  .pagefind-ui {
+    --pagefind-ui-scale: 0.75;
+    --pagefind-ui-primary: navy;
+    --pagefind-ui-text: black;
+    --pagefind-ui-border: slategrey;
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 0.25rem;
+    --pagefind-ui-font: sans-serif;
+
+    width: 50%;
+  }
+
+  .pagefind-ui.yellow {
+    --pagefind-ui-background: lightyellow;
+  }
+
+  .pagefind-ui.red {
+    --pagefind-ui-background: peachpuff;
+    width: 100%;
+  }
+
+  .pagefind-ui .pagefind-ui__drawer:not(.pagefind-ui__hidden) {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-top: 0px;
+    z-index: 9999;
+    padding: 0 2em 1em;
+    overflow-y: auto;
+    box-shadow:
+      0 10px 10px -5px rgba(0, 0, 0, 0.2),
+      0 2px 2px 0 rgba(0, 0, 0, 0.1);
+    border-bottom-right-radius: var(--pagefind-ui-border-radius);
+    border-bottom-left-radius: var(--pagefind-ui-border-radius);
+    background-color: var(--pagefind-ui-background);
+  }
+
+  .pagefind-ui .pagefind-ui__result-link {
+    color: var(--pagefind-ui-primary);
+  }
+
+  .pagefind-ui .pagefind-ui__result-excerpt {
+    color: var(--pagefind-ui-text);
+  }
+</style>

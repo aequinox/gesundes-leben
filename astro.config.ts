@@ -9,6 +9,7 @@ import react from "@astrojs/react";
 
 import { SITE } from "./src/config";
 import { remarkPlugins } from "./src/utils/remarkPlugins";
+import pagefind from "astro-pagefind";
 // import { rehypePlugins } from "./src/utils/rehypePlugins";
 
 // https://astro.build/config
@@ -50,6 +51,7 @@ export default defineConfig({
       },
     }),
     react(),
+    pagefind(),
   ],
 
   vite: {
