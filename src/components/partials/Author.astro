@@ -45,12 +45,16 @@ const textClasses = ["italic", size === "sm" ? "text-sm" : "text-base"];
         role="presentation"
       />
       <span class:list={textClasses}>
-        <span class="sr-only">{t("author.from")}</span>
+        <span data-pagefind-ignore class="sr-only">
+          {t("author.from")}
+        </span>
         <a
           href={`/author/${author.slug}`}
           class="rounded-sm hover:underline focus:outline-none focus:ring-2 focus:ring-skin-accent focus:ring-offset-2"
         >
-          {author.data.name}
+          <span data-pagefind-filter={t("author.name")}>
+            {author.data.name}
+          </span>
         </a>
       </span>
     </div>

@@ -66,7 +66,11 @@ const ariaLabel =
   />
 
   <span class:list={textClasses}>
-    <time datetime={dt.toISOString()} title={dt.toLocaleString(lang)}>
+    <time
+      data-pagefind-sort="date"
+      datetime={dt.toISOString()}
+      title={dt.toLocaleString(lang)}
+    >
       {date}
     </time>
     <span aria-hidden="true" class="select-none">

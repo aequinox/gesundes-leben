@@ -1,68 +1,98 @@
 ---
 import Footer from "@/components/sections/Footer.astro";
 import Header from "@/components/sections/Header.astro";
-// import SearchBar from "@/components/sections/Search";
 import { SITE } from "@/config";
 import Layout from "@/layouts/Layout.astro";
 import Main from "@/layouts/Main.astro";
-// import getSortedPosts from "@/utils/getSortedPosts";
-// import { getCollection } from "astro:content";
 import SearchBar from "astro-pagefind/components/Search";
-
 import { getLangFromUrl, useTranslations } from "i18n/utils";
-
-// Retrieve all published articles
-// const posts = await getCollection(
-//   "blog",
-//   ({ data }: any): boolean => !data.draft
-// );
-// const sortedPosts = await getSortedPosts(posts);
-
-// List of items to search in
-// const searchList = sortedPosts.map(({ data, slug }) => ({
-//   title: data.title,
-//   description: data.description,
-//   data,
-//   slug,
-// }));
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+
+interface SearchProps {
+  id: string;
+  className: string;
+  uiOptions: {
+    showImages: boolean;
+    showSubResults: boolean;
+    highlightAll: boolean;
+    excerptLength: number;
+    pageSize: number;
+    autofocus: boolean;
+    // processResult = opts.processResult ?? null;
+    // processTerm = opts.processTerm ?? null;
+    // showEmptyFilters = opts.showEmptyFilters ?? true;
+    // openFilters = opts.openFilters ?? [];
+    // debounceTimeoutMs = opts.debounceTimeoutMs ?? 300;
+    // mergeIndex = opts.mergeIndex ?? [];
+    // translations = opts.translations ?? [];
+    // autofocus = opts.autofocus ?? false;
+    sort: "relevance" | "date" | "alphabetical";
+  };
+}
+
+const searchProps: SearchProps = {
+  id: "search",
+  className: "pagefind-ui",
+  uiOptions: {
+    showImages: true,
+    showSubResults: true,
+    highlightAll: true,
+    excerptLength: 120,
+    pageSize: 5,
+    autofocus: true,
+    sort: "relevance",
+  },
+};
 ---
 
 <Layout title={`${t("nav.search")} | ${SITE.title}`}>
   <Header activeNav="search" />
-  <!-- <link href="/pagefind/pagefind-ui.css" rel="stylesheet" /> -->
-  <!-- <script is:inline src="/pagefind/pagefind-ui.js"></script> -->
   <Main pageTitle={t("nav.search")} pageDesc={t("nav.searchDescription")}>
-    <SearchBar
-      id="search"
-      className="pagefind-ui"
-      uiOptions={{ showImages: false }}
-    />
-    <!-- <SearchBar client:load searchList={searchList} /> -->
+    <div class="mx-auto w-full max-w-content">
+      <SearchBar {...searchProps} />
+    </div>
   </Main>
   <Footer />
 </Layout>
 
-<style is:global>
-  nav {
-    display: grid;
-    place-items: center;
-  }
-
+<style is:global lang="css">
   .pagefind-ui {
-    --pagefind-ui-scale: 0.75;
-    --pagefind-ui-primary: navy;
-    --pagefind-ui-text: black;
-    --pagefind-ui-border: slategrey;
-    --pagefind-ui-border-width: 1px;
-    --pagefind-ui-border-radius: 0.25rem;
-    --pagefind-ui-font: sans-serif;
-
-    width: 50%;
+    --pagefind-ui-scale: 0.8;
+    --pagefind-ui-primary: oklch(var(--color-accent));
+    --pagefind-ui-text: oklch(var(--color-text-base));
+    --pagefind-ui-background: oklch(var(--color-fill));
+    --pagefind-ui-border: oklch(var(--color-border));
+    --pagefind-ui-border-width: 2px;
+    --pagefind-ui-border-radius: 0.5rem;
+    --pagefind-ui-tag: oklch(var(--color-fill));
+    --pagefind-ui-image-border-radius: 8px;
+    --pagefind-ui-image-box-ratio: 16 / 9;
+    --pagefind-ui-font: var(--font-family, system-ui, sans-serif);
+    width: 100%;
+    margin: 1rem auto;
   }
 
+  .pagefind-ui .pagefind-ui__search-input {
+    @apply rounded-lg border-2 border-skin-line bg-skin-fill px-4 py-3 pl-12 focus-visible:outline-none;
+  }
+
+  .pagefind-ui .pagefind-ui__search-input:focus-visible {
+    @apply border-skin-accent outline-2 outline-offset-1 outline-skin-accent;
+  }
+
+  .pagefind-ui .pagefind-ui__search-clear {
+    @apply right-4;
+  }
+
+  .pagefind-ui .pagefind-ui__search-icon {
+    @apply left-4;
+  }
+
+  .pagefind-ui .pagefind-ui__drawer {
+    @apply mt-4;
+  }
   .pagefind-ui.yellow {
     --pagefind-ui-background: lightyellow;
   }
@@ -73,26 +103,29 @@ const t = useTranslations(lang);
   }
 
   .pagefind-ui .pagefind-ui__drawer:not(.pagefind-ui__hidden) {
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin-top: 0px;
-    z-index: 9999;
-    padding: 0 2em 1em;
-    overflow-y: auto;
+    @apply relative rounded-lg border-2 border-skin-line bg-skin-fill;
     box-shadow:
-      0 10px 10px -5px rgba(0, 0, 0, 0.2),
-      0 2px 2px 0 rgba(0, 0, 0, 0.1);
-    border-bottom-right-radius: var(--pagefind-ui-border-radius);
-    border-bottom-left-radius: var(--pagefind-ui-border-radius);
-    background-color: var(--pagefind-ui-background);
+      0 4px 6px -1px oklch(var(--color-card-muted) / 0.1),
+      0 2px 4px -2px oklch(var(--color-card-muted) / 0.1);
+  }
+
+  .pagefind-ui .pagefind-ui__result {
+    @apply border-b-2 border-skin-line p-4;
   }
 
   .pagefind-ui .pagefind-ui__result-link {
-    color: var(--pagefind-ui-primary);
+    @apply text-lg font-semibold text-skin-accent hover:underline;
   }
 
   .pagefind-ui .pagefind-ui__result-excerpt {
-    color: var(--pagefind-ui-text);
+    @apply mt-2 text-skin-base;
+  }
+
+  .pagefind-ui .pagefind-ui__message {
+    @apply p-4 text-skin-base;
+  }
+
+  .pagefind-ui mark {
+    @apply bg-skin-accent bg-opacity-20 px-1 text-skin-base;
   }
 </style>

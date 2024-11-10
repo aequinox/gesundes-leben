@@ -20,7 +20,7 @@ export const remarkPlugins: RemarkPlugins = [
     remarkCollapse,
     {
       test: "Inhaltsverzeichnis",
-      summary: () => "Anzeigen",
+      summary: (str: string) => `${str} anzeigen`,
     },
   ],
   remarkSectionize,

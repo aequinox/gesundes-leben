@@ -64,6 +64,16 @@ type TranslationCategories = {
   };
   author: {
     from: string;
+    name: string;
+  };
+  category: {
+    name: string;
+  };
+  group: {
+    name: string;
+  };
+  tag: {
+    name: string;
   };
   headings: {
     allArticles: string;
@@ -127,6 +137,16 @@ export const ui: Record<Language, TranslationCategories> = {
     },
     author: {
       from: "von",
+      name: "Autor",
+    },
+    category: {
+      name: "Kategorie",
+    },
+    group: {
+      name: "Gruppe",
+    },
+    tag: {
+      name: "Tag",
     },
     headings: {
       allArticles: "Alle Artikel",
@@ -185,9 +205,19 @@ export const ui: Record<Language, TranslationCategories> = {
     },
     author: {
       from: "from",
+      name: "Author",
+    },
+    category: {
+      name: "Category",
+    },
+    group: {
+      name: "Group",
+    },
+    tag: {
+      name: "Tag",
     },
     headings: {
-      allArticles: "All articles",
+      allArticles: "All Articles",
     },
     toc: {
       title: "Table of Contents",
