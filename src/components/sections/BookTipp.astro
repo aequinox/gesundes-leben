@@ -67,7 +67,7 @@ const ratingStars = Array.from({ length: 5 }, (_, i) => i < rating);
     <div class="grid w-full grid-cols-1 gap-6 md:grid-cols-12 md:gap-0">
       <!-- Book Cover Container -->
       <div
-        class="relative h-full[300px] overflow-hidden bg-gradient-to-br from-skin-accent/5 to-skin-accent/10 md:col-span-4 md:h-full"
+        class="h-full[300px] relative overflow-hidden bg-gradient-to-br from-skin-accent/5 to-skin-accent/10 md:col-span-4 md:h-full"
       >
         {
           bookCover ? (
@@ -145,7 +145,7 @@ const ratingStars = Array.from({ length: 5 }, (_, i) => i < rating);
 
           <!-- Description -->
           <p
-            class="relative text-base leading-relaxed text-skin-base/80 line-clamp-3"
+            class="relative line-clamp-3 text-base leading-relaxed text-skin-base/80"
           >
             {description}
           </p>
