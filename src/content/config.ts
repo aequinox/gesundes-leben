@@ -122,6 +122,7 @@ const blog = defineCollection({
       tags: z.array(z.string()).default(["others"]),
       categories: z.array(z.enum(CATEGORIES)),
       group: z.enum(GROUPS),
+      books: z.record(z.string(), z.array(reference("books"))).optional(),
       favorites: z
         .record(z.string(), z.array(reference("favorites")))
         .optional(),
@@ -147,4 +148,4 @@ const blog = defineCollection({
   // }),
 });
 
-export const collections = { authors, blog, favorites, glossary, books };
+export const collections = { authors, blog, books, favorites, glossary };
