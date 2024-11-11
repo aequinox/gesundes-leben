@@ -81,6 +81,13 @@ type TranslationCategories = {
   toc: {
     title: string;
   };
+  book: {
+    affiliate: string;
+    coverAlt: string;
+    recommendation: string;
+    isbn: string;
+    learnMore: string;
+  };
 };
 
 /**
@@ -154,6 +161,13 @@ export const ui: Record<Language, TranslationCategories> = {
     toc: {
       title: "Inhaltsverzeichnis",
     },
+    book: {
+      affiliate: "Affiliate",
+      coverAlt: 'Cover des Buches "{title}" von {author}',
+      recommendation: "Buchtipp",
+      isbn: "ISBN:",
+      learnMore: "Mehr erfahren",
+    },
   },
   en: {
     nav: {
@@ -221,6 +235,13 @@ export const ui: Record<Language, TranslationCategories> = {
     },
     toc: {
       title: "Table of Contents",
+    },
+    book: {
+      affiliate: "Affiliate",
+      coverAlt: 'Cover of the book "{title}" by {author}',
+      recommendation: "Book Recommendation",
+      isbn: "ISBN:",
+      learnMore: "Learn More",
     },
   },
 } as const;

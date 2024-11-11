@@ -8,7 +8,7 @@ heroImage:
   src: ./2024-07-17-die-koerperlichkeit-der-depression/images/die_koerperlichkeit_der_depression.png
   alt: test1
 pubDatetime: 2024-08-12T19:45:39Z
-modDatetime: 2024-11-11T11:24:54Z
+modDatetime: 2024-11-11T11:29:05Z
 draft: false
 featured: false
 group: fragezeiten
@@ -43,10 +43,6 @@ import { Image } from "astro:assets";
 import Button from "@/components/elements/Button.astro";
 import BookTipp from "@/components/sections/BookTipp.astro";
 import Books from "@/components/sections/Books.astro";
-
-## Buchempfehlung zur Selbstentwicklung
-
-<Books data={frontmatter.books} id="Selbstentwicklung" />
 
 ## Inhaltsverzeichnis
 
@@ -224,6 +220,6 @@ Daher ist es wichtig, Zinkpräparate nur in Absprache mit einem Arzt oder Heilpr
 
 <Favorites data={frontmatter.favorites} id="Triple" />
 
-## BookTipp
+## Buchempfehlung zur Selbstentwicklung
 
-<BookTipp data={frontmatter.books} />
+<Books data={frontmatter.books} id="Selbstentwicklung" />

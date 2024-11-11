@@ -3,6 +3,7 @@ import { Picture } from "astro:assets";
 import { Icon } from "astro-icon/components";
 import Button from "@/components/elements/Button.astro";
 import type { BookTippProps } from "@/types/books";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 
 type Props = BookTippProps;
 
@@ -17,6 +18,9 @@ const {
   rating = 4,
   class: className,
 }: Props = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 
 const ratingStars = Array.from({ length: 5 }, (_, i) => i < rating);
 ---
@@ -45,7 +49,7 @@ const ratingStars = Array.from({ length: 5 }, (_, i) => i < rating);
     class="absolute right-4 top-4 z-10 flex items-center gap-1.5 rounded-full bg-skin-accent/90 px-3 py-1.5 text-xs font-medium text-skin-inverted backdrop-blur-sm"
   >
     <Icon name="tabler:info-circle" class="h-4 w-4" />
-    <span>Affiliate</span>
+    <span>{t("book.affiliate")}</span>
   </div>
 
   <div class="flex h-full flex-col md:flex-row">
@@ -58,7 +62,9 @@ const ratingStars = Array.from({ length: 5 }, (_, i) => i < rating);
           <Picture
             src={bookCover}
             formats={["avif", "webp"]}
-            alt={`Cover des Buches "${title}" von ${author}`}
+            alt={t("book.coverAlt")
+              .replace("{title}", title)
+              .replace("{author}", author)}
             class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             widths={[400, 800]}
             sizes="(max-width: 768px) 100vw, 33vw"
@@ -90,7 +96,7 @@ const ratingStars = Array.from({ length: 5 }, (_, i) => i < rating);
             <div
               class="text-sm font-semibold uppercase tracking-wider text-skin-accent"
             >
-              Buchtipp
+              {t("book.recommendation")}
             </div>
             {
               publishYear && (
@@ -144,7 +150,7 @@ const ratingStars = Array.from({ length: 5 }, (_, i) => i < rating);
             <div class="flex items-center gap-2">
               <Icon name="tabler:barcode" class="h-5 w-5 text-skin-accent/60" />
               <span class="text-sm font-medium text-skin-base/75">
-                ISBN: {isbn}
+                {t("book.isbn")} {isbn}
               </span>
             </div>
           )
@@ -157,7 +163,7 @@ const ratingStars = Array.from({ length: 5 }, (_, i) => i < rating);
           target="_blank"
           rel="noopener noreferrer"
           class="ml-auto"
-          text="Mehr erfahren"
+          text={t("book.learnMore")}
         />
       </div>
     </div>
