@@ -1,0 +1,21 @@
+---
+title: Example Books Usage
+description: Example showing how to use the Books component
+heroImage:
+  src: ./2024-07-17-die-koerperlichkeit-der-depression/images/die_koerperlichkeit_der_depression.png
+  alt: Example Image
+pubDatetime: 2024-04-26T12:00:00Z
+draft: false
+featured: false
+group: fragezeiten
+categories:
+  - Lifestyle & Psyche
+books:
+  Selbstentwicklung: ["die-1-prozent-methode", "der-weg-des-kunstlers"]
+---
+
+import Books from "@/components/sections/Books.astro";
+
+## Buchempfehlungen zur Selbstentwicklung
+
+<Books data={frontmatter.books} id="Selbstentwicklung" />

@@ -1,80 +1,28 @@
 ---
 import { getCollection, type CollectionEntry } from "astro:content";
+import type { BookData } from "@/types/books";
 import Layout from "@/layouts/Layout.astro";
-import BookTipp from "@/components/sections/BookTipp.astro";
+import BooksSection from "@/components/sections/Books.astro";
 import Header from "@/components/sections/Header.astro";
 import Footer from "@/components/sections/Footer.astro";
 
-interface BookData {
-  title: string;
-  author: string;
-  description: string;
-  isbn?: string;
-  url?: string;
-  bookCover?: string;
-  publishYear?: number;
-  rating: 1 | 2 | 3 | 4 | 5;
-  category?: string[];
-  featured?: boolean;
-}
-
-const books: CollectionEntry<"books">[] = await getCollection("books");
-const featuredBooks = books.filter(
-  (book): book is CollectionEntry<"books"> & { data: BookData } =>
-    book.data.featured
+const allBooks = await getCollection("books");
+const featuredBooks = allBooks.filter(
+  (
+    book: CollectionEntry<"books">
+  ): book is CollectionEntry<"books"> & { data: BookData } =>
+    book.data.featured === true
 );
 ---
 
 <Layout title="Buchtipps | Empfohlene Bücher für persönliches Wachstum">
   <Header />
-  <main class="mx-auto max-w-content px-4 py-12">
-    <header class="animate-fade-in mb-16 text-center">
-      <h1 class="mb-4 text-4xl font-bold text-skin-base">Buchtipps</h1>
-      <p class="mx-auto max-w-2xl text-lg text-skin-base/80">
-        Sorgfältig ausgewählte Bücher, die dich auf deinem Weg zu persönlichem
-        Wachstum und Entwicklung unterstützen. Jedes Buch wurde von uns gelesen
-        und für wertvoll befunden.
-      </p>
-    </header>
-
-    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2">
-      {
-        featuredBooks.map(({ data }: CollectionEntry<"books">) => (
-          <div data-aos="fade-up" class="book-card group">
-            <BookTipp {...data} />
-          </div>
-        ))
-      }
-
-      {
-        !featuredBooks.length && (
-          <p class="text-center text-lg text-skin-base/80">
-            Aktuell sind keine Buchtipps verfügbar. Schau bald wieder vorbei!
-          </p>
-        )
-      }
-    </div>
+  <main>
+    <BooksSection
+      books={featuredBooks}
+      title="Buchtipps"
+      description="Sorgfältig ausgewählte Bücher, die dich auf deinem Weg zu persönlichem Wachstum und Entwicklung unterstützen. Jedes Buch wurde von uns gelesen und für wertvoll befunden."
+    />
   </main>
   <Footer />
 </Layout>
-
-<style>
-  .book-card {
-    @apply relative isolate overflow-hidden rounded-2xl bg-skin-card/30 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg;
-  }
-
-  .animate-fade-in {
-    animation: fadeIn 0.8s ease-out;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-</style>

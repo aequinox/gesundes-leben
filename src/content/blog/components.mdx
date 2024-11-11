@@ -8,7 +8,7 @@ heroImage:
   src: ./2024-07-17-die-koerperlichkeit-der-depression/images/die_koerperlichkeit_der_depression.png
   alt: test1
 pubDatetime: 2024-08-12T19:45:39Z
-modDatetime: 2024-11-11T10:38:31Z
+modDatetime: 2024-11-11T11:24:54Z
 draft: false
 featured: false
 group: fragezeiten
@@ -26,7 +26,7 @@ tags:
   - Trauma
   - Vitamin D
 books:
-  - die-1-prozent-methode
+  Selbstentwicklung: ["die-1-prozent-methode"]
 favorites:
   Double: ["natugena-zink-komplex", "rubini-edelholunder"]
   Single: ["vitamin-d-test"]
@@ -42,6 +42,11 @@ import DepressionImage from "./2024-07-17-die-koerperlichkeit-der-depression/ima
 import { Image } from "astro:assets";
 import Button from "@/components/elements/Button.astro";
 import BookTipp from "@/components/sections/BookTipp.astro";
+import Books from "@/components/sections/Books.astro";
+
+## Buchempfehlung zur Selbstentwicklung
+
+<Books data={frontmatter.books} id="Selbstentwicklung" />
 
 ## Inhaltsverzeichnis
 

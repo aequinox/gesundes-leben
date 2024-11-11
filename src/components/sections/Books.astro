@@ -1,0 +1,88 @@
+---
+import type { CollectionEntry } from "astro:content";
+import type { BookData } from "@/types/books";
+import { getCollection } from "astro:content";
+import BookTipp from "./BookTipp.astro";
+
+interface Props {
+  data?: Record<string, string[]>;
+  id?: string;
+  books?: (CollectionEntry<"books"> & { data: BookData })[];
+  title?: string;
+  description?: string;
+}
+
+const {
+  data,
+  id,
+  books: propBooks,
+  title = "Buchtipps",
+  description,
+} = Astro.props;
+
+let displayBooks: (CollectionEntry<"books"> & { data: BookData })[] = [];
+
+if (propBooks) {
+  // Direct books array provided (used by books.astro page)
+  displayBooks = propBooks;
+} else if (data && id) {
+  // Books referenced by ID (used in MDX files)
+  const allBooks = await getCollection("books");
+  const bookIds = data[id] || [];
+  displayBooks = allBooks.filter((book: CollectionEntry<"books">) =>
+    bookIds.includes(book.id)
+  );
+}
+---
+
+<section class="mx-auto max-w-content px-4 py-12">
+  {
+    title && description && (
+      <header class="animate-fade-in mb-16 text-center">
+        <h1 class="mb-4 text-4xl font-bold text-skin-base">{title}</h1>
+        <p class="mx-auto max-w-2xl text-lg text-skin-base/80">{description}</p>
+      </header>
+    )
+  }
+
+  <div class="grid auto-rows-fr grid-cols-1 gap-8 md:grid-cols-2">
+    {
+      displayBooks.map(({ data }) => (
+        <div data-aos="fade-up" class="book-card flex">
+          <BookTipp {...data} class="w-full" />
+        </div>
+      ))
+    }
+
+    {
+      !displayBooks.length && (
+        <p class="col-span-full text-center text-lg text-skin-base/80">
+          Aktuell sind keine Buchtipps verfügbar. Schau bald wieder vorbei!
+        </p>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Ensure consistent card heights in the grid */
+  .book-card {
+    height: 100%;
+    display: flex;
+  }
+</style>
