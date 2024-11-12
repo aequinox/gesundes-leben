@@ -5,6 +5,7 @@ export type Author = CollectionEntry<"authors">;
 export type Blog = CollectionEntry<"blog">;
 export type Favorite = CollectionEntry<"favorites">;
 export type Glossary = CollectionEntry<"glossary">;
+export type Reference = CollectionEntry<"references">;
 
 export interface ImageReference {
   alt: string;
@@ -46,4 +47,18 @@ export interface AuthorData {
   name: string;
   bio: string;
   avatar?: ImageMetadata | string;
+}
+
+export interface ReferenceData {
+  title: string;
+  authors: string[];
+  year: number;
+  journal?: string;
+  volume?: number;
+  issue?: number;
+  pages?: string;
+  url?: string;
+  doi?: string;
+  pmid?: string;
+  slug: string;
 }

@@ -1,30 +1,74 @@
 {
-  // Extend the base Astro strict TypeScript configuration
+  /**
+   * Extend the base Astro strict TypeScript configuration
+   *
+   * @see https://docs.astro.build/en/reference/configuration/#tsconfig
+   */
   "extends": "astro/tsconfigs/strict",
 
-  // Specify the files to include in the TypeScript project
+  /**
+   * Specify the files to include in the TypeScript project
+   *
+   * @see https://www.typescriptlang.org/tsconfig#include
+   */
   "include": [".astro/types.d.ts", "**/*"],
 
-  // Exclude the 'dist' directory from the TypeScript project
+  /**
+   * Exclude the 'dist' directory from the TypeScript project
+   *
+   * @see https://www.typescriptlang.org/tsconfig#exclude
+   */
   "exclude": ["dist"],
 
+  /**
+   * Configure TypeScript compiler options
+   *
+   * @see https://www.typescriptlang.org/tsconfig#compilerOptions
+   */
   "compilerOptions": {
-    // Set the base directory for module resolution
+    /**
+     * Set the base directory for module resolution
+     *
+     * @see https://www.typescriptlang.org/tsconfig#baseUrl
+     */
     "baseUrl": "src",
 
-    // Specify JSX syntax with React JSX support
+    /**
+     * Specify JSX syntax with React JSX support
+     *
+     * @see https://www.typescriptlang.org/tsconfig#jsx
+     */
     "jsx": "react-jsx",
     "jsxImportSource": "react",
 
-    // Target the latest ECMAScript version for output
+    /**
+     * Target the latest ECMAScript version for output
+     *
+     * @see https://www.typescriptlang.org/tsconfig#target
+     */
     "target": "ESNext",
 
-    // Enable all strict type-checking options
+    /**
+     * Enable all strict type-checking options
+     *
+     * @see https://www.typescriptlang.org/tsconfig#strict
+     */
     "strict": true,
 
-    // Configure module path aliases for cleaner imports
+    /**
+     * Configure module path aliases for cleaner imports
+     *
+     * @see https://www.typescriptlang.org/tsconfig#paths
+     */
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+
+    /**
+     * Allow JavaScript files to be included in the TypeScript project
+     *
+     * @see https://www.typescriptlang.org/tsconfig#allowJs
+     */
+    "allowJs": true
   }
 }

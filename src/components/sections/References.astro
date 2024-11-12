@@ -1,0 +1,98 @@
+---
+import { getEntry } from "astro:content";
+import type { Reference, ReferencesProps } from "@/types/references";
+
+const { references = [], class: className } =
+  Astro.props satisfies ReferencesProps;
+
+// Get all references data
+const referencesEntry = await getEntry("references", "references");
+const allReferences: Reference[] = Array.isArray(referencesEntry?.data)
+  ? referencesEntry.data
+  : [];
+
+// Filter references based on shortcodes if provided, otherwise show all
+const filteredReferences =
+  references.length > 0
+    ? allReferences.filter(ref => references.includes(ref.shortcode))
+    : allReferences;
+
+// Sort references by first author's last name
+const sortedReferences = filteredReferences.sort((a, b) => {
+  const getLastName = (author: string) => {
+    const parts = author.split(",")[0].trim().split(" ");
+    return parts[parts.length - 1];
+  };
+
+  return getLastName(a.authors[0]).localeCompare(getLastName(b.authors[0]));
+});
+
+// Format authors list
+const formatAuthors = (authors: readonly string[]) => {
+  return authors
+    .map(
+      (author, index) => `${author}${index < authors.length - 1 ? ", " : ""}`
+    )
+    .join("");
+};
+
+// Format citation
+const formatCitation = (ref: Reference) => {
+  const parts = [
+    ref.journal && `${ref.journal}`,
+    ref.volume && `${ref.volume}`,
+    ref.issue && `(${ref.issue})`,
+    ref.pages && `, ${ref.pages}`,
+  ].filter(Boolean);
+
+  return parts.join(" ");
+};
+---
+
+<div class:list={["references", className]}>
+  <h2 class="text-2xl font-bold mb-6">Sources</h2>
+  <ul class="space-y-4">
+    {
+      sortedReferences.map(ref => (
+        <li class="reference-item">
+          {/* Authors */}
+          <span class="font-semibold">{formatAuthors(ref.authors)}</span>
+
+          {/* Year */}
+          <span class="ml-1">({ref.year})</span>
+
+          {/* Title */}
+          <span class="ml-1">
+            {ref.url ? (
+              <a
+                href={ref.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-primary hover:underline"
+              >
+                {ref.title}
+              </a>
+            ) : (
+              ref.title
+            )}
+          </span>
+
+          {/* Journal info */}
+          {ref.journal && (
+            <span class="italic ml-1">{formatCitation(ref)}</span>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .references {
+    @apply my-8 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg;
+  }
+
+  .reference-item {
+    @apply text-sm leading-relaxed;
+  }
+</style>

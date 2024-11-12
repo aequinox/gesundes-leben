@@ -49,7 +49,6 @@ const {
 } = post;
 
 const authorEntry = await getAuthorEntry(author);
-
 const { Content } = await post.render();
 
 const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
