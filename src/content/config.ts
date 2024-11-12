@@ -43,21 +43,19 @@ const favorites = defineCollection({
   }),
 });
 
-/**
- * Defines the schema for a books collection with various content properties.
- *
- * Schema Fields:
- * - title: A string representing the book title
- * - author: A string representing the book's author
- * - description: A detailed description of the book
- * - isbn: An optional ISBN number
- * - url: An optional URL to purchase or learn more about the book
- * - bookCover: An optional image for the book cover
- * - publishYear: An optional publication year
- * - rating: An optional rating from 1 to 5
- * - category: An array of categories the book belongs to
- * - featured: A boolean indicating if the book should be featured
- */
+const references = defineCollection({
+  type: "data",
+  schema: z.object({
+    title: z.string(),
+    authors: z.array(z.string()),
+    year: z.number(),
+    journal: z.string().optional(),
+    url: z.string().optional(),
+    doi: z.string().optional(),
+    pmid: z.string().optional(),
+  }),
+});
+
 const books = defineCollection({
   type: "data",
   schema: ({ image }) =>
@@ -81,30 +79,6 @@ const books = defineCollection({
     }),
 });
 
-/**
- * Defines the schema for a blog collection with various content properties.
- *
- * Schema Fields:
- * - title: A string representing the post title.
- * - author: A union of string and author reference, defaults to SITE.author.
- * - heroImage: An object with image source and alt text.
- * - pubDatetime: The publication date coerced to a date object.
- * - modDatetime: An optional modification date.
- * - featured: An optional boolean indicating if the post is featured.
- * - draft: A boolean indicating if the post is a draft, defaults to false.
- * - tags: An array of strings for post tags, defaults to ["others"].
- * - categories: An array of category enums.
- * - group: A group enum value.
- * - favorites: An optional record mapping to arrays of favorite references.
- * - ogImage: An optional OpenGraph image, with size refinement or as a string.
- * - description: A string describing the post.
- * - canonicalURL: An optional string for the canonical URL.
- * - readingTime: An optional number indicating reading time in minutes.
- * - references: An optional array of references.
- *
- * The schema also applies a transformation to add "Drafts" or "Scheduled" tags
- * based on the draft status and publication date.
- */
 const blog = defineCollection({
   type: "content",
   schema: ({ image }) =>
@@ -116,7 +90,7 @@ const blog = defineCollection({
         alt: z.string(),
       }),
       pubDatetime: z.coerce.date(),
-      modDatetime: z.coerce.date().optional(), //.nullable(),
+      modDatetime: z.coerce.date().optional(),
       featured: z.boolean().optional(),
       draft: z.boolean().default(false),
       tags: z.array(z.string()).default(["others"]),
@@ -126,6 +100,7 @@ const blog = defineCollection({
       favorites: z
         .record(z.string(), z.array(reference("favorites")))
         .optional(),
+      references: z.array(reference("references")).optional(),
       ogImage: image()
         .refine(img => img.width >= 1200 && img.height >= 630, {
           message: "OpenGraph image must be at least 1200 X 630 pixels!",
@@ -135,17 +110,14 @@ const blog = defineCollection({
       description: z.string(),
       canonicalURL: z.string().optional(),
       readingTime: z.number().optional(),
-      // references: z.array(reference("references")).optional(),
     }),
-  // .transform(obj => {
-  //   // Add draft tag
-  //   if (obj.draft == true) {
-  //     obj.tags.push("Drafts");
-  //   } else if (obj.pubDatetime > new Date()) {
-  //     obj.tags.push("Scheduled");
-  //   }
-  //   return obj;
-  // }),
 });
 
-export const collections = { authors, blog, books, favorites, glossary };
+export const collections = {
+  authors,
+  blog,
+  books,
+  favorites,
+  glossary,
+  references,
+};
