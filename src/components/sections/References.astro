@@ -50,7 +50,7 @@ const formatCitation = (ref: Reference) => {
 ---
 
 <div class:list={["references", className]}>
-  <h2 class="text-2xl font-bold mb-6">Sources</h2>
+  <h2 class="mb-6 text-2xl font-bold">Sources</h2>
   <ul class="space-y-4">
     {
       sortedReferences.map(ref => (
@@ -79,7 +79,7 @@ const formatCitation = (ref: Reference) => {
 
           {/* Journal info */}
           {ref.journal && (
-            <span class="italic ml-1">{formatCitation(ref)}</span>
+            <span class="ml-1 italic">{formatCitation(ref)}</span>
           )}
         </li>
       ))
@@ -89,7 +89,7 @@ const formatCitation = (ref: Reference) => {
 
 <style>
   .references {
-    @apply my-8 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg;
+    @apply my-8 rounded-lg bg-gray-50 p-6 dark:bg-gray-800;
   }
 
   .reference-item {
