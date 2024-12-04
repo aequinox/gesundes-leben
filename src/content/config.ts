@@ -45,9 +45,10 @@ const favorites = defineCollection({
 });
 
 const references = defineCollection({
-  loader: file("src/content/references/references.json", {
-    parser: text => JSON.parse(text).references,
-  }),
+  type: "data",
+  // loader: file("src/content/references/references.json", {
+  //   parser: text => JSON.parse(text).references,
+  // }),
   schema: z.object({
     title: z.string(),
     authors: z.array(z.string()),

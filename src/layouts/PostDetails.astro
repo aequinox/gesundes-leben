@@ -45,10 +45,12 @@ const {
     modDatetime,
     categories,
     tags,
+    references,
   },
 } = post;
 
 const authorEntry = await getAuthorEntry(author);
+const reference = await getReference(title);
 const { Content } = await post.render();
 
 const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
@@ -148,6 +150,9 @@ const t = useTranslations(lang);
       <article id="article" class="prose mx-auto mt-6 max-w-none">
         <Content components={components} />
       </article>
+
+      <!-- References -->
+      <!-- {references && references.length > 0 && <References references={references} />} -->
 
       <!-- Tags -->
       <ul class="my-8 flex flex-wrap gap-2" role="list" aria-label="Tags">

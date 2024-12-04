@@ -33,6 +33,53 @@ export class ReferenceUtils {
   }
 
   /**
+   * Retrieves all references related to a given reference or slug
+   * References are considered related if they:
+   * - Share the same journal
+   * - Share at least one author
+   * - Are from the same year
+   * - Have the same volume
+   */
+  public static async getReferencesEntries(
+    referenceOrSlug: Reference | string
+  ): Promise<Reference[]> {
+    try {
+      // Get the reference if a slug was provided
+      const reference =
+        typeof referenceOrSlug === "string"
+          ? await ReferenceUtils.getReference(referenceOrSlug)
+          : referenceOrSlug;
+
+      if (!reference) {
+        return [];
+      }
+
+      const allReferences = await ReferenceUtils.getAllReferences();
+
+      // Filter out the current reference and find related ones
+      return allReferences.filter(ref => {
+        if (ref.id === reference.id) return false;
+
+        const { data } = reference;
+        const refData = ref.data;
+
+        // Check if references share any characteristics
+        const sameJournal = data.journal && data.journal === refData.journal;
+        const sameYear = data.year === refData.year;
+        const sameVolume = data.volume && data.volume === refData.volume;
+        const sharedAuthors = data.authors.some(author =>
+          refData.authors.includes(author)
+        );
+
+        return sameJournal || sameYear || sameVolume || sharedAuthors;
+      });
+    } catch (error) {
+      console.error("Error fetching related references:", error);
+      return [];
+    }
+  }
+
+  /**
    * Retrieves references by author
    */
   public static async getReferencesByAuthor(
