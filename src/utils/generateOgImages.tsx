@@ -3,42 +3,46 @@ import type { CollectionEntry } from "astro:content";
 import postOgImage from "./og-templates/post";
 import siteOgImage from "./og-templates/site";
 
-export interface OgImageOptions {
-  width?: number;
-  height?: number;
-  fitTo?:
-    | {
-        mode: "original";
-      }
-    | {
-        mode: "width" | "height";
-        value: number;
-      };
-  background?: string;
-  font?: {
-    loadSystemFonts: boolean;
-    fontFiles?: string[];
-    defaultFontFamily?: string;
-  };
+interface OgImageDimensions {
+  width: number;
+  height: number;
 }
 
-const DEFAULT_OPTIONS: Required<OgImageOptions> = {
+type OgImageFitMode =
+  | { mode: "original" }
+  | { mode: "width"; value: number }
+  | { mode: "height"; value: number }
+  | { mode: "zoom"; value: number };
+
+interface OgImageFont {
+  loadSystemFonts: boolean;
+  fontFiles?: string[];
+  defaultFontFamily?: string;
+}
+
+export interface OgImageOptions extends Partial<OgImageDimensions> {
+  fitTo?: OgImageFitMode;
+  background?: string;
+  font?: Partial<OgImageFont>;
+}
+
+const DEFAULT_OPTIONS = {
   width: 1200,
   height: 630,
   fitTo: {
-    mode: "width",
+    mode: "width" as const,
     value: 1200,
   },
   background: "#ffffff",
   font: {
     loadSystemFonts: true,
-    fontFiles: [],
+    fontFiles: [] as string[],
     defaultFontFamily: "Arial",
   },
-};
+} as const;
 
 /**
- * Converts SVG string to PNG buffer
+ * Converts SVG string to PNG buffer with optimized performance and error handling
  * @param svg - SVG string to convert
  * @param options - Conversion options
  * @returns PNG buffer
@@ -46,38 +50,61 @@ const DEFAULT_OPTIONS: Required<OgImageOptions> = {
  */
 function svgBufferToPngBuffer(
   svg: string,
-  options: Partial<OgImageOptions> = {}
+  options: OgImageOptions = {}
 ): Buffer {
-  try {
-    const mergedOptions = {
-      ...DEFAULT_OPTIONS,
-      ...options,
-      font: {
-        ...DEFAULT_OPTIONS.font,
-        ...options.font,
-      },
-    };
+  if (!svg) {
+    throw new Error("SVG input is required");
+  }
 
+  const mergedOptions = {
+    ...DEFAULT_OPTIONS,
+    ...options,
+    font: {
+      ...DEFAULT_OPTIONS.font,
+      ...options.font,
+    },
+  };
+
+  try {
     const resvg = new Resvg(svg, {
       background: mergedOptions.background,
       fitTo: mergedOptions.fitTo,
-      font: {
-        loadSystemFonts: mergedOptions.font.loadSystemFonts,
-        fontFiles: mergedOptions.font.fontFiles,
-        defaultFontFamily: mergedOptions.font.defaultFontFamily,
-      },
+      font: mergedOptions.font,
     });
 
     return resvg.render().asPng();
   } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Failed to convert SVG to PNG: ${errorMessage}`);
+  }
+}
+
+/**
+ * Validates image dimensions are within acceptable ranges
+ * @param width - Image width in pixels
+ * @param height - Image height in pixels
+ * @throws {Error} If dimensions are invalid
+ */
+function validateImageDimensions(width?: number, height?: number): void {
+  const MIN_DIMENSION = 200;
+  const MAX_DIMENSION = 2048;
+
+  if (width && (width < MIN_DIMENSION || width > MAX_DIMENSION)) {
     throw new Error(
-      `Failed to convert SVG to PNG: ${error instanceof Error ? error.message : "Unknown error"}`
+      `Width must be between ${MIN_DIMENSION} and ${MAX_DIMENSION} pixels`
+    );
+  }
+
+  if (height && (height < MIN_DIMENSION || height > MAX_DIMENSION)) {
+    throw new Error(
+      `Height must be between ${MIN_DIMENSION} and ${MAX_DIMENSION} pixels`
     );
   }
 }
 
 /**
- * Generates OpenGraph image for a blog post
+ * Generates OpenGraph image for a blog post with improved error handling and validation
  * @param post - Blog post entry
  * @param options - Image generation options
  * @returns PNG buffer
@@ -85,16 +112,20 @@ function svgBufferToPngBuffer(
  */
 export async function generateOgImageForPost(
   post: CollectionEntry<"blog">,
-  options: Partial<OgImageOptions> = {}
+  options: OgImageOptions = {}
 ): Promise<Buffer> {
+  if (!post) {
+    throw new Error("Post data is required");
+  }
+
   try {
     validateImageDimensions(options.width, options.height);
     const svg = await postOgImage(post);
     return svgBufferToPngBuffer(svg, options);
   } catch (error) {
-    throw new Error(
-      `Failed to generate post OG image: ${error instanceof Error ? error.message : "Unknown error"}`
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Failed to generate post OG image: ${errorMessage}`);
   }
 }
 
@@ -105,51 +136,15 @@ export async function generateOgImageForPost(
  * @throws {Error} If image generation fails
  */
 export async function generateOgImageForSite(
-  options: Partial<OgImageOptions> = {}
+  options: OgImageOptions = {}
 ): Promise<Buffer> {
   try {
     validateImageDimensions(options.width, options.height);
     const svg = await siteOgImage();
     return svgBufferToPngBuffer(svg, options);
   } catch (error) {
-    throw new Error(
-      `Failed to generate site OG image: ${error instanceof Error ? error.message : "Unknown error"}`
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Failed to generate site OG image: ${errorMessage}`);
   }
-}
-
-/**
- * Validates image dimensions
- * @param width - Image width
- * @param height - Image height
- * @throws {Error} If dimensions are invalid
- */
-export function validateImageDimensions(width?: number, height?: number): void {
-  if (width && (width < 200 || width > 2000)) {
-    throw new Error("Width must be between 200 and 2000 pixels");
-  }
-  if (height && (height < 200 || height > 2000)) {
-    throw new Error("Height must be between 200 and 2000 pixels");
-  }
-}
-
-/**
- * Creates OpenGraph image options with validation
- * @param options - Partial options to merge with defaults
- * @returns Complete validated options
- * @throws {Error} If options are invalid
- */
-export function createOgImageOptions(
-  options: Partial<OgImageOptions> = {}
-): Required<OgImageOptions> {
-  validateImageDimensions(options.width, options.height);
-
-  return {
-    ...DEFAULT_OPTIONS,
-    ...options,
-    font: {
-      ...DEFAULT_OPTIONS.font,
-      ...options.font,
-    },
-  };
 }

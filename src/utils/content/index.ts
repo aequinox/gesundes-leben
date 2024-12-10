@@ -2,7 +2,7 @@ import { AuthorUtils } from "./authors";
 import { PostUtils } from "./posts";
 import { GlossaryUtils } from "./glossary";
 import { FavoriteUtils } from "./favorites";
-import { ReferenceUtils } from "./references";
+// import { ReferenceUtils } from "./references";
 
 export * from "./types";
 
@@ -17,7 +17,7 @@ export class ContentManager {
   public readonly posts = PostUtils;
   public readonly glossary = GlossaryUtils;
   public readonly favorites = FavoriteUtils;
-  public readonly references = ReferenceUtils;
+  // public readonly references = ReferenceUtils;
 
   private constructor() {}
 
@@ -33,4 +33,5 @@ export class ContentManager {
 export const contentManager = ContentManager.getInstance();
 
 // Export individual utilities for direct access
-export { AuthorUtils, PostUtils, GlossaryUtils, FavoriteUtils, ReferenceUtils };
+export { AuthorUtils, PostUtils, GlossaryUtils, FavoriteUtils };
+// export { AuthorUtils, PostUtils, GlossaryUtils, FavoriteUtils, ReferenceUtils };
