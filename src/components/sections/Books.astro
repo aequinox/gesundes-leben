@@ -18,7 +18,7 @@ const {
   books: propBooks,
   title = "Buchtipps",
   description,
-} = Astro.props;
+}: Props = Astro.props;
 
 let displayBooks: (CollectionEntry<"books"> & { data: BookData })[] = [];
 

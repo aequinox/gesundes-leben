@@ -9,11 +9,11 @@ export class AuthorUtils {
    * Retrieves an author entry by slug or author reference
    */
   public static async getAuthorEntry(
-    author: string | { slug: string }
+    author: string | { collection: "authors"; id: string }
   ): Promise<Author | undefined | null> {
     try {
-      const slug = typeof author === "string" ? author : author.slug;
-      const entry = await getEntry("authors", slug);
+      const identifier = typeof author === "string" ? author : author.id;
+      const entry = await getEntry("authors", identifier);
       return entry || null;
     } catch (error) {
       console.error("Error fetching author:", error);
@@ -45,7 +45,7 @@ export class AuthorUtils {
    * Maps author references to full author data
    */
   public static async resolveAuthors(
-    authors: (string | { slug: string })[]
+    authors: (string | { collection: "authors"; id: string })[]
   ): Promise<(Author | null)[]> {
     const resolved = await Promise.all(
       authors.map(async author => {
