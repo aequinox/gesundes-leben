@@ -99,7 +99,7 @@ const socialCount = SOCIALS.filter(social => social.active).length;
           <h2>Ausgewählte Artikel</h2>
           <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
             {featuredPosts.map(post => (
-              <Card post={post} secHeading={false} loading="lazy" />
+              <Card post={post} loading="lazy" />
             ))}
           </div>
         </section>
@@ -115,9 +115,7 @@ const socialCount = SOCIALS.filter(social => social.active).length;
             <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {recentPosts.map(
                 (post, index) =>
-                  index < SITE.postPerIndex && (
-                    <Card {post} secHeading={false} loading="lazy" />
-                  )
+                  index < SITE.postPerIndex && <Card {post} loading="lazy" />
               )}
             </div>
           </section>

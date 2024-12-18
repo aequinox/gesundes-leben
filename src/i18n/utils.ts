@@ -1,28 +1,15 @@
-import { ui, defaultLang, showDefaultLang } from "./ui";
+import { ui, defaultLang } from "./ui";
+import type { Languages, TranslationKey } from "./ui";
 
 /**
  * Type for supported languages in the application
  */
-export type SupportedLanguage = keyof typeof ui;
+export type SupportedLanguage = Languages;
 
 /**
- * Helper type to convert nested object structure to dot notation
+ * Configuration for showing default language in URL
  */
-type DotPrefix<T extends string, K extends string> = `${T}.${K}`;
-
-/**
- * Helper type to create dot notation paths from nested object
- */
-type DotNestedKeys<T extends object> = {
-  [K in keyof T & string]: T[K] extends object
-    ? DotPrefix<K, DotNestedKeys<T[K]>> | K
-    : K;
-}[keyof T & string];
-
-/**
- * Type for translation keys using dot notation
- */
-export type TranslationKey = DotNestedKeys<(typeof ui)[typeof defaultLang]>;
+export const showDefaultLang = false;
 
 /**
  * Extracts the language code from the URL
@@ -32,7 +19,7 @@ export type TranslationKey = DotNestedKeys<(typeof ui)[typeof defaultLang]>;
 export function getLangFromUrl(url: URL): SupportedLanguage {
   try {
     const [, lang] = url.pathname.split("/");
-    return lang in ui ? (lang as SupportedLanguage) : defaultLang;
+    return isValidLanguage(lang) ? lang : defaultLang;
   } catch (error) {
     console.error("Error extracting language from URL:", error);
     return defaultLang;
@@ -40,15 +27,16 @@ export function getLangFromUrl(url: URL): SupportedLanguage {
 }
 
 /**
- * Gets a nested value from an object using a dot-notation path
- * @param obj - The object to traverse
- * @param path - The dot-notation path
- * @returns The value at the path or undefined
+ * Gets a translation value from the UI translations object
+ * @param obj - The translations object
+ * @param key - The translation key
+ * @returns The translation value or undefined
  */
-function getNestedValue(obj: any, path: string): string | undefined {
-  return path.split(".").reduce((acc, part) => acc?.[part], obj) as
-    | string
-    | undefined;
+function getTranslationValue(
+  obj: (typeof ui)[SupportedLanguage],
+  key: TranslationKey
+): string | undefined {
+  return obj[key];
 }
 
 /**
@@ -60,7 +48,9 @@ export function useTranslations(lang: SupportedLanguage) {
   return function translate(key: TranslationKey): string {
     try {
       const value =
-        getNestedValue(ui[lang], key) ?? getNestedValue(ui[defaultLang], key);
+        getTranslationValue(ui[lang], key) ??
+        getTranslationValue(ui[defaultLang], key);
+
       if (value === undefined) {
         console.warn(
           `Translation missing for key "${key}" in language "${lang}"`
@@ -101,5 +91,5 @@ export function useTranslatedPath(lang: SupportedLanguage) {
  * @returns boolean indicating if the language is supported
  */
 export function isValidLanguage(lang: string): lang is SupportedLanguage {
-  return lang in ui;
+  return Object.keys(ui).includes(lang);
 }

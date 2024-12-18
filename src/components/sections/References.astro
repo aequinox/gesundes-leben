@@ -1,15 +1,46 @@
 ---
+/**
+ * References Component
+ *
+ * A component for displaying academic references and citations
+ * with proper formatting and accessibility features.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <References
+ *   references={["ref1", "ref2"]}
+ *   class="my-8"
+ * />
+ * ```
+ */
+
 import { getEntry } from "astro:content";
 import type { Reference, ReferencesProps } from "@/types/references";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 
-const { references = [], class: className } =
-  Astro.props satisfies ReferencesProps;
+// interface Author {
+//   /** Author's full name */
+//   name: string;
+//   /** Optional author's identifier */
+//   id?: string;
+// }
 
-// Get all references data
-const referencesEntry = await getEntry("references", "references");
-const allReferences: Reference[] = Array.isArray(referencesEntry?.data)
-  ? referencesEntry.data
-  : [];
+const { references = [], class: className = "" }: ReferencesProps = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Load references data
+let allReferences: Reference[] = [];
+try {
+  const referencesEntry = await getEntry("references", "references");
+  allReferences = Array.isArray(referencesEntry?.data)
+    ? referencesEntry.data
+    : [];
+} catch (error) {
+  console.error("Error loading references:", error);
+}
 
 // Filter references based on shortcodes if provided, otherwise show all
 const filteredReferences =
@@ -19,7 +50,7 @@ const filteredReferences =
 
 // Sort references by first author's last name
 const sortedReferences = filteredReferences.sort((a, b) => {
-  const getLastName = (author: string) => {
+  const getLastName = (author: string): string => {
     const parts = author.split(",")[0].trim().split(" ");
     return parts[parts.length - 1];
   };
@@ -27,17 +58,19 @@ const sortedReferences = filteredReferences.sort((a, b) => {
   return getLastName(a.authors[0]).localeCompare(getLastName(b.authors[0]));
 });
 
-// Format authors list
-const formatAuthors = (authors: readonly string[]) => {
+// Format authors list with proper punctuation
+const formatAuthors = (authors: readonly string[]): string => {
   return authors
-    .map(
-      (author, index) => `${author}${index < authors.length - 1 ? ", " : ""}`
-    )
+    .map((author, index) => {
+      if (index === authors.length - 1) return author;
+      if (index === authors.length - 2) return `${author} & `;
+      return `${author}, `;
+    })
     .join("");
 };
 
-// Format citation
-const formatCitation = (ref: Reference) => {
+// Format citation with proper punctuation
+const formatCitation = (ref: Reference): string => {
   const parts = [
     ref.journal && `${ref.journal}`,
     ref.volume && `${ref.volume}`,
@@ -47,52 +80,153 @@ const formatCitation = (ref: Reference) => {
 
   return parts.join(" ");
 };
+
+// Memoize common class names
+const containerClasses = [
+  "references",
+  "my-8 rounded-lg",
+  "bg-gray-50 dark:bg-gray-800",
+  "p-6",
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+
+// Generate unique ID for accessibility
+const sectionId = `references-${Math.random().toString(36).substring(2, 9)}`;
 ---
 
-<div class:list={["references", className]}>
-  <h2 class="mb-6 text-2xl font-bold">Sources</h2>
-  <ul class="space-y-4">
+<section
+  id={sectionId}
+  class={containerClasses}
+  aria-labelledby={`${sectionId}-title`}
+>
+  <h2 id={`${sectionId}-title`} class="mb-6 text-2xl font-bold text-skin-base">
+    {t("references.title")}
+  </h2>
+
+  <ul class="space-y-4" role="list">
     {
-      sortedReferences.map(ref => (
-        <li class="reference-item">
-          {/* Authors */}
-          <span class="font-semibold">{formatAuthors(ref.authors)}</span>
+      // eslint-disable-next-line no-unused-vars
+      sortedReferences.map((ref, index) => (
+        <li class="reference-item text-sm leading-relaxed" role="listitem">
+          <div class="citation-content">
+            {/* Authors */}
+            <span class="font-semibold">{formatAuthors(ref.authors)}</span>
 
-          {/* Year */}
-          <span class="ml-1">({ref.year})</span>
+            {/* Year */}
+            <span class="ml-1">({ref.year})</span>
 
-          {/* Title */}
-          <span class="ml-1">
-            {ref.url ? (
-              <a
-                href={ref.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-primary hover:underline"
-              >
-                {ref.title}
-              </a>
-            ) : (
-              ref.title
+            {/* Title */}
+            <span class="ml-1">
+              {ref.url ? (
+                <a
+                  href={ref.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-skin-accent"
+                  aria-label={t("references.viewSource").replace(
+                    "{title}",
+                    ref.title
+                  )}
+                >
+                  {ref.title}
+                </a>
+              ) : (
+                ref.title
+              )}
+            </span>
+
+            {/* Journal info */}
+            {ref.journal && (
+              <span class="ml-1 italic">{formatCitation(ref)}</span>
             )}
-          </span>
-
-          {/* Journal info */}
-          {ref.journal && (
-            <span class="ml-1 italic">{formatCitation(ref)}</span>
-          )}
+          </div>
         </li>
       ))
     }
   </ul>
-</div>
+
+  {
+    sortedReferences.length === 0 && (
+      <p class="text-skin-base/80" role="status">
+        {t("references.noReferences")}
+      </p>
+    )
+  }
+</section>
 
 <style>
+  /* Base styles */
   .references {
-    @apply my-8 rounded-lg bg-gray-50 p-6 dark:bg-gray-800;
+    @apply transition-colors duration-300;
   }
 
-  .reference-item {
-    @apply text-sm leading-relaxed;
+  /* Focus styles */
+  .references:focus-within {
+    @apply ring-2 ring-skin-accent ring-offset-2;
+  }
+
+  /* Citation styles */
+  .citation-content {
+    @apply relative pl-8;
+  }
+
+  .citation-content::before {
+    content: "[" counter(reference-counter) "]";
+    @apply absolute left-0 font-medium text-skin-accent;
+    counter-increment: reference-counter;
+  }
+
+  /* Link styles */
+  a:focus-visible {
+    @apply outline-none ring-2 ring-skin-accent ring-offset-2;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .references {
+      @apply transition-none;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .references {
+      @apply break-inside-avoid bg-transparent shadow-none;
+    }
+
+    a {
+      @apply text-current no-underline;
+    }
+
+    a[href^="http"]::after {
+      content: " (" attr(href) ")";
+      @apply text-sm;
+    }
+  }
+
+  /* High contrast mode */
+  @media (forced-colors: active) {
+    .references {
+      @apply border border-[CanvasText];
+    }
+  }
+
+  /* Dark mode adjustments */
+  :global(.dark) .references {
+    @apply bg-gray-800/50;
+  }
+
+  /* Counter styles */
+  .references {
+    counter-reset: reference-counter;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .citation-content {
+      @apply pl-6 text-xs;
+    }
   }
 </style>

@@ -1,103 +1,145 @@
 ---
+/**
+ * ItemGrid Component
+ *
+ * A flexible grid component for displaying items with icons, titles,
+ * descriptions, and optional actions. Supports customizable layouts
+ * and styling.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <ItemGrid
+ *   items={[
+ *     {
+ *       title: "Feature 1",
+ *       description: "Description",
+ *       icon: "tabler:check"
+ *     }
+ *   ]}
+ *   columns={2}
+ * />
+ * ```
+ */
+
 import { Icon } from "astro-icon/components";
 import type { ItemGrid as Props } from "@/types/components";
 import Button from "@/components/elements/Button.astro";
 
+// interface ItemClasses {
+//   container?: string;
+//   panel?: string;
+//   title?: string;
+//   description?: string;
+//   icon?: string;
+//   action?: string;
+// }
+
 const {
   items = [],
-  columns,
+  columns = 2,
   defaultIcon = "",
   classes = {},
 }: Props = Astro.props;
 
-const {
-  container: containerClass = "",
-  panel: panelClass = "",
-  title: titleClass = "",
-  description: descriptionClass = "",
-  icon: defaultIconClass = "text-primary",
-  action: actionClass = "",
-} = classes;
+// Memoize common class names
+const containerClasses = [
+  "not-prose mx-auto grid gap-8",
+  "text-skin-base md:gap-y-12",
+  columns === 4
+    ? "sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+    : columns === 3
+      ? "sm:grid-cols-2 lg:grid-cols-3"
+      : columns === 2
+        ? "sm:grid-cols-2"
+        : "",
+  classes?.container,
+]
+  .filter(Boolean)
+  .join(" ");
+
+const panelClasses = ["flex max-w-md flex-row", classes?.panel]
+  .filter(Boolean)
+  .join(" ");
+
+const titleClasses = ["text-xl font-bold", classes?.title]
+  .filter(Boolean)
+  .join(" ");
+
+const descriptionClasses = ["text-skin-base/50", "mt-2", classes?.description]
+  .filter(Boolean)
+  .join(" ");
+
+const iconClasses = ["mr-2 h-7 w-7 rtl:ml-2", classes?.icon || "text-primary"]
+  .filter(Boolean)
+  .join(" ");
+
+const actionClasses = ["text-lg font-medium leading-6", "mt-2", classes?.action]
+  .filter(Boolean)
+  .join(" ");
+
+// Generate unique IDs for accessibility
+const gridId = `item-grid-${Math.random().toString(36).substring(2, 9)}`;
 ---
 
 {
-  items && (
+  items && items.length > 0 && (
     <div
-      class:list={[
-        "not-prose mx-auto grid gap-8 text-skin-base md:gap-y-12",
-        columns === 4
-          ? "sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-          : columns === 3
-            ? "sm:grid-cols-2 lg:grid-cols-3"
-            : columns === 2
-              ? "sm:grid-cols-2"
-              : "",
-        containerClass,
-      ]}
+      id={gridId}
+      class={containerClasses}
+      role="list"
+      aria-label="Features grid"
     >
       {items.map(
-        ({
-          title,
-          description,
-          icon,
-          callToAction,
-          classes: itemClasses = {},
-        }) => (
-          <div>
-            <div
-              class:list={[
-                "flex max-w-md flex-row",
-                panelClass,
-                itemClasses?.panel,
-              ]}
-            >
-              <div class="flex justify-center">
-                {(icon || defaultIcon) && (
-                  <Icon
-                    name={icon || defaultIcon}
-                    class:list={[
-                      "mr-2 h-7 w-7 rtl:ml-2",
-                      defaultIconClass,
-                      itemClasses?.icon,
-                    ]}
-                  />
-                )}
-              </div>
-              <div class="mt-0.5">
-                {title && (
-                  <h3
-                    class:list={[
-                      "text-xl font-bold",
-                      titleClass,
-                      itemClasses?.title,
-                    ]}
+        (
+          { title, description, icon, callToAction, classes: itemClasses = {} },
+          index
+        ) => (
+          <div
+            class={`${panelClasses} ${itemClasses?.panel || ""}`}
+            role="listitem"
+            data-aos="fade-up"
+            data-aos-delay={index * 100}
+          >
+            <div class="flex justify-center">
+              {(icon || defaultIcon) && (
+                <Icon
+                  name={icon || defaultIcon}
+                  class={`${iconClasses} ${itemClasses?.icon || ""}`}
+                  aria-hidden="true"
+                />
+              )}
+            </div>
+            <div class="mt-0.5">
+              {title && (
+                <h3 class={`${titleClasses} ${itemClasses?.title || ""}`}>
+                  {title}
+                </h3>
+              )}
+              {description && (
+                <p
+                  class={`${descriptionClasses} ${itemClasses?.description || ""}`}
+                  set:html={description}
+                />
+              )}
+              {callToAction && (
+                <div
+                  class={`${actionClasses} ${itemClasses?.actionClass || ""}`}
+                >
+                  <Button
+                    variant="link"
+                    {...callToAction}
+                    class="group inline-flex items-center gap-1 hover:text-skin-accent"
                   >
-                    {title}
-                  </h3>
-                )}
-                {description && (
-                  <p
-                    class:list={[
-                      "text-skin-base/50",
-                      title ? "mt-3" : "",
-                      descriptionClass,
-                      itemClasses?.description,
-                    ]}
-                    set:html={description}
-                  />
-                )}
-                {callToAction && (
-                  <div
-                    class:list={[
-                      title || description ? "mt-3" : "",
-                      actionClass,
-                      itemClasses?.actionClass,
-                    ]}
-                  >
-                    <Button variant="link" {...callToAction} />
-                  </div>
-                )}
-              </div>
+                    <span>{callToAction.text}</span>
+                    <Icon
+                      name="tabler:arrow-right"
+                      class="h-4 w-4 transition-transform group-hover:translate-x-1"
+                      aria-hidden="true"
+                    />
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         )
@@ -106,8 +148,129 @@ const {
   )
 }
 
-<!-- <style lang="css">
-  h3 {
-    @apply mt-0 !important;
+<style>
+  /* Base styles */
+  div[role="list"] {
+    @apply transition-colors duration-300;
   }
-</style> -->
+
+  /* Focus styles */
+  div:focus-within {
+    @apply ring-2 ring-skin-accent ring-offset-2;
+  }
+
+  /* Animation styles */
+  [data-aos] {
+    @apply opacity-0 transition-all duration-500;
+  }
+
+  [data-aos].aos-animate {
+    @apply opacity-100;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    div,
+    .transition-all,
+    .group-hover\:translate-x-1 {
+      @apply transform-none transition-none;
+    }
+
+    [data-aos] {
+      @apply opacity-100 transition-none;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    div[role="list"] {
+      @apply grid-cols-2 gap-4;
+    }
+
+    div[role="listitem"] {
+      @apply break-inside-avoid;
+    }
+
+    .group-hover\:translate-x-1 {
+      @apply transform-none;
+    }
+  }
+
+  /* High contrast mode */
+  @media (forced-colors: active) {
+    div[role="listitem"] {
+      @apply border border-[CanvasText];
+    }
+  }
+
+  /* Dark mode adjustments */
+  :global(.dark) div[role="list"] {
+    @apply bg-skin-card/5;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    div[role="list"] {
+      @apply gap-4;
+    }
+
+    div[role="listitem"] {
+      @apply flex-col text-center;
+    }
+
+    .rtl\:ml-2 {
+      @apply ml-0;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Enhances grid items with animation on scroll
+   */
+  function setupItemGrid() {
+    const items = document.querySelectorAll("[data-aos]");
+
+    if (!("IntersectionObserver" in window)) {
+      items.forEach(item => item.classList.add("aos-animate"));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("aos-animate");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        rootMargin: "50px",
+        threshold: 0.1,
+      }
+    );
+
+    items.forEach(item => observer.observe(item));
+
+    // Cleanup function
+    return () => {
+      items.forEach(item => observer.unobserve(item));
+      observer.disconnect();
+    };
+  }
+
+  // Initialize on page load
+  let cleanup = setupItemGrid();
+
+  // Re-initialize after Astro page transitions
+  document.addEventListener("astro:after-swap", () => {
+    if (cleanup) cleanup();
+    cleanup = setupItemGrid();
+  });
+
+  // Cleanup on page unload
+  document.addEventListener("astro:before-swap", () => {
+    if (cleanup) cleanup();
+  });
+</script>

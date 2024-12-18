@@ -1,8 +1,31 @@
 ---
-import type { Features as Props } from "@/types/components";
+/**
+ * Features Component
+ *
+ * A flexible component for displaying feature lists with icons, titles,
+ * and descriptions in a responsive grid layout.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <Features
+ *   title="Key Features"
+ *   items={[
+ *     {
+ *       title: "Feature 1",
+ *       description: "Description",
+ *       icon: "tabler:check"
+ *     }
+ *   ]}
+ * />
+ * ```
+ */
 
+import type { Features as Props } from "@/types/components";
 import Headline from "./Headline.astro";
 import ItemGrid from "./ItemGrid.astro";
+
+type HeadlineClasses = Record<string, string>;
 
 const {
   title = await Astro.slots.render("title"),
@@ -15,29 +38,139 @@ const {
   classes = {},
 }: Props = Astro.props;
 
-const isString = (value: any): value is string => typeof value === "string";
+// Type guard for string class definitions
+const isString = (value: unknown): value is string => typeof value === "string";
+
+// Process headline classes
+const headlineClasses: HeadlineClasses = isString(classes?.headline)
+  ? { container: classes.headline }
+  : typeof classes?.headline === "object" && classes?.headline !== null
+    ? (classes.headline as HeadlineClasses)
+    : {};
+
+// Process item classes
+const itemClasses: Record<string, string> = {
+  container: "",
+  title: "md:text-xl",
+  icon: "text-white bg-skin-accent rounded-full w-10 h-10 p-2 md:w-12 md:h-12 md:p-3 mr-4",
+  ...(isString(classes?.items)
+    ? { container: classes.items }
+    : typeof classes?.items === "object" && classes?.items !== null
+      ? classes.items
+      : {}),
+};
+
+// Memoize container classes
+const containerClasses = ["max-w-5xl", classes?.container]
+  .filter(Boolean)
+  .join(" ");
 ---
 
-<section id={id} class={`max-w-5xl ${classes?.container ?? ""}`}>
+<section
+  id={id}
+  class={containerClasses}
+  aria-labelledby={id ? `${id}-title` : undefined}
+>
   <Headline
     title={title}
     subtitle={subtitle}
     tagline={tagline}
-    classes={isString(classes?.headline)
-      ? { container: classes?.headline }
-      : (classes?.headline ?? {})}
+    classes={headlineClasses}
   />
+
   <ItemGrid
     items={items}
     columns={columns}
     defaultIcon={defaultIcon}
-    classes={{
-      container: "",
-      title: "md:text-xl",
-      icon: "text-white bg-skin-accent rounded-full w-10 h-10 p-2 md:w-12 md:h-12 md:p-3 mr-4",
-      ...(isString(classes?.items)
-        ? { container: classes?.items }
-        : (classes?.items ?? {})),
-    }}
+    classes={itemClasses}
   />
 </section>
+
+<style>
+  /* Base styles */
+  section {
+    @apply mx-auto transition-all duration-300;
+  }
+
+  /* Focus styles */
+  section:focus-within {
+    @apply ring-2 ring-skin-accent ring-offset-2;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    section,
+    .transition-all {
+      @apply transition-none;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    section {
+      @apply break-inside-avoid shadow-none;
+    }
+  }
+
+  /* Dark mode adjustments */
+  :global(.dark) section {
+    @apply bg-skin-card/5;
+  }
+
+  /* Animation styles */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    section {
+      @apply px-4;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Enhances features section with intersection observer for animations
+   */
+  function setupFeatures() {
+    const features = document.querySelectorAll('section[id^="features-"]');
+
+    if (!("IntersectionObserver" in window)) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("animate-fade-in");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        rootMargin: "50px",
+        threshold: 0.1,
+      }
+    );
+
+    features.forEach(feature => observer.observe(feature));
+  }
+
+  // Initialize on page load
+  setupFeatures();
+
+  // Re-initialize after Astro page transitions
+  document.addEventListener("astro:after-swap", setupFeatures);
+</script>

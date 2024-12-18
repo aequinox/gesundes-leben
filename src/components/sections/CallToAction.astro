@@ -1,4 +1,21 @@
 ---
+/**
+ * CallToAction Component
+ *
+ * A versatile section component that displays a prominent call-to-action message
+ * with optional title, subtitle, tagline, and action buttons.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <CallToAction
+ *   title="Get Started Today"
+ *   subtitle="Join thousands of satisfied customers"
+ *   callToAction={{ text: "Sign Up", href: "/signup" }}
+ * />
+ * ```
+ */
+
 import type {
   CallToAction,
   Widget,
@@ -22,14 +39,13 @@ interface Props extends Widget {
   classes?: CSSClassesObject;
 }
 
-const {
-  title = await Astro.slots.render("title"),
-  subtitle = await Astro.slots.render("subtitle"),
-  tagline = await Astro.slots.render("tagline"),
-  actions = await Astro.slots.render("actions"),
-  id,
-  classes = {},
-}: Props = Astro.props;
+const { id, classes = {} }: Props = Astro.props;
+
+// Get slot content
+const title = await Astro.slots.render("title");
+const subtitle = await Astro.slots.render("subtitle");
+const tagline = await Astro.slots.render("tagline");
+const actions = await Astro.slots.render("actions");
 
 // Type guard to check if action is CallToAction
 const isCallToAction = (
@@ -39,52 +55,96 @@ const isCallToAction = (
     typeof action !== "string" && action !== null && typeof action === "object"
   );
 };
+
+// Memoize common class names
+const containerClasses = [
+  "not-prose relative scroll-mt-[72px]",
+  "mx-auto max-w-7xl px-4 py-4 text-skin-base md:px-6 md:py-8 lg:py-12",
+  "mx-auto max-w-content",
+  classes.container,
+]
+  .filter(Boolean)
+  .join(" ");
+
+const cardClasses = [
+  "mx-auto max-w-3xl",
+  "rounded-md border border-skin-card",
+  "bg-skin-card/10 p-6 text-center",
+  "shadow-xl backdrop-blur-sm",
+  "transition-all duration-300 hover:bg-skin-card/20",
+].join(" ");
+
+const buttonContainerClasses = [
+  "m-auto mt-6",
+  "flex max-w-xs flex-col flex-nowrap gap-4",
+  "sm:max-w-md sm:flex-row sm:justify-center",
+].join(" ");
 ---
 
-<section class="not-prose relative scroll-mt-[72px]" id={id}>
-  <div
-    class:list={[
-      "relative mx-auto max-w-7xl px-4 py-4 text-skin-base md:px-6 md:py-8 lg:py-12",
-      "mx-auto max-w-content",
-      classes.container,
-    ]}
-  >
-    <div
-      class="mx-auto max-w-3xl rounded-md border border-skin-card bg-skin-card/10 p-6 text-center shadow-xl"
-    >
-      <Headline
-        title={title}
-        subtitle={subtitle}
-        tagline={tagline}
-        classes={{
-          container: "mb-0 md:mb-0",
-          title:
-            "text-4xl md:text-4xl font-bold tracking-tighter mb-4 font-heading leading-snug md:leading-tight",
-          subtitle: "text-xl text-skin-muted",
-        }}
-      />
-      {
-        actions && (
-          <div class="m-auto mt-6 flex max-w-xs flex-col flex-nowrap gap-4 sm:max-w-md sm:flex-row sm:justify-center">
-            {Array.isArray(actions) ? (
-              actions.map(action => (
-                <div class="flex w-full sm:w-auto">
-                  {isCallToAction(action) ? (
-                    <Button
-                      {...action}
-                      class={`w-full sm:mb-0 ${action.class ?? ""}`}
-                    />
-                  ) : (
-                    <Fragment set:html={action} />
-                  )}
-                </div>
-              ))
-            ) : (
-              <Fragment set:html={actions} />
-            )}
-          </div>
-        )
-      }
-    </div>
+<section class={containerClasses} id={id} aria-labelledby={`${id}-title`}>
+  <div class={cardClasses}>
+    <Headline
+      title={title || Astro.props.title}
+      subtitle={subtitle || Astro.props.subtitle}
+      tagline={tagline || Astro.props.tagline}
+      classes={{
+        container: "mb-0 md:mb-0",
+        title:
+          "text-4xl md:text-4xl font-bold tracking-tighter mb-4 font-heading leading-snug md:leading-tight",
+        subtitle: "text-xl text-skin-muted",
+      }}
+    />
+
+    {
+      (actions || Astro.props.actions) && (
+        <div class={buttonContainerClasses}>
+          {Array.isArray(Astro.props.actions) ? (
+            // eslint-disable-next-line no-unused-vars
+            Astro.props.actions.map((action, index) => (
+              <div class="flex w-full sm:w-auto">
+                {isCallToAction(action) ? (
+                  <Button
+                    {...action}
+                    class={`w-full sm:mb-0 ${action.class ?? ""}`}
+                    aria-label={action.text}
+                  />
+                ) : (
+                  <Fragment set:html={action} />
+                )}
+              </div>
+            ))
+          ) : (
+            <Fragment set:html={actions || Astro.props.actions} />
+          )}
+        </div>
+      )
+    }
   </div>
 </section>
+
+<style>
+  /* Enhance focus styles for better accessibility */
+  section:focus-within {
+    @apply ring-2 ring-skin-accent ring-offset-2;
+  }
+
+  /* Smooth transitions */
+  section {
+    @apply transition-all duration-300;
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    section,
+    .transition-all {
+      @apply transition-none;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    section {
+      @apply break-inside-avoid shadow-none;
+    }
+  }
+</style>

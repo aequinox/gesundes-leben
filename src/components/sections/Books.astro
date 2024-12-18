@@ -1,70 +1,130 @@
 ---
+/**
+ * Books Component
+ *
+ * A container component that displays a collection of books, either from direct props
+ * or by fetching them based on provided IDs. Supports optional header content and
+ * handles empty states gracefully.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <Books
+ *   title="Featured Books"
+ *   description="Our top picks"
+ *   books={books}
+ * />
+ * ```
+ */
+
 import type { CollectionEntry } from "astro:content";
 import type { BookData } from "@/types/books";
 import { getCollection } from "astro:content";
 import BookTipp from "./BookTipp.astro";
 
 interface Props {
+  /** Optional mapping of section IDs to book IDs */
   data?: Record<string, string[]>;
+  /** Optional section ID to filter books */
   id?: string;
+  /** Optional direct array of books to display */
   books?: (CollectionEntry<"books"> & { data: BookData })[];
+  /** Optional section title */
   title?: string;
+  /** Optional section description */
   description?: string;
 }
 
-const {
-  data,
-  id,
-  books: propBooks,
-  title = "Buchtipps",
-  description,
-}: Props = Astro.props;
+const { data, id, books: propBooks, title, description }: Props = Astro.props;
 
+// const lang = getLangFromUrl(Astro.url);
+// const t = useTranslations(lang);
+
+// Determine which books to display
 let displayBooks: (CollectionEntry<"books"> & { data: BookData })[] = [];
 
-if (propBooks) {
-  // Direct books array provided (used by books.astro page)
-  displayBooks = propBooks;
-} else if (data && id) {
-  // Books referenced by ID (used in MDX files)
-  const allBooks = await getCollection("books");
-  const bookIds = data[id] || [];
-  displayBooks = allBooks.filter((book: CollectionEntry<"books">) =>
-    bookIds.includes(book.id)
-  );
+try {
+  if (propBooks) {
+    // Direct books array provided (used by books.astro page)
+    displayBooks = propBooks;
+  } else if (data && id) {
+    // Books referenced by ID (used in MDX files)
+    const bookIds = data[id] || [];
+    const allBooks = await getCollection("books");
+    displayBooks = allBooks.filter(book => bookIds.includes(book.id));
+  }
+} catch (error) {
+  console.error("Error loading books:", error);
+  // Continue with empty displayBooks array
 }
+
+// Memoize grid classes based on number of books
+const gridClasses = [
+  "grid auto-rows-fr gap-8",
+  displayBooks.length === 1
+    ? "grid-cols-1 max-w-md mx-auto"
+    : displayBooks.length === 2
+      ? "grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto"
+      : "grid-cols-1 md:grid-cols-2 max-w-content mx-auto",
+].join(" ");
+
+// Memoize empty state message
+const emptyStateMessage =
+  "Aktuell sind keine Buchtipps verfügbar. Schau bald wieder vorbei!";
 ---
 
-<section class="mx-auto max-w-content px-4 py-12">
+<section
+  class="mx-auto max-w-content px-4 py-12"
+  aria-labelledby={title ? "books-section-title" : undefined}
+>
   {
-    title && description && (
+    (title || description) && (
       <header class="animate-fade-in mb-16 text-center">
-        <h1 class="mb-4 text-4xl font-bold text-skin-base">{title}</h1>
-        <p class="mx-auto max-w-2xl text-lg text-skin-base/80">{description}</p>
+        {title && (
+          <h1
+            id="books-section-title"
+            class="mb-4 text-4xl font-bold text-skin-base"
+          >
+            {title}
+          </h1>
+        )}
+        {description && (
+          <p class="mx-auto max-w-2xl text-lg text-skin-base/80">
+            {description}
+          </p>
+        )}
       </header>
     )
   }
 
-  <div class="grid auto-rows-fr grid-cols-1 gap-8 md:grid-cols-2">
-    {
-      displayBooks.map(({ data }) => (
-        <div data-aos="fade-up" class="book-card flex">
-          <BookTipp {...data} class="w-full" />
-        </div>
-      ))
-    }
-
-    {
-      !displayBooks.length && (
-        <p class="col-span-full text-center text-lg text-skin-base/80">
-          Aktuell sind keine Buchtipps verfügbar. Schau bald wieder vorbei!
-        </p>
-      )
-    }
-  </div>
+  {
+    displayBooks.length > 0 ? (
+      <div
+        class={gridClasses}
+        role="list"
+        aria-label={title || "Book recommendations"}
+      >
+        {displayBooks.map(({ data }, index) => (
+          <div
+            data-aos="fade-up"
+            data-aos-delay={index * 100}
+            class="book-card flex"
+            role="listitem"
+          >
+            <BookTipp {...data} class="w-full" />
+          </div>
+        ))}
+      </div>
+    ) : (
+      <p class="text-center text-lg text-skin-base/80" role="status">
+        {emptyStateMessage}
+      </p>
+    )
+  }
 </section>
 
 <style>
+  /* Animation styles */
   .animate-fade-in {
     animation: fadeIn 0.8s ease-out;
   }
@@ -80,9 +140,23 @@ if (propBooks) {
     }
   }
 
-  /* Ensure consistent card heights in the grid */
+  /* Card styles */
   .book-card {
-    height: 100%;
-    display: flex;
+    @apply transition-transform duration-300 ease-out;
+  }
+
+  .book-card:hover {
+    @apply scale-[1.02] transform;
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in {
+      animation: none;
+    }
+
+    .book-card {
+      transition: none;
+    }
   }
 </style>

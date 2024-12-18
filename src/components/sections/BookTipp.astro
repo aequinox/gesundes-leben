@@ -1,4 +1,22 @@
 ---
+/**
+ * BookTipp Component
+ *
+ * A card component that displays detailed information about a book recommendation,
+ * including cover image, title, author, rating, and description.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <BookTipp
+ *   title="Book Title"
+ *   author="Author Name"
+ *   description="Book description..."
+ *   rating={4}
+ * />
+ * ```
+ */
+
 import { Picture } from "astro:assets";
 import { Icon } from "astro-icon/components";
 import Button from "@/components/elements/Button.astro";
@@ -22,16 +40,25 @@ const {
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
+// Generate array for star rating display
 const ratingStars = Array.from({ length: 5 }, (_, i) => i < rating);
+
+// Memoize common class names
+const cardClasses = [
+  "group relative isolate flex transform flex-col overflow-hidden",
+  "rounded-2xl bg-gradient-to-br from-skin-card/90 to-skin-card-muted/90",
+  "shadow-lg backdrop-blur-sm transition-all duration-500 ease-out-expo",
+  "hover:scale-[1.02] hover:shadow-xl focus-within:ring-2 focus-within:ring-skin-accent",
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+
+// Format the rating string with the current rating value
+const ratingString = t("book.rating").replace("{rating}", String(rating));
 ---
 
-<article
-  data-aos="fade-up"
-  class:list={[
-    "group relative isolate flex transform flex-col overflow-hidden rounded-2xl bg-gradient-to-br from-skin-card/90 to-skin-card-muted/90 shadow-lg backdrop-blur-sm transition-all duration-500 ease-out-expo hover:scale-[1.02] hover:shadow-xl",
-    className,
-  ]}
->
+<article class={cardClasses} data-aos="fade-up">
   <!-- Decorative background elements -->
   <div
     class="absolute inset-0 -z-10 bg-gradient-to-br from-skin-accent/5 to-transparent"
@@ -47,8 +74,9 @@ const ratingStars = Array.from({ length: 5 }, (_, i) => i < rating);
   <!-- Affiliate Badge -->
   <div
     class="absolute right-4 top-4 z-10 flex items-center gap-1.5 rounded-full bg-skin-accent/90 px-3 py-1.5 text-xs font-medium text-skin-inverted backdrop-blur-sm"
+    role="note"
   >
-    <Icon name="tabler:info-circle" class="h-4 w-4" />
+    <Icon name="tabler:info-circle" class="h-4 w-4" aria-hidden="true" />
     <span>{t("book.affiliate")}</span>
   </div>
 
@@ -68,12 +96,14 @@ const ratingStars = Array.from({ length: 5 }, (_, i) => i < rating);
             class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             widths={[400, 800]}
             sizes="(max-width: 768px) 100vw, 33vw"
+            loading="lazy"
           />
         ) : (
           <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-skin-accent/5 to-skin-accent/10">
             <Icon
               name="tabler:book"
               class="h-32 w-32 text-skin-accent/40 transition-transform duration-500 ease-out-expo group-hover:scale-110"
+              aria-hidden="true"
             />
           </div>
         )
@@ -114,17 +144,13 @@ const ratingStars = Array.from({ length: 5 }, (_, i) => i < rating);
           </h2>
 
           <!-- Rating Stars -->
-          <div
-            class="flex items-center gap-1"
-            aria-label={`${rating} von 5 Sternen`}
-          >
+          <div class="flex items-center gap-1" aria-label={ratingString}>
             {
               ratingStars.map(filled => (
                 <Icon
                   name={filled ? "tabler:star-filled" : "tabler:star"}
-                  class={`h-5 w-5 ${
-                    filled ? "text-amber-400" : "text-skin-base/30"
-                  }`}
+                  class={`h-5 w-5 ${filled ? "text-amber-400" : "text-skin-base/30"}`}
+                  aria-hidden="true"
                 />
               ))
             }
@@ -142,13 +168,21 @@ const ratingStars = Array.from({ length: 5 }, (_, i) => i < rating);
         class="mt-6 flex flex-wrap items-center gap-6 border-t border-skin-line/30 pt-6"
       >
         <div class="flex items-center gap-2">
-          <Icon name="tabler:user" class="h-5 w-5 text-skin-accent/60" />
+          <Icon
+            name="tabler:user"
+            class="h-5 w-5 text-skin-accent/60"
+            aria-hidden="true"
+          />
           <span class="text-sm font-medium text-skin-base/75">{author}</span>
         </div>
         {
           isbn && (
             <div class="flex items-center gap-2">
-              <Icon name="tabler:barcode" class="h-5 w-5 text-skin-accent/60" />
+              <Icon
+                name="tabler:barcode"
+                class="h-5 w-5 text-skin-accent/60"
+                aria-hidden="true"
+              />
               <span class="text-sm font-medium text-skin-base/75">
                 {t("book.isbn")} {isbn}
               </span>
@@ -171,6 +205,7 @@ const ratingStars = Array.from({ length: 5 }, (_, i) => i < rating);
 </article>
 
 <style>
+  /* Custom transition timing function */
   .ease-out-expo {
     transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
   }
@@ -178,5 +213,14 @@ const ratingStars = Array.from({ length: 5 }, (_, i) => i < rating);
   /* Enhance focus styles for better accessibility */
   article:focus-within {
     @apply ring-2 ring-skin-accent ring-offset-2 ring-offset-skin-base;
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    article,
+    .group-hover\:scale-105,
+    .group-hover\:scale-110 {
+      @apply transform-none transition-none;
+    }
   }
 </style>

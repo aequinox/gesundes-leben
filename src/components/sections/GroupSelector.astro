@@ -1,82 +1,125 @@
 ---
+/**
+ * GroupSelector Component
+ *
+ * A navigation component that allows users to filter content by different
+ * groups with visual indicators and smooth transitions.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <GroupSelector groupType="pro" />
+ * ```
+ */
+
 import { Icon } from "astro-icon/components";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 
 export type Identifier = "pro" | "contra" | "question-time";
 
 interface Group {
+  /** Unique identifier for the group */
   name: Identifier;
+  /** Display title */
   title: string;
+  /** Icon name from the icon set */
   icon: string;
+  /** Navigation link */
   link: string;
+  /** Group description */
   slogan: string;
+  /** Position in layout (left, middle, right) */
   position?: string;
 }
 
+interface Props {
+  /** The type of group to display */
+  groupType: Identifier;
+}
+
+const { groupType }: Props = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Group configurations with type safety
 const groups: Record<Identifier, Group> = {
   pro: {
     name: "pro",
-    title: "Pro",
+    title: t("group.pro.title"),
     icon: "tabler:thumb-up",
     link: "/pro/",
-    slogan: "Über alles, was deine Gesundheit stärkt, sie erhält und fördert",
+    slogan: t("group.pro.slogan"),
     position: "left",
   },
   contra: {
     name: "contra",
-    title: "Kontra",
+    title: t("group.contra.title"),
     icon: "tabler:thumb-down",
     link: "/kontra/",
-    slogan: "Über alles, was deine Gesundheit schwächt und du meiden solltest",
+    slogan: t("group.contra.slogan"),
     position: "right",
   },
   "question-time": {
     name: "question-time",
-    title: "Frage-Zeiten",
+    title: t("group.questionTime.title"),
     icon: "tabler:question-mark",
     link: "/fragezeiten/",
-    slogan: "Über Wissenswertes, Wissenschaftliches und Lesenswertes",
+    slogan: t("group.questionTime.slogan"),
     position: "middle",
   },
-};
+} as const;
 
-type Props = {
-  groupType: Identifier;
-};
-
-const { groupType }: Props = Astro.props;
 const { title, icon, slogan, position } = groups[groupType];
-// const { title, icon, link, slogan } = groups[groupType];
+
+// Memoize translated strings
+const ariaLabel = t("group.select").replace("{type}", title);
+
+// Memoize common class names
+const buttonClasses = [
+  "group-selector group",
+  "transition-all delay-100 duration-300 ease-in-out",
+  position,
+]
+  .filter(Boolean)
+  .join(" ");
+
+const cardClasses = [
+  "h-full rounded-sm border-2 border-solid p-6 text-center text-lg",
+  "transition delay-100 duration-300 ease-in-out",
+  `${groupType}-card`,
+].join(" ");
+
+const iconContainerClasses = [
+  "group-type-icon hidden",
+  "group-hover:-translate-y-1",
+  "md:block",
+].join(" ");
+
+const iconWrapperClasses = [
+  "inline-block max-w-full items-start justify-center overflow-hidden",
+  "rounded-full border-4 border-solid bg-skin-fill p-3",
+  `group-hover:border-${groupType}/90`,
+  `border-${groupType}/50`,
+].join(" ");
 ---
 
-<!-- border-pro/50 border-contra/50 border-question-time/50 --><!-- border-pro/90 border-contra/90 border-question-time/90 -->
 <button
-  class:list={[
-    "group-selector group transition-all delay-100 duration-300 ease-in-out",
-    position,
-  ]}
+  class={buttonClasses}
   id={`${groupType}-group`}
+  aria-label={ariaLabel}
+  type="button"
 >
-  <!-- <a href={link}> -->
-  <div
-    class:list={[
-      "h-full rounded-sm border-2 border-solid p-6 text-center text-lg transition delay-100 duration-300 ease-in-out",
-      `${groupType}-card`,
-    ]}
-  >
-    <div class="group-type-icon hidden group-hover:-translate-y-1 md:block">
-      <div
-        class:list={[
-          "inline-block max-w-full items-start justify-center overflow-hidden rounded-full border-4 border-solid bg-skin-fill p-3",
-          `group-hover:border-${groupType}/90`,
-          `border-${groupType}/50`,
-        ]}
-      >
+  <div class={cardClasses}>
+    <div class={iconContainerClasses}>
+      <div class={iconWrapperClasses}>
         <Icon
           name={icon}
           class:list={[
             "bg-skin h-10 w-10 text-xl text-skin-accent",
             `${groupType}-icon`,
           ]}
+          aria-hidden="true"
         />
       </div>
     </div>
@@ -89,48 +132,29 @@ const { title, icon, slogan, position } = groups[groupType];
       <p class="text-skin">{slogan}</p>
     </div>
   </div>
-  <!-- </a> -->
 </button>
 
-<!-- <script is:inline define:vars={{ groupType }}>
-  document.addEventListener("astro:page-load", () => {
-    const button = document.getElementById(`${groupType}-group`);
-
-    button.addEventListener("click", () => {
-      const blogGrid = document.getElementById("article-grid");
-      const articleCards = blogGrid.querySelectorAll(".article-card");
-
-      articleCards.forEach(card => {
-        card.classList.toggle("show", true);
-      });
-
-      articleCards.forEach(card => {
-        const shouldShow = card.dataset.group === groupType;
-        card.classList.toggle("hide", !shouldShow);
-        card.classList.toggle("show", shouldShow);
-      });
-    });
-  });
-</script> -->
-
-<style lang="postcss">
-
+<style>
+  /* Icon styles */
   .group-type-icon {
-    @apply -mt-16 mb-5 max-w-full cursor-pointer leading-none text-skin-fill transition delay-150 duration-500 group-hover:scale-105;
+    @apply -mt-16 mb-5 max-w-full cursor-pointer leading-none text-skin-fill;
+    @apply transition delay-150 duration-500 group-hover:scale-105;
   }
 
+  /* Card styles */
   .pro-card {
-    @apply border-none bg-gradient-to-t from-10% via-30% to-transparent to-95% from-pro via-pro;
+    @apply border-none bg-gradient-to-t from-pro from-10% via-pro via-30% to-transparent to-95%;
   }
 
   .contra-card {
-    @apply border-none bg-gradient-to-t from-10% via-30% to-transparent to-95% from-contra via-contra;
+    @apply border-none bg-gradient-to-t from-contra from-10% via-contra via-30% to-transparent to-95%;
   }
 
   .question-time-card {
-    @apply border-none bg-gradient-to-t from-10% via-30% to-transparent to-95% from-question-time via-question-time;
+    @apply border-none bg-gradient-to-t from-question-time from-10% via-question-time via-30% to-transparent to-95%;
   }
 
+  /* Icon colors */
   .pro-icon {
     @apply text-pro;
   }
@@ -143,6 +167,7 @@ const { title, icon, slogan, position } = groups[groupType];
     @apply text-question-time;
   }
 
+  /* Position styles */
   .middle {
     @apply order-2;
   }
@@ -154,4 +179,86 @@ const { title, icon, slogan, position } = groups[groupType];
   .right {
     @apply order-3;
   }
+
+  /* Focus styles */
+  button:focus-visible {
+    @apply outline-none ring-2 ring-skin-accent ring-offset-2;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .transition-all,
+    .transition,
+    .group-hover\:scale-105,
+    .group-hover\:-translate-y-1 {
+      @apply transform-none transition-none;
+    }
+  }
+
+  /* High contrast mode */
+  @media (forced-colors: active) {
+    button {
+      @apply border-2 border-[ButtonText];
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    button {
+      @apply break-inside-avoid shadow-none;
+    }
+  }
 </style>
+
+<script>
+  /**
+   * Enhances group selector with keyboard navigation and filtering
+   */
+  function setupGroupSelector() {
+    const buttons =
+      document.querySelectorAll<HTMLButtonElement>(".group-selector");
+
+    buttons.forEach(button => {
+      button.addEventListener("click", () => {
+        const blogGrid = document.getElementById("article-grid");
+        if (!blogGrid) return;
+
+        const groupType = button.id.replace("-group", "");
+        const articleCards =
+          blogGrid.querySelectorAll<HTMLElement>(".article-card");
+
+        articleCards.forEach(card => {
+          const shouldShow = card.dataset.group === groupType;
+          card.classList.toggle("hide", !shouldShow);
+          card.classList.toggle("show", shouldShow);
+
+          // Update ARIA attributes
+          card.setAttribute("aria-hidden", (!shouldShow).toString());
+        });
+
+        // Announce filter change to screen readers
+        const announcement = document.createElement("div");
+        announcement.setAttribute("role", "status");
+        announcement.setAttribute("aria-live", "polite");
+        announcement.className = "sr-only";
+        announcement.textContent = `Showing ${groupType} content`;
+        document.body.appendChild(announcement);
+        setTimeout(() => announcement.remove(), 1000);
+      });
+
+      // Keyboard navigation
+      button.addEventListener("keydown", (e: KeyboardEvent) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          button.click();
+        }
+      });
+    });
+  }
+
+  // Initialize on page load
+  setupGroupSelector();
+
+  // Re-initialize after Astro page transitions
+  document.addEventListener("astro:after-swap", setupGroupSelector);
+</script>

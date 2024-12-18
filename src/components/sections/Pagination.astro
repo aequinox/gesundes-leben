@@ -1,69 +1,220 @@
 ---
-import LinkButton from "@/components/elements/LinkButton.astro";
-import { getLangFromUrl, useTranslations } from "i18n/utils";
+/**
+ * Pagination Component
+ *
+ * A navigation component for moving between pages of content.
+ * Supports keyboard navigation, accessibility features, and
+ * internationalization.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <Pagination
+ *   currentPage={1}
+ *   totalPages={5}
+ *   prevUrl="/page/0"
+ *   nextUrl="/page/2"
+ * />
+ * ```
+ */
 
-export interface Props {
+import LinkButton from "@/components/elements/LinkButton.astro";
+import { Icon } from "astro-icon/components";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+interface Props {
+  /** Current page number */
   currentPage: number;
+  /** Total number of pages */
   totalPages: number;
+  /** URL for the previous page */
   prevUrl: string;
+  /** URL for the next page */
   nextUrl: string;
 }
 
-const { currentPage, totalPages, prevUrl, nextUrl } = Astro.props;
-
-const prev = currentPage > 1 ? "" : "disabled";
-const next = currentPage < totalPages ? "" : "disabled";
-const isPrevDisabled = prev === "disabled";
-const isNextDisabled = next === "disabled";
+const { currentPage, totalPages, prevUrl, nextUrl }: Props = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+
+// Determine button states
+const isPrevDisabled = currentPage <= 1;
+const isNextDisabled = currentPage >= totalPages;
+
+// Memoize common class names
+const containerClasses = [
+  "pagination-wrapper",
+  "mb-8 mt-auto flex justify-center",
+  "items-center gap-4",
+].join(" ");
+
+const buttonBaseClasses = [
+  "inline-flex items-center gap-1",
+  "transition-colors duration-200",
+  "hover:text-skin-accent focus:text-skin-accent",
+].join(" ");
+
+const disabledClasses = [
+  "pointer-events-none select-none opacity-50",
+  "hover:text-skin-base group-hover:fill-skin-base",
+].join(" ");
+
+// Generate unique IDs for accessibility
+const navId = `pagination-${Math.random().toString(36).substring(2, 9)}`;
 ---
 
-{
-  totalPages > 1 && (
-    <nav class="pagination-wrapper" aria-label="Pagination">
-      <LinkButton
-        disabled={isPrevDisabled}
-        href={prevUrl}
-        className={`mr-4 select-none ${prev}`}
-        ariaLabel="Previous"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class:list={[{ "disabled-svg": isPrevDisabled }]}
-        >
-          <path d="M12.707 17.293 8.414 13H18v-2H8.414l4.293-4.293-1.414-1.414L4.586 12l6.707 6.707z" />
-        </svg>
-        {t("nav.prev")}
-      </LinkButton>
-      {currentPage} / {totalPages}
-      <LinkButton
-        disabled={isNextDisabled}
-        href={nextUrl}
-        className={`ml-4 select-none ${next}`}
-        ariaLabel="Next"
-      >
-        {t("nav.next")}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class:list={[{ "disabled-svg": isNextDisabled }]}
-        >
-          <path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z" />
-        </svg>
-      </LinkButton>
-    </nav>
-  )
-}
+<nav
+  class={containerClasses}
+  aria-label={t("pagination.navigation")}
+  id={navId}
+>
+  <LinkButton
+    disabled={isPrevDisabled}
+    href={prevUrl}
+    className={`${buttonBaseClasses} ${isPrevDisabled ? disabledClasses : ""}`}
+    aria-label={t("pagination.previous")}
+    aria-disabled={isPrevDisabled}
+  >
+    <Icon
+      name="tabler:chevron-left"
+      class={`h-6 w-6 ${isPrevDisabled ? "disabled-svg" : ""}`}
+      aria-hidden="true"
+    />
+    <span>{t("pagination.prev")}</span>
+  </LinkButton>
 
-<style lang="postcss">
-  .pagination-wrapper {
-    @apply mb-8 mt-auto flex justify-center;
+  <span
+    class="text-skin-base"
+    aria-label={t("pagination.currentPage")
+      .replace("{current}", String(currentPage))
+      .replace("{total}", String(totalPages))}
+  >
+    {currentPage} / {totalPages}
+  </span>
+
+  <LinkButton
+    disabled={isNextDisabled}
+    href={nextUrl}
+    className={`${buttonBaseClasses} ${isNextDisabled ? disabledClasses : ""}`}
+    aria-label={t("pagination.next")}
+    aria-disabled={isNextDisabled}
+  >
+    <span>{t("pagination.next")}</span>
+    <Icon
+      name="tabler:chevron-right"
+      class={`h-6 w-6 ${isNextDisabled ? "disabled-svg" : ""}`}
+      aria-hidden="true"
+    />
+  </LinkButton>
+</nav>
+
+<style>
+  /* Base styles */
+  nav {
+    @apply transition-colors duration-300;
   }
-  .disabled {
-    @apply pointer-events-none select-none opacity-50 hover:text-skin-base group-hover:fill-skin-base;
+
+  /* Focus styles */
+  nav:focus-within {
+    @apply ring-2 ring-skin-accent ring-offset-2;
   }
+
+  /* Icon styles */
   .disabled-svg {
     @apply group-hover:!fill-skin-base;
   }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    nav,
+    .transition-colors {
+      @apply transition-none;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    nav {
+      @apply hidden;
+    }
+  }
+
+  /* High contrast mode */
+  @media (forced-colors: active) {
+    nav {
+      @apply border border-[ButtonText];
+    }
+
+    .disabled-svg {
+      @apply opacity-50;
+    }
+  }
+
+  /* Dark mode adjustments */
+  :global(.dark) nav {
+    @apply bg-skin-fill/5;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    nav {
+      @apply flex-wrap gap-2;
+    }
+  }
 </style>
+
+<script>
+  /**
+   * Enhances pagination with keyboard navigation
+   */
+  function setupPagination() {
+    const nav = document.querySelector(".pagination-wrapper");
+    if (!nav) return;
+
+    const buttons =
+      nav.querySelectorAll<HTMLAnchorElement>("a:not([disabled])");
+
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        const prevButton = Array.from(buttons).find(btn =>
+          btn.getAttribute("aria-label")?.includes("previous")
+        );
+        if (prevButton && !prevButton.hasAttribute("disabled")) {
+          e.preventDefault();
+          prevButton.click();
+        }
+      } else if (e.key === "ArrowRight") {
+        const nextButton = Array.from(buttons).find(btn =>
+          btn.getAttribute("aria-label")?.includes("next")
+        );
+        if (nextButton && !nextButton.hasAttribute("disabled")) {
+          e.preventDefault();
+          nextButton.click();
+        }
+      }
+    };
+
+    // Add keyboard navigation
+    document.addEventListener("keydown", handleKeydown);
+
+    // Cleanup function
+    return () => {
+      document.removeEventListener("keydown", handleKeydown);
+    };
+  }
+
+  // Initialize on page load
+  let cleanup = setupPagination();
+
+  // Re-initialize after Astro page transitions
+  document.addEventListener("astro:after-swap", () => {
+    if (cleanup) cleanup();
+    cleanup = setupPagination();
+  });
+
+  // Cleanup on page unload
+  document.addEventListener("astro:before-swap", () => {
+    if (cleanup) cleanup();
+  });
+</script>

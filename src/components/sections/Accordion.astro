@@ -1,83 +1,148 @@
 ---
+/**
+ * Accordion Component
+ *
+ * A reusable accordion component that provides collapsible content sections.
+ * Features smooth animations, keyboard accessibility, and ARIA support.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <Accordion title="Section Title">
+ *   This is the accordion content
+ * </Accordion>
+ * ```
+ */
+
 import { Icon } from "astro-icon/components";
 
 interface Props {
+  /** The title text displayed in the accordion header */
   title: string;
+  /** Optional CSS classes to apply to the accordion container */
   classes?: string;
+  /** Optional ID for the accordion. If not provided, derived from title */
+  id?: string;
 }
 
-const { title, classes } = Astro.props as Props;
+const {
+  title,
+  classes = "",
+  id = title.toLowerCase().replace(/\s+/g, "-"),
+}: Props = Astro.props;
+
+// Derive ARIA IDs from component ID
+const buttonId = `${id}-button`;
+const contentId = `${id}-content`;
 ---
 
 <div class={`accordion group relative divide-y divide-skin-line/10 ${classes}`}>
   <button
-    class="accordion-button flex w-full flex-1 items-center justify-between gap-2 py-3 text-left text-xl font-medium text-skin-base transition hover:text-skin-accent/75"
+    class="accordion-button flex w-full flex-1 items-center justify-between gap-2 py-3 text-left text-xl font-medium text-skin-base transition-colors duration-200 hover:text-skin-accent focus:outline-none focus:ring-2 focus:ring-skin-accent focus:ring-offset-2"
     type="button"
-    id={`${title} accordion menu button`}
+    id={buttonId}
     aria-expanded="false"
-    aria-controls={`${title} Akkordion Menü Inhalt`}
+    aria-controls={contentId}
   >
-    {title}
+    <span class="flex-1">{title}</span>
     <Icon
       name="tabler:chevron-down"
       aria-hidden="true"
-      class="accordion-chevron h-7 w-7 shrink-0 transition-transform"
+      class="accordion-chevron h-7 w-7 shrink-0 transform transition-transform duration-300 ease-in-out"
     />
   </button>
+
   <div
-    id={`${title} accordion menu content`}
-    aria-labelledby={`${title} accordion menu button`}
+    id={contentId}
+    aria-labelledby={buttonId}
     class="accordion-content h-0 overflow-hidden transition-all duration-300 ease-in-out sm:px-4"
+    role="region"
   >
-    <p
-      class="prose mb-4 mt-1 max-w-full text-base font-normal text-skin-base transition-[height]"
+    <div
+      class="prose prose-lg mb-4 mt-1 max-w-full text-base font-normal text-skin-base"
     >
       <slot />
-    </p>
+    </div>
   </div>
 </div>
 
 <script>
-  function accordionSetup() {
-    document.querySelectorAll(".accordion").forEach(accordionMenu => {
-      const accordionButton = accordionMenu.querySelector(".accordion-button");
-      const accordionChevron =
-        accordionMenu.querySelector(".accordion-chevron");
-      const accordionContent = accordionMenu.querySelector(
-        ".accordion-content"
-      ) as HTMLElement;
+  /**
+   * Sets up accordion functionality with keyboard support and ARIA attributes
+   */
+  function setupAccordion() {
+    const accordions = document.querySelectorAll<HTMLElement>(".accordion");
 
-      if (accordionButton && accordionContent && accordionChevron) {
-        accordionButton.addEventListener("click", () => {
-          const expanded = !accordionMenu.classList.toggle("active");
-          accordionButton.setAttribute("aria-expanded", String(expanded));
-          if (accordionContent) {
-            accordionContent.style.maxHeight = expanded
-              ? `${accordionContent.scrollHeight}px`
-              : "0px";
-          }
-          accordionChevron.classList.toggle("rotate-180", expanded);
-        });
-      }
+    accordions.forEach(accordion => {
+      const button =
+        accordion.querySelector<HTMLButtonElement>(".accordion-button");
+      const chevron =
+        accordion.querySelector<HTMLElement>(".accordion-chevron");
+      const content =
+        accordion.querySelector<HTMLElement>(".accordion-content");
+
+      if (!button || !content || !chevron) return;
+
+      const toggleAccordion = (expanded: boolean) => {
+        button.setAttribute("aria-expanded", String(expanded));
+        content.style.maxHeight = expanded ? `${content.scrollHeight}px` : "0";
+        chevron.style.transform = expanded ? "rotate(180deg)" : "";
+        accordion.classList.toggle("active", expanded);
+      };
+
+      // Click handler
+      button.addEventListener("click", () => {
+        const isExpanded = button.getAttribute("aria-expanded") === "true";
+        toggleAccordion(!isExpanded);
+      });
+
+      // Keyboard handler
+      button.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          button.click();
+        }
+      });
+
+      // Handle dynamic content changes
+      const resizeObserver = new ResizeObserver(() => {
+        if (button.getAttribute("aria-expanded") === "true") {
+          content.style.maxHeight = `${content.scrollHeight}px`;
+        }
+      });
+
+      resizeObserver.observe(content);
     });
   }
 
-  accordionSetup();
-  document.addEventListener("astro:after-swap", accordionSetup);
+  // Initialize on page load
+  setupAccordion();
+
+  // Re-initialize after Astro page transitions
+  document.addEventListener("astro:after-swap", setupAccordion);
 </script>
 
-<style lang="css">
-  .accordion.active .accordion-content {
-    max-height: 100%;
-  }
-
+<style>
+  /* Base accordion styles */
   .accordion-content {
     transition: max-height 0.3s ease-in-out;
   }
-  .accordion-chevron {
-    transition: transform 0.3s ease-in-out;
+
+  /* Focus styles for better accessibility */
+  .accordion-button:focus-visible {
+    @apply outline-none ring-2 ring-skin-accent ring-offset-2;
   }
-  .accordion.active .accordion-chevron {
-    transform: rotate(180deg);
+
+  /* Active state styles */
+  .accordion.active .accordion-content {
+    @apply border-t border-skin-line/10;
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .accordion-content,
+    .accordion-chevron {
+      transition-duration: 0.01ms !important;
+    }
   }
 </style>

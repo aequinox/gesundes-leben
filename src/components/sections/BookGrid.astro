@@ -1,11 +1,31 @@
 ---
+/**
+ * BookGrid Component
+ *
+ * Displays a responsive grid of book recommendations with optional header content.
+ * Supports animation and responsive layout for different screen sizes.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <BookGrid
+ *   books={books}
+ *   title="Recommended Books"
+ *   description="Our carefully selected book recommendations"
+ * />
+ * ```
+ */
+
 import type { CollectionEntry } from "astro:content";
 import type { BookData } from "@/types/books";
 import BookTipp from "./BookTipp.astro";
 
 interface Props {
+  /** Array of book entries with their associated data */
   books: (CollectionEntry<"books"> & { data: BookData })[];
+  /** Optional title for the book grid section */
   title?: string;
+  /** Optional description text for the book grid section */
   description?: string;
 }
 
@@ -14,36 +34,55 @@ const {
   title = "Buchtipps",
   description = "Sorgfältig ausgewählte Bücher, die dich auf deinem Weg zu persönlichem Wachstum und Entwicklung unterstützen. Jedes Buch wurde von uns gelesen und für wertvoll befunden.",
 }: Props = Astro.props;
+
+// Memoize empty state message for reuse
+const emptyStateMessage =
+  "Aktuell sind keine Buchtipps verfügbar. Schau bald wieder vorbei!";
 ---
 
-<section class="mx-auto max-w-content px-4 py-12">
+<section
+  class="mx-auto max-w-content px-4 py-12"
+  aria-labelledby="book-grid-title"
+>
   <header class="animate-fade-in mb-16 text-center">
-    <h1 class="mb-4 text-4xl font-bold text-skin-base">{title}</h1>
-    <p class="mx-auto max-w-2xl text-lg text-skin-base/80">
-      {description}
-    </p>
-  </header>
-
-  <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+    <h1 id="book-grid-title" class="mb-4 text-4xl font-bold text-skin-base">
+      {title}
+    </h1>
     {
-      books.map(({ data }) => (
-        <div data-aos="fade-up" class="book-card">
-          <BookTipp {...data} />
-        </div>
-      ))
-    }
-
-    {
-      !books.length && (
-        <p class="col-span-full text-center text-lg text-skin-base/80">
-          Aktuell sind keine Buchtipps verfügbar. Schau bald wieder vorbei!
-        </p>
+      description && (
+        <p class="mx-auto max-w-2xl text-lg text-skin-base/80">{description}</p>
       )
     }
-  </div>
+  </header>
+
+  {
+    books.length > 0 ? (
+      <div
+        class="grid grid-cols-1 gap-8 md:grid-cols-2"
+        role="list"
+        aria-label="Book recommendations grid"
+      >
+        {books.map(({ data }, index) => (
+          <div
+            data-aos="fade-up"
+            data-aos-delay={index * 100}
+            class="book-card"
+            role="listitem"
+          >
+            <BookTipp {...data} />
+          </div>
+        ))}
+      </div>
+    ) : (
+      <p class="text-center text-lg text-skin-base/80" role="status">
+        {emptyStateMessage}
+      </p>
+    )
+  }
 </section>
 
 <style>
+  /* Fade in animation for the header */
   .animate-fade-in {
     animation: fadeIn 0.8s ease-out;
   }
@@ -56,6 +95,26 @@ const {
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  /* Ensure consistent card heights and smooth transitions */
+  .book-card {
+    @apply transition-transform duration-300 ease-out;
+  }
+
+  .book-card:hover {
+    @apply scale-[1.02] transform;
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in {
+      animation: none;
+    }
+
+    .book-card {
+      transition: none;
     }
   }
 </style>

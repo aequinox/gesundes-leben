@@ -1,26 +1,167 @@
 ---
-// import { getLangFromUrl, useTranslations } from "i18n/utils";
+/**
+ * Header Component
+ *
+ * A responsive header component that includes navigation, skip links,
+ * and accessibility features. Appears on every page and handles
+ * site-wide navigation.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <Header activeNav="posts" />
+ * ```
+ */
+
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import Navigation from "@/components/sections/Navigation.astro";
 import type { NavigationLink } from "@/data/navigation";
 
-export interface Props {
+interface Props {
+  /** Currently active navigation item */
   activeNav?: NavigationLink;
 }
 
-const { activeNav } = Astro.props;
+const { activeNav }: Props = Astro.props;
 
-// const lang = getLangFromUrl(Astro.url);
-// const t = useTranslations(lang);
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Memoize translated strings
+const skipToContentText = t("nav.skipToContent");
+
+// Memoize common class names
+const skipLinkClasses = [
+  "absolute -top-full left-16 z-50",
+  "bg-skin-accent px-3 py-2 text-skin-inverted",
+  "transition-all focus:top-4",
+].join(" ");
 ---
 
 <header class="sticky top-0 z-10 w-full">
-  <!-- <a id="skip-to-content" href="#main-content">{t("nav.skipToContent")}</a> -->
+  <!-- Skip to content link -->
+  <a id="skip-to-content" href="#main-content" class={skipLinkClasses}>
+    {skipToContentText}
+  </a>
 
+  <!-- Main navigation -->
   <Navigation activeNav={activeNav} />
 </header>
 
-<style lang="postcss">
-  #skip-to-content {
-    @apply absolute -top-full left-16 z-50 bg-skin-accent px-3 py-2 text-skin-inverted transition-all focus:top-4;
+<style>
+  /* Base styles */
+  header {
+    @apply bg-skin-fill/75 backdrop-blur-md;
+    @apply transition-colors duration-300;
+  }
+
+  /* Skip link focus styles */
+  #skip-to-content:focus {
+    @apply outline-none ring-2 ring-skin-accent ring-offset-2;
+  }
+
+  /* Focus styles */
+  /* header:focus-within {
+    @apply ring-2 ring-skin-accent ring-offset-2;
+  } */
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    header,
+    .transition-all {
+      @apply transition-none;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    header {
+      @apply hidden;
+    }
+  }
+
+  /* High contrast mode */
+  @media (forced-colors: active) {
+    header {
+      @apply border-b-2 border-[CanvasText];
+    }
   }
 </style>
+
+<script>
+  /**
+   * Enhances header functionality with scroll behavior and keyboard navigation
+   */
+  function setupHeader() {
+    const header = document.querySelector("header");
+    const skipLink = document.getElementById("skip-to-content");
+
+    if (!header || !skipLink) return;
+
+    // Handle scroll behavior
+    let lastScroll = window.scrollY;
+    const scrollThreshold = 50;
+
+    const handleScroll = () => {
+      const currentScroll = window.scrollY;
+      const isScrollingDown = currentScroll > lastScroll;
+      const hasScrolledPastThreshold = currentScroll > scrollThreshold;
+
+      header.classList.toggle(
+        "header-hidden",
+        isScrollingDown && hasScrolledPastThreshold
+      );
+      header.classList.toggle("header-shadow", hasScrolledPastThreshold);
+
+      lastScroll = currentScroll;
+    };
+
+    // Handle skip link
+    const handleSkipLink = (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const mainContent = document.getElementById("main-content");
+        if (mainContent) {
+          mainContent.focus();
+          mainContent.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    };
+
+    // Add scroll listener with debounce
+    let scrollTimeout: number;
+    const debouncedScroll = () => {
+      if (scrollTimeout) {
+        window.cancelAnimationFrame(scrollTimeout);
+      }
+      scrollTimeout = window.requestAnimationFrame(handleScroll);
+    };
+
+    // Add event listeners
+    window.addEventListener("scroll", debouncedScroll, { passive: true });
+    skipLink.addEventListener("keydown", handleSkipLink);
+
+    // Cleanup function
+    return () => {
+      window.removeEventListener("scroll", debouncedScroll);
+      skipLink.removeEventListener("keydown", handleSkipLink);
+      if (scrollTimeout) {
+        window.cancelAnimationFrame(scrollTimeout);
+      }
+    };
+  }
+
+  // Initialize on page load
+  let cleanup = setupHeader();
+
+  // Re-initialize after Astro page transitions
+  document.addEventListener("astro:after-swap", () => {
+    if (cleanup) cleanup();
+    cleanup = setupHeader();
+  });
+
+  // Cleanup on page unload
+  document.addEventListener("astro:before-swap", () => {
+    if (cleanup) cleanup();
+  });
+</script>

@@ -1,44 +1,82 @@
 ---
+/**
+ * Favorites Component
+ *
+ * A collapsible section that displays favorite products or recommendations
+ * with category-based styling and interactive features.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <Favorites
+ *   data={favoritesData}
+ *   id="health-products"
+ * />
+ * ```
+ */
+
 import { getCollection, type CollectionEntry } from "astro:content";
 import { Icon } from "astro-icon/components";
 import Button from "@/components/elements/Button.astro";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 
 interface Props {
+  /** Mapping of section IDs to favorite IDs */
   data?: Record<string, string[]>;
+  /** Section ID to filter favorites */
   id?: string;
 }
 
 interface CategoryConfig {
+  /** Icon name from the icon set */
   icon: string;
+  /** Text color class */
   color: string;
+  /** Background gradient class */
   gradient: string;
+  /** Category label for screen readers */
+  label: string;
 }
 
-const { data, id }: Props = Astro.props;
+const { data, id = "" }: Props = Astro.props;
 
-const favorites: CollectionEntry<"favorites">[] = await getCollection(
-  "favorites",
-  ({ id: favoriteId }: CollectionEntry<"favorites">) =>
-    data && id ? data[id]?.includes(favoriteId) : false
-);
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 
+// Category styling configuration
 const categoryConfigs: Record<string, CategoryConfig> = {
   Basis: {
     icon: "tabler:shield",
     color: "text-emerald-500",
     gradient: "from-emerald-500/10 to-emerald-500/5",
+    label: "Basic Product",
   },
   Premium: {
     icon: "tabler:shield-check",
     color: "text-violet-500",
     gradient: "from-violet-500/10 to-violet-500/5",
+    label: "Premium Product",
   },
   Profi: {
     icon: "tabler:shield-star",
     color: "text-amber-500",
     gradient: "from-amber-500/10 to-amber-500/5",
+    label: "Professional Product",
   },
 };
+
+// Load and filter favorites
+let favorites: CollectionEntry<"favorites">[] = [];
+try {
+  if (data && id) {
+    const allFavorites = await getCollection("favorites");
+    favorites = allFavorites.filter(({ id: favoriteId }) =>
+      data[id]?.includes(favoriteId)
+    );
+  }
+} catch (error) {
+  console.error("Error loading favorites:", error);
+}
 
 const favoritesCount = favorites.length;
 
@@ -49,49 +87,75 @@ const gridClasses =
     2: "grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto gap-8",
     3: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-content mx-auto gap-8",
   }[favoritesCount] || "grid-cols-1 md:grid-cols-3 max-w-content mx-auto gap-8";
+
+// Generate unique IDs for accessibility
+const sectionId = `favorites-${id}`;
+const headerId = `${sectionId}-header`;
+const contentId = `${sectionId}-content`;
+
+// Format title based on favorites count
+const title =
+  favoritesCount > 1
+    ? t("favorites.multipleTitle").replace("{topic}", id)
+    : t("favorites.singleTitle").replace("{topic}", id);
 ---
 
-<section data-aos="fade-up" class="mx-auto max-w-content py-12">
+<section
+  data-aos="fade-up"
+  class="mx-auto max-w-content py-12"
+  aria-labelledby={headerId}
+>
   <div class="favorites-container">
     <input
       type="checkbox"
       name="favorites"
-      id={`favorites-${id}`}
+      id={sectionId}
       class="hidden"
+      aria-hidden="true"
     />
+
     <div class="favorites-wrapper">
-      <label for={`favorites-${id}`} class="favorites-header group">
+      <label
+        for={sectionId}
+        id={headerId}
+        class="favorites-header group"
+        role="button"
+        aria-expanded="false"
+        aria-controls={contentId}
+        tabindex="0"
+      >
         <span class="text-xl font-medium text-skin-base">
-          {
-            favoritesCount > 1
-              ? `Unsere Favoriten zum Thema ${id}`
-              : `Unser Favorit zum Thema ${id}`
-          }
+          {title}
         </span>
         <Icon
           name="tabler:chevron-down"
           class="h-6 w-6 transform transition-transform duration-300 group-hover:text-skin-accent"
+          aria-hidden="true"
         />
       </label>
 
-      <div class="favorites-content">
+      <div
+        id={contentId}
+        class="favorites-content"
+        role="region"
+        aria-labelledby={headerId}
+      >
         <p
           class="mx-auto mb-12 max-w-content text-left text-lg text-skin-base/80"
         >
-          Wir werben für Partner und Produkte, von denen wir überzeugt sind und
-          mit denen wir in der Praxis ausgezeichnete Erfahrungen gemacht haben.
-          Das bedeutet, diese entsprechen hohen Standards bezüglich Qualität,
-          Preis-Leistungs-Verhältnis, therapeutisch wirksamer Dosierung,
-          Reinheit und Nachhaltigkeit. Die Einnahmen, die wir durch manche der
-          Empfehlungen erzielen, kommen dem Blog zugute. <b
-            class="text-skin-accent">#weildueswertbist</b
-          >
+          {t("favorites.description")}
+          <b class="text-skin-accent">#weildueswertbist</b>
         </p>
 
         <div class={`grid ${gridClasses}`}>
           {
             favorites.map(({ data: { category, name, descriptions, url } }) => {
               const config = categoryConfigs[category || "Basis"];
+              const buttonText = t("favorites.viewProduct").replace(
+                "{category}",
+                category || "Basis"
+              );
+
               return (
                 <div class="favorite-card group h-full">
                   <div
@@ -102,13 +166,13 @@ const gridClasses =
                       {category && (
                         <Icon
                           name={config.icon}
-                          aria-hidden="true"
+                          aria-label={config.label}
                           class={`h-7 w-7 ${config.color} ml-4 shrink-0`}
                         />
                       )}
                     </div>
 
-                    <ul class="mb-8 flex-grow space-y-4">
+                    <ul class="mb-8 flex-grow space-y-4" role="list">
                       {descriptions.map((description: string) => (
                         <li class="flex items-start">
                           <Icon
@@ -129,7 +193,7 @@ const gridClasses =
                       target="_blank"
                       rel="noopener noreferrer"
                       class="mt-auto w-full justify-center"
-                      text={`Zum ${category ? category.toUpperCase() : ""} Produkt`}
+                      text={buttonText}
                     />
                   </div>
                 </div>
@@ -144,6 +208,7 @@ const gridClasses =
 </section>
 
 <style>
+  /* Container styles */
   .favorites-container {
     @apply relative overflow-hidden rounded-2xl bg-skin-card/30 backdrop-blur-sm;
   }
@@ -152,14 +217,17 @@ const gridClasses =
     @apply relative border-l-4 border-skin-accent;
   }
 
+  /* Header styles */
   .favorites-header {
     @apply flex cursor-pointer items-center justify-between bg-skin-card/50 px-6 py-4 transition-colors duration-300 hover:bg-skin-card/70;
   }
 
+  /* Content styles */
   .favorites-content {
     @apply max-h-0 overflow-hidden px-6 transition-all duration-500 ease-in-out;
   }
 
+  /* Expanded state */
   input:checked ~ .favorites-wrapper .favorites-content {
     @apply max-h-full py-8;
   }
@@ -168,6 +236,7 @@ const gridClasses =
     @apply rotate-180;
   }
 
+  /* Card styles */
   .favorite-card {
     @apply relative isolate;
   }
@@ -181,8 +250,73 @@ const gridClasses =
     @apply opacity-100;
   }
 
-  /* Position the list items with proper alignment */
+  /* List styles */
   .favorite-card ul {
     @apply pl-7;
   }
+
+  /* Focus styles */
+  .favorites-header:focus-visible {
+    @apply outline-none ring-2 ring-skin-accent ring-offset-2;
+  }
+
+  /* Keyboard interaction */
+  .favorites-header:focus-visible svg {
+    @apply text-skin-accent;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .favorites-content,
+    .transition-all,
+    .hover\:scale-\[1\.02\] {
+      @apply transform-none transition-none;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .favorites-container {
+      @apply bg-transparent shadow-none;
+    }
+
+    .favorites-content {
+      @apply max-h-full;
+    }
+
+    .favorites-header {
+      @apply hidden;
+    }
+  }
 </style>
+
+<script>
+  /**
+   * Enhances the favorites section with keyboard navigation
+   */
+  function setupFavorites() {
+    const headers =
+      document.querySelectorAll<HTMLLabelElement>(".favorites-header");
+
+    headers.forEach(header => {
+      header.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          const input = document.getElementById(
+            header.getAttribute("for") || ""
+          ) as HTMLInputElement;
+          if (input) {
+            input.checked = !input.checked;
+            header.setAttribute("aria-expanded", input.checked.toString());
+          }
+        }
+      });
+    });
+  }
+
+  // Initialize on page load
+  setupFavorites();
+
+  // Re-initialize after Astro page transitions
+  document.addEventListener("astro:after-swap", setupFavorites);
+</script>

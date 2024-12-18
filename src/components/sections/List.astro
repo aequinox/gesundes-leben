@@ -1,48 +1,64 @@
 ---
+/**
+ * List Component
+ *
+ * A component for displaying structured lists with optional introductions
+ * and decorative elements. Supports custom styling and accessibility features.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <List
+ *   title="Main Title"
+ *   items={[
+ *     { intro: "First", content: "Content 1" },
+ *     { content: "Content 2" }
+ *   ]}
+ * />
+ * ```
+ */
+
 interface Item {
+  /** Optional introduction text */
   intro?: string;
+  /** Main content text */
   content: string;
 }
 
 interface Props {
+  /** Section title */
   title?: string;
+  /** Array of list items */
   items: Item[];
+  /** Optional CSS classes for the title */
   titleClasses?: string;
 }
 
-const { title, items, titleClasses }: Props = Astro.props;
+const { title, items, titleClasses = "" }: Props = Astro.props;
+
+// Memoize common class names
+const sectionClasses = [
+  "relative mx-auto -mb-4 mt-8",
+  "box-border overflow-hidden hyphens-auto",
+  "rounded-md",
+  "bg-gradient-to-b from-skin-card via-skin-card/50 to-transparent",
+  "p-6 text-lg",
+].join(" ");
+
+const titleBaseClasses = ["text-2xl font-normal text-skin-base", titleClasses]
+  .filter(Boolean)
+  .join(" ");
+
+const listClasses = ["prose mx-auto w-full max-w-content px-4"].join(" ");
+
+// Generate unique IDs for accessibility
+const sectionId = `list-section-${Math.random().toString(36).substring(2, 9)}`;
+const titleId = title ? `${sectionId}-title` : undefined;
 ---
 
-<style lang="css">
-  .wave-divider {
-    @apply absolute bottom-0 left-0 w-[calc(100%+1.5px)] rotate-180 transform overflow-hidden leading-none;
-  }
-
-  .wave-divider svg {
-    @apply relative block h-16 w-full rotate-180 overflow-hidden;
-  }
-
-  .wave-divider .shape-fill {
-    @apply fill-skin-fill;
-  }
-
-  .list-icon {
-    @apply stroke-skin-accent stroke-2;
-  }
-</style>
-
-<section
-  class="relative mx-auto -mb-4 mt-8 box-border overflow-hidden hyphens-auto rounded-md bg-gradient-to-b from-skin-card via-skin-card/50 to-transparent p-6 text-lg"
-  data-aos="fade-up"
->
-  {
-    title && (
-      <div class:list={["text-2xl font-normal text-skin-base", titleClasses]}>
-        {title}
-      </div>
-    )
-  }
-  <div class="wave-divider">
+<section class={sectionClasses} data-aos="fade-up" aria-labelledby={titleId}>
+  <!-- Decorative wave divider -->
+  <div class="wave-divider" aria-hidden="true">
     <svg
       data-name="Layer 1"
       xmlns="http://www.w3.org/2000/svg"
@@ -54,8 +70,17 @@ const { title, items, titleClasses }: Props = Astro.props;
         class="shape-fill"></path>
     </svg>
   </div>
-  <div class="prose mx-auto w-full max-w-content px-4">
-    <ul class="mb-20">
+
+  {
+    title && (
+      <div class={titleBaseClasses} id={titleId}>
+        {title}
+      </div>
+    )
+  }
+
+  <div class={listClasses}>
+    <ul class="mb-20" role="list">
       {
         items.map((item: Item) => (
           <li>
@@ -69,3 +94,143 @@ const { title, items, titleClasses }: Props = Astro.props;
     </ul>
   </div>
 </section>
+
+<style>
+  /* Wave divider styles */
+  .wave-divider {
+    @apply absolute bottom-0 left-0 w-[calc(100%+1.5px)] rotate-180 transform overflow-hidden leading-none;
+  }
+
+  .wave-divider svg {
+    @apply relative block h-16 w-full rotate-180 overflow-hidden;
+  }
+
+  .wave-divider .shape-fill {
+    @apply fill-skin-fill;
+  }
+
+  /* List styles */
+  ul {
+    @apply list-none pl-0;
+  }
+
+  li {
+    @apply relative mb-4 pl-6;
+  }
+
+  li::before {
+    content: "";
+    @apply absolute left-0 top-[0.6em] h-2 w-2 rounded-full bg-skin-accent;
+  }
+
+  /* Focus styles */
+  section:focus-within {
+    @apply ring-2 ring-skin-accent ring-offset-2;
+  }
+
+  /* Animation styles */
+  [data-aos] {
+    @apply opacity-0 transition-all duration-500;
+  }
+
+  [data-aos].aos-animate {
+    @apply opacity-100;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    section,
+    [data-aos] {
+      @apply transform-none opacity-100 transition-none;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    section {
+      @apply break-inside-avoid bg-transparent shadow-none;
+    }
+
+    .wave-divider {
+      @apply hidden;
+    }
+  }
+
+  /* High contrast mode */
+  @media (forced-colors: active) {
+    section {
+      @apply border border-[CanvasText];
+    }
+
+    li::before {
+      @apply bg-[CanvasText];
+    }
+  }
+
+  /* Dark mode adjustments */
+  :global(.dark) section {
+    @apply bg-skin-card/5;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    section {
+      @apply p-4;
+    }
+
+    .wave-divider svg {
+      @apply h-12;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Enhances list sections with animation on scroll
+   */
+  function setupList() {
+    const sections = document.querySelectorAll("[data-aos]");
+
+    if (!("IntersectionObserver" in window)) {
+      sections.forEach(section => section.classList.add("aos-animate"));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("aos-animate");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        rootMargin: "50px",
+        threshold: 0.1,
+      }
+    );
+
+    sections.forEach(section => observer.observe(section));
+
+    // Cleanup function
+    return () => {
+      sections.forEach(section => observer.unobserve(section));
+      observer.disconnect();
+    };
+  }
+
+  // Initialize on page load
+  let cleanup = setupList();
+
+  // Re-initialize after Astro page transitions
+  document.addEventListener("astro:after-swap", () => {
+    if (cleanup) cleanup();
+    cleanup = setupList();
+  });
+
+  // Cleanup on page unload
+  document.addEventListener("astro:before-swap", () => {
+    if (cleanup) cleanup();
+  });
+</script>

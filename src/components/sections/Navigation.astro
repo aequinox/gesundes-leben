@@ -1,4 +1,17 @@
 ---
+/**
+ * Navigation Component
+ *
+ * A responsive navigation component with mobile menu support,
+ * theme toggle, search functionality, and accessibility features.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <Navigation activeNav="posts" />
+ * ```
+ */
+
 import LinkButton from "@/components/elements/LinkButton.astro";
 import ThemeToggle from "@/components/elements/ThemeToggle.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
@@ -6,35 +19,40 @@ import type { NavigationLink } from "@/data/navigation";
 import { LOGO_IMAGE, SITE } from "@/config";
 import MenuIcon from "@/components/elements/Icon.astro";
 
-export interface Props {
+interface Props {
+  /** Currently active navigation item */
   activeNav?: NavigationLink;
 }
 
-const { activeNav } = Astro.props;
-const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
-
 interface NavLink {
+  /** URL for the link */
   href: string;
+  /** Navigation key for active state */
   key: NavigationLink;
+  /** Display label */
   label: string;
 }
 
+interface ActionButton extends NavLink {
+  /** Icon name from the icon set */
+  icon: "archive" | "search";
+  /** Whether to show text on mobile */
+  showTextOnMobile: boolean;
+}
+
+const { activeNav }: Props = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Define main navigation links
 const NAV_LINKS: NavLink[] = [
   { href: "/posts/", key: "posts", label: t("nav.posts") },
-  /*
-  { href: "/categories/", key: "categories", label: t("nav.categories") },
-  { href: "/tags/", key: "tags", label: t("nav.tags") },
-   */
   { href: "/glossary/", key: "glossary", label: t("nav.glossary") },
   { href: "/about/", key: "about", label: t("nav.about") },
 ];
 
-interface ActionButton extends NavLink {
-  icon: "archive" | "search";
-  showTextOnMobile: boolean;
-}
-
+// Define action buttons
 const ACTION_BUTTONS: ActionButton[] = [
   SITE.showArchives && {
     href: "/archives/",
@@ -51,14 +69,50 @@ const ACTION_BUTTONS: ActionButton[] = [
     showTextOnMobile: false,
   },
 ].filter((button): button is ActionButton => Boolean(button));
+
+// Memoize common class names
+const navClasses = [
+  "nav-container h-16",
+  "bg-skin-fill/75 backdrop-blur-md",
+  "transition-all duration-200",
+].join(" ");
+
+const menuButtonClasses = ["flex h-16 items-center p-2 md:hidden"].join(" ");
+
+const menuItemsClasses = [
+  "fixed right-4 top-16 hidden",
+  "rounded-lg border-2 border-skin-line bg-skin-fill shadow-lg",
+  "md:static md:flex md:border-none md:bg-transparent md:shadow-none",
+].join(" ");
+
+const menuListClasses = [
+  "grid w-44 grid-cols-2 grid-rows-4 gap-x-2 gap-y-2 p-4",
+  "md:flex md:w-auto md:grid-cols-none md:grid-rows-none",
+  "md:items-center md:gap-x-5 md:gap-y-0 md:p-0",
+].join(" ");
+
+const linkClasses = [
+  "w-full px-4 py-3 text-center font-medium",
+  "hover:text-skin-accent",
+  "md:my-0 md:w-auto md:px-2 md:py-1",
+].join(" ");
+
+// Memoize translated strings
+const menuLabels = {
+  open: t("nav.openMenu"),
+  close: t("nav.closeMenu"),
+};
 ---
 
 <header class="sticky top-0 z-20 w-full">
   <nav
-    class="nav-container h-16 bg-skin-fill/75 backdrop-blur-md transition-all duration-200"
+    class={navClasses}
+    role="navigation"
+    aria-label={t("nav.mainNavigation")}
   >
     <div class="mx-auto flex h-16 w-full items-center justify-between">
-      <a href="/" class="flex h-16 items-center">
+      <!-- Logo/Home Link -->
+      <a href="/" class="flex h-16 items-center" aria-label={t("nav.home")}>
         {
           LOGO_IMAGE.enable ? (
             <img
@@ -75,12 +129,14 @@ const ACTION_BUTTONS: ActionButton[] = [
       </a>
 
       <div class="flex items-center">
+        <!-- Mobile Menu Button -->
         <button
           id="hamburger-menu"
-          class="flex h-16 items-center p-2 md:hidden"
-          aria-label="Open Menu"
+          class={menuButtonClasses}
+          aria-label={t("nav.toggleMenu")}
           aria-expanded="false"
           aria-controls="menu-items"
+          data-labels={JSON.stringify(menuLabels)}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -93,6 +149,7 @@ const ACTION_BUTTONS: ActionButton[] = [
             stroke-linecap="round"
             stroke-linejoin="round"
             class="menu-icon h-6 w-6"
+            aria-hidden="true"
           >
             <line x1="7" y1="12" x2="21" y2="12" class="line"></line>
             <line x1="3" y1="6" x2="21" y2="6" class="line"></line>
@@ -102,20 +159,16 @@ const ACTION_BUTTONS: ActionButton[] = [
           </svg>
         </button>
 
-        <div
-          id="menu-items"
-          class="fixed right-4 top-16 hidden rounded-lg border-2 border-skin-line bg-skin-fill shadow-lg md:static md:flex md:border-none md:bg-transparent md:shadow-none"
-        >
-          <ul
-            class="grid w-44 grid-cols-2 grid-rows-4 gap-x-2 gap-y-2 p-4 md:flex md:w-auto md:grid-cols-none md:grid-rows-none md:items-center md:gap-x-5 md:gap-y-0 md:p-0"
-          >
+        <!-- Navigation Menu -->
+        <div id="menu-items" class={menuItemsClasses}>
+          <ul class={menuListClasses}>
             {
               NAV_LINKS.map(({ href, key, label }) => (
                 <li class="col-span-2 flex items-center justify-center">
                   <a
                     href={href}
                     class:list={[
-                      "w-full px-4 py-3 text-center font-medium hover:text-skin-accent md:my-0 md:w-auto md:px-2 md:py-1",
+                      linkClasses,
                       activeNav === key &&
                         "text-skin-accent underline decoration-wavy decoration-2 underline-offset-4",
                     ]}
@@ -135,7 +188,7 @@ const ACTION_BUTTONS: ActionButton[] = [
                     <LinkButton
                       href={href}
                       className={`action-button ${activeNav === key ? "active" : ""}`}
-                      ariaLabel={label}
+                      aria-label={label}
                       title={label}
                     >
                       <MenuIcon name={icon} active={activeNav === key} />
@@ -156,29 +209,37 @@ const ACTION_BUTTONS: ActionButton[] = [
 </header>
 
 <style>
+  /* Menu icon animations */
   .menu-icon .line {
     @apply transition-opacity duration-200;
   }
+
   .menu-icon .close {
     @apply opacity-0 transition-opacity duration-200;
   }
+
   #hamburger-menu[aria-expanded="true"] .line {
     @apply opacity-0;
   }
+
   #hamburger-menu[aria-expanded="true"] .close {
     @apply opacity-100;
   }
 
+  /* Action button styles */
   :global(.action-button) {
     @apply flex items-center justify-center p-2 hover:text-skin-accent;
   }
+
   :global(.action-button.active) {
     @apply text-skin-accent;
   }
+
   :global(.action-button svg) {
     @apply h-6 w-6;
   }
 
+  /* Navigation container styles */
   .nav-container {
     @apply px-4 py-3 transition-all duration-200;
     border-bottom: 2px solid transparent;
@@ -187,41 +248,116 @@ const ACTION_BUTTONS: ActionButton[] = [
   .nav-container.scrolled {
     @apply border-b-2 border-skin-accent px-4 py-1;
   }
+
+  /* Focus styles */
+  a:focus-visible,
+  button:focus-visible {
+    @apply outline-none ring-2 ring-skin-accent ring-offset-2;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .nav-container,
+    .menu-icon .line,
+    .menu-icon .close {
+      @apply transition-none;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    header {
+      @apply hidden;
+    }
+  }
+
+  /* High contrast mode */
+  @media (forced-colors: active) {
+    .nav-container {
+      @apply border-b-2 border-[ButtonText];
+    }
+  }
+
+  /* Dark mode adjustments */
+  :global(.dark) .nav-container {
+    @apply bg-skin-fill/90;
+  }
 </style>
 
 <script>
-  function toggleNav() {
+  /**
+   * Enhances navigation with mobile menu and scroll behavior
+   */
+  function setupNavigation() {
     const menuBtn = document.getElementById("hamburger-menu");
     const menuItems = document.getElementById("menu-items");
+    const nav = document.querySelector(".nav-container");
 
-    if (!menuBtn || !menuItems) return;
+    if (!menuBtn || !menuItems || !nav) return;
 
-    menuBtn.addEventListener("click", () => {
+    // Get menu labels
+    const labels = menuBtn.dataset.labels
+      ? JSON.parse(menuBtn.dataset.labels)
+      : {
+          open: "Open Menu",
+          close: "Close Menu",
+        };
+
+    // Toggle mobile menu
+    const toggleMenu = () => {
       const isExpanded = menuBtn.getAttribute("aria-expanded") === "true";
       menuBtn.setAttribute("aria-expanded", (!isExpanded).toString());
       menuBtn.setAttribute(
         "aria-label",
-        isExpanded ? "Open Menu" : "Close Menu"
+        isExpanded ? labels.open : labels.close
       );
       menuItems.classList.toggle("hidden");
-    });
+    };
+
+    // Handle scroll behavior
+    const handleScroll = () => {
+      const scrollThreshold = window.innerHeight * 0.25;
+      const isScrolled = window.scrollY > scrollThreshold;
+      nav.classList.toggle("scrolled", isScrolled);
+    };
+
+    // Add event listeners
+    menuBtn.addEventListener("click", toggleMenu);
+
+    // Add scroll listener with debounce
+    let scrollTimeout: number;
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (scrollTimeout) {
+          window.cancelAnimationFrame(scrollTimeout);
+        }
+        scrollTimeout = window.requestAnimationFrame(handleScroll);
+      },
+      { passive: true }
+    );
+
+    // Cleanup function
+    return () => {
+      menuBtn.removeEventListener("click", toggleMenu);
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollTimeout) {
+        window.cancelAnimationFrame(scrollTimeout);
+      }
+    };
   }
 
-  function handleScroll() {
-    const nav = document.querySelector(".nav-container");
-    if (!nav) return;
+  // Initialize on page load
+  let cleanup = setupNavigation();
 
-    const scrollThreshold = window.innerHeight * 0.25; // 25% of viewport height
-    const isScrolled = window.scrollY > scrollThreshold;
+  // Re-initialize after Astro page transitions
+  document.addEventListener("astro:after-swap", () => {
+    if (cleanup) cleanup();
+    cleanup = setupNavigation();
+  });
 
-    nav.classList.toggle("scrolled", isScrolled);
-  }
-
-  // Initialize
-  toggleNav();
-  handleScroll();
-
-  // Event listeners
-  document.addEventListener("astro:after-swap", toggleNav);
-  window.addEventListener("scroll", handleScroll);
+  // Cleanup on page unload
+  document.addEventListener("astro:before-swap", () => {
+    if (cleanup) cleanup();
+  });
 </script>

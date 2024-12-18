@@ -1,35 +1,186 @@
 ---
-import { SOCIALS } from "@/config";
-import LinkButton from "@/components/elements/LinkButton.astro";
-import socialIcons from "@/assets/socialIcons";
+/**
+ * Socials Component
+ *
+ * A component for displaying social media links with icons
+ * and accessibility features.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <Socials centered={true} />
+ * ```
+ */
 
-export interface Props {
+import { SOCIALS } from "@/config";
+import socialIcons from "@/assets/socialIcons";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+interface Props {
+  /** Whether to center the social icons */
   centered?: boolean;
 }
 
-const { centered = false } = Astro.props;
+const { centered = false }: Props = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Filter active social links
+const activeSocials = SOCIALS.filter(social => social.active);
+
+// Memoize common class names
+const containerClasses = [
+  "social-icons",
+  "flex-wrap justify-center gap-1",
+  centered ? "flex" : "",
+]
+  .filter(Boolean)
+  .join(" ");
+
+const buttonClasses = [
+  "link-button",
+  "p-2 hover:rotate-6 sm:p-1",
+  "transition-transform duration-200",
+  "focus:outline-none focus:ring-2 focus:ring-skin-accent focus:ring-offset-2",
+].join(" ");
 ---
 
-<div class={`social-icons ${centered ? "flex" : ""}`}>
+<div
+  class={containerClasses}
+  role="navigation"
+  aria-label={t("socials.navigation")}
+>
   {
-    SOCIALS.filter(social => social.active).map(social => (
-      <LinkButton
-        href={social.href}
-        className="link-button"
-        title={social.linkTitle}
-      >
-        <Fragment set:html={socialIcons[social.name]} />
-        <span class="sr-only">{social.linkTitle}</span>
-      </LinkButton>
-    ))
+    activeSocials.map(social => {
+      const ariaLabel = t("socials.visitProfile").replace(
+        "{platform}",
+        social.name
+      );
+      return (
+        <a
+          href={social.href}
+          class={buttonClasses}
+          title={social.linkTitle}
+          aria-label={ariaLabel}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Fragment set:html={socialIcons[social.name]} />
+          <span class="sr-only">{social.linkTitle}</span>
+        </a>
+      );
+    })
   }
 </div>
 
-<style lang="postcss">
+<style>
+  /* Base styles */
   .social-icons {
-    @apply flex-wrap justify-center gap-1;
+    @apply transition-colors duration-300;
   }
-  .link-button {
-    @apply p-2 hover:rotate-6 sm:p-1;
+
+  /* Icon styles */
+  .link-button :global(svg) {
+    @apply h-6 w-6 transition-transform duration-200;
+  }
+
+  /* Hover effects */
+  .link-button:hover :global(svg) {
+    @apply scale-110;
+  }
+
+  /* Focus styles */
+  .link-button:focus-visible {
+    @apply rotate-0 outline-none ring-2 ring-skin-accent ring-offset-2;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .social-icons,
+    .link-button,
+    .link-button :global(svg) {
+      @apply transform-none transition-none;
+    }
+
+    .link-button:hover {
+      @apply rotate-0;
+    }
+
+    .link-button:hover :global(svg) {
+      @apply scale-100;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .social-icons {
+      @apply hidden;
+    }
+  }
+
+  /* High contrast mode */
+  @media (forced-colors: active) {
+    .link-button {
+      @apply border border-[ButtonText];
+    }
+  }
+
+  /* Dark mode adjustments */
+  :global(.dark) .social-icons {
+    @apply bg-skin-fill/5;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .link-button {
+      @apply p-2;
+    }
+
+    .link-button :global(svg) {
+      @apply h-5 w-5;
+    }
   }
 </style>
+
+<script>
+  /**
+   * Enhances social links with keyboard navigation
+   */
+  function setupSocials() {
+    const links = document.querySelectorAll<HTMLAnchorElement>(".link-button");
+
+    const handleKeydown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        target.click();
+      }
+    };
+
+    links.forEach(link => {
+      link.addEventListener("keydown", handleKeydown);
+    });
+
+    // Cleanup function
+    return () => {
+      links.forEach(link => {
+        link.removeEventListener("keydown", handleKeydown);
+      });
+    };
+  }
+
+  // Initialize on page load
+  let cleanup = setupSocials();
+
+  // Re-initialize after Astro page transitions
+  document.addEventListener("astro:after-swap", () => {
+    if (cleanup) cleanup();
+    cleanup = setupSocials();
+  });
+
+  // Cleanup on page unload
+  document.addEventListener("astro:before-swap", () => {
+    if (cleanup) cleanup();
+  });
+</script>

@@ -1,8 +1,30 @@
 ---
-import type { Content as Props } from "@/types/components";
+/**
+ * Content Component
+ *
+ * A flexible section component that displays content with optional title,
+ * subtitle, tagline, call-to-action buttons, and a side image.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <Content
+ *   title="Main Title"
+ *   subtitle="Subtitle text"
+ *   items={[{ title: "Feature 1", description: "Description" }]}
+ * />
+ * ```
+ */
+
+import type { Content as ContentProps } from "@/types/components";
 import Button from "@/components/elements/Button.astro";
 import Headline from "@/components/sections/Headline.astro";
 import ItemGrid from "@/components/sections/ItemGrid.astro";
+
+interface Props extends ContentProps {
+  /** Whether the content is rendered after another content section */
+  isAfterContent?: boolean;
+}
 
 const {
   title = await Astro.slots.render("title"),
@@ -18,15 +40,33 @@ const {
   id,
   classes = {},
 }: Props = Astro.props;
+
+// Memoize common class names
+const containerClasses = [
+  "m-12 mx-auto max-w-content",
+  isAfterContent ? "pt-0 md:pt-0 lg:pt-0" : "",
+  classes?.container ?? "",
+]
+  .filter(Boolean)
+  .join(" ");
+
+const contentClasses = ["not-prose mb-2 text-skin-base", classes?.content ?? ""]
+  .filter(Boolean)
+  .join(" ");
+
+const flexClasses = [
+  "md:flex",
+  isReversed ? "md:flex-row-reverse" : "",
+  "rounded-r-md md:gap-8",
+]
+  .filter(Boolean)
+  .join(" ");
 ---
 
 <section
   id={id}
-  class:list={[
-    "m-12 mx-auto max-w-content",
-    isAfterContent ? "pt-0 md:pt-0 lg:pt-0" : "",
-    classes?.container ?? "",
-  ]}
+  class={containerClasses}
+  aria-labelledby={id ? `${id}-title` : undefined}
 >
   <Headline
     title={title}
@@ -38,26 +78,22 @@ const {
       subtitle: "max-w-4xl mx-auto sm:text-center text-xl text-skin-accent",
     }}
   />
+
   <div class="mx-auto max-w-7xl rounded-md border-2 border-skin-muted/10">
-    <div
-      class:list={[
-        "md:flex",
-        isReversed ? "md:flex-row-reverse" : "",
-        "rounded-r-md md:gap-8",
-      ]}
-    >
+    <div class={flexClasses}>
+      <!-- Content Column -->
       <div class="self-center md:basis-1/2">
         <div class="p-4">
-          {
-            content && (
-              <div class="not-prose mb-2 text-skin-base" set:html={content} />
-            )
-          }
+          {content && <div class={contentClasses} set:html={content} />}
 
           {
             callToAction && (
               <div class="mb-8 mt-[-40px] text-skin-base">
-                <Button variant="link" {...callToAction} />
+                <Button
+                  variant="link"
+                  {...callToAction}
+                  aria-label={callToAction.text}
+                />
               </div>
             )
           }
@@ -77,15 +113,55 @@ const {
           }}
         />
       </div>
-      <div aria-hidden="true" class="mt-10 md:mt-0 md:basis-1/2">
-        {
-          image && typeof image === "string" && (
+
+      <!-- Image Column -->
+      {
+        image && (
+          <div aria-hidden="true" class="mt-10 md:mt-0 md:basis-1/2">
             <div class="mx-auto h-full max-w-full">
               <Fragment set:html={image} />
             </div>
-          )
-        }
-      </div>
+          </div>
+        )
+      }
     </div>
   </div>
 </section>
+
+<style>
+  /* Smooth transitions */
+  section {
+    @apply transition-all duration-300;
+  }
+
+  /* Focus styles */
+  section:focus-within {
+    @apply ring-2 ring-skin-accent ring-offset-2;
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    section,
+    .transition-all {
+      @apply transition-none;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    section {
+      @apply break-inside-avoid shadow-none;
+    }
+
+    .border-2 {
+      @apply border-0;
+    }
+  }
+
+  /* Responsive layout */
+  @media (max-width: 768px) {
+    .md\:basis-1\/2 {
+      @apply w-full;
+    }
+  }
+</style>
