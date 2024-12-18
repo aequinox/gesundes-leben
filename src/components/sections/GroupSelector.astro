@@ -78,29 +78,50 @@ const ariaLabel = t("group.select").replace("{type}", title);
 // Memoize common class names
 const buttonClasses = [
   "group-selector group",
-  "transition-all delay-100 duration-300 ease-in-out",
+  "transition-all duration-500 ease-out",
+  "hover:scale-[1.02]",
   position,
 ]
   .filter(Boolean)
   .join(" ");
 
 const cardClasses = [
-  "h-full rounded-sm border-2 border-solid p-6 text-center text-lg",
-  "transition delay-100 duration-300 ease-in-out",
+  "h-full rounded-xl p-8 text-center",
+  "backdrop-blur-md backdrop-saturate-200",
+  "border border-solid border-opacity-30",
+  "transition duration-500 ease-out",
   `${groupType}-card`,
 ].join(" ");
 
 const iconContainerClasses = [
-  "group-type-icon hidden",
-  "group-hover:-translate-y-1",
+  "group-type-icon",
+  "transform transition-all duration-500",
+  "group-hover:-translate-y-2 group-hover:scale-110",
   "md:block",
 ].join(" ");
 
 const iconWrapperClasses = [
-  "inline-block max-w-full items-start justify-center overflow-hidden",
-  "rounded-full border-4 border-solid bg-skin-fill p-3",
-  `group-hover:border-${groupType}/90`,
-  `border-${groupType}/50`,
+  "inline-flex items-center justify-center",
+  "rounded-2xl border-2 border-solid",
+  "bg-skin-fill/80 backdrop-blur-md",
+  "p-4",
+  `group-hover:border-${groupType}`,
+  `border-${groupType}/40`,
+  `icon-wrapper-${groupType}`,
+].join(" ");
+
+const titleClasses = [
+  "text-skin mb-4 mt-2",
+  "lg:text-4xl md:text-3xl text-5xl font-bold capitalize leading-tight",
+  "tracking-tight",
+  "transition-colors duration-300",
+  `group-hover:text-${groupType}`,
+].join(" ");
+
+const sloganClasses = [
+  "text-skin lg:text-lg leading-relaxed",
+  "transition-colors duration-300",
+  "opacity-95 group-hover:opacity-100",
 ].join(" ");
 ---
 
@@ -116,7 +137,7 @@ const iconWrapperClasses = [
         <Icon
           name={icon}
           class:list={[
-            "bg-skin h-10 w-10 text-xl text-skin-accent",
+            "h-12 w-12 transition-transform duration-500",
             `${groupType}-icon`,
           ]}
           aria-hidden="true"
@@ -124,12 +145,10 @@ const iconWrapperClasses = [
       </div>
     </div>
     <div class="cursor-pointer">
-      <h2
-        class="text-skin mb-3 mt-1 text-4xl font-semibold capitalize leading-8"
-      >
+      <h2 class={titleClasses}>
         {title}
       </h2>
-      <p class="text-skin">{slogan}</p>
+      <p class={sloganClasses}>{slogan}</p>
     </div>
   </div>
 </button>
@@ -137,60 +156,94 @@ const iconWrapperClasses = [
 <style>
   /* Icon styles */
   .group-type-icon {
-    @apply -mt-16 mb-5 max-w-full cursor-pointer leading-none text-skin-fill;
-    @apply transition delay-150 duration-500 group-hover:scale-105;
+    @apply -mt-20 mb-6 cursor-pointer leading-none;
+    @apply transition-all duration-500;
   }
 
-  /* Card styles */
+  /* Card styles with enhanced glass morphism for dark mode */
   .pro-card {
-    @apply border-none bg-gradient-to-t from-pro from-10% via-pro via-30% to-transparent to-95%;
+    @apply bg-gradient-to-br from-pro/20 via-pro/10 to-transparent;
+    @apply dark:from-pro/30 dark:via-pro/15 dark:to-transparent/10;
+    @apply shadow-[0_8px_32px_0_rgba(var(--color-pro-rgb),0.2)];
+    @apply hover:shadow-[0_8px_40px_0_rgba(var(--color-pro-rgb),0.35)];
+    @apply dark:shadow-[0_8px_32px_0_rgba(var(--color-pro-rgb),0.3)];
+    @apply dark:hover:shadow-[0_8px_40px_0_rgba(var(--color-pro-rgb),0.45)];
   }
 
   .contra-card {
-    @apply border-none bg-gradient-to-t from-contra from-10% via-contra via-30% to-transparent to-95%;
+    @apply bg-gradient-to-br from-contra/20 via-contra/10 to-transparent;
+    @apply dark:from-contra/30 dark:via-contra/15 dark:to-transparent/10;
+    @apply shadow-[0_8px_32px_0_rgba(var(--color-contra-rgb),0.2)];
+    @apply hover:shadow-[0_8px_40px_0_rgba(var(--color-contra-rgb),0.35)];
+    @apply dark:shadow-[0_8px_32px_0_rgba(var(--color-contra-rgb),0.3)];
+    @apply dark:hover:shadow-[0_8px_40px_0_rgba(var(--color-contra-rgb),0.45)];
   }
 
   .question-time-card {
-    @apply border-none bg-gradient-to-t from-question-time from-10% via-question-time via-30% to-transparent to-95%;
+    @apply bg-gradient-to-br from-question-time/20 via-question-time/10 to-transparent;
+    @apply dark:from-question-time/30 dark:via-question-time/15 dark:to-transparent/10;
+    @apply shadow-[0_8px_32px_0_rgba(var(--color-question-time-rgb),0.2)];
+    @apply hover:shadow-[0_8px_40px_0_rgba(var(--color-question-time-rgb),0.35)];
+    @apply dark:shadow-[0_8px_32px_0_rgba(var(--color-question-time-rgb),0.3)];
+    @apply dark:hover:shadow-[0_8px_40px_0_rgba(var(--color-question-time-rgb),0.45)];
   }
 
-  /* Icon colors */
+  /* Icon colors with enhanced contrast and glow effects */
   .pro-icon {
-    @apply text-pro;
+    @apply text-pro drop-shadow-md;
+    @apply dark:text-pro dark:drop-shadow-[0_0_8px_rgba(var(--color-pro-rgb),0.5)];
   }
 
   .contra-icon {
-    @apply text-contra;
+    @apply text-contra drop-shadow-md;
+    @apply dark:text-contra dark:drop-shadow-[0_0_8px_rgba(var(--color-contra-rgb),0.5)];
   }
 
   .question-time-icon {
-    @apply text-question-time;
+    @apply text-question-time drop-shadow-md;
+    @apply dark:text-question-time dark:drop-shadow-[0_0_8px_rgba(var(--color-question-time-rgb),0.5)];
+  }
+
+  /* Icon wrapper glow effects for dark mode */
+  .icon-wrapper-pro {
+    @apply dark:shadow-[0_0_15px_rgba(var(--color-pro-rgb),0.2)];
+    @apply dark:group-hover:shadow-[0_0_20px_rgba(var(--color-pro-rgb),0.3)];
+  }
+
+  .icon-wrapper-contra {
+    @apply dark:shadow-[0_0_15px_rgba(var(--color-contra-rgb),0.2)];
+    @apply dark:group-hover:shadow-[0_0_20px_rgba(var(--color-contra-rgb),0.3)];
+  }
+
+  .icon-wrapper-question-time {
+    @apply dark:shadow-[0_0_15px_rgba(var(--color-question-time-rgb),0.2)];
+    @apply dark:group-hover:shadow-[0_0_20px_rgba(var(--color-question-time-rgb),0.3)];
   }
 
   /* Position styles */
   .middle {
-    @apply order-2;
+    @apply order-2 md:mx-4;
   }
 
   .left {
-    @apply order-1;
+    @apply order-1 md:mr-4;
   }
 
   .right {
-    @apply order-3;
+    @apply order-3 md:ml-4;
   }
 
   /* Focus styles */
   button:focus-visible {
-    @apply outline-none ring-2 ring-skin-accent ring-offset-2;
+    @apply outline-none ring-2 ring-skin-accent ring-offset-4;
   }
 
   /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
     .transition-all,
     .transition,
-    .group-hover\:scale-105,
-    .group-hover\:-translate-y-1 {
+    .group-hover\:scale-110,
+    .group-hover\:-translate-y-2 {
       @apply transform-none transition-none;
     }
   }
