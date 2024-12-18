@@ -29,8 +29,11 @@ interface UITranslations {
   "nav.toggleMenu": string;
   "nav.openMenu": string;
   "nav.closeMenu": string;
+  "nav.backHome": string;
   "nav.backToTop": string;
+  "nav.page": string;
   "nav.themeToggle": string;
+  "nav.searchDescription": string;
 
   // Categories and Tags
   "category.name": string;
@@ -56,6 +59,7 @@ interface UITranslations {
   "socials.visitProfile": string;
 
   // Posts
+  "post.allTags": string;
   "post.minuteRead": string;
   "post.minutesRead": string;
   "post.publishDate": string;
@@ -66,6 +70,8 @@ interface UITranslations {
   "post.readMore": string;
   "post.backToTop": string;
   "post.share": string;
+  "post.withTag": string;
+  "post.withCategory": string;
 
   // Search
   "search.label": string;
@@ -98,6 +104,7 @@ interface UITranslations {
   "footer.rights": string;
 
   // Glossary
+  "glossary.all": string;
   "glossary.excerpt": string;
   "glossary.readMore": string;
   "glossary.readMoreLabel": string;
@@ -119,6 +126,10 @@ interface UITranslations {
   // Author
   "author.from": string;
   "author.name": string;
+
+  // Errors and Warnings
+  "errors.404.title": string;
+  "errors.404.description": string;
 }
 
 export const ui: Record<
@@ -142,8 +153,11 @@ export const ui: Record<
     "nav.toggleMenu": "Toggle menu",
     "nav.openMenu": "Open menu",
     "nav.closeMenu": "Close menu",
+    "nav.backHome": "Back to homepage",
     "nav.backToTop": "Back to top",
+    "nav.page": "Page {page}",
     "nav.themeToggle": "Toggle theme",
+    "nav.searchDescription": "Search through posts, categories and tags.",
 
     // Categories and Tags
     "category.name": "Category",
@@ -169,6 +183,7 @@ export const ui: Record<
     "socials.visitProfile": "Visit {platform} profile",
 
     // Posts
+    "post.allTags": "All Tags",
     "post.minuteRead": "minute read",
     "post.minutesRead": "minutes read",
     "post.publishDate": "Published:",
@@ -179,6 +194,8 @@ export const ui: Record<
     "post.readMore": "Read more",
     "post.backToTop": "Back to top",
     "post.share": "Share this post",
+    "post.withTag": "with tags",
+    "post.withCategory": "in category",
 
     // Search
     "search.label": "Search",
@@ -212,6 +229,7 @@ export const ui: Record<
     "footer.rights": "All rights reserved.",
 
     // Glossary
+    "glossary.all": "All glossary entries",
     "glossary.excerpt": "Entry excerpt",
     "glossary.readMore": "Read more about {title}",
     "glossary.readMoreLabel": "Read more",
@@ -236,6 +254,10 @@ export const ui: Record<
     // Author
     "author.from": "from",
     "author.name": "Author",
+
+    // Errors and Warnings
+    "errors.404.title": "Page not found",
+    "errors.404.description": "The page you are looking for was not found.",
   },
 
   de: {
@@ -255,8 +277,11 @@ export const ui: Record<
     "nav.toggleMenu": "Menü umschalten",
     "nav.openMenu": "Menü öffnen",
     "nav.closeMenu": "Menü schließen",
+    "nav.backHome": "Zur Startseite",
     "nav.backToTop": "Nach oben",
+    "nav.page": "Seite {page}",
     "nav.themeToggle": "Theme umschalten",
+    "nav.searchDescription": "Durchsucht Beiträge, Kategorien und Tags.",
 
     // Categories and Tags
     "category.name": "Kategorie",
@@ -282,6 +307,7 @@ export const ui: Record<
     "socials.visitProfile": "{platform} Profil besuchen",
 
     // Posts
+    "post.allTags": "Alle Tags",
     "post.minuteRead": "Minute Lesezeit",
     "post.minutesRead": "Minuten Lesezeit",
     "post.publishDate": "Veröffentlicht:",
@@ -292,6 +318,8 @@ export const ui: Record<
     "post.readMore": "Weiterlesen",
     "post.backToTop": "Nach oben",
     "post.share": "Beitrag teilen",
+    "post.withTag": "mit Tags",
+    "post.withCategory": "in Kategorie",
 
     // Search
     "search.label": "Suche",
@@ -325,6 +353,7 @@ export const ui: Record<
     "footer.rights": "Alle Rechte vorbehalten.",
 
     // Glossary
+    "glossary.all": "Alle Glossareinträge",
     "glossary.excerpt": "Eintrag Auszug",
     "glossary.readMore": "Mehr über {title} lesen",
     "glossary.readMoreLabel": "Weiterlesen",
@@ -349,6 +378,11 @@ export const ui: Record<
     // Author
     "author.from": "von",
     "author.name": "Autor",
+
+    // Errors and Warnings
+    "errors.404.title": "Seite nicht gefunden",
+    "errors.404.description":
+      "Die Seite, die Sie suchen, wurde nicht gefunden.",
   },
 };
 

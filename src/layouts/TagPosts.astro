@@ -28,7 +28,7 @@ const t = useTranslations(lang);
   <Main
     pageTitle={[`Tag:`, `${tagName}`]}
     titleTransition={tag}
-    pageDesc={`${t("articles.withTag")} "${tagName}".`}
+    pageDesc={`${t("post.withTag")} "${tagName}".`}
     data-pagefind-ignore="all"
   >
     <h1 slot="title" transition:name={tag}>{`Tag:${tagName}`}</h1>

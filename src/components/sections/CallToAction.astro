@@ -99,8 +99,7 @@ const buttonContainerClasses = [
       (actions || Astro.props.actions) && (
         <div class={buttonContainerClasses}>
           {Array.isArray(Astro.props.actions) ? (
-            // eslint-disable-next-line no-unused-vars
-            Astro.props.actions.map((action, index) => (
+            Astro.props.actions.map(action => (
               <div class="flex w-full sm:w-auto">
                 {isCallToAction(action) ? (
                   <Button

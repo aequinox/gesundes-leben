@@ -107,8 +107,7 @@ const sectionId = `references-${Math.random().toString(36).substring(2, 9)}`;
 
   <ul class="space-y-4" role="list">
     {
-      // eslint-disable-next-line no-unused-vars
-      sortedReferences.map((ref, index) => (
+      sortedReferences.map(ref => (
         <li class="reference-item text-sm leading-relaxed" role="listitem">
           <div class="citation-content">
             {/* Authors */}

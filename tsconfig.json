@@ -69,6 +69,13 @@
      *
      * @see https://www.typescriptlang.org/tsconfig#allowJs
      */
-    "allowJs": true
+    "allowJs": true,
+
+    /**
+     * Specify the module resolution strategy
+     *
+     * @see https://www.typescriptlang.org/tsconfig#moduleResolution
+     */
+    "moduleResolution": "bundler"
   }
 }
