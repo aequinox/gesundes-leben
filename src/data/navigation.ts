@@ -6,5 +6,6 @@ export type NavigationLink =
   | "glossary"
   | "groups"
   | "posts"
+  | "references"
   | "search"
   | "tags";

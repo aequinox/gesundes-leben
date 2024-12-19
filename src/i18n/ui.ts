@@ -18,9 +18,10 @@ interface UITranslations {
   "nav.about": string;
   "nav.posts": string;
   "nav.tags": string;
+  "nav.categories": string;
+  "nav.references": string;
   "nav.search": string;
   "nav.archives": string;
-  "nav.categories": string;
   "nav.glossary": string;
   "nav.prev": string;
   "nav.next": string;
@@ -145,6 +146,7 @@ export const ui: Record<
     "nav.search": "Search",
     "nav.archives": "Archives",
     "nav.categories": "Categories",
+    "nav.references": "References",
     "nav.glossary": "Glossary",
     "nav.prev": "Previous",
     "nav.next": "Next",
@@ -269,6 +271,7 @@ export const ui: Record<
     "nav.search": "Suche",
     "nav.archives": "Archiv",
     "nav.categories": "Kategorien",
+    "nav.references": "Quellen",
     "nav.glossary": "Glossar",
     "nav.prev": "Zurück",
     "nav.next": "Weiter",

@@ -43,11 +43,19 @@ export class ReferenceUtils {
    */
   public static async getAllReferences(): Promise<ReferenceEntry[]> {
     try {
-      if (!ReferenceUtils.referenceCache) {
+      if (ReferenceUtils.referenceCache === null) {
         ReferenceUtils.referenceCache = await getCollection("references");
+      }
+      if (!Array.isArray(ReferenceUtils.referenceCache)) {
+        throw new ReferenceError(
+          "Failed to fetch references. The reference cache is not an array."
+        );
       }
       return ReferenceUtils.referenceCache;
     } catch (error) {
+      if (error instanceof ReferenceError) {
+        throw error;
+      }
       throw new ReferenceError("Failed to fetch references", error);
     }
   }

@@ -1,0 +1,71 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/sections/Header.astro";
+import Footer from "../components/sections/Footer.astro";
+import {
+  formatCitation,
+  sortReferences,
+  SortCriterion,
+  SortOrder,
+} from "../utils/references";
+import type { Reference } from "../types/references";
+
+const references = await getCollection("references");
+const sortedReferences = sortReferences(
+  references,
+  SortCriterion.YEAR,
+  SortOrder.DESC
+);
+---
+
+<Layout title="References | Academic Citations">
+  <Header />
+  <main class="mx-auto max-w-content px-4 py-12">
+    <h1 class="mb-8 text-3xl font-bold">Academic References</h1>
+
+    <div class="space-y-6">
+      {
+        sortedReferences.map((reference: Reference) => (
+          <div class="rounded-lg border-2 border-skin-line bg-skin-fill p-6">
+            <p class="mb-2 text-lg font-medium text-skin-accent">
+              {reference.data.title}
+            </p>
+            <p class="mb-4 text-skin-base">{formatCitation(reference)}</p>
+            {reference.data.abstract && (
+              <p class="mb-4 text-sm text-skin-base">
+                {reference.data.abstract}
+              </p>
+            )}
+            {reference.data.keywords && reference.data.keywords.length > 0 && (
+              <div class="flex flex-wrap gap-2">
+                {reference.data.keywords.map((keyword: string) => (
+                  <span class="rounded-full bg-skin-card px-3 py-1 text-xs text-skin-base">
+                    {keyword}
+                  </span>
+                ))}
+              </div>
+            )}
+            {reference.data.doi && (
+              <a
+                href={`https://doi.org/${reference.data.doi}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="mt-4 inline-block text-sm text-skin-accent hover:underline"
+              >
+                DOI: {reference.data.doi}
+              </a>
+            )}
+          </div>
+        ))
+      }
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  .max-w-content {
+    max-width: 65rem;
+  }
+</style>

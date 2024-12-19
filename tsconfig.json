@@ -34,12 +34,11 @@
     "baseUrl": "src",
 
     /**
-     * Specify JSX syntax with React JSX support
+     * Specify JSX syntax with Astro JSX support
      *
-     * @see https://www.typescriptlang.org/tsconfig#jsx
+     * @see https://docs.astro.build/en/guides/typescript/#jsx-configuration
      */
-    "jsx": "react-jsx",
-    "jsxImportSource": "react",
+    "jsx": "preserve",
 
     /**
      * Target the latest ECMAScript version for output
