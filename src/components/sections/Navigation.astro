@@ -2,8 +2,16 @@
 /**
  * Navigation Component
  *
- * A responsive navigation component with mobile menu support,
- * theme toggle, search functionality, and accessibility features.
+ * A modern, responsive navigation component that provides site-wide navigation with
+ * enhanced accessibility, mobile support, and performance optimizations.
+ *
+ * Features:
+ * - Responsive design with mobile-first approach
+ * - Enhanced accessibility with ARIA labels and keyboard navigation
+ * - Smooth animations with reduced motion support
+ * - Optimized performance with proper event handling
+ * - Theme toggle and search functionality
+ * - Print and high contrast mode optimizations
  *
  * @component
  * @example
@@ -19,11 +27,13 @@ import type { NavigationLink } from "@/data/navigation";
 import { LOGO_IMAGE, SITE } from "@/config";
 import MenuIcon from "@/components/elements/Icon.astro";
 
+// Type-safe component props
 interface Props {
   /** Currently active navigation item */
   activeNav?: NavigationLink;
 }
 
+// Type definitions for navigation items
 interface NavLink {
   /** URL for the link */
   href: string;
@@ -42,8 +52,18 @@ interface ActionButton extends NavLink {
 
 const { activeNav }: Props = Astro.props;
 
+// Internationalization setup
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+
+// Pre-compute translated strings for performance
+const i18nStrings = {
+  mainNav: t("nav.mainNavigation"),
+  home: t("nav.home"),
+  toggleMenu: t("nav.toggleMenu"),
+  openMenu: t("nav.openMenu"),
+  closeMenu: t("nav.closeMenu"),
+} as const;
 
 // Define main navigation links
 const NAV_LINKS: NavLink[] = [
@@ -55,7 +75,7 @@ const NAV_LINKS: NavLink[] = [
   { href: "/about/", key: "about", label: t("nav.about") },
 ];
 
-// Define action buttons
+// Define action buttons with type safety
 const ACTION_BUTTONS: ActionButton[] = [
   SITE.showArchives && {
     href: "/archives/",
@@ -73,152 +93,166 @@ const ACTION_BUTTONS: ActionButton[] = [
   },
 ].filter((button): button is ActionButton => Boolean(button));
 
-// Memoize common class names
-const navClasses = [
+// Utility function to combine Tailwind classes
+const tw = (...classes: string[]) => classes.filter(Boolean).join(" ");
+
+// Component-specific class compositions
+const navClasses = tw(
   "nav-container h-16",
-  "bg-skin-fill/75 backdrop-blur-md",
-  "transition-all duration-200",
-].join(" ");
+  "bg-skin-fill/85 backdrop-blur-lg",
+  "transition-all duration-200 ease-in-out",
+  "border-b border-skin-line/10",
+  "shadow-sm"
+);
 
-const menuButtonClasses = ["flex h-16 items-center p-2 md:hidden"].join(" ");
+const menuButtonClasses = tw(
+  "flex h-16 items-center p-2 md:hidden",
+  "hover:text-skin-accent focus:text-skin-accent",
+  "transition-colors duration-200"
+);
 
-const menuItemsClasses = [
+const menuItemsClasses = tw(
   "fixed right-4 top-16 hidden",
-  "rounded-lg border-2 border-skin-line bg-skin-fill shadow-lg",
-  "md:static md:flex md:border-none md:bg-transparent md:shadow-none",
-].join(" ");
+  "rounded-lg border border-skin-line bg-skin-fill/95",
+  "shadow-lg backdrop-blur-md",
+  "transform-gpu transition-transform duration-200",
+  "md:static md:flex md:transform-none",
+  "md:border-none md:bg-transparent md:shadow-none md:backdrop-blur-none"
+);
 
-const menuListClasses = [
-  "grid w-44 grid-cols-2 grid-rows-4 gap-x-2 gap-y-2 p-4",
+const menuListClasses = tw(
+  "grid w-44 grid-cols-2 grid-rows-4 gap-2 p-4",
   "md:flex md:w-auto md:grid-cols-none md:grid-rows-none",
-  "md:items-center md:gap-x-5 md:gap-y-0 md:p-0",
-].join(" ");
+  "md:items-center md:gap-x-5 md:gap-y-0 md:p-0"
+);
 
-const linkClasses = [
+const linkClasses = tw(
   "w-full px-4 py-3 text-center font-medium",
-  "hover:text-skin-accent",
-  "md:my-0 md:w-auto md:px-2 md:py-1",
-].join(" ");
+  "transition-colors duration-200",
+  "hover:text-skin-accent focus:text-skin-accent",
+  "md:my-0 md:w-auto md:px-2 md:py-1"
+);
 
-// Memoize translated strings
-const menuLabels = {
-  open: t("nav.openMenu"),
-  close: t("nav.closeMenu"),
-};
+const activeClasses = tw(
+  "text-skin-accent",
+  "underline decoration-wavy decoration-2 underline-offset-4"
+);
 ---
 
-<header class="sticky top-0 z-20 w-full">
-  <nav
-    class={navClasses}
-    role="navigation"
-    aria-label={t("nav.mainNavigation")}
-  >
-    <div class="mx-auto flex h-16 w-full items-center justify-between">
-      <!-- Logo/Home Link -->
-      <a href="/" class="flex h-16 items-center" aria-label={t("nav.home")}>
-        {
-          LOGO_IMAGE.enable ? (
-            <img
-              src={`/assets/${LOGO_IMAGE.svg ? "logo.svg" : "logo.png"}`}
-              alt={SITE.title}
-              width={LOGO_IMAGE.width}
-              height={LOGO_IMAGE.height}
-              loading="eager"
-            />
-          ) : (
-            SITE.title
-          )
-        }
-      </a>
+<nav class={navClasses} role="navigation" aria-label={i18nStrings.mainNav}>
+  <div class="mx-auto flex h-16 w-full items-center justify-between px-4">
+    {/* Logo/Home Link */}
+    <a
+      href="/"
+      class="flex h-16 items-center transition-opacity hover:opacity-80"
+      aria-label={i18nStrings.home}
+    >
+      {
+        LOGO_IMAGE.enable ? (
+          <img
+            src={`/assets/${LOGO_IMAGE.svg ? "logo.svg" : "logo.png"}`}
+            alt={SITE.title}
+            width={LOGO_IMAGE.width}
+            height={LOGO_IMAGE.height}
+            loading="eager"
+            class="h-auto max-h-10 w-auto"
+          />
+        ) : (
+          <span class="text-lg font-bold">{SITE.title}</span>
+        )
+      }
+    </a>
 
-      <div class="flex items-center">
-        <!-- Mobile Menu Button -->
-        <button
-          id="hamburger-menu"
-          class={menuButtonClasses}
-          aria-label={t("nav.toggleMenu")}
-          aria-expanded="false"
-          aria-controls="menu-items"
-          data-labels={JSON.stringify(menuLabels)}
+    <div class="flex items-center gap-2">
+      {/* Mobile Menu Button */}
+      <button
+        id="hamburger-menu"
+        class={menuButtonClasses}
+        aria-label={i18nStrings.toggleMenu}
+        aria-expanded="false"
+        aria-controls="menu-items"
+        data-labels={JSON.stringify({
+          open: i18nStrings.openMenu,
+          close: i18nStrings.closeMenu,
+        })}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="menu-icon h-6 w-6"
+          aria-hidden="true"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="menu-icon h-6 w-6"
-            aria-hidden="true"
-          >
-            <line x1="7" y1="12" x2="21" y2="12" class="line"></line>
-            <line x1="3" y1="6" x2="21" y2="6" class="line"></line>
-            <line x1="12" y1="18" x2="21" y2="18" class="line"></line>
-            <line x1="18" y1="6" x2="6" y2="18" class="close"></line>
-            <line x1="6" y1="6" x2="18" y2="18" class="close"></line>
-          </svg>
-        </button>
+          <line x1="7" y1="12" x2="21" y2="12" class="line"></line>
+          <line x1="3" y1="6" x2="21" y2="6" class="line"></line>
+          <line x1="12" y1="18" x2="21" y2="18" class="line"></line>
+          <line x1="18" y1="6" x2="6" y2="18" class="close"></line>
+          <line x1="6" y1="6" x2="18" y2="18" class="close"></line>
+        </svg>
+      </button>
 
-        <!-- Navigation Menu -->
-        <div id="menu-items" class={menuItemsClasses}>
-          <ul class={menuListClasses}>
+      {/* Navigation Menu */}
+      <div id="menu-items" class={menuItemsClasses} role="menu">
+        <ul class={menuListClasses}>
+          {/* Main Navigation Links */}
+          {
+            NAV_LINKS.map(({ href, key, label }) => (
+              <li class="col-span-2 flex items-center justify-center">
+                <a
+                  href={href}
+                  class:list={[linkClasses, activeNav === key && activeClasses]}
+                  aria-current={activeNav === key ? "page" : undefined}
+                  role="menuitem"
+                >
+                  {label}
+                </a>
+              </li>
+            ))
+          }
+
+          {/* Action Buttons and Theme Toggle */}
+          <li
+            class="col-span-2 flex items-center justify-end gap-x-2 md:col-span-1"
+          >
             {
-              NAV_LINKS.map(({ href, key, label }) => (
-                <li class="col-span-2 flex items-center justify-center">
-                  <a
+              ACTION_BUTTONS.map(
+                ({ href, key, label, icon, showTextOnMobile }) => (
+                  <LinkButton
                     href={href}
-                    class:list={[
-                      linkClasses,
-                      activeNav === key &&
-                        "text-skin-accent underline decoration-wavy decoration-2 underline-offset-4",
-                    ]}
-                    aria-current={activeNav === key ? "page" : undefined}
+                    className={`action-button ${activeNav === key ? "active" : ""}`}
+                    ariaLabel={label}
+                    title={label}
                   >
-                    {label}
-                  </a>
-                </li>
-              ))
-            }
-            <li
-              class="col-span-2 flex items-center justify-end gap-x-2 md:col-span-1"
-            >
-              {
-                ACTION_BUTTONS.map(
-                  ({ href, key, label, icon, showTextOnMobile }) => (
-                    <LinkButton
-                      href={href}
-                      className={`action-button ${activeNav === key ? "active" : ""}`}
-                      aria-label={label}
-                      title={label}
-                    >
-                      <MenuIcon name={icon} active={activeNav === key} />
-                      <span class={showTextOnMobile ? "sm:sr-only" : "sr-only"}>
-                        {label}
-                      </span>
-                    </LinkButton>
-                  )
+                    <MenuIcon name={icon} active={activeNav === key} />
+                    <span class={showTextOnMobile ? "sm:sr-only" : "sr-only"}>
+                      {label}
+                    </span>
+                  </LinkButton>
                 )
-              }
-              {SITE.lightAndDarkMode && <ThemeToggle lang={lang} />}
-            </li>
-          </ul>
-        </div>
+              )
+            }
+            {SITE.lightAndDarkMode && <ThemeToggle lang={lang} />}
+          </li>
+        </ul>
       </div>
     </div>
-  </nav>
-</header>
+  </div>
+</nav>
 
 <style>
   /* Menu icon animations */
   .menu-icon .line {
-    @apply transition-opacity duration-200;
+    @apply transition-opacity duration-200 ease-in-out;
   }
 
   .menu-icon .close {
-    @apply opacity-0 transition-opacity duration-200;
+    @apply opacity-0 transition-opacity duration-200 ease-in-out;
   }
 
   #hamburger-menu[aria-expanded="true"] .line {
@@ -231,7 +265,9 @@ const menuLabels = {
 
   /* Action button styles */
   :global(.action-button) {
-    @apply flex items-center justify-center p-2 hover:text-skin-accent;
+    @apply flex items-center justify-center p-2;
+    @apply transition-colors duration-200 ease-in-out;
+    @apply hover:text-skin-accent focus:text-skin-accent;
   }
 
   :global(.action-button.active) {
@@ -244,12 +280,14 @@ const menuLabels = {
 
   /* Navigation container styles */
   .nav-container {
-    @apply px-4 py-3 transition-all duration-200;
+    @apply px-4 py-3;
+    @apply transition-all duration-200 ease-in-out;
     border-bottom: 2px solid transparent;
   }
 
   .nav-container.scrolled {
     @apply border-b-2 border-skin-accent px-4 py-1;
+    @apply shadow-md;
   }
 
   /* Focus styles */
@@ -258,109 +296,233 @@ const menuLabels = {
     @apply outline-none ring-2 ring-skin-accent ring-offset-2;
   }
 
-  /* Reduced motion */
+  /* Reduced motion preferences */
   @media (prefers-reduced-motion: reduce) {
     .nav-container,
     .menu-icon .line,
-    .menu-icon .close {
-      @apply transition-none;
+    .menu-icon .close,
+    :global(.action-button),
+    .transition-all {
+      @apply transform-none transition-none;
     }
   }
 
-  /* Print styles */
+  /* Print optimization */
   @media print {
-    header {
+    nav {
       @apply hidden;
     }
   }
 
-  /* High contrast mode */
+  /* High contrast mode support */
   @media (forced-colors: active) {
     .nav-container {
       @apply border-b-2 border-[ButtonText];
     }
   }
 
-  /* Dark mode adjustments */
+  /* Dark mode optimizations */
   :global(.dark) .nav-container {
     @apply bg-skin-fill/90;
+  }
+
+  /* Mobile menu animations */
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  .menu-enter {
+    animation: slideIn 0.2s ease-out;
+  }
+
+  .menu-exit {
+    animation: slideOut 0.2s ease-in;
   }
 </style>
 
 <script>
   /**
-   * Enhances navigation with mobile menu and scroll behavior
+   * Enhanced navigation functionality with improved performance and accessibility
+   *
+   * Features:
+   * - Smooth mobile menu animations
+   * - Performance optimized with RAF
+   * - Enhanced keyboard navigation
+   * - Proper cleanup on page transitions
    */
-  function setupNavigation() {
-    const menuBtn = document.getElementById("hamburger-menu");
-    const menuItems = document.getElementById("menu-items");
-    const nav = document.querySelector(".nav-container");
+  class NavigationController {
+    private menuBtn: HTMLElement | null;
+    private menuItems: HTMLElement | null;
+    private nav: HTMLElement | null;
+    private scrollTimeout: number | null;
+    private labels: { open: string; close: string };
 
-    if (!menuBtn || !menuItems || !nav) return;
+    constructor() {
+      this.menuBtn = document.getElementById("hamburger-menu");
+      this.menuItems = document.getElementById("menu-items");
+      this.nav = document.querySelector(".nav-container");
+      this.scrollTimeout = null;
+      this.labels = this.getMenuLabels();
 
-    // Get menu labels
-    const labels = menuBtn.dataset.labels
-      ? JSON.parse(menuBtn.dataset.labels)
-      : {
-          open: "Open Menu",
-          close: "Close Menu",
-        };
+      if (!this.menuBtn || !this.menuItems || !this.nav) {
+        console.warn("Navigation elements not found");
+        return;
+      }
 
-    // Toggle mobile menu
-    const toggleMenu = () => {
-      const isExpanded = menuBtn.getAttribute("aria-expanded") === "true";
-      menuBtn.setAttribute("aria-expanded", (!isExpanded).toString());
-      menuBtn.setAttribute(
+      this.init();
+    }
+
+    private getMenuLabels(): { open: string; close: string } {
+      return this.menuBtn?.dataset.labels
+        ? JSON.parse(this.menuBtn.dataset.labels)
+        : {
+            open: "Open Menu",
+            close: "Close Menu",
+          };
+    }
+
+    private init(): void {
+      this.setupEventListeners();
+      this.setupKeyboardNav();
+    }
+
+    private toggleMenu = (): void => {
+      if (!this.menuBtn || !this.menuItems) return;
+
+      const isExpanded = this.menuBtn.getAttribute("aria-expanded") === "true";
+      const willExpand = !isExpanded;
+
+      this.menuBtn.setAttribute("aria-expanded", willExpand.toString());
+      this.menuBtn.setAttribute(
         "aria-label",
-        isExpanded ? labels.open : labels.close
+        willExpand ? this.labels.close : this.labels.open
       );
-      menuItems.classList.toggle("hidden");
-    };
 
-    // Handle scroll behavior
-    const handleScroll = () => {
-      const scrollThreshold = window.innerHeight * 0.25;
-      const isScrolled = window.scrollY > scrollThreshold;
-      nav.classList.toggle("scrolled", isScrolled);
-    };
-
-    // Add event listeners
-    menuBtn.addEventListener("click", toggleMenu);
-
-    // Add scroll listener with debounce
-    let scrollTimeout: number;
-    window.addEventListener(
-      "scroll",
-      () => {
-        if (scrollTimeout) {
-          window.cancelAnimationFrame(scrollTimeout);
-        }
-        scrollTimeout = window.requestAnimationFrame(handleScroll);
-      },
-      { passive: true }
-    );
-
-    // Cleanup function
-    return () => {
-      menuBtn.removeEventListener("click", toggleMenu);
-      window.removeEventListener("scroll", handleScroll);
-      if (scrollTimeout) {
-        window.cancelAnimationFrame(scrollTimeout);
+      // Toggle with animation
+      if (willExpand) {
+        this.menuItems.classList.remove("hidden");
+        this.menuItems.classList.add("menu-enter");
+      } else {
+        this.menuItems.classList.add("menu-exit");
+        setTimeout(() => {
+          this.menuItems?.classList.add("hidden");
+          this.menuItems?.classList.remove("menu-exit");
+        }, 200);
       }
     };
+
+    private handleScroll = (): void => {
+      if (!this.nav) return;
+
+      const scrollThreshold = window.innerHeight * 0.25;
+      const isScrolled = window.scrollY > scrollThreshold;
+
+      this.nav.classList.toggle("scrolled", isScrolled);
+    };
+
+    private setupKeyboardNav(): void {
+      // Close menu on Escape
+      document.addEventListener("keydown", (e: KeyboardEvent) => {
+        if (
+          e.key === "Escape" &&
+          this.menuBtn?.getAttribute("aria-expanded") === "true"
+        ) {
+          this.toggleMenu();
+        }
+      });
+
+      // Focus trap within menu when open
+      const focusableElements = this.menuItems?.querySelectorAll(
+        'a[href], button, [tabindex]:not([tabindex="-1"])'
+      );
+
+      if (focusableElements?.length) {
+        const firstFocusable = focusableElements[0] as HTMLElement;
+        const lastFocusable = focusableElements[
+          focusableElements.length - 1
+        ] as HTMLElement;
+
+        lastFocusable.addEventListener("keydown", (e: KeyboardEvent) => {
+          if (e.key === "Tab" && !e.shiftKey) {
+            e.preventDefault();
+            firstFocusable.focus();
+          }
+        });
+
+        firstFocusable.addEventListener("keydown", (e: KeyboardEvent) => {
+          if (e.key === "Tab" && e.shiftKey) {
+            e.preventDefault();
+            lastFocusable.focus();
+          }
+        });
+      }
+    }
+
+    private setupEventListeners(): void {
+      // Menu toggle
+      this.menuBtn?.addEventListener("click", this.toggleMenu);
+
+      // Optimized scroll handling
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (this.scrollTimeout) {
+            cancelAnimationFrame(this.scrollTimeout);
+          }
+          this.scrollTimeout = requestAnimationFrame(this.handleScroll);
+        },
+        { passive: true }
+      );
+
+      // Close menu on click outside
+      document.addEventListener("click", (e: MouseEvent) => {
+        if (
+          this.menuBtn?.getAttribute("aria-expanded") === "true" &&
+          !this.menuItems?.contains(e.target as Node) &&
+          !this.menuBtn.contains(e.target as Node)
+        ) {
+          this.toggleMenu();
+        }
+      });
+    }
+
+    public cleanup(): void {
+      this.menuBtn?.removeEventListener("click", this.toggleMenu);
+      if (this.scrollTimeout) {
+        cancelAnimationFrame(this.scrollTimeout);
+      }
+    }
   }
 
-  // Initialize on page load
-  let cleanup = setupNavigation();
+  // Initialize controller
+  let controller: NavigationController | null = new NavigationController();
 
-  // Re-initialize after Astro page transitions
+  // Handle Astro page transitions
   document.addEventListener("astro:after-swap", () => {
-    if (cleanup) cleanup();
-    cleanup = setupNavigation();
+    controller?.cleanup();
+    controller = new NavigationController();
   });
 
-  // Cleanup on page unload
   document.addEventListener("astro:before-swap", () => {
-    if (cleanup) cleanup();
+    controller?.cleanup();
+    controller = null;
   });
 </script>
