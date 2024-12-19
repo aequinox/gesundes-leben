@@ -2,380 +2,84 @@
   "references": [
     {
       "title": "The content of selected minerals, bioactive compounds, and the antioxidant properties of the flowers and fruit of selected cultivars and wildly growing plants of Sambucus nigra L.",
-      "authors": ["Młynarczyk, Karolina", "et al."],
+      "authors": [
+        {
+          "name": "Młynarczyk, Karolina"
+        }
+      ],
       "year": 2020,
       "journal": "Molecules",
       "volume": 25,
       "issue": 4,
       "pages": "876",
       "url": "https://pubmed.ncbi.nlm.nih.gov/32079214/",
-      "slug": "minerals_bioactive"
+      "slug": "minerals_bioactive",
+      "keywords": ["Sambucus nigra", "minerals", "bioactive compounds", "antioxidants"]
     },
     {
       "title": "A review of the antiviral properties of black elder (Sambucus nigra L.) products",
-      "authors": ["Porter, Randall S.", "Bode, Robert F."],
+      "authors": [
+        {
+          "name": "Porter, Randall S."
+        },
+        {
+          "name": "Bode, Robert F."
+        }
+      ],
       "year": 2017,
       "journal": "Phytotherapy Research",
       "volume": 31,
       "issue": 4,
       "pages": "533-554",
       "url": "https://pubmed.ncbi.nlm.nih.gov/28198157/",
-      "slug": "antiviral_elder"
+      "slug": "antiviral_elder",
+      "keywords": ["Sambucus nigra", "antiviral", "black elder", "review"]
     },
     {
       "title": "Variability of polyphenol content and antioxidant activity in different plant parts of elderberry (Sambucus nigra L.) and in its genotypes",
-      "authors": ["von Oszmiański", "et al."],
+      "authors": [
+        {
+          "name": "von Oszmiański, Jan"
+        }
+      ],
       "year": 2012,
       "journal": "Acta Scientiarum Polonorum. Hortorum Cultus",
       "volume": 11,
       "issue": 3,
       "pages": "67-76",
-      "slug": "polyphenol_elder"
+      "slug": "polyphenol_elder",
+      "keywords": ["Sambucus nigra", "polyphenol", "antioxidant", "genotypes"]
     },
     {
-      "title": "Polysaccharides from european black elderberry extract enhance dendritic cell mediated T cell immune responses.",
-      "authors": ["Stich, Lena", "et al."],
+      "title": "Polysaccharides from european black elderberry extract enhance dendritic cell mediated T cell immune responses",
+      "authors": [
+        {
+          "name": "Stich, Lena"
+        }
+      ],
       "year": 2022,
-      "journal": "International journal of molecular sciences",
+      "journal": "International Journal of Molecular Sciences",
       "volume": 23,
       "issue": 7,
       "pages": "3949",
       "url": "https://pubmed.ncbi.nlm.nih.gov/35409309/",
-      "slug": "polysaccharides"
+      "slug": "polysaccharides",
+      "keywords": ["elderberry", "polysaccharides", "immune response", "T cells"]
     },
     {
-      "title": "Black elderberry (Sambucus nigra) supplementation effectively treats upper respiratory symptoms: A meta-analysis of randomized, controlled clinical trials.",
-      "authors": ["Hawkins, Jessie", "et al."],
+      "title": "Black elderberry (Sambucus nigra) supplementation effectively treats upper respiratory symptoms: A meta-analysis of randomized, controlled clinical trials",
+      "authors": [
+        {
+          "name": "Hawkins, Jessie"
+        }
+      ],
       "year": 2019,
-      "journal": "Complementary therapies in medicine",
+      "journal": "Complementary Therapies in Medicine",
       "volume": 42,
       "pages": "361-365",
       "url": "https://pubmed.ncbi.nlm.nih.gov/30670267/",
-      "slug": "elderberry_meta"
-    },
-    {
-      "title": "Randomized study of the efficacy and safety of oral elderberry extract in the treatment of influenza A and B virus infections.",
-      "authors": ["Zakay-Rones, Zichria", "et al."],
-      "year": 2004,
-      "journal": "Journal of International Medical Research",
-      "volume": 32,
-      "issue": 2,
-      "pages": "132-140",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/15080016/",
-      "slug": "elderberry_flu"
-    },
-    {
-      "title": "Inhibition of several strains of influenza virus in vitro and reduction of symptoms by an elderberry extract (Sambucus nigra L.) during an outbreak of influenza B Panama.",
-      "authors": ["Zakay-Rones, Zichria", "et al."],
-      "year": 1995,
-      "journal": "The Journal of Alternative and Complementary Medicine",
-      "volume": 1,
-      "issue": 4,
-      "pages": "361-369",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/9395631/",
-      "slug": "influenza_inhib"
-    },
-    {
-      "title": "Binding of a natural anthocyanin inhibitor to influenza neuraminidase by mass spectrometry.",
-      "authors": ["Swaminathan, Kavya", "et al."],
-      "year": 2013,
-      "journal": "Analytical and Bioanalytical Chemistry",
-      "volume": 405,
-      "pages": "6563-6572",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/23748498/",
-      "slug": "anthocyanin_bind"
-    },
-    {
-      "title": "Substituent effects on the binding of natural product anthocyanidin inhibitors to influenza neuraminidase with mass spectrometry.",
-      "authors": ["Swaminathan, Kavya", "Müller, Patrick", "Downard, Kevin M."],
-      "year": 2014,
-      "journal": "Analytica chimica acta",
-      "volume": 828,
-      "pages": "61-69",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/24845816/",
-      "slug": "anthocyanidin"
-    },
-    {
-      "title": "Elderberry flavonoids bind to and prevent H1N1 infection in vitro.",
-      "authors": ["Roschek Jr, Bill", "et al."],
-      "year": 2009,
-      "journal": "Phytochemistry",
-      "volume": 70,
-      "issue": 10,
-      "pages": "1255-1261",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/19682714/",
-      "slug": "flavonoids_h1n1"
-    },
-    {
-      "title": "Elderberry supplementation reduces cold duration and symptoms in air-travellers: A randomized, double-blind placebo-controlled clinical trial.",
-      "authors": ["Tiralongo, Evelin", "Wee, Shirley S.", "Lea, Rodney A."],
-      "year": 2016,
-      "journal": "Nutrients",
-      "volume": 8,
-      "issue": 4,
-      "pages": "182",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/27023596/",
-      "slug": "elderberry_cold"
-    },
-    {
-      "title": "Anti-influenza virus effects of elderberry juice and its fractions.",
-      "authors": ["Kinoshita, Emiko", "et al."],
-      "year": 2012,
-      "journal": "Bioscience, biotechnology, and biochemistry",
-      "volume": 76,
-      "issue": 9,
-      "pages": "1633-1638",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/22972323/",
-      "slug": "elderberry_juice"
-    },
-    {
-      "title": "The effect of Sambucol, a black elderberry-based, natural product, on the production of human cytokines: I. Inflammatory cytokines.",
-      "authors": ["Barak, Vivian", "Halperin, Tal", "Kalickman, Inna"],
-      "year": 2001,
-      "journal": "Eur Cytokine Netw",
-      "volume": 12,
-      "issue": 2,
-      "pages": "290-296",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/11399518/",
-      "slug": "sambucol_cytokine"
-    },
-    {
-      "title": "A new high-quality elderberry plant extract exerts antiviral and immunomodulatory effects in vitro and ex vivo",
-      "authors": [
-        "Christiane Schön",
-        "Yvonne Mödinger",
-        "Franziska Krüger",
-        "Cornelia Doebis",
-        "Ivo Pischel",
-        "Bernd Bonnländer"
-      ],
-      "year": 2021,
-      "journal": "Food and Agricultural Immunology",
-      "volume": 32,
-      "issue": 1,
-      "pages": "650-662",
-      "url": "https://www.tandfonline.com/doi/full/10.1080/09540105.2021.1978941",
-      "slug": "elderberry_extract"
-    },
-    {
-      "title": "Elderberry is anti-bacterial, anti-viral and modulates the immune system: anti-bacterial, anti-viral and immunomodulatory non-clinical (in-vitro) effects of elderberry fruit and flowers (Sambucus nigra): a systematic review",
-      "authors": ["Wermig-Morgan, Julia"],
-      "year": 2020,
-      "journal": "Research Gate",
-      "volume": 1,
-      "issue": 1,
-      "pages": "1-20",
-      "url": "https://www.researchgate.net/publication/339237008_Elderberry_is_anti-bacterial_anti-viral_and_modulates_the_immune_system_anti-bacterial_anti-viral_and_immunomodulatory_non-clinical_in-vitro_effects_of_elderberry_fruit_and_flowers_Sambucus_nigra_a_sy",
-      "slug": "elderberry_review"
-    },
-    {
-      "title": "Rational and safe use of the top two botanical dietary supplements to enhance the immune system.",
-      "authors": ["Kim, Hyunjin", "Calderón, Angela I."],
-      "year": 2022,
-      "journal": "Combinatorial Chemistry & High Throughput Screening",
-      "volume": 25,
-      "issue": 7,
-      "pages": "1129-1130",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/35135449",
-      "slug": "botanical_immune"
-    },
-    {
-      "title": "How can lemons benefit your health",
-      "authors": ["Ware, M."],
-      "year": 2023,
-      "journal": "Medical News Today",
-      "volume": 1,
-      "issue": 1,
-      "pages": "1-10",
-      "url": "https://www.medicalnewstoday.com/articles/28347",
-      "slug": "lemon_benefits"
-    },
-    {
-      "title": "The sleep-promoting and hypothermic effects of glycine are mediated by NMDA receptors in the suprachiasmatic nucleus",
-      "authors": ["Kawai, Nobuhiro"],
-      "year": 2015,
-      "journal": "Neuropsychopharmacology",
-      "volume": 40,
-      "issue": 6,
-      "pages": "1405-1416",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/25533534/",
-      "slug": "glycine_sleep"
-    },
-    {
-      "title": "Binding of Pro-Gly-Pro at the active site of leukotriene A4 hydrolase/aminopeptidase and development of an epoxide hydrolase selective inhibitor",
-      "authors": ["Stsiapanava, Alena"],
-      "year": 2014,
-      "journal": "Proceedings of the National Academy of Sciences",
-      "volume": 111,
-      "issue": 11,
-      "pages": "4227-4232",
-      "url": "https://www.researchgate.net/publication/260486369_Binding_of_Pro-Gly-Pro_at_the_active_site_of_leukotriene_A4_hydrolaseaminopeptidase_and_development_of_an_epoxide_hydrolase_selective_inhibitor",
-      "slug": "pro_gly_pro"
-    },
-    {
-      "title": "Chemistry, nutrition, and health-promoting properties of Hericium erinaceus (Lion's Mane) mushroom fruiting bodies and mycelia and their bioactive compounds",
-      "authors": ["Friedman, Mendel"],
-      "year": 2015,
-      "journal": "Journal of Agricultural and Food Chemistry",
-      "volume": 63,
-      "issue": 32,
-      "pages": "7108-7123",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/26244378/",
-      "slug": "lions_mane"
-    },
-    {
-      "title": "Immunomodulatory activities of a fungal protein extracted from Hericium erinaceus through regulating the gut microbiota",
-      "authors": ["Diling, Chen"],
-      "year": 2017,
-      "journal": "Frontiers in Immunology",
-      "volume": 8,
-      "pages": "666",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/28713364/",
-      "slug": "fungal_protein"
-    },
-    {
-      "title": "The best mushrooms to support your immune system",
-      "authors": ["Hifas da Terra"],
-      "year": 2023,
-      "journal": "Hifas da Terra Blog",
-      "volume": 1,
-      "issue": 1,
-      "pages": "1-10",
-      "url": "https://hifasdaterra.com/en/blog/the-best-mushrooms-to-support-your-immune-system/",
-      "slug": "immune_mushrooms"
-    },
-    {
-      "title": "Immunomodulation and anti-inflammatory effects of garlic compounds",
-      "authors": ["Arreola, Rodrigo"],
-      "year": 2015,
-      "journal": "Journal of Immunology Research",
-      "volume": 2015,
-      "pages": "401630",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/28713364/",
-      "slug": "garlic_immune"
-    },
-    {
-      "title": "Garlic: a review of potential therapeutic effects",
-      "authors": ["Bayan, Leyla", "Peir Hossain Koulivand", "Ali Gorji"],
-      "year": 2014,
-      "journal": "Avicenna Journal of Phytomedicine",
-      "volume": 4,
-      "issue": 1,
-      "pages": "1-14",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/28713364/",
-      "slug": "garlic_review"
-    },
-    {
-      "title": "Mediterranean diet intervention alters the gut microbiome in older people reducing frailty and improving health status: the NU-AGE 1‑year dietary intervention across five European countries",
-      "authors": ["Ghosh, Tarini Shankar"],
-      "year": 2020,
-      "journal": "Gut",
-      "volume": 69,
-      "issue": 7,
-      "pages": "1218-1228",
-      "slug": "mediterranean_diet"
-    },
-    {
-      "title": "Olive oil, immune system and infection",
-      "authors": ["Puertollano, Ma A."],
-      "year": 2010,
-      "journal": "Nutricion Hospitalaria",
-      "volume": 25,
-      "issue": 1,
-      "pages": "1-8",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/20204249/",
-      "slug": "olive_oil_immune"
-    },
-    {
-      "title": "Apple cider vinegar and your health",
-      "authors": ["WebMD Editorial Team"],
-      "year": 2023,
-      "journal": "WebMD",
-      "volume": 1,
-      "issue": 1,
-      "pages": "1-5",
-      "url": "https://www.webmd.com/diet/apple-cider-vinegar-and-your-health",
-      "slug": "apple_cider"
-    },
-    {
-      "title": "Probiotics and immune health",
-      "authors": ["Yan, Fang", "D. B. Polk"],
-      "year": 2011,
-      "journal": "Current Opinion in Gastroenterology",
-      "volume": 27,
-      "issue": 6,
-      "pages": "496-501",
-      "url": "https://journals.lww.com/co-gastroenterology/pages/articleviewer.aspx?year=2011&issue=11000&article=00003&type=abstract",
-      "slug": "probiotics_immune"
-    },
-    {
-      "title": "Anti-oxidative and anti-inflammatory effects of ginger in health and physical activity: review of current evidence",
-      "authors": ["Mashhadi, Nafiseh Shokri"],
-      "year": 2013,
-      "journal": "International Journal of Preventive Medicine",
-      "volume": 4,
-      "issue": 1,
-      "pages": "S36-S42",
-      "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3665023/",
-      "slug": "ginger_effects"
-    },
-    {
-      "title": "Effect of ginger on inflammatory diseases",
-      "authors": ["Ballester, Pura"],
-      "year": 2022,
-      "journal": "Molecules",
-      "volume": 27,
-      "issue": 21,
-      "pages": "7223",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/36364048/",
-      "slug": "ginger_inflam"
-    },
-    {
-      "title": "Daily consumption of lemon and ginger herbal infusion caused tumor regression and activation of the immune system in a mouse model of breast cancer",
-      "authors": ["Al-Ataby, Israa A.", "Wamidh H. Talib"],
-      "year": 2022,
-      "journal": "Frontiers in Nutrition",
-      "volume": 9,
-      "pages": "829101",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/35495945/",
-      "slug": "lemon_ginger"
-    },
-    {
-      "title": "Potential impact of strawberries on human health: a review of the science",
-      "authors": ["Hannum, SM"],
-      "year": 2004,
-      "journal": "Journal of Agricultural and Food Chemistry",
-      "volume": 44,
-      "issue": 1,
-      "pages": "1-17",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/15077879/",
-      "slug": "strawberry_health"
-    },
-    {
-      "title": "Berries: anti-inflammatory effects in humans",
-      "authors": [
-        "Joseph, Shama V.",
-        "Indika Edirisinghe",
-        "Britt M. Burton-Freeman"
-      ],
-      "year": 2014,
-      "journal": "Journal of Agricultural and Food Chemistry",
-      "volume": 62,
-      "issue": 18,
-      "pages": "3886-3903",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/24512603/",
-      "slug": "berries_antiinflam"
-    },
-    {
-      "title": "Brassica-Derived Plant Bioactives as Modulators of Chemopreventive and Inflammatory Signaling Pathways",
-      "authors": ["Sturm, C.", "Wagner, AE"],
-      "year": 2017,
-      "journal": "Molecules",
-      "volume": 18,
-      "issue": 9,
-      "pages": "11640-11666",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/28862664/",
-      "slug": "brassica_bioactive"
+      "slug": "elderberry_meta",
+      "keywords": ["elderberry", "respiratory symptoms", "meta-analysis", "clinical trials"]
     }
   ]
 }

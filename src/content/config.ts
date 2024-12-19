@@ -44,25 +44,25 @@ const favorites = defineCollection({
   }),
 });
 
-// const references = defineCollection({
-//   type: "data",
-//   // loader: file("src/content/references/references.json", {
-//   //   parser: text => JSON.parse(text).references,
-//   // }),
-//   schema: z.object({
-//     title: z.string(),
-//     authors: z.array(z.string()),
-//     year: z.number(),
-//     journal: z.string().optional(),
-//     volume: z.number().optional(),
-//     issue: z.number().optional(),
-//     pages: z.string().optional(),
-//     url: z.string().optional(),
-//     doi: z.string().optional(),
-//     pmid: z.string().optional(),
-//     slug: z.string(),
-//   }),
-// });
+const references = defineCollection({
+  type: "data",
+  // loader: file("src/content/references/references.json", {
+  //   parser: text => JSON.parse(text).references,
+  // }),
+  schema: z.object({
+    title: z.string(),
+    authors: z.array(z.string()),
+    year: z.number(),
+    journal: z.string().optional(),
+    volume: z.number().optional(),
+    issue: z.number().optional(),
+    pages: z.string().optional(),
+    url: z.string().optional(),
+    doi: z.string().optional(),
+    pmid: z.string().optional(),
+    slug: z.string(),
+  }),
+});
 
 const books = defineCollection({
   type: "data",

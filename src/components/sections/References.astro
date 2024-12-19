@@ -15,51 +15,56 @@
  * ```
  */
 
-import { getEntry } from "astro:content";
-import type { Reference, ReferencesProps } from "@/types/references";
-import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { ReferenceUtils } from "../../utils/content";
+import type { Reference } from "../../utils/content/types";
+import { getLangFromUrl, useTranslations } from "../../i18n/utils";
 
-// interface Author {
-//   /** Author's full name */
-//   name: string;
-//   /** Optional author's identifier */
-//   id?: string;
-// }
+interface Props {
+  /** Array of reference IDs to display */
+  references?: string[];
+  /** Optional CSS class name */
+  class?: string;
+}
 
-const { references = [], class: className = "" }: ReferencesProps = Astro.props;
+const { references = [], class: className = "" }: Props = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-// Load references data
-let allReferences: Reference[] = [];
+// Load and process references
+let sortedReferences: Reference[] = [];
 try {
-  const referencesEntry = await getEntry("references", "references");
-  allReferences = Array.isArray(referencesEntry?.data)
-    ? referencesEntry.data
-    : [];
+  // Get all references and filter if needed
+  const allReferences = await ReferenceUtils.getAllReferences();
+  const filteredReferences =
+    references.length > 0
+      ? allReferences.filter(ref => references.includes(ref.id))
+      : allReferences;
+
+  // Sort references by first author's last name
+  sortedReferences = [...filteredReferences].sort((a, b) => {
+    const getLastName = (author: string): string => {
+      const parts = author.split(",")[0].trim().split(" ");
+      return parts[parts.length - 1];
+    };
+
+    const authorA = Array.isArray(a.data.authors) ? a.data.authors[0] : "";
+    const authorB = Array.isArray(b.data.authors) ? b.data.authors[0] : "";
+
+    return getLastName(authorA).localeCompare(getLastName(authorB));
+  });
 } catch (error) {
   console.error("Error loading references:", error);
 }
 
-// Filter references based on shortcodes if provided, otherwise show all
-const filteredReferences =
-  references.length > 0
-    ? allReferences.filter(ref => references.includes(ref.shortcode))
-    : allReferences;
+/**
+ * Formats a list of authors with proper punctuation
+ * @param authors - Array of author names
+ * @returns Formatted author string
+ */
+const formatAuthors = (authors: ReadonlyArray<string>): string => {
+  if (!Array.isArray(authors)) return "";
 
-// Sort references by first author's last name
-const sortedReferences = filteredReferences.sort((a, b) => {
-  const getLastName = (author: string): string => {
-    const parts = author.split(",")[0].trim().split(" ");
-    return parts[parts.length - 1];
-  };
-
-  return getLastName(a.authors[0]).localeCompare(getLastName(b.authors[0]));
-});
-
-// Format authors list with proper punctuation
-const formatAuthors = (authors: readonly string[]): string => {
   return authors
     .map((author, index) => {
       if (index === authors.length - 1) return author;
@@ -69,13 +74,18 @@ const formatAuthors = (authors: readonly string[]): string => {
     .join("");
 };
 
-// Format citation with proper punctuation
+/**
+ * Formats citation details with proper punctuation
+ * @param ref - Reference data
+ * @returns Formatted citation string
+ */
 const formatCitation = (ref: Reference): string => {
+  const { data } = ref;
   const parts = [
-    ref.journal && `${ref.journal}`,
-    ref.volume && `${ref.volume}`,
-    ref.issue && `(${ref.issue})`,
-    ref.pages && `, ${ref.pages}`,
+    data.journal && `${data.journal}`,
+    data.volume && `${data.volume}`,
+    data.issue && `(${data.issue})`,
+    data.pages && `, ${data.pages}`,
   ].filter(Boolean);
 
   return parts.join(" ");
@@ -111,34 +121,49 @@ const sectionId = `references-${Math.random().toString(36).substring(2, 9)}`;
         <li class="reference-item text-sm leading-relaxed" role="listitem">
           <div class="citation-content">
             {/* Authors */}
-            <span class="font-semibold">{formatAuthors(ref.authors)}</span>
+            <span class="font-semibold">{formatAuthors(ref.data.authors)}</span>
 
             {/* Year */}
-            <span class="ml-1">({ref.year})</span>
+            <span class="ml-1">({ref.data.year})</span>
 
             {/* Title */}
             <span class="ml-1">
-              {ref.url ? (
+              {ref.data.url ? (
                 <a
-                  href={ref.url}
+                  href={ref.data.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   class="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-skin-accent"
                   aria-label={t("references.viewSource").replace(
                     "{title}",
-                    ref.title
+                    ref.data.title
                   )}
                 >
-                  {ref.title}
+                  {ref.data.title}
                 </a>
               ) : (
-                ref.title
+                ref.data.title
               )}
             </span>
 
             {/* Journal info */}
-            {ref.journal && (
+            {ref.data.journal && (
               <span class="ml-1 italic">{formatCitation(ref)}</span>
+            )}
+
+            {/* DOI link if available */}
+            {ref.data.doi && (
+              <span class="ml-2">
+                <a
+                  href={`https://doi.org/${ref.data.doi}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-xs text-primary hover:underline"
+                  aria-label={`DOI: ${ref.data.doi}`}
+                >
+                  [DOI]
+                </a>
+              </span>
             )}
           </div>
         </li>
