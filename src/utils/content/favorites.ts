@@ -1,5 +1,5 @@
 import { getCollection, getEntry } from "astro:content";
-import type { Favorite, FavoriteData } from "./types";
+import type { Favorite } from "./types";
 
 /**
  * Custom error class for favorite-related operations

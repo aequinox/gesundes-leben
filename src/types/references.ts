@@ -1,4 +1,4 @@
-import type { CollectionEntry } from "astro:content";
+import type { Reference } from "@/utils/content/types";
 
 /**
  * Reference System Type Definitions
@@ -36,11 +36,11 @@ export interface ReferenceData {
   readonly abstract?: string;
 }
 
-/**
- * Complete Reference type using Astro's CollectionEntry
- * @type Reference
- */
-export type Reference = CollectionEntry<"references">;
+// /**
+//  * Complete Reference type using Astro's CollectionEntry
+//  * @type Reference
+//  */
+// export type Reference = CollectionEntry<"references">;
 
 /**
  * Props interface for the References component

@@ -1,5 +1,5 @@
-import { getCollection, getEntry, type CollectionEntry } from "astro:content";
-import type { ReferenceData } from "../../types/references";
+import { getCollection, getEntry } from "astro:content";
+import type { Reference } from "./types";
 
 /**
  * Custom error class for reference-related operations
@@ -15,18 +15,13 @@ class ReferenceError extends Error {
 }
 
 /**
- * Type alias for Reference Collection Entry
- */
-type ReferenceEntry = CollectionEntry<"references">;
-
-/**
  * Utility class for managing academic references
  * Provides methods for retrieving, filtering, sorting, and grouping references
  * @class ReferenceUtils
  */
 export class ReferenceUtils {
   // Cache for frequently accessed data
-  private static referenceCache: ReferenceEntry[] | null = null;
+  private static referenceCache: Reference[] | null = null;
 
   /**
    * Clears the reference cache
@@ -38,10 +33,10 @@ export class ReferenceUtils {
 
   /**
    * Retrieves all references with caching
-   * @returns Promise<ReferenceEntry[]> Array of all references
+   * @returns Promise<Reference[]> Array of all references
    * @throws {ReferenceError} If there's an error fetching references
    */
-  public static async getAllReferences(): Promise<ReferenceEntry[]> {
+  public static async getAllReferences(): Promise<Reference[]> {
     try {
       if (ReferenceUtils.referenceCache === null) {
         ReferenceUtils.referenceCache = await getCollection("references");
@@ -63,10 +58,10 @@ export class ReferenceUtils {
   /**
    * Retrieves a single reference by its ID
    * @param id - The unique identifier for the reference
-   * @returns Promise<ReferenceEntry | null> The found reference or null if not found
+   * @returns Promise<Reference | null> The found reference or null if not found
    * @throws {ReferenceError} If there's an error fetching the reference
    */
-  public static async getReference(id: string): Promise<ReferenceEntry | null> {
+  public static async getReference(id: string): Promise<Reference | null> {
     try {
       const reference = await getEntry("references", id);
       return reference || null;
@@ -81,11 +76,11 @@ export class ReferenceUtils {
   /**
    * Finds references related to a given reference based on multiple criteria
    * @param referenceOrId - Reference entry or ID to find related references for
-   * @returns Promise<ReferenceEntry[]> Array of related references
+   * @returns Promise<Reference[]> Array of related references
    */
   public static async getRelatedReferences(
-    referenceOrId: ReferenceEntry | string
-  ): Promise<ReferenceEntry[]> {
+    referenceOrId: Reference | string
+  ): Promise<Reference[]> {
     try {
       const reference =
         typeof referenceOrId === "string"
@@ -142,11 +137,11 @@ export class ReferenceUtils {
   /**
    * Retrieves references by author name (case-insensitive partial match)
    * @param authorName - Name of the author to search for
-   * @returns Promise<ReferenceEntry[]> Array of references by the author
+   * @returns Promise<Reference[]> Array of references by the author
    */
   public static async getReferencesByAuthor(
     authorName: string
-  ): Promise<ReferenceEntry[]> {
+  ): Promise<Reference[]> {
     const references = await ReferenceUtils.getAllReferences();
     const searchName = authorName.toLowerCase();
 
@@ -159,14 +154,14 @@ export class ReferenceUtils {
 
   /**
    * Groups references by year in descending order
-   * @returns Promise<Record<number, ReferenceEntry[]>> Object with years as keys and reference arrays as values
+   * @returns Promise<Record<number, Reference[]>> Object with years as keys and reference arrays as values
    */
   public static async groupReferencesByYear(): Promise<
-    Record<number, ReferenceEntry[]>
+    Record<number, Reference[]>
   > {
     const references = await ReferenceUtils.getAllReferences();
     const grouped = references.reduce(
-      (acc: Record<number, ReferenceEntry[]>, ref) => {
+      (acc: Record<number, Reference[]>, ref) => {
         const year = ref.data.year;
         (acc[year] = acc[year] || []).push(ref);
         return acc;
@@ -181,14 +176,14 @@ export class ReferenceUtils {
 
   /**
    * Groups references by journal alphabetically
-   * @returns Promise<Record<string, ReferenceEntry[]>> Object with journals as keys and reference arrays as values
+   * @returns Promise<Record<string, Reference[]>> Object with journals as keys and reference arrays as values
    */
   public static async groupReferencesByJournal(): Promise<
-    Record<string, ReferenceEntry[]>
+    Record<string, Reference[]>
   > {
     const references = await ReferenceUtils.getAllReferences();
     const grouped = references.reduce(
-      (acc: Record<string, ReferenceEntry[]>, ref) => {
+      (acc: Record<string, Reference[]>, ref) => {
         const journal = ref.data.journal || "Uncategorized";
         (acc[journal] = acc[journal] || []).push(ref);
         return acc;
@@ -204,11 +199,9 @@ export class ReferenceUtils {
   /**
    * Searches references across multiple fields
    * @param query - Search term
-   * @returns Promise<ReferenceEntry[]> Array of matching references
+   * @returns Promise<Reference[]> Array of matching references
    */
-  public static async searchReferences(
-    query: string
-  ): Promise<ReferenceEntry[]> {
+  public static async searchReferences(query: string): Promise<Reference[]> {
     const references = await ReferenceUtils.getAllReferences();
     const searchTerm = query.toLowerCase();
 
@@ -232,16 +225,16 @@ export class ReferenceUtils {
    * @param references - Array of references to sort
    * @param criteria - 'year' | 'title'
    * @param order - 'asc' | 'desc'
-   * @returns ReferenceEntry[] Sorted array of references
+   * @returns Reference[] Sorted array of references
    */
   public static sortReferences(
-    references: ReadonlyArray<ReferenceEntry>,
+    references: ReadonlyArray<Reference>,
     criteria: "year" | "title" = "year",
     order: "asc" | "desc" = "desc"
-  ): ReferenceEntry[] {
+  ): Reference[] {
     const sortFunctions = {
-      year: (a: ReferenceEntry, b: ReferenceEntry) => b.data.year - a.data.year,
-      title: (a: ReferenceEntry, b: ReferenceEntry) =>
+      year: (a: Reference, b: Reference) => b.data.year - a.data.year,
+      title: (a: Reference, b: Reference) =>
         a.data.title.localeCompare(b.data.title, undefined, {
           sensitivity: "base",
         }),
@@ -254,11 +247,11 @@ export class ReferenceUtils {
   /**
    * Gets the most recent references
    * @param limit - Maximum number of references to return
-   * @returns Promise<ReferenceEntry[]> Array of most recent references
+   * @returns Promise<Reference[]> Array of most recent references
    */
   public static async getRecentReferences(
     limit: number = 5
-  ): Promise<ReferenceEntry[]> {
+  ): Promise<Reference[]> {
     const references = await ReferenceUtils.getAllReferences();
     return ReferenceUtils.sortReferences(references, "year", "desc").slice(
       0,
@@ -270,12 +263,12 @@ export class ReferenceUtils {
    * Gets references for a specific volume and optional issue
    * @param volume - Volume number
    * @param issue - Optional issue number
-   * @returns Promise<ReferenceEntry[]> Array of matching references
+   * @returns Promise<Reference[]> Array of matching references
    */
   public static async getReferencesByVolumeAndIssue(
     volume: number,
     issue?: number
-  ): Promise<ReferenceEntry[]> {
+  ): Promise<Reference[]> {
     const references = await ReferenceUtils.getAllReferences();
     return references.filter(
       reference =>
@@ -286,9 +279,9 @@ export class ReferenceUtils {
 
   /**
    * Gets references with URLs
-   * @returns Promise<ReferenceEntry[]> Array of references with URLs
+   * @returns Promise<Reference[]> Array of references with URLs
    */
-  public static async getReferencesWithUrls(): Promise<ReferenceEntry[]> {
+  public static async getReferencesWithUrls(): Promise<Reference[]> {
     const references = await ReferenceUtils.getAllReferences();
     return references.filter(reference => reference.data.url);
   }

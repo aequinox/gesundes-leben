@@ -55,7 +55,7 @@ const skipLinkClasses = tw(
 ---
 
 <header
-  class="sticky top-0 z-10 w-full h-24 transform-gpu"
+  class="sticky top-0 z-10 h-24 w-full transform"
   role="banner"
   aria-label={i18nStrings.mainHeader}
 >
@@ -74,133 +74,247 @@ const skipLinkClasses = tw(
 </header>
 
 <style>
-  /* Base styles with modern glass effect */
+  /* Base styles with modern glass effect and theme transition handling */
   header {
     @apply bg-skin-fill/85 backdrop-blur-lg;
-    @apply transition-all duration-300 ease-in-out;
+    /* Optimize transitions for better performance */
+    @apply will-change-transform;
+    @apply transform-gpu;
+    /* Smoother theme transitions */
+    @apply transition-[background-color,border-color,box-shadow] duration-150 ease-in-out;
     @apply border-b border-skin-line/10;
     @apply shadow-sm;
   }
 
-  /* Enhanced glass effect on scroll */
+  /* Enhanced glass effect on scroll with optimized transitions */
   header.scrolled {
     @apply bg-skin-fill/95;
     @apply shadow-md;
   }
 
-  /* Skip link styles with improved accessibility */
+  /* Skip link styles with improved accessibility and consistent theming */
   #skip-to-content {
     @apply focus:shadow-lg;
     @apply focus:outline-none focus:ring-2 focus:ring-skin-accent focus:ring-offset-2;
+    @apply bg-skin-accent text-skin-inverted;
   }
 
-  /* Reduced motion preferences */
+  /* Reduced motion preferences - Disable non-essential animations */
   @media (prefers-reduced-motion: reduce) {
     header,
-    #skip-to-content,
-    .transition-all {
-      @apply transition-none transform-none;
+    #skip-to-content {
+      @apply transform-none transition-none;
     }
   }
 
-  /* Print optimization */
+  /* Print optimization - Hide header when printing */
   @media print {
     header {
       @apply hidden;
     }
   }
 
-  /* High contrast mode support */
+  /* High contrast mode support with improved visibility */
   @media (forced-colors: active) {
     header {
       @apply border-b-2 border-[CanvasText];
       @apply shadow-none;
+      forced-color-adjust: none;
     }
   }
 
-  /* Dark mode optimizations */
+  /* Dark mode optimizations with smoother transitions */
   :global(.dark) header {
     @apply bg-skin-fill/90;
     @apply border-skin-line/5;
   }
+
+  /* Prevent FOUC during theme transitions */
+  :root[data-theme-loading] header {
+    @apply transition-none;
+  }
 </style>
+
+<!-- Theme initialization script - Prevent FOUC -->
+<script is:inline>
+  (function () {
+    // Get theme from localStorage or system preference
+    const getTheme = () => {
+      if (
+        typeof localStorage !== "undefined" &&
+        localStorage.getItem("theme")
+      ) {
+        return localStorage.getItem("theme");
+      }
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    };
+
+    // Apply theme immediately before page renders
+    const theme = getTheme();
+    document.documentElement.classList[theme === "dark" ? "add" : "remove"](
+      "dark"
+    );
+
+    // Mark as loading to prevent transition flicker
+    document.documentElement.setAttribute("data-theme-loading", "");
+
+    // Remove loading state after a short delay
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        document.documentElement.removeAttribute("data-theme-loading");
+      }, 50);
+    });
+  })();
+</script>
 
 <script>
   /**
-   * Enhanced header functionality with improved performance and accessibility
+   * HeaderController class
    *
+   * Manages header behavior with optimized performance and theme handling.
    * Features:
-   * - Smooth scroll-based animations
-   * - Performance optimized with RAF and Intersection Observer
+   * - Smooth scroll-based animations using IntersectionObserver
+   * - Optimized theme transitions
    * - Enhanced keyboard navigation
+   * - Memory leak prevention
    * - Proper cleanup on page transitions
    */
-
   class HeaderController {
     private static readonly SCROLL_THRESHOLD = 50; // px
-    private static readonly ANIMATION_DURATION = 300; // ms
+    // private static readonly ANIMATION_DURATION = 150; // ms - reduced for smoother feel
+    private static readonly DEBOUNCE_DELAY = 10; // ms
 
     private header: HTMLElement | null;
     private skipLink: HTMLElement | null;
     private lastScroll: number;
     private scrollTimeout: number | null;
     private observer: IntersectionObserver | null;
+    private resizeObserver: ResizeObserver | null;
+    private themeChangeHandler: (() => void) | null;
 
     constructor() {
+      // Initialize elements with error handling
       this.header = document.querySelector("header");
       this.skipLink = document.getElementById("skip-to-content");
       this.lastScroll = window.scrollY;
       this.scrollTimeout = null;
       this.observer = null;
+      this.resizeObserver = null;
+      this.themeChangeHandler = null;
 
       if (!this.header || !this.skipLink) {
-        console.warn("Header elements not found");
+        console.warn("[HeaderController] Required elements not found");
         return;
       }
 
-      this.init();
+      // Initialize with performance optimizations
+      requestAnimationFrame(() => this.init());
     }
 
     private init(): void {
       this.setupScrollObserver();
+      this.setupResizeObserver();
       this.setupEventListeners();
+      this.setupThemeChangeHandler();
     }
 
+    /**
+     * Sets up the Intersection Observer for scroll-based animations
+     * with optimized performance and reduced jank
+     */
     private setupScrollObserver(): void {
-      // Use Intersection Observer for better performance
+      if (!this.header) return;
+
       const options = {
         threshold: [0, 0.5, 1],
         rootMargin: `-${HeaderController.SCROLL_THRESHOLD}px 0px 0px 0px`,
       };
 
       this.observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          this.header?.classList.toggle("scrolled", !entry.isIntersecting);
+        // Use requestAnimationFrame for smooth class toggling
+        requestAnimationFrame(() => {
+          entries.forEach(entry => {
+            if (this.header) {
+              this.header.classList.toggle("scrolled", !entry.isIntersecting);
+            }
+          });
         });
       }, options);
 
-      // Observe a sentinel element at the top of the page
+      // Create and observe sentinel element
       const sentinel = document.createElement("div");
-      sentinel.style.height = "1px";
+      sentinel.style.cssText = "height: 1px; pointer-events: none; opacity: 0;";
       document.body.prepend(sentinel);
       this.observer.observe(sentinel);
     }
 
+    /**
+     * Sets up ResizeObserver to handle header adjustments
+     * when window size changes
+     */
+    private setupResizeObserver(): void {
+      if (!this.header) return;
+
+      const handleResize = () => {
+        if (this.header) {
+          // Recalculate header properties on resize
+          this.header.style.setProperty(
+            "--header-height",
+            `${this.header.offsetHeight}px`
+          );
+        }
+      };
+
+      this.resizeObserver = new ResizeObserver(
+        this.debounce(handleResize, HeaderController.DEBOUNCE_DELAY)
+      );
+
+      this.resizeObserver.observe(this.header);
+    }
+
+    /**
+     * Handles theme changes to prevent FOUC and ensure smooth transitions
+     */
+    private setupThemeChangeHandler(): void {
+      if (!this.header) return;
+
+      this.themeChangeHandler = () => {
+        // Temporarily disable transitions during theme change
+        this.header?.style.setProperty("transition", "none");
+        requestAnimationFrame(() => {
+          this.header?.style.removeProperty("transition");
+        });
+      };
+
+      // Listen for theme changes
+      document.addEventListener("theme-change", this.themeChangeHandler);
+    }
+
+    /**
+     * Optimized scroll handler using RAF and transform
+     * for better performance
+     */
     private handleScroll = (): void => {
       if (!this.header) return;
 
       const currentScroll = window.scrollY;
       const isScrollingDown = currentScroll > this.lastScroll;
 
-      // Apply transform for better performance
-      if (
-        isScrollingDown &&
-        currentScroll > HeaderController.SCROLL_THRESHOLD
-      ) {
-        this.header.style.transform = "translateY(-100%)";
-      } else {
-        this.header.style.transform = "translateY(0)";
-      }
+      requestAnimationFrame(() => {
+        if (!this.header) return;
+
+        // Use transform for GPU-accelerated animations
+        if (
+          isScrollingDown &&
+          currentScroll > HeaderController.SCROLL_THRESHOLD
+        ) {
+          this.header.style.transform = "translateY(-100%)";
+        } else {
+          this.header.style.transform = "translateY(0)";
+        }
+      });
 
       this.lastScroll = currentScroll;
     };
@@ -221,7 +335,9 @@ const skipLinkClasses = tw(
     };
 
     private setupEventListeners(): void {
-      // Optimized scroll handling
+      if (!this.header || !this.skipLink) return;
+
+      // Optimized scroll handling with passive listener
       window.addEventListener(
         "scroll",
         () => {
@@ -234,17 +350,52 @@ const skipLinkClasses = tw(
       );
 
       // Keyboard navigation
-      this.skipLink?.addEventListener("keydown", this.handleSkipLink);
+      this.skipLink.addEventListener("keydown", this.handleSkipLink);
     }
 
+    /**
+     * Utility method to debounce function calls
+     */
+    // eslint-disable-next-line no-unused-vars
+    private debounce<T extends (...args: unknown[]) => void>(
+      fn: T,
+      delay: number
+    ): T {
+      let timeoutId: ReturnType<typeof setTimeout>;
+      const debouncedFn = (...args: Parameters<T>) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn.apply(null, args), delay);
+      };
+      return debouncedFn as T;
+    }
+
+    /**
+     * Comprehensive cleanup to prevent memory leaks
+     */
     public cleanup(): void {
+      // Remove event listeners
       window.removeEventListener("scroll", this.handleScroll);
       this.skipLink?.removeEventListener("keydown", this.handleSkipLink);
-      this.observer?.disconnect();
 
+      if (this.themeChangeHandler) {
+        document.removeEventListener("theme-change", this.themeChangeHandler);
+      }
+
+      // Cleanup observers
+      this.observer?.disconnect();
+      this.resizeObserver?.disconnect();
+
+      // Cancel any pending animations
       if (this.scrollTimeout) {
         cancelAnimationFrame(this.scrollTimeout);
       }
+
+      // Clear references
+      this.header = null;
+      this.skipLink = null;
+      this.observer = null;
+      this.resizeObserver = null;
+      this.themeChangeHandler = null;
     }
   }
 

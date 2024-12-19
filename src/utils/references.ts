@@ -9,11 +9,7 @@
  * @version 1.0.0
  */
 
-import type {
-  Reference,
-  ReferenceData,
-  ReferenceCollection,
-} from "../types/references";
+import type { Reference } from "@/utils/content/types";
 
 /**
  * Author interface for citation formatting
