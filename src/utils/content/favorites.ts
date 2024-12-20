@@ -106,9 +106,15 @@ export class FavoriteUtils {
           : FavoriteUtils.sortByName(cached);
       }
 
-      const favorites = await getCollection("favorites");
+      const favorites = (await getCollection("favorites")) || [];
+
       if (useCache) {
         FavoriteUtils.favoritesCache = favorites;
+      }
+
+      // If the collection is empty, return it directly
+      if (favorites.length === 0) {
+        return favorites;
       }
 
       return sortBy === "category"
