@@ -67,11 +67,17 @@ export class PostUtils {
    * @param posts - Array of posts to sort
    * @returns Sorted array of posts
    */
-  public static sortByDate(posts: ReadonlyArray<Blog>): Blog[] {
+  public static sortByDate(posts: ReadonlyArray<Blog>): ReadonlyArray<Blog> {
     return [...posts].sort((a, b) => {
-      const dateA = a.data.modDatetime ?? a.data.pubDatetime;
-      const dateB = b.data.modDatetime ?? b.data.pubDatetime;
-      return dateB.getTime() - dateA.getTime();
+      const dateA =
+        typeof a.data.modDatetime === "string"
+          ? a.data.modDatetime
+          : a.data.pubDatetime;
+      const dateB =
+        typeof b.data.modDatetime === "string"
+          ? b.data.modDatetime
+          : b.data.pubDatetime;
+      return new Date(dateB).getTime() - new Date(dateA).getTime();
     });
   }
 
