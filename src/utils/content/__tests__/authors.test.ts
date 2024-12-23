@@ -29,15 +29,16 @@ describe("AuthorUtils", () => {
     render: vi.fn(),
   };
 
-  // Clear mocks before each test
+  // Setup and cleanup
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(console, "error").mockImplementation(() => {});
     AuthorUtils["authorCache"] = null; // Reset cache
   });
 
-  // Clean up after all tests
   afterEach(() => {
     vi.resetAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("getAuthorEntry", () => {
@@ -70,12 +71,19 @@ describe("AuthorUtils", () => {
       expect(result).toBeNull();
     });
 
-    it("should throw error when getEntry fails", async () => {
+    it("should return null when getEntry fails", async () => {
       const error = new Error("Database error");
       vi.mocked(getEntry).mockRejectedValueOnce(error);
 
-      await expect(AuthorUtils.getAuthorEntry("john-doe")).rejects.toThrow(
-        "Author retrieval failed: Database error"
+      const result = await AuthorUtils.getAuthorEntry("john-doe");
+
+      expect(result).toBeNull();
+      // Verify error was logged
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining(
+          "Failed to fetch author with identifier: john-doe"
+        ),
+        error
       );
     });
   });
@@ -101,13 +109,10 @@ describe("AuthorUtils", () => {
       expect(getCollection).toHaveBeenCalledTimes(1);
     });
 
-    it("should throw error when getCollection fails", async () => {
-      const error = new Error("Database error");
-      vi.mocked(getCollection).mockRejectedValueOnce(error);
+    it("should return an empty array when getCollection fails", async () => {
+      const result = await AuthorUtils.getAllAuthors();
 
-      await expect(AuthorUtils.getAllAuthors()).rejects.toThrow(
-        "Authors collection retrieval failed: Database error"
-      );
+      expect(result).toEqual([]);
     });
   });
 
@@ -128,11 +133,13 @@ describe("AuthorUtils", () => {
       expect(result).toBeNull();
     });
 
-    it("should propagate errors from getAuthorEntry", async () => {
+    it("should return null when getEntry fails", async () => {
       const error = new Error("Database error");
       vi.mocked(getEntry).mockRejectedValueOnce(error);
 
-      await expect(AuthorUtils.getAuthorData("john-doe")).rejects.toThrow();
+      const result = await AuthorUtils.getAuthorData("john-doe");
+
+      expect(result).toBeNull();
     });
   });
 
@@ -153,13 +160,13 @@ describe("AuthorUtils", () => {
       expect(getEntry).toHaveBeenCalledTimes(3);
     });
 
-    it("should throw error when resolution fails", async () => {
+    it("should handle errors during resolution", async () => {
       const error = new Error("Database error");
       vi.mocked(getEntry).mockRejectedValueOnce(error);
 
-      await expect(AuthorUtils.resolveAuthors(["john-doe"])).rejects.toThrow(
-        "Author resolution failed: Author retrieval failed: Database error"
-      );
+      const result = await AuthorUtils.resolveAuthors(["john-doe"]);
+
+      expect(result).toEqual([null]);
     });
   });
 

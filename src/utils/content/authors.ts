@@ -26,7 +26,7 @@ export class AuthorUtils {
    * Retrieves an author entry by slug or author reference with error handling
    * @param author - Author identifier (string slug or reference object)
    * @returns Promise resolving to Author entry or null if not found
-   * @throws Error if the author retrieval fails
+   * Returns null if the author is not found or if retrieval fails
    */
   public static async getAuthorEntry(
     author: string | { collection: "authors"; id: string }
@@ -36,32 +36,33 @@ export class AuthorUtils {
       const entry = await getEntry("authors", identifier);
       return entry || null;
     } catch (error) {
+      // Log the error but return null instead of throwing
       console.error(
         `Failed to fetch author with identifier: ${typeof author === "string" ? author : author.id}`,
         error
       );
-      throw new Error(
-        `Author retrieval failed: ${error instanceof Error ? error.message : "Unknown error"}`
-      );
+      return null;
     }
   }
 
   /**
    * Retrieves all authors with caching for performance
-   * @returns Promise resolving to array of all authors
-   * @throws Error if authors collection retrieval fails
+   * @returns Promise resolving to array of all authors, or empty array if retrieval fails
    */
   public static async getAllAuthors(): Promise<Author[]> {
     try {
       if (!AuthorUtils.authorCache) {
-        AuthorUtils.authorCache = await getCollection("authors");
+        const result = await getCollection("authors");
+        if (!Array.isArray(result)) {
+          console.error("Invalid authors collection format");
+          return [];
+        }
+        AuthorUtils.authorCache = result;
       }
-      return AuthorUtils.authorCache;
+      return AuthorUtils.authorCache || [];
     } catch (error) {
       console.error("Failed to fetch authors collection", error);
-      throw new Error(
-        `Authors collection retrieval failed: ${error instanceof Error ? error.message : "Unknown error"}`
-      );
+      return [];
     }
   }
 
@@ -71,13 +72,8 @@ export class AuthorUtils {
    * @returns Promise resolving to author data or null if not found
    */
   public static async getAuthorData(slug: string): Promise<AuthorData | null> {
-    try {
-      const author = await AuthorUtils.getAuthorEntry(slug);
-      return author?.data || null;
-    } catch (error) {
-      console.error(`Failed to fetch author data for slug: ${slug}`, error);
-      throw error; // Re-throw to allow caller to handle
-    }
+    const author = await AuthorUtils.getAuthorEntry(slug);
+    return author?.data || null;
   }
 
   /**
@@ -88,16 +84,10 @@ export class AuthorUtils {
   public static async resolveAuthors(
     authors: ReadonlyArray<string | { collection: "authors"; id: string }>
   ): Promise<(Author | null)[]> {
-    try {
-      return await Promise.all(
-        authors.map(author => AuthorUtils.getAuthorEntry(author))
-      );
-    } catch (error) {
-      console.error("Failed to resolve authors", error);
-      throw new Error(
-        `Author resolution failed: ${error instanceof Error ? error.message : "Unknown error"}`
-      );
-    }
+    // Since getAuthorEntry now handles errors internally, we can simplify this
+    return Promise.all(
+      authors.map(author => AuthorUtils.getAuthorEntry(author))
+    );
   }
 
   /**

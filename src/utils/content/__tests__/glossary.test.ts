@@ -50,15 +50,16 @@ describe("GlossaryUtils", () => {
     },
   ];
 
-  // Clear mocks and cache before each test
+  // Setup and cleanup
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(console, "error").mockImplementation(() => {});
     GlossaryUtils["glossaryCache"] = null;
   });
 
-  // Clean up after all tests
   afterEach(() => {
     vi.resetAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("sortByDate", () => {
@@ -154,12 +155,16 @@ describe("GlossaryUtils", () => {
       expect(getCollection).toHaveBeenCalledTimes(2);
     });
 
-    it("should throw GlossaryError when collection retrieval fails", async () => {
+    it("should return empty array when collection retrieval fails", async () => {
       const error = new Error("Database error");
       vi.mocked(getCollection).mockRejectedValueOnce(error);
 
-      await expect(GlossaryUtils.getAllEntries()).rejects.toThrow(
-        "Failed to fetch glossary entries"
+      const result = await GlossaryUtils.getAllEntries();
+
+      expect(result).toEqual([]);
+      expect(console.error).toHaveBeenCalledWith(
+        "Failed to fetch glossary entries",
+        error
       );
     });
 
@@ -170,11 +175,14 @@ describe("GlossaryUtils", () => {
       expect(result).toEqual([]);
     });
 
-    it("should throw GlossaryError when response is not an array", async () => {
+    it("should return empty array when response is not an array", async () => {
       vi.mocked(getCollection).mockResolvedValueOnce({} as any);
 
-      await expect(GlossaryUtils.getAllEntries()).rejects.toThrow(
-        "Failed to fetch glossary entries: Invalid response format"
+      const result = await GlossaryUtils.getAllEntries();
+
+      expect(result).toEqual([]);
+      expect(console.error).toHaveBeenCalledWith(
+        "Invalid glossary collection format"
       );
     });
   });
@@ -196,12 +204,16 @@ describe("GlossaryUtils", () => {
       expect(result).toBeNull();
     });
 
-    it("should throw GlossaryError when retrieval fails", async () => {
+    it("should return null when retrieval fails", async () => {
       const error = new Error("Database error");
       vi.mocked(getEntry).mockRejectedValueOnce(error);
 
-      await expect(GlossaryUtils.getEntry("test-entry")).rejects.toThrow(
-        "Failed to fetch glossary entry with slug: test-entry"
+      const result = await GlossaryUtils.getEntry("test-entry");
+
+      expect(result).toBeNull();
+      expect(console.error).toHaveBeenCalledWith(
+        "Failed to fetch glossary entry with slug: test-entry",
+        error
       );
     });
   });
@@ -222,11 +234,13 @@ describe("GlossaryUtils", () => {
 
     it("should handle invalid author references", async () => {
       vi.mocked(getCollection).mockResolvedValueOnce(mockGlossaryEntries);
-      vi.mocked(getEntry).mockRejectedValue(new Error("Invalid author"));
+      // Mock getEntry to return null for invalid author
+      vi.mocked(getEntry).mockResolvedValueOnce(null);
 
       const result = await GlossaryUtils.getEntriesByAuthor("invalid-author");
 
       expect(result).toEqual([]);
+      expect(getEntry).toHaveBeenCalledWith("authors", "invalid-author");
     });
   });
 
@@ -310,7 +324,7 @@ describe("GlossaryUtils", () => {
     });
   });
 
-  describe.skip("getRelatedEntries", () => {
+  describe("getRelatedEntries", () => {
     it("should find related entries based on title similarity", async () => {
       vi.mocked(getCollection).mockResolvedValueOnce([
         { ...mockGlossary, data: { ...mockGlossaryData, title: "Test Entry" } },

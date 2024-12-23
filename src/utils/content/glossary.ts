@@ -3,19 +3,6 @@ import { AuthorUtils } from "./authors";
 import type { Glossary, ContentMetadata } from "./types";
 
 /**
- * Custom error class for glossary-related operations
- */
-class GlossaryError extends Error {
-  constructor(
-    message: string,
-    public readonly cause?: unknown
-  ) {
-    super(message);
-    this.name = "GlossaryError";
-  }
-}
-
-/**
  * Sort options for glossary entries
  */
 type SortOption = "date" | "title";
@@ -86,8 +73,7 @@ export class GlossaryUtils {
   /**
    * Retrieves all glossary entries with optional sorting and caching
    * @param options - Optional configuration for sorting and caching
-   * @returns Promise resolving to array of entries
-   * @throws GlossaryError if retrieval fails
+   * @returns Promise resolving to array of entries, or empty array if retrieval fails
    */
   public static async getAllEntries(
     options: {
@@ -115,15 +101,9 @@ export class GlossaryUtils {
       const result = await getCollection("glossary");
 
       // Handle undefined/null result or non-array result
-      if (!result) {
+      if (!result || !Array.isArray(result)) {
+        console.error("Invalid glossary collection format");
         return [];
-      }
-
-      // Ensure result is an array
-      if (!Array.isArray(result)) {
-        throw new GlossaryError(
-          "Failed to fetch glossary entries: Invalid response format"
-        );
       }
 
       // Update cache only if using cache
@@ -131,41 +111,33 @@ export class GlossaryUtils {
         GlossaryUtils.glossaryCache = result;
       }
 
-      const entries = result;
-
       // Return sorted entries
       return sortBy === "date"
-        ? GlossaryUtils.sortByDate(entries)
-        : GlossaryUtils.sortByTitle(entries);
+        ? GlossaryUtils.sortByDate(result)
+        : GlossaryUtils.sortByTitle(result);
     } catch (error) {
       // Clear cache on error if not using cache
       if (!useCache) {
         GlossaryUtils.clearCache();
       }
 
-      // Re-throw GlossaryErrors, wrap others
-      if (error instanceof GlossaryError) {
-        throw error;
-      }
-      throw new GlossaryError("Failed to fetch glossary entries", error);
+      console.error("Failed to fetch glossary entries", error);
+      return [];
     }
   }
 
   /**
    * Retrieves a single glossary entry by slug
    * @param slug - Unique identifier for the entry
-   * @returns Promise resolving to entry or null if not found
-   * @throws GlossaryError if retrieval fails
+   * @returns Promise resolving to entry or null if not found or if retrieval fails
    */
   public static async getEntry(slug: string): Promise<Glossary | null> {
     try {
       const entry = await getEntry("glossary", slug);
       return entry || null;
     } catch (error) {
-      throw new GlossaryError(
-        `Failed to fetch glossary entry with slug: ${slug}`,
-        error
-      );
+      console.error(`Failed to fetch glossary entry with slug: ${slug}`, error);
+      return null;
     }
   }
 
@@ -227,18 +199,16 @@ export class GlossaryUtils {
           if (content.includes(searchTerm)) {
             return [entry];
           }
-        } catch {
-          // If any render fails, return empty array as per test requirement
-          return [];
+        } catch (error) {
+          console.error(`Failed to render entry ${entry.id}`, error);
+          continue;
         }
       }
 
       return [];
     } catch (error) {
-      throw new GlossaryError(
-        `Failed to search entries with query: ${query}`,
-        error
-      );
+      console.error(`Failed to search entries with query: ${query}`, error);
+      return [];
     }
   }
 
@@ -270,7 +240,8 @@ export class GlossaryUtils {
           ])
       );
     } catch (error) {
-      throw new GlossaryError("Failed to group entries by alphabet", error);
+      console.error("Failed to group entries by alphabet", error);
+      return {};
     }
   }
 
@@ -304,10 +275,8 @@ export class GlossaryUtils {
         .slice(0, limit)
         .map(item => item.entry);
     } catch (error) {
-      throw new GlossaryError(
-        `Failed to get related entries for: ${entry.id}`,
-        error
-      );
+      console.error(`Failed to get related entries for: ${entry.id}`, error);
+      return [];
     }
   }
 
