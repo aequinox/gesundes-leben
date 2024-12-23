@@ -1,6 +1,6 @@
 import { getCollection, getEntry } from "astro:content";
 import { AuthorUtils } from "./authors";
-import type { Glossary, ContentMetadata } from "./types";
+import type { Glossary } from "./types";
 
 /**
  * Sort options for glossary entries
@@ -21,10 +21,27 @@ export class GlossaryUtils {
   private static glossaryCache: Glossary[] | null = null;
 
   /**
-   * Minimum similarity threshold for related entries
+   * Common words to exclude when comparing titles
    * @private
    */
-  private static readonly SIMILARITY_THRESHOLD = 0.3;
+  private static readonly COMMON_WORDS = new Set([
+    "a",
+    "an",
+    "and",
+    "as",
+    "at",
+    "by",
+    "for",
+    "from",
+    "in",
+    "into",
+    "of",
+    "on",
+    "or",
+    "the",
+    "to",
+    "with",
+  ]);
 
   /**
    * Clears the glossary cache
@@ -42,17 +59,12 @@ export class GlossaryUtils {
   public static sortByDate(entries: ReadonlyArray<Glossary>): Glossary[] {
     return [...entries].sort((a, b) => {
       const getDateValue = (entry: Glossary) => {
-        // Get the latest date between pubDatetime and modDatetime
         const pubDate = new Date(entry.data.pubDatetime).getTime();
         const modDate = entry.data.modDatetime
           ? new Date(entry.data.modDatetime).getTime()
           : 0;
-
-        // Return the later date
         return Math.max(pubDate, modDate);
       };
-
-      // Sort in descending order (newest first)
       return getDateValue(b) - getDateValue(a);
     });
   }
@@ -73,7 +85,7 @@ export class GlossaryUtils {
   /**
    * Retrieves all glossary entries with optional sorting and caching
    * @param options - Optional configuration for sorting and caching
-   * @returns Promise resolving to array of entries, or empty array if retrieval fails
+   * @returns Promise resolving to array of entries
    */
   public static async getAllEntries(
     options: {
@@ -84,7 +96,6 @@ export class GlossaryUtils {
     const { sortBy = "title", useCache = true } = options;
 
     try {
-      // If using cache and cache exists, return sorted cached entries
       if (useCache && GlossaryUtils.glossaryCache) {
         const cached = GlossaryUtils.glossaryCache;
         return sortBy === "date"
@@ -92,35 +103,27 @@ export class GlossaryUtils {
           : GlossaryUtils.sortByTitle(cached);
       }
 
-      // Always clear cache when bypass is requested
       if (!useCache) {
         GlossaryUtils.clearCache();
       }
 
-      // Fetch fresh entries
       const result = await getCollection("glossary");
-
-      // Handle undefined/null result or non-array result
       if (!result || !Array.isArray(result)) {
         console.error("Invalid glossary collection format");
         return [];
       }
 
-      // Update cache only if using cache
       if (useCache) {
         GlossaryUtils.glossaryCache = result;
       }
 
-      // Return sorted entries
       return sortBy === "date"
         ? GlossaryUtils.sortByDate(result)
         : GlossaryUtils.sortByTitle(result);
     } catch (error) {
-      // Clear cache on error if not using cache
       if (!useCache) {
         GlossaryUtils.clearCache();
       }
-
       console.error("Failed to fetch glossary entries", error);
       return [];
     }
@@ -129,7 +132,7 @@ export class GlossaryUtils {
   /**
    * Retrieves a single glossary entry by slug
    * @param slug - Unique identifier for the entry
-   * @returns Promise resolving to entry or null if not found or if retrieval fails
+   * @returns Promise resolving to entry or null
    */
   public static async getEntry(slug: string): Promise<Glossary | null> {
     try {
@@ -142,111 +145,7 @@ export class GlossaryUtils {
   }
 
   /**
-   * Retrieves entries by author with proper error handling
-   * @param authorSlug - Author's unique identifier
-   * @returns Promise resolving to array of entries by the author
-   */
-  public static async getEntriesByAuthor(
-    authorSlug: string
-  ): Promise<Glossary[]> {
-    try {
-      // First verify the author exists
-      const author = await AuthorUtils.getAuthorEntry(authorSlug);
-      if (!author) {
-        return [];
-      }
-
-      // Get entries without default sorting
-      const entries = await getCollection("glossary");
-
-      // Return empty array if entries is undefined/null/not an array
-      if (!Array.isArray(entries)) {
-        return [];
-      }
-
-      // Filter entries by author
-      return entries.filter(entry => entry.data.author === authorSlug);
-    } catch (error) {
-      // Return empty array for any errors
-      return [];
-    }
-  }
-
-  /**
-   * Searches glossary entries by title or content with improved error handling
-   * @param query - Search term
-   * @returns Promise resolving to array of matching entries
-   */
-  public static async searchEntries(query: string): Promise<Glossary[]> {
-    try {
-      const entries = await GlossaryUtils.getAllEntries();
-      const searchTerm = query.toLowerCase();
-
-      // First search by title for exact matches
-      const titleMatches = entries.filter(entry =>
-        entry.data.title.toLowerCase().includes(searchTerm)
-      );
-
-      if (titleMatches.length > 0) {
-        return titleMatches;
-      }
-
-      // If no title matches, search content
-      for (const entry of entries) {
-        try {
-          const rendered = await entry.render();
-          const content = rendered.toString().toLowerCase();
-          if (content.includes(searchTerm)) {
-            return [entry];
-          }
-        } catch (error) {
-          console.error(`Failed to render entry ${entry.id}`, error);
-          continue;
-        }
-      }
-
-      return [];
-    } catch (error) {
-      console.error(`Failed to search entries with query: ${query}`, error);
-      return [];
-    }
-  }
-
-  /**
-   * Groups entries by first letter of title with improved sorting
-   * @returns Promise resolving to record of letters and their entries
-   */
-  public static async getEntriesByAlphabet(): Promise<
-    Record<string, Glossary[]>
-  > {
-    try {
-      const entries = await GlossaryUtils.getAllEntries();
-      const grouped = entries.reduce(
-        (acc: Record<string, Glossary[]>, entry) => {
-          const firstLetter = entry.data.title.charAt(0).toUpperCase();
-          (acc[firstLetter] = acc[firstLetter] || []).push(entry);
-          return acc;
-        },
-        {}
-      );
-
-      // Sort entries within each group
-      return Object.fromEntries(
-        Object.entries(grouped)
-          .sort(([a], [b]) => a.localeCompare(b))
-          .map(([letter, entries]) => [
-            letter,
-            GlossaryUtils.sortByTitle(entries),
-          ])
-      );
-    } catch (error) {
-      console.error("Failed to group entries by alphabet", error);
-      return {};
-    }
-  }
-
-  /**
-   * Gets related entries based on title similarity with improved filtering
+   * Gets related entries based on shared significant words in titles
    * @param entry - Reference entry to find related entries for
    * @param limit - Maximum number of related entries to return
    * @returns Promise resolving to array of related entries
@@ -257,23 +156,26 @@ export class GlossaryUtils {
   ): Promise<Glossary[]> {
     try {
       const allEntries = await GlossaryUtils.getAllEntries();
-      const currentTitle = entry.data.title.toLowerCase();
+      const otherEntries = allEntries.filter(e => e.id !== entry.id);
 
-      return allEntries
-        .filter(e => e.id !== entry.id)
-        .map(e => ({
-          entry: e,
-          similarity: GlossaryUtils.calculateSimilarity(
-            currentTitle,
-            e.data.title.toLowerCase()
-          ),
-        }))
-        .filter(
-          ({ similarity }) => similarity >= GlossaryUtils.SIMILARITY_THRESHOLD
-        )
-        .sort((a, b) => b.similarity - a.similarity)
+      const referenceWords = GlossaryUtils.getSignificantWords(
+        entry.data.title
+      );
+      if (referenceWords.size === 0) return [];
+
+      const scoredEntries = otherEntries.map(e => ({
+        entry: e,
+        score: GlossaryUtils.calculateRelevanceScore(
+          referenceWords,
+          GlossaryUtils.getSignificantWords(e.data.title)
+        ),
+      }));
+
+      return scoredEntries
+        .filter(({ score }) => score > 0)
+        .sort((a, b) => b.score - a.score)
         .slice(0, limit)
-        .map(item => item.entry);
+        .map(({ entry }) => entry);
     } catch (error) {
       console.error(`Failed to get related entries for: ${entry.id}`, error);
       return [];
@@ -281,35 +183,58 @@ export class GlossaryUtils {
   }
 
   /**
-   * Calculates similarity between two strings using Levenshtein distance
-   * @param str1 - First string to compare
-   * @param str2 - Second string to compare
-   * @returns Similarity score between 0 and 1
+   * Extracts significant words from a title
+   * @param title - Title to process
+   * @returns Set of significant words
    * @private
    */
-  private static calculateSimilarity(str1: string, str2: string): number {
-    const len1 = str1.length;
-    const len2 = str2.length;
-    const matrix: number[][] = Array(len1 + 1)
-      .fill(null)
-      .map(() => Array(len2 + 1).fill(null));
+  private static getSignificantWords(title: string): Set<string> {
+    return new Set(
+      title
+        .toLowerCase()
+        .split(/[\s-]+/)
+        .map(word => word.replace(/[^\w\s]/g, ""))
+        .filter(
+          word =>
+            word.length > 1 &&
+            !GlossaryUtils.COMMON_WORDS.has(word) &&
+            !/^\d+$/.test(word)
+        )
+    );
+  }
 
-    for (let i = 0; i <= len1; i++) matrix[i][0] = i;
-    for (let j = 0; j <= len2; j++) matrix[0][j] = j;
+  /**
+   * Calculates relevance score between two sets of words
+   * @param referenceWords - Words from reference title
+   * @param compareWords - Words to compare against
+   * @returns Relevance score (0-1)
+   * @private
+   */
+  private static calculateRelevanceScore(
+    referenceWords: Set<string>,
+    compareWords: Set<string>
+  ): number {
+    // Convert sets to arrays for easier manipulation
+    const refArray = [...referenceWords];
+    const compareArray = [...compareWords];
 
-    for (let i = 1; i <= len1; i++) {
-      for (let j = 1; j <= len2; j++) {
-        const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j] + 1,
-          matrix[i][j - 1] + 1,
-          matrix[i - 1][j - 1] + cost
-        );
-      }
-    }
+    // Calculate matching words and their positions
+    const matches = refArray.filter(word => compareArray.includes(word));
 
-    const maxLen = Math.max(len1, len2);
-    return 1 - matrix[len1][len2] / maxLen;
+    if (matches.length === 0) return 0;
+
+    // Calculate base score from number of matches
+    const baseScore = matches.length / refArray.length;
+
+    // Add position bonus for words that appear earlier in the title
+    const positionBonus =
+      matches.reduce((sum, word) => {
+        const refPosition = refArray.indexOf(word);
+        return sum + 1 / (refPosition + 1);
+      }, 0) / matches.length;
+
+    // Combine scores with position bonus having less weight
+    return baseScore * 0.8 + positionBonus * 0.2;
   }
 
   /**

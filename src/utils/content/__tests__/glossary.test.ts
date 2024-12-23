@@ -218,148 +218,95 @@ describe("GlossaryUtils", () => {
     });
   });
 
-  describe("getEntriesByAuthor", () => {
-    it("should retrieve entries by author", async () => {
-      vi.mocked(getCollection).mockResolvedValueOnce(mockGlossaryEntries);
-      vi.mocked(getEntry).mockResolvedValue({
-        ...mockGlossary,
-        id: "kai-renner",
-        slug: "kai-renner",
-      });
-
-      const result = await GlossaryUtils.getEntriesByAuthor("kai-renner");
-
-      expect(result).toEqual(mockGlossaryEntries);
-    });
-
-    it("should handle invalid author references", async () => {
-      vi.mocked(getCollection).mockResolvedValueOnce(mockGlossaryEntries);
-      // Mock getEntry to return null for invalid author
-      vi.mocked(getEntry).mockResolvedValueOnce(null);
-
-      const result = await GlossaryUtils.getEntriesByAuthor("invalid-author");
-
-      expect(result).toEqual([]);
-      expect(getEntry).toHaveBeenCalledWith("authors", "invalid-author");
-    });
-  });
-
-  describe("searchEntries", () => {
-    const mockRender = vi.fn();
-
-    beforeEach(() => {
-      mockRender.mockResolvedValue({
-        toString: () => "Test content with searchable text",
-      });
-    });
-
-    it("should search entries by title", async () => {
-      vi.mocked(getCollection).mockResolvedValueOnce([
-        {
-          ...mockGlossary,
-          data: { ...mockGlossaryData, title: "Searchable Title" },
-        },
-      ]);
-
-      const result = await GlossaryUtils.searchEntries("searchable");
-
-      expect(result.length).toBe(1);
-      expect(result[0].data.title).toBe("Searchable Title");
-    });
-
-    it("should search entries by content", async () => {
-      const entryWithRender = {
-        ...mockGlossary,
-        render: mockRender.mockResolvedValue({
-          toString: () => "Test content with searchable text",
-        }),
-      };
-      vi.mocked(getCollection).mockResolvedValueOnce([entryWithRender]);
-
-      const result = await GlossaryUtils.searchEntries("searchable");
-
-      expect(result.length).toBe(1);
-    });
-
-    it("should handle render failures gracefully", async () => {
-      const entryWithFailingRender = {
-        ...mockGlossary,
-        render: vi.fn().mockRejectedValue(new Error("Render failed")),
-        rendered: undefined,
-      };
-      vi.mocked(getCollection).mockResolvedValueOnce([entryWithFailingRender]);
-
-      const result = await GlossaryUtils.searchEntries("xx");
-
-      expect(result).toEqual([]);
-    });
-  });
-
-  describe("getEntriesByAlphabet", () => {
-    it("should group entries by first letter of title", async () => {
-      const entries = [
-        { ...mockGlossary, data: { ...mockGlossaryData, title: "Apple" } },
-        { ...mockGlossary, data: { ...mockGlossaryData, title: "Banana" } },
-        { ...mockGlossary, data: { ...mockGlossaryData, title: "another" } },
-      ];
-      vi.mocked(getCollection).mockResolvedValueOnce(entries);
-
-      const result = await GlossaryUtils.getEntriesByAlphabet();
-
-      expect(Object.keys(result).sort()).toEqual(["A", "B"]);
-      expect(result["A"].length).toBe(2); // "Apple" and "another"
-      expect(result["B"].length).toBe(1);
-    });
-
-    it("should sort entries within each group", async () => {
-      const entries = [
-        { ...mockGlossary, data: { ...mockGlossaryData, title: "Alpha" } },
-        { ...mockGlossary, data: { ...mockGlossaryData, title: "another" } },
-      ];
-      vi.mocked(getCollection).mockResolvedValueOnce(entries);
-
-      const result = await GlossaryUtils.getEntriesByAlphabet();
-
-      expect(result["A"].map(e => e.data.title)).toEqual(["Alpha", "another"]);
-    });
-  });
-
   describe("getRelatedEntries", () => {
-    it("should find related entries based on title similarity", async () => {
-      vi.mocked(getCollection).mockResolvedValueOnce([
-        { ...mockGlossary, data: { ...mockGlossaryData, title: "Test Entry" } },
-        {
-          ...mockGlossary,
-          data: { ...mockGlossaryData, title: "Test Entry 2" },
-        },
-        { ...mockGlossary, data: { ...mockGlossaryData, title: "Unrelated" } },
-      ]);
+    const createMockEntry = (id: string, title: string): Glossary => ({
+      ...mockGlossary,
+      id,
+      data: { ...mockGlossaryData, title },
+    });
+
+    it("should find entries with shared significant words", async () => {
+      const entries = [
+        createMockEntry("1", "JavaScript Programming Guide"),
+        createMockEntry("2", "Advanced JavaScript Techniques"),
+        createMockEntry("3", "Python Programming"),
+        createMockEntry("4", "Unrelated Topic"),
+      ];
+      vi.mocked(getCollection).mockResolvedValueOnce(entries);
+
+      const result = await GlossaryUtils.getRelatedEntries(entries[0]);
+
+      expect(result).toHaveLength(2);
+      // Test for presence of expected titles without enforcing order
+      const titles = result.map(e => e.data.title);
+      expect(titles).toContain("Advanced JavaScript Techniques");
+      expect(titles).toContain("Python Programming");
+    });
+
+    it("should ignore common words and numbers", async () => {
+      const entries = [
+        createMockEntry("1", "The Art of Programming"),
+        createMockEntry("2", "Programming 101"),
+        createMockEntry("3", "A Guide to the Art"),
+        createMockEntry("4", "Something Different"),
+      ];
+      vi.mocked(getCollection).mockResolvedValueOnce(entries);
+
+      const result = await GlossaryUtils.getRelatedEntries(entries[0]);
+
+      expect(result).toHaveLength(2);
+      // Test for presence of expected titles without enforcing order
+      const titles = result.map(e => e.data.title);
+      expect(titles).toContain("Programming 101");
+      expect(titles).toContain("A Guide to the Art");
+    });
+
+    it("should respect the limit parameter", async () => {
+      const entries = [
+        createMockEntry("1", "Web Development"),
+        createMockEntry("2", "Web Design"),
+        createMockEntry("3", "Web Security"),
+        createMockEntry("4", "Web Performance"),
+      ];
+      vi.mocked(getCollection).mockResolvedValueOnce(entries);
+
+      const result = await GlossaryUtils.getRelatedEntries(entries[0], 2);
+
+      expect(result).toHaveLength(2);
+    });
+
+    it("should exclude the reference entry", async () => {
+      const entries = [
+        createMockEntry("1", "Test Topic"),
+        createMockEntry("2", "Test Topic"), // Same title, different ID
+      ];
+      vi.mocked(getCollection).mockResolvedValueOnce(entries);
+
+      const result = await GlossaryUtils.getRelatedEntries(entries[0]);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe("2");
+    });
+
+    it("should handle entries with no significant words", async () => {
+      const entries = [
+        createMockEntry("1", "The and of"),
+        createMockEntry("2", "A to the"),
+      ];
+      vi.mocked(getCollection).mockResolvedValueOnce(entries);
+
+      const result = await GlossaryUtils.getRelatedEntries(entries[0]);
+
+      expect(result).toHaveLength(0);
+    });
+
+    it("should handle errors gracefully", async () => {
+      vi.mocked(getCollection).mockRejectedValueOnce(new Error("Test error"));
 
       const result = await GlossaryUtils.getRelatedEntries(mockGlossary);
 
-      expect(result.length).toBe(1);
-      expect(result[0].data.title).toBe("Test Entry 2");
-    });
-
-    it("should limit the number of related entries", async () => {
-      const similarEntries = Array.from({ length: 10 }, (_, i) => ({
-        ...mockGlossary,
-        id: `entry-${i}`,
-        data: { ...mockGlossaryData, title: `Test Entry ${i}` },
-      }));
-      vi.mocked(getCollection).mockResolvedValueOnce(similarEntries);
-
-      const result = await GlossaryUtils.getRelatedEntries(mockGlossary, 3);
-
-      expect(result.length).toBe(3);
-    });
-
-    it("should exclude the reference entry from results", async () => {
-      vi.mocked(getCollection).mockResolvedValueOnce([mockGlossary]);
-
-      const result = await GlossaryUtils.getRelatedEntries(mockGlossary);
-
-      expect(result.length).toBe(0);
+      expect(result).toEqual([]);
+      expect(console.error).toHaveBeenCalled();
     });
   });
 

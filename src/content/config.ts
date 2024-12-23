@@ -29,8 +29,8 @@ export interface ImageReference {
 }
 
 // Schema Constants
-const RATING_VALUES = ["1", "2", "3", "4", "5"] as const;
-type Rating = (typeof RATING_VALUES)[number];
+// const RATING_VALUES = ["1", "2", "3", "4", "5"] as const;
+// type Rating = (typeof RATING_VALUES)[number];
 const DEFAULT_CATEGORY = ["Selbstentwicklung"];
 
 // Collection Schemas
