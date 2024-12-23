@@ -21,8 +21,8 @@ describe("AuthorUtils", () => {
   };
 
   const mockAuthor: Author = {
-    id: "kai-renner",
-    slug: "kai-renner",
+    id: "john-doe",
+    slug: "john-doe",
     body: "",
     collection: "authors",
     data: mockAuthorData,
@@ -44,10 +44,10 @@ describe("AuthorUtils", () => {
     it("should retrieve an author by string slug", async () => {
       vi.mocked(getEntry).mockResolvedValueOnce(mockAuthor);
 
-      const result = await AuthorUtils.getAuthorEntry("kai-renner");
+      const result = await AuthorUtils.getAuthorEntry("john-doe");
 
       expect(result).toEqual(mockAuthor);
-      expect(getEntry).toHaveBeenCalledWith("authors", "kai-renner");
+      expect(getEntry).toHaveBeenCalledWith("authors", "john-doe");
     });
 
     it("should retrieve an author by reference object", async () => {
@@ -55,11 +55,11 @@ describe("AuthorUtils", () => {
 
       const result = await AuthorUtils.getAuthorEntry({
         collection: "authors",
-        id: "kai-renner",
+        id: "john-doe",
       });
 
       expect(result).toEqual(mockAuthor);
-      expect(getEntry).toHaveBeenCalledWith("authors", "kai-renner");
+      expect(getEntry).toHaveBeenCalledWith("authors", "john-doe");
     });
 
     it("should return null for non-existent author", async () => {
@@ -74,7 +74,7 @@ describe("AuthorUtils", () => {
       const error = new Error("Database error");
       vi.mocked(getEntry).mockRejectedValueOnce(error);
 
-      await expect(AuthorUtils.getAuthorEntry("kai-renner")).rejects.toThrow(
+      await expect(AuthorUtils.getAuthorEntry("john-doe")).rejects.toThrow(
         "Author retrieval failed: Database error"
       );
     });
@@ -115,7 +115,7 @@ describe("AuthorUtils", () => {
     it("should retrieve author data by slug", async () => {
       vi.mocked(getEntry).mockResolvedValueOnce(mockAuthor);
 
-      const result = await AuthorUtils.getAuthorData("kai-renner");
+      const result = await AuthorUtils.getAuthorData("john-doe");
 
       expect(result).toEqual(mockAuthorData);
     });
@@ -132,7 +132,7 @@ describe("AuthorUtils", () => {
       const error = new Error("Database error");
       vi.mocked(getEntry).mockRejectedValueOnce(error);
 
-      await expect(AuthorUtils.getAuthorData("kai-renner")).rejects.toThrow();
+      await expect(AuthorUtils.getAuthorData("john-doe")).rejects.toThrow();
     });
   });
 
@@ -144,9 +144,9 @@ describe("AuthorUtils", () => {
         .mockResolvedValueOnce(mockAuthor);
 
       const result = await AuthorUtils.resolveAuthors([
-        "kai-renner",
+        "john-doe",
         "non-existent",
-        { collection: "authors", id: "kai-renner" },
+        { collection: "authors", id: "john-doe" },
       ]);
 
       expect(result).toEqual([mockAuthor, null, mockAuthor]);
@@ -157,7 +157,7 @@ describe("AuthorUtils", () => {
       const error = new Error("Database error");
       vi.mocked(getEntry).mockRejectedValueOnce(error);
 
-      await expect(AuthorUtils.resolveAuthors(["kai-renner"])).rejects.toThrow(
+      await expect(AuthorUtils.resolveAuthors(["john-doe"])).rejects.toThrow(
         "Author resolution failed: Author retrieval failed: Database error"
       );
     });
@@ -167,7 +167,7 @@ describe("AuthorUtils", () => {
     it("should return true for existing author", async () => {
       vi.mocked(getEntry).mockResolvedValueOnce(mockAuthor);
 
-      const result = await AuthorUtils.authorExists("kai-renner");
+      const result = await AuthorUtils.authorExists("john-doe");
 
       expect(result).toBe(true);
     });
@@ -183,7 +183,7 @@ describe("AuthorUtils", () => {
     it("should return false when getEntry throws", async () => {
       vi.mocked(getEntry).mockRejectedValueOnce(new Error("Database error"));
 
-      const result = await AuthorUtils.authorExists("kai-renner");
+      const result = await AuthorUtils.authorExists("john-doe");
 
       expect(result).toBe(false);
     });
