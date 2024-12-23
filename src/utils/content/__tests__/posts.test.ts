@@ -13,7 +13,7 @@ describe("PostUtils", () => {
   // Sample test data
   const mockPostData: Blog["data"] = {
     title: "Test Post",
-    author: "john-doe",
+    author: "kai-renner",
     pubDatetime: new Date("2024-01-01"),
     modDatetime: new Date("2024-01-02"),
     draft: false,

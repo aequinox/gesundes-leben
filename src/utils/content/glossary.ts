@@ -114,11 +114,9 @@ export class GlossaryUtils {
       // Fetch fresh entries
       const result = await getCollection("glossary");
 
-      // Handle undefined/null result
+      // Handle undefined/null result or non-array result
       if (!result) {
-        throw new GlossaryError(
-          "Failed to fetch glossary entries: No entries found"
-        );
+        return [];
       }
 
       // Ensure result is an array

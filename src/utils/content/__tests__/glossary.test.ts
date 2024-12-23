@@ -13,7 +13,7 @@ describe("GlossaryUtils", () => {
   // Sample test data
   const mockGlossaryData = {
     title: "Test Entry",
-    author: "john-doe",
+    author: "kai-renner",
     pubDatetime: new Date("2024-01-01"),
     modDatetime: new Date("2024-01-02"),
   };
@@ -162,6 +162,21 @@ describe("GlossaryUtils", () => {
         "Failed to fetch glossary entries"
       );
     });
+
+    it("should handle empty collection", async () => {
+      vi.mocked(getCollection).mockResolvedValueOnce([]);
+
+      const result = await GlossaryUtils.getAllEntries();
+      expect(result).toEqual([]);
+    });
+
+    it("should throw GlossaryError when response is not an array", async () => {
+      vi.mocked(getCollection).mockResolvedValueOnce({} as any);
+
+      await expect(GlossaryUtils.getAllEntries()).rejects.toThrow(
+        "Failed to fetch glossary entries: Invalid response format"
+      );
+    });
   });
 
   describe("getEntry", () => {
@@ -196,11 +211,11 @@ describe("GlossaryUtils", () => {
       vi.mocked(getCollection).mockResolvedValueOnce(mockGlossaryEntries);
       vi.mocked(getEntry).mockResolvedValue({
         ...mockGlossary,
-        id: "john-doe",
-        slug: "john-doe",
+        id: "kai-renner",
+        slug: "kai-renner",
       });
 
-      const result = await GlossaryUtils.getEntriesByAuthor("john-doe");
+      const result = await GlossaryUtils.getEntriesByAuthor("kai-renner");
 
       expect(result).toEqual(mockGlossaryEntries);
     });
