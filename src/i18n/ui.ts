@@ -251,7 +251,7 @@ export const ui: Record<
 
     // Date and Time
     "datetime.at": "at",
-    "readingTime.minutes": "min read",
+    "readingTime.minutes": "minutes read",
 
     // Author
     "author.from": "from",
@@ -376,7 +376,7 @@ export const ui: Record<
 
     // Date and Time
     "datetime.at": "um",
-    "readingTime.minutes": "min Lesezeit",
+    "readingTime.minutes": "Minuten Lesezeit",
 
     // Author
     "author.from": "von",
