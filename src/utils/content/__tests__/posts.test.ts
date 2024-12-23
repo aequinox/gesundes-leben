@@ -125,7 +125,7 @@ describe("PostUtils", () => {
     });
   });
 
-  describe.skip("getAllPosts", () => {
+  describe("getAllPosts", () => {
     it("should retrieve all posts with default filtering", async () => {
       vi.mocked(getCollection).mockResolvedValueOnce(mockPosts);
 
@@ -271,7 +271,7 @@ describe("PostUtils", () => {
     });
   });
 
-  describe.skip("postExists", () => {
+  describe("postExists", () => {
     it("should return true for existing post", async () => {
       vi.mocked(getCollection).mockResolvedValueOnce(mockPosts);
 

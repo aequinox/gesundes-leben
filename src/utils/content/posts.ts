@@ -89,13 +89,17 @@ export class PostUtils {
    * @private
    */
   private static filterPosts(
-    posts: ReadonlyArray<Blog>,
+    posts: ReadonlyArray<Blog> | undefined | null,
     options: PostFilterOptions = {}
   ): Blog[] {
+    if (!posts) {
+      return [];
+    }
+
     const { includeDrafts = false, includeScheduled = false } = options;
     const now = new Date();
 
-    return posts.filter(post => {
+    return Array.from(posts).filter(post => {
       if (!includeDrafts && post.data.draft) return false;
       if (!includeScheduled && post.data.pubDatetime > now) return false;
       return true;
@@ -108,10 +112,13 @@ export class PostUtils {
    * @returns Promise resolving to array of posts
    * @throws PostError if retrieval fails
    */
-  public static async getAllPosts(options: PostOptions = {}): Promise<Blog[]> {
+  public static async getAllPosts(
+    options: PostOptions = {}
+  ): Promise<ReadonlyArray<Blog>> {
     const { sort = true, useCache = true, ...filterOptions } = options;
 
     try {
+      // Check cache first if enabled
       if (useCache && PostUtils.postsCache) {
         const filteredPosts = PostUtils.filterPosts(
           PostUtils.postsCache,
@@ -120,15 +127,27 @@ export class PostUtils {
         return sort ? PostUtils.sortByDate(filteredPosts) : filteredPosts;
       }
 
+      // Fetch posts from collection
       const posts = await getCollection("blog");
+
+      // Handle posts collection
+      const postsArray = posts || [];
+
+      // Update cache if enabled
       if (useCache) {
-        PostUtils.postsCache = posts;
+        PostUtils.postsCache = postsArray;
       }
 
-      const filteredPosts = PostUtils.filterPosts(posts, filterOptions);
+      // Filter and sort posts
+      const filteredPosts = PostUtils.filterPosts(postsArray, filterOptions);
       return sort ? PostUtils.sortByDate(filteredPosts) : filteredPosts;
     } catch (error) {
-      throw new PostError("Failed to fetch blog posts", error);
+      // Enhanced error handling with more context
+      const message =
+        error instanceof Error
+          ? `Failed to fetch blog posts: ${error.message}`
+          : "Failed to fetch blog posts";
+      throw new PostError(message, error);
     }
   }
 
