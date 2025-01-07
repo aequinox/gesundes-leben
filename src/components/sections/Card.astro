@@ -145,13 +145,15 @@ const readMoreClasses = [
           )
         }
 
-        <h2
-          id={`post-title-${slug}`}
-          class={titleClasses}
-          transition:name={slugifyStr(title)}
-        >
-          {title}
-        </h2>
+        <a href={href} aria-label={`Read more about ${title}`}>
+          <h2
+            id={`post-title-${slug}`}
+            class={titleClasses}
+            transition:name={slugifyStr(title)}
+          >
+            {title}
+          </h2>
+        </a>
 
         <ArticleMeta post={post} />
 
@@ -219,12 +221,12 @@ const readMoreClasses = [
 
   /* Focus styles */
   article:focus-within {
-    @apply ring-2 ring-skin-accent ring-offset-2;
+    @apply ring-1 ring-skin-accent;
   }
 
   /* Link focus styles */
   a:focus-visible {
-    @apply outline-none ring-2 ring-skin-accent ring-offset-2;
+    @apply outline-none ring-1 ring-skin-accent;
   }
 
   /* Reduced motion */
