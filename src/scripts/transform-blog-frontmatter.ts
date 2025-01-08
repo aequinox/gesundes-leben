@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { parse, stringify } from "yaml";
 import { readFileSync, writeFileSync, readdirSync, unlinkSync } from "fs";
 import { join } from "path";
-import { slugify } from "../utils/slugify";
+import { slugifyStr } from "../utils/slugify";
 import { CATEGORIES, GROUPS } from "../data/taxonomies";
 import type { Category } from "../data/taxonomies";
 
@@ -73,7 +73,7 @@ function transformFrontmatter(
     id: frontmatter.id || uuidv4(),
     title: frontmatter.title,
     author: "sandra-pfeiffer",
-    slug: slugify(frontmatter.title),
+    slug: slugifyStr(frontmatter.title),
     description: "", // Will be updated by ChatGPT
     heroImage: frontmatter.coverImage
       ? {
