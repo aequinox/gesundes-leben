@@ -1,0 +1,123 @@
+---
+title: "Gesunde Grenzen setzen lernen"
+date: "2024-09-18"
+categories:
+  - "lifestyle-psyche"
+tags:
+  - "angst"
+  - "burnout"
+  - "selbstfuersorge"
+  - "stress"
+coverImage: "Depositphotos_56702307_XL-scaled.jpg"
+---
+
+## Was du über das Grenzen setzen wissen solltest in unter 10 Minuten
+
+**und warum du Nein sagen üben solltest.**
+
+## Was sind gesunde Grenzen?
+
+Gesunde Grenzen zu setzen bedeutet, dass du in der Lage bist, Nein zu sagen zu den Anfragen und Bitten anderer Menschen. Insbesondere, wenn es dadurch zu einem Konflikt mit deinen Werten kommt. Gesunde Grenzen sind die Eckpfeiler von gesunden Beziehungen – sowohl derer mit anderen als auch der Beziehung zu dir selbst.
+
+Wenn du ja zu anderen sagst, stelle sicher, dass du nicht nein zu dir selbst sagst.
+
+Paulo Coelho
+
+Das fällt uns erst mal gar nicht so leicht. Erstens möchten wir vielleicht ein harmonisches Umfeld und befürchten, dass andere enttäuscht oder ärgerlich mit uns sein könnten, wenn wir nicht tun, was sie sich wünschen. Zweitens haben wir alle ein sehr großes Bedürfnis danach, uns mit anderen zu verbinden. Und sich zu verbinden ist – zumindest dem Anschein nach – am einfachsten, wenn wir etwas tun, das dem anderen zugutekommt oder gefällt. Denn dann hat der andere erst mal eine gute Meinung von uns und ist zufrieden. Drittens denken wir vielleicht auch so etwas wie „eine Hand wäscht die andere“ und dann ist es nicht schlecht, wenn wir jemandem einen Gefallen tun, denn dann tut der andere uns vermutlich auch einmal einen Gefallen, wenn wir zukünftig Hilfe brauchen.
+
+Gesunde Grenzen zu setzen ist aber unerlässlich, wenn wir uns selbst treu bleiben, unsere Ziele verfolgen, unsere Werte leben und mit unserer Lebens-Zeit und unseren Ressourcen sorgfältig umgehen möchten. Denn wer sich ununterbrochen verausgabt, läuft Gefahr, die eigene Seele auf dem Altar der Gefälligkeit zu opfern.
+
+Beispiele gesunder Grenzen
+
+- Dein Partner:in bittet dich, zu einer Veranstaltung über das Wochenende mitzugehen. Du sagst Nein, weil du Zeit zur Erholung benötigst nach einer anstrengenden Arbeitswoche – obwohl du befürchtest, dass er/sie ärgerlich sein könnte.
+
+- Du sagst deiner Schwiegermutter, dass heute kein geeigneter Tag ist, um spontan vorbeizuschauen.
+
+- Du prüfst keine E-Mails mehr oder sozialen Medien vor dem Zubettgehen, um deine Regenerationsphasen zu schützen und guten Schlaf zu unterstützen.
+
+- Für das Wochenende hast du einen Ausflug mit deinen Kindern geplant, aber dein Chef fragt dich per E-Mail, ob du am Samstag zur Arbeit kommst aufgrund eines Engpasses. Du befürchtest, du könntest deinen Chef enttäuschen, aber letztendlich bleibst du deinem Vorsatz treu, am Wochenende nicht zu arbeiten und priorisierst die gemeinsame Aktivität mit deinen Kindern.
+
+- Obwohl du für gewöhnlich das Osterfest für die Familie ausrichtest, sagst du dieses Mal nein, weil du bei der Arbeit gerade besonders gefordert bist und die Woche danach in den Urlaub fährst und nicht bereits erschöpft die Reise antreten möchtest.
+
+Es erfordert viel Mut, sich gegen unsere Feinde zu behaupten, aber genauso viel, sich gegen unsere Freunde zu behaupten.
+
+**J. K. Rowling**
+
+## Konsequenzen eines Mangels an Grenzen setzen
+
+Häufig denken wir an die möglichen Konsequenzen, wenn wir Grenzen setzen, aber nicht an die Konsequenzen, die folgen können, wenn wir keine Grenzen setzen. Deshalb lass uns einmal anschauen, welche Konsequenzen es haben kann, wenn du nicht Nein sagst, sondern dich vorrangig um die Bedürfnisse und Wünsche anderer kümmerst.
+
+- **Beziehungsprobleme:** Wer seine eigenen Wünsche und Bedürfnisse gewohnheitsmäßig ignoriert, um den Wünschen anderer nachzukommen, in dem wächst der Groll immer weiter an, was schließlich zu Vertrauensverlust, unterdrückter Aggression, verringerter Intimität, häufigen Konflikten und vielen anderen Beziehungsproblemen führt.
+
+- **Ein geringes [Selbstwertgefühl](https://gesundheit-in-tuebingen.de/4-regeln-fuer-ein-gutes-selbstwertgefuehl/):** Kennst du jemanden, der dafür bewundert wird, dass er niemals für sich selbst eintritt, seine Zeit nicht schützt und fortlaufend seine eigenen Wünsche und Bedürfnisse zurückstellt, um andere Menschen zu befriedigen? Nein? Das ist keine Überraschung und der Grund, warum solche Menschen häufig von anderen schlecht behandelt werden, denn sie verlieren den Respekt. Und das ist nachvollziehbar, denn wer sich selbst und seine Bedürfnisse nicht respektiert, kann nicht erwarten, von anderen respektiert zu werden.
+
+- **Stress und Burnout:** Wer zu den Bitten anderer nicht Nein sagen lernt, fällt schnell in eine chronische Überforderung und gerät unter Stress. Mehr noch – das kann in einem Teufelskreis enden. Denn wenn dich andere als jemanden wahrnehmen, der immer Ja sagt, stellen die Menschen in deinem Umfeld natürlich immer mehr Anfragen an dich. Daraus entwickelt sich häufig ein Teufelskreis aus chronischem Stress, der schließlich in einem Burnout enden kann.
+
+- **Ängste und chronische Sorgen:** Mangelnde Abgrenzung – und im Allgemeinen ein Mangel an Durchsetzungskraft – ist eine der Hauptursachen für chronische Sorgen und Ängste, die den meisten Menschen nicht bewusst ist.
+
+- **Co-Abhängigkeit und Gefallsucht (d. h. es jedem recht machen wollen):** Wenn es dir schwerfällt, Nein zu sagen, liegt das oft an der Angst, dass andere Menschen von dir enttäuscht sein könnten. Je mehr du es jedoch vermeidest, Nein zu sagen und gesunde Grenzen zu setzen, desto stärker wird deine Überzeugung, dass du dafür verantwortlich bist, andere Menschen bei Laune zu halten, was es noch schwieriger macht, gute Grenzen zu setzen. Und dann befindest du dich in einem weiteren Teufelskreis.
+
+- **Anfälligkeit und Krankheit:** Man weiß heute aus der [Psychoneuroimmunologie](https://gesundheit-in-tuebingen.de/glossar/psychoneuroimmunologie/), dass Menschen, die nicht Nein sagen und Grenzen setzen, häufig krank werden, teilweise auch schwer krank. Studien haben gezeigt, dass Menschen, die Schwierigkeiten haben, persönliche Grenzen zu setzen und sich gegenüber anderen abzugrenzen, häufiger unter stressbedingten Gesundheitsproblemen leiden.
+
+Zusammengefasst lässt sich sagen, dass die Fähigkeit, „nein“ zu sagen, ein wichtiger Bestandteil des Stressmanagements und der allgemeinen Gesundheit sein kann.
+
+Grenzen zu setzen bedeutet den Mut zu haben uns selbst zu lieben, selbst wenn wir dadurch riskieren andere zu enttäuschen.
+
+**Brené Brown**
+
+## Wesentliche Erkenntnisse über gesunde Grenzen
+
+Es ist nicht ungewöhnlich, dass man sich dreht und windet und versucht, sich um das Nein  sagen herumzudrücken. Das geht den meisten von uns so. Hier findest du einige wichtige Erkenntnisse darüber, warum es uns so geht und warum es sich lohnt, das Grenzen setzen zu lernen und zu üben.
+
+- Grenzen zu setzen ist schwierig, weil es mit schwierigen Gefühlen verbunden ist und diese uns unangenehm sind. **Der Schlüssel zum Setzen (und Durchsetzen) gesunder Grenzen ist daher die Fähigkeit, mit den schwierigen Emotionen umzugehen, die mit dem Nein sagen einhergehen.** Wenn du beispielsweise nicht ertragen kannst, dass jemand wütend auf dich ist, weil du seine Bitte abgelehnt hast, wird es dir schwerfallen, gesunde Grenzen zu setzen. **Beim Setzen von Grenzen geht es folglich viel weniger um Kommunikation, als die meisten Menschen denken, sondern viel mehr um emotionale Belastbarkeit.** Gleichzeitig ist es für dich eine Chance, genau das zu lernen – die unangenehmen Gefühle auszuhalten (deine und die anderer). Und um etwas zu lernen, braucht man immer Übung! Also kannst du dich ebenso gut freuen, wenn dir eine Gelegenheit zum Nein sagen gegeben wird, weil es dir eine Gelegenheit bietet zu üben.
+
+- **Beim Setzen gesunder Grenzen geht es in erster Linie um dich und dein Verhalten, und nicht um das Verhalten anderer.** Beim Grenzensetzen geht es darum, zu bestimmen, wie du dich angesichts der Wünsche oder des schlechten Verhaltens anderer Menschen verhalten wirst. Es ist weitverbreitet, das aus dem Blick zu verlieren, aber du hast keine Kontrolle über das, was andere Menschen tun – das Einzige, was du kontrollieren kannst, ist dein eigenes Verhalten.
+
+- **Wenn du Nein sagst, ist das die einzige Möglichkeit für andere Menschen, deine Grenzen kennenzulernen. Und nur, was man kennt, kann man auch respektieren.** Das bedeutet, genau genommen tust du dem anderen einen Gefallen damit, wenn du nein sagst. Die meisten Menschen möchten ihr Gegenüber respektieren und ein harmonisches Miteinander gestalten. Das kann man aber nur, wenn man die gegenseitigen Grenzen kennenlernt und einschätzen kann. Denn nur so ist eine Abwägung und Abstimmung aufeinander möglich. Also tue dem anderen den Gefallen, deine Grenzen klar zu äußern.
+
+- **Jedes „Nein“ ist ein „Ja“ zu etwas anderem.** Das Setzen von Grenzen kann dir vielleicht wie eine übermäßig negative Sache vorkommen – eine ganze Menge Nein sagen. Aber vergiss nicht: Der Grund, warum du zu etwas Nein sagst, ist, dass du zu etwas anderem Ja sagen kannst. Ein Beispiel: Du sagst Nein zu einem Treffen mit einer Freundin, weil du Ja sagst zu Selbstfürsorge und einem ruhigen Abend mit dir selbst.
+
+Nur wenn du nein sagst, kannst du dich auf die Dinge konzentrieren, die wirklich wichtig sind.
+
+**Steve Jobbs**
+
+## Tipps und Methoden, um gesunde Grenzen zu setzen
+
+Wie das Allermeiste im Leben kann man auch das Grenzensetzen üben und erlernen. Und es gibt natürlich auch Tipps und Methoden, wie das gut gelingen kann. Hier findest du einige davon.
+
+- **Setze keine Grenze, die du nicht durchzusetzen bereit bist.** Grenzen zu setzen ist schwierig, sie durchzusetzen ist noch schwieriger. Aber wenn du Grenzen setzt und sie dann nicht durchsetzt, lernen die Menschen in deinem Umfeld, dass sie deine Grenzen nicht respektieren müssen. Und das macht dir das Grenzensetzen und Durchsetzen auf lange Sicht noch schwieriger. Überlege es dir deshalb genau, bevor du eine Grenze setzt. Die folgende Frage kann dabei hilfreich sein: Bin ich bereit, diese Grenze durchzusetzen, wenn sie verletzt wird?
+
+- **Sei spezifisch beim Grenzensetzen. Grenzen sollten sich auf das Verhalten beziehen – nicht auf Gefühle, Überzeugungen, Erwartungen, Wünsche, Träume usw.** Wenn du eine Grenze setzt, sollte ganz klar sein, mit welchem Verhalten du nicht einverstanden bist und wie du darauf reagieren wirst, wenn es vorkommt.  
+   Ein Beispiel: Du kannst keine Grenze gegen Wut an sich setzen, aber du kannst  eine Grenze setzen, wenn dich jemand anbrüllt. Du kannst keine Grenze setzen, wenn dein Partner:in sich „nicht kümmert“, aber du kannst eine Grenze setzen, wenn er/sie auf den sozialen Medien herum daddelt, anstatt im Haushalt zu helfen.
+
+- **Sei dir klar über die Werte hinter deinen Grenzen.** Das Setzen und Durchsetzen gesunder Grenzen kann eine Herausforderung sein. Das bedeutet, dass du die größtmögliche Motivation dafür benötigst, die du aufbringen kannst. Und eine der besten Möglichkeiten, deine Motivation für etwas zu steigern – auch für das Setzen gesunder Grenzen – besteht darin, dir deiner Werte bewusst zu sein. **Je klarer du dir darüber bist, warum die jeweilige Grenze für dich wirklich wichtig ist, desto mehr Motivation und Entschlossenheit wirst du aufbringen, sie zu setzen und durchzusetzen.**
+
+„Nein" ist ein vollständiger Satz.
+
+**Annie Lamott**
+
+## Übung ist das halbe Leben
+
+Viele von uns drücken sich gerne darum, Nein zu jemand anderem zu sagen. Abhängig von deinen bisherigen Erfahrungen und deiner erlernten Haltung dazu. Manche haben vielleicht im Elternhaus einen entspannten Umgang damit gelernt. Die meisten Menschen, die ich kenne, eher nicht. Deshalb ist es eine Herausforderung, Nein zu sagen und Grenzen gegenüber anderen zu setzen.
+
+**Aber hey, Herausforderungen sind dafür da, dass wir sie bewältigen!** Und jedes Mal, wenn du eine Grenze setzt und den Mut aufbringst, Nein zu sagen, hast du die Chance, eine neue, gute Erfahrung damit zu machen und zu lernen und besser darin zu werden. Und irgendwann wirst du durch viel Übung feststellen, dass dir ein Nein leicht von den Lippen kommt und du dadurch echte Lebensqualität gewinnst und mehr Leichtigkeit. Und dafür lohnt sich der Einsatz auf jeden Fall. Das ist zumindest das Feedback meiner Klient:innen, die sich auf diese Reise begeben – und auch meine eigene Erfahrung.
+
+Erstaunlicherweise haben viele Menschen auch kein Problem mit einem klaren Nein, sondern eher damit, wenn unklar kommuniziert wird und offen bleibt, wie der andere zum Gesagten steht. Also nur Mut und munter das Grenzen setzen üben. **#weildueswertbist**
+
+## Erinnere dich daran
+
+- Keine gesunden Grenzen zu setzen und nicht nein zu sagen, hat Konsequenzen, die dir dein Leben erschweren können, auch wenn es kurzfristig einfacher erscheint, ja zu sagen.
+
+- Wer sich selbst und seine Bedürfnisse und Grenzen nicht respektiert, kann nicht erwarten, von anderen respektiert zu werden.
+
+- Um gesunde Grenzen zu setzen, ist es wichtig zu lernen, deine emotionale Belastbarkeit aufzubauen. Übung ist der Schlüssel dazu.
+
+- Beim Grenzen setzen geht es um dich und dein Verhalten, denn das ist das Einzige, was du kontrollieren kannst. Über andere kannst du nicht bestimmen.
+
+- Wenn du Nein sagst, bietest du anderen eine Chance, deine Grenzen kennenzulernen.
+
+- Jedes „Nein“ ist gleichzeitig ein „Ja“ zu etwas, das dir wichtig ist.
+
+Quellen:
+
+- `Maté, Gabriel. _*The Myth of Normal: Trauma, Illness, and Healing in a Toxic Culture*_. Avery, 2022.`.

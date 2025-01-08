@@ -1,0 +1,50 @@
+---
+title: "Lesenswert: Würde: Was uns stark macht - als Einzelne und als Gesellschaft"
+date: "2024-08-30"
+categories:
+  - "lesenswertes"
+tags:
+  - "neurobiologie"
+  - "wuerde"
+coverImage: "Depositphotos_308745418_XL-scaled.jpg"
+---
+
+## Die Würde aus wissenschaftlicher Sicht, erklärt von einem Professor der Neurobiologie
+
+**von Gerald Hüther.**
+
+Wer noch kein Fan von Gerald Hüther ist, hat etwas verpasst und sollte es dringend werden. Seit Jahrzehnten setzt sich der Professor der Neurobiologie und Autor für mehr Bewusstsein für neurobiologische Erkenntnisse und - wie ich finde - mehr Menschlichkeit ein. Dabei vermittelt er nicht nur die wissenschaftliche Materie, sondern vor allem deren Einfluss auf die Bildung, die gesellschaftliche sowie die ganz persönliche Entwicklung.
+
+Hüther hat nicht nur eine ganze Reihe hervorragender Bücher über die umfassenden Themen der Hirnforschung geschrieben, sondern es gibt auch viele YouTube Videos, in denen er in einfachen Bildern und verständlicher Sprache vermittelt, wie wir uns neurobiologische Erkenntnisse zunutze machen können. Er erklärt, wie uns diese dienen können, um unsere Kinder kindgerechter zu erziehen und in uns schlummernde Potenziale zu entwickeln.
+
+Seine besondere Art, komplexe Vorgänge und Zusammenhänge auf einfache, zugewandte und klar verständliche Weise zu erklären, ist für ihn charakteristisch und was ich besonders an seinen Werken liebe. Er redet nicht geschwollen, wie wir das von so manchen Experten gewohnt sind, um sich hervorzutun und abzuheben. Er redet mit uns wie der nette, gebildete Typ von nebenan, der großzügig sein Wissen mit uns teilt, weil er überzeugt ist, dass es uns nützen kann und man durch das, was man teilt, reicher wird.
+
+In “Würde” hat er sich aus wissenschaftlicher Sicht an ein großes und dringliches Thema gewagt: Die elementaren Fragen, was Würde ist, wie es um unsere Würde (gesellschaftlich) steht, wozu wir Würde brauchen, wie wir uns unserer Würde bewusst sein können und wieso wir unsere Würde dringender denn je erforschen und (wieder-) entdecken sollten. Sein Buch gipfelt in dem Kapitel, wie es wäre “in Würde zu leben, bevor wir in Würde sterben.“
+
+Förderung von Würde und Gleichheit ist nicht nur ein Traum, sondern eine Pflicht für alle Menschen.
+
+**nelson Mandela**
+
+Mich hat sein Buch in tiefen Bereichen meines Herzens angerührt und besinnlich werden lassen. Es ist, als würden durch seine Worte eine tiefe Sehnsucht geweckt, wie Leben auch sein könnte, und wie ich selbst sein und handeln könnte, damit sich Leben wirklich gut, authentisch und richtig anfühlt.
+
+Gleichzeitig wurde mir durch sein Buch einmal mehr bewusst, in wie vielen Bereichen unsere Gesellschaft bereits in würdelose Eskapaden abgerutscht ist (zum Beispiel in manchen Forschungsgebieten) und dies im Allgemeinen hingenommen wird, ohne dass ein Aufschrei der Entrüstung durch die Bevölkerung geht. Stattdessen vielleicht eher ein laxes Schulterzucken. Mehr noch, viele begrüßen vielleicht sogar Entwicklungen, bei denen Forschung um des Forschens willen betrieben wird und in Bereiche vordringt, die man früher als “heilig” und “unantastbar“ angesehen hat. Die Frage “wollen wir das? Und wozu?” die Hüther in seinem Buch stellt, stellen sich die Akteure dabei leider eher nicht.
+
+Umso wichtiger ist es, dass du und ich das tun, und wagen, uns existenziellen Fragen zu stellen. Daran erinnert Hüther und fragt auch: Willst du das? Was bedeutet Würde für dich? Was verstehst du darunter? Was kann sie dir bringen? Und wenn du sie hast, wie könnte es dann möglich sein, dass sie dir jemand anders wieder nimmt?
+
+Die Würde des Menschen besteht in der Wahl.
+
+**Mahatma Gandhi**
+
+Diese Fragen sind nicht immer bequem. Aber jeder, der sich für das Leben und wie wir es uns gestalten, interessiert – denn wir sind Gestalter unseres Lebens – wird nicht davor zurückschrecken, sich mit ihnen zu beschäftigen und Hüther dafür dankbar sein, dass er sie stellt und uns damit zum Innehalten und Nachsinnen bringt.
+
+Schön ist, dass uns Hüther mit diesen wichtigen Fragen nicht allein lässt, sondern Hinweise, Einblicke und Erkenntnisse aus seiner jahrzehntelangen Arbeit zur Verfügung stellt. So leitet er unseren inneren Exkurs und flüstert uns zu: “Es ist möglich in Würde zu leben. Mach mit!” **#weildueswertbist**
+
+![Aufgeschlagenes Buch auf einem Schreibtisch mit verschwommenen Bibliotheksregalen im Hintergrund.](images/banner_book_suggestion_c3040951-8a56-41eb-bc0c-d8096c258e3a-1024x256.png)
+
+Werbung:
+
+##### "Würde: Was uns stark macht - als Einzelne und als Gesellschaft"
+
+von Gerald Hüther
+
+## Das Buch zum Artikel
