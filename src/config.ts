@@ -57,7 +57,7 @@ type Site = {
  */
 export const SITE: Site = {
   website: "https://gesundes-leben.vision/",
-  author: "Kai Renner",
+  author: "kai-renner",
   profile: "https://gesundes-leben.vision",
   desc: "Entdecke wertvolle Tipps und Einblicke für ein gesundes Leben. Von Ernährung bis mentale Gesundheit - dein Wegweiser zu mehr Wohlbefinden.",
   title: "Gesundes Leben",
