@@ -1,6 +1,22 @@
-import type socialIcons from "@/assets/socialIcons";
+/**
+ * Site Configuration and Types
+ * This module contains all global configuration settings and type definitions
+ * for the Astro blog theme.
+ */
 
+// Import social media icon definitions
+import type socialIcons from "./assets/socialIcons";
+
+// Type Definitions
 export type SocialPlatform = keyof typeof socialIcons;
+
+/**
+ * Social media link configuration
+ * @property name - Platform name (must match socialIcons keys)
+ * @property href - URL to social media profile
+ * @property active - Whether to display the social link
+ * @property linkTitle - Accessible title for the link
+ */
 export interface SocialObject {
   readonly name: SocialPlatform;
   readonly href: string;
@@ -10,172 +26,125 @@ export interface SocialObject {
 
 export type SocialObjects = readonly SocialObject[];
 
+/**
+ * Main site configuration type
+ * Defines all configurable aspects of the site
+ */
 type Site = {
-  website: string;
-  author: string;
-  profile: string;
-  desc: string;
-  title: string;
-  ogImage?: string;
-  lightAndDarkMode: boolean;
-  postPerIndex: number;
-  postPerPage: number;
-  scheduledPostMargin: number;
-  showArchives?: boolean;
-  showSearch?: boolean;
+  website: string; // Production URL
+  author: string; // Site author name
+  profile: string; // Author profile URL
+  desc: string; // Site description
+  title: string; // Site title
+  ogImage?: string; // Default Open Graph image
+  lightAndDarkMode: boolean; // Theme toggle support
+  postPerIndex: number; // Posts on index page
+  postPerPage: number; // Posts per pagination page
+  scheduledPostMargin: number; // Buffer time for scheduled posts
+  showArchives?: boolean; // Show archives section
+  showSearch?: boolean; // Enable search functionality
   editPost?: {
-    url?: URL["href"];
-    text?: string;
-    appendFilePath?: boolean;
+    // Edit post link configuration
+    url?: URL["href"]; // Base URL for edits
+    text?: string; // Edit link text
+    appendFilePath?: boolean; // Add file path to URL
   };
 };
 
+/**
+ * Site Configuration
+ * Main configuration object for the site
+ */
 export const SITE: Site = {
-  website: "https://gesundes-leben.vision/", // replace this with your deployed domain
-  author: "kai-renner",
+  website: "https://gesundes-leben.vision/",
+  author: "Kai Renner",
   profile: "https://gesundes-leben.vision",
-  desc: "A minimal, responsive and SEO-friendly Astro blog theme.",
+  desc: "Entdecke wertvolle Tipps und Einblicke für ein gesundes Leben. Von Ernährung bis mentale Gesundheit - dein Wegweiser zu mehr Wohlbefinden.",
   title: "Gesundes Leben",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,
   postPerIndex: 4,
   postPerPage: 6,
-  scheduledPostMargin: 15 * 60 * 1000, // 15 minutes
+  scheduledPostMargin: 15 * 60 * 1000, // 15 minutes in milliseconds
   showArchives: true,
   showSearch: true,
 };
 
+/**
+ * Locale Configuration
+ * Defines language settings for the site
+ */
 export const LOCALE = {
-  lang: "de", // html lang code. Set this empty and default will be "en"
-  langTag: ["de-DE"], // BCP 47 Language Tags. Set this empty [] to use the environment default
+  lang: "de", // Primary language
+  langTag: ["de-DE"], // BCP 47 language tags for better SEO
 } as const;
 
+/**
+ * Logo Configuration
+ * Settings for the site logo
+ */
 export const LOGO_IMAGE = {
-  enable: false,
-  svg: true,
-  width: 216,
-  height: 46,
+  enable: false, // Whether to show logo
+  svg: true, // Use SVG format
+  width: 216, // Logo width
+  height: 46, // Logo height
 };
 
+/**
+ * Social Media Links
+ * Configuration for social media presence
+ * Note: Only keep active:true for platforms you actually use
+ */
 export const SOCIALS: SocialObjects = [
-  {
-    name: "Github",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: ` ${SITE.title} on Github`,
-    active: true,
-  },
+  // Active social platforms
   {
     name: "Facebook",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on Facebook`,
+    href: "https://github.com/satnaing/astro-paper", // TODO: Update with actual Facebook page
+    linkTitle: `${SITE.title} auf Facebook`,
     active: true,
   },
   {
     name: "Instagram",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on Instagram`,
+    href: "https://github.com/satnaing/astro-paper", // TODO: Update with actual Instagram profile
+    linkTitle: `${SITE.title} auf Instagram`,
     active: true,
   },
   {
     name: "LinkedIn",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on LinkedIn`,
+    href: "https://github.com/satnaing/astro-paper", // TODO: Update with actual LinkedIn profile
+    linkTitle: `${SITE.title} auf LinkedIn`,
     active: true,
   },
+  // Email configuration
   {
     name: "Mail",
-    href: "mailto:yourmail@gmail.com",
-    linkTitle: `Send an email to ${SITE.title}`,
+    href: "mailto:kontakt@gesundes-leben.vision", // TODO: Update with actual email address
+    linkTitle: `E-Mail an ${SITE.title} senden`,
+    active: true,
+  },
+  // Inactive social platforms - consider removing unused ones
+  {
+    name: "Github",
+    href: "https://github.com/satnaing/astro-paper",
+    linkTitle: `${SITE.title} auf Github`,
     active: false,
   },
   {
     name: "Twitter",
     href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on Twitter`,
-    active: false,
-  },
-  {
-    name: "Twitch",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on Twitch`,
+    linkTitle: `${SITE.title} auf Twitter`,
     active: false,
   },
   {
     name: "YouTube",
     href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on YouTube`,
+    linkTitle: `${SITE.title} auf YouTube`,
     active: false,
   },
   {
     name: "WhatsApp",
     href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on WhatsApp`,
-    active: false,
-  },
-  {
-    name: "Snapchat",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on Snapchat`,
-    active: false,
-  },
-  {
-    name: "Pinterest",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on Pinterest`,
-    active: false,
-  },
-  {
-    name: "TikTok",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on TikTok`,
-    active: false,
-  },
-  {
-    name: "CodePen",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on CodePen`,
-    active: false,
-  },
-  {
-    name: "Discord",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on Discord`,
-    active: false,
-  },
-  {
-    name: "GitLab",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on GitLab`,
-    active: false,
-  },
-  {
-    name: "Reddit",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on Reddit`,
-    active: false,
-  },
-  {
-    name: "Skype",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on Skype`,
-    active: false,
-  },
-  {
-    name: "Steam",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on Steam`,
-    active: false,
-  },
-  {
-    name: "Telegram",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on Telegram`,
-    active: false,
-  },
-  {
-    name: "Mastodon",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on Mastodon`,
+    linkTitle: `${SITE.title} auf WhatsApp`,
     active: false,
   },
 ];
