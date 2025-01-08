@@ -17,6 +17,9 @@ import Hr from "@/components/elements/Hr.astro";
 import Socials from "@/components/sections/Socials.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { SITE } from "@/config";
+import { getAuthorEntry } from "@/utils/getAuthor";
+
+const author = await getAuthorEntry(SITE.author);
 
 interface Props {
   /** Whether to remove the top margin */
@@ -55,7 +58,7 @@ const copyrightClasses = [
     <div class={copyrightClasses}>
       <span>
         {t("footer.copyright")} &#169; {currentYear}
-        {SITE.author && ` ${SITE.author}`}
+        {SITE.author && ` ${author?.data.name ?? SITE.author}`}
       </span>
       <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
       <span>{t("footer.rights")}</span>
