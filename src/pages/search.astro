@@ -59,73 +59,131 @@ const searchProps: SearchProps = {
 
 <style is:global lang="css">
   .pagefind-ui {
-    --pagefind-ui-scale: 0.8;
+    --pagefind-ui-scale: 1;
     --pagefind-ui-primary: oklch(var(--color-accent));
     --pagefind-ui-text: oklch(var(--color-text-base));
     --pagefind-ui-background: oklch(var(--color-fill));
     --pagefind-ui-border: oklch(var(--color-border));
     --pagefind-ui-border-width: 2px;
-    --pagefind-ui-border-radius: 0.5rem;
+    --pagefind-ui-border-radius: 0.75rem;
     --pagefind-ui-tag: oklch(var(--color-fill));
-    --pagefind-ui-image-border-radius: 8px;
+    --pagefind-ui-image-border-radius: 12px;
     --pagefind-ui-image-box-ratio: 16 / 9;
-    --pagefind-ui-font: var(--font-family, system-ui, sans-serif);
+    --pagefind-ui-font: "Montserrat", var(--font-family, system-ui, sans-serif);
     width: 100%;
-    margin: 1rem auto;
+    margin: 2rem auto;
+  }
+
+  /* Search form wrapper */
+  .pagefind-ui div[data-pagefind-ui] {
+    @apply relative block w-full;
+  }
+
+  /* Search input container */
+  .pagefind-ui .pagefind-ui__search-container {
+    @apply relative;
   }
 
   .pagefind-ui .pagefind-ui__search-input {
-    @apply rounded-lg border-2 border-skin-line bg-skin-fill px-4 py-3 pl-12 focus-visible:outline-none;
-  }
-
-  .pagefind-ui .pagefind-ui__search-input:focus-visible {
-    @apply border-skin-accent outline-2 outline-offset-1 outline-skin-accent;
-  }
-
-  .pagefind-ui .pagefind-ui__search-clear {
-    @apply right-4;
-  }
-
-  .pagefind-ui .pagefind-ui__search-icon {
-    @apply left-4;
-  }
-
-  .pagefind-ui .pagefind-ui__drawer {
-    @apply mt-4;
-  }
-  .pagefind-ui.yellow {
-    --pagefind-ui-background: lightyellow;
-  }
-
-  .pagefind-ui.red {
-    --pagefind-ui-background: peachpuff;
+    @apply rounded-xl border-2 border-skin-line bg-skin-fill px-6 py-4 pl-14 pr-14 text-lg transition-all duration-300 ease-in-out focus-visible:outline-none;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
     width: 100%;
   }
 
+  /* Search input wrapper */
+  .pagefind-ui .pagefind-ui__search-container > div {
+    @apply relative;
+  }
+
+  .pagefind-ui .pagefind-ui__search-input:focus-visible {
+    @apply border-skin-accent outline-2 outline-offset-1 outline-skin-accent shadow-lg;
+    transform: translateY(-1px);
+  }
+
+  /* Clear button */
+  .pagefind-ui button[title="Clear search"] {
+    position: absolute !important;
+    right: 1rem !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 24px !important;
+    height: 24px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: none !important;
+    border: none !important;
+    opacity: 0.7 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    z-index: 100 !important;
+  }
+
+  /* Clear button hover */
+  .pagefind-ui button[title="Clear search"]:hover {
+    opacity: 1 !important;
+    transform: translateY(-50%) scale(1.1) !important;
+  }
+
+  /* Clear button icon */
+  .pagefind-ui button[title="Clear search"] svg {
+    width: 16px !important;
+    height: 16px !important;
+    display: block !important;
+  }
+
+  .pagefind-ui .pagefind-ui__search-icon {
+    @apply absolute left-5 scale-125 opacity-70;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .pagefind-ui .pagefind-ui__drawer {
+    @apply mt-6;
+  }
+
   .pagefind-ui .pagefind-ui__drawer:not(.pagefind-ui__hidden) {
-    @apply relative rounded-lg border-2 border-skin-line bg-skin-fill;
+    @apply relative rounded-xl border-2 border-skin-line bg-skin-fill transition-all duration-300;
     box-shadow:
       0 4px 6px -1px oklch(var(--color-card-muted) / 0.1),
       0 2px 4px -2px oklch(var(--color-card-muted) / 0.1);
   }
 
   .pagefind-ui .pagefind-ui__result {
-    @apply border-b-2 border-skin-line p-4;
+    @apply border-b-2 border-skin-line p-6 transition-colors duration-200 hover:bg-skin-card;
   }
 
   .pagefind-ui .pagefind-ui__result-link {
-    @apply text-lg font-semibold text-skin-accent hover:underline;
+    @apply text-xl font-bold text-skin-accent transition-all duration-200 hover:text-skin-accent hover:underline;
+    font-family: "Libre Baskerville", serif;
   }
 
   .pagefind-ui .pagefind-ui__result-excerpt {
-    @apply mt-2 text-skin-base;
+    @apply mt-3 text-base text-skin-base leading-relaxed;
+    font-family: "Montserrat", sans-serif;
   }
 
   .pagefind-ui .pagefind-ui__message {
-    @apply p-4 text-skin-base;
+    @apply p-6 text-lg text-skin-base;
+    font-family: "Montserrat", sans-serif;
   }
 
   .pagefind-ui mark {
-    @apply bg-skin-accent bg-opacity-20 px-1 text-skin-base;
+    @apply bg-skin-accent bg-opacity-20 px-1.5 py-0.5 text-skin-base rounded-md transition-colors duration-200;
+  }
+
+  /* Loading state */
+  .pagefind-ui__loading {
+    @apply opacity-70 transition-opacity duration-200;
+  }
+
+  /* Results count */
+  .pagefind-ui__results-count {
+    @apply text-sm text-skin-base opacity-75 mb-4;
+    font-family: "Montserrat", sans-serif;
   }
 </style>
