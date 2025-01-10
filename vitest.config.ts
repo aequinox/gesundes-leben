@@ -6,9 +6,13 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     // Include test files pattern
-    include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     // Exclude patterns
-    exclude: ['node_modules/**/*', 'dist/**/*'],
+    exclude: [
+      'node_modules/**/*', 
+      'dist/**/*',
+      '.astro/**/*'
+    ],
     // Enable test coverage reporting
     coverage: {
       provider: 'v8',

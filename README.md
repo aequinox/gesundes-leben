@@ -30,6 +30,7 @@ A modern, high-performance blog and content management system built with Astro, 
 │   ├── content/       # Blog posts and other content
 │   ├── layouts/       # Page layouts
 │   ├── pages/         # Page components
+│   ├── scripts/       # Utility scripts
 │   ├── styles/        # Global styles
 │   ├── types/         # TypeScript type definitions
 │   └── utils/         # Utility functions
@@ -59,17 +60,18 @@ npm run dev
 
 ## 🧞 Available Commands
 
-| Command           | Action                                       |
-| :---------------- | :------------------------------------------- |
-| `npm install`     | Installs dependencies                        |
-| `npm run dev`     | Starts local dev server at `localhost:4321`  |
-| `npm run build`   | Build your production site to `./dist/`      |
-| `npm run preview` | Preview your build locally, before deploying |
-| `npm run sync`    | Sync content types                           |
-| `npm run format`  | Format code with Prettier                    |
-| `npm run lint`    | Lint code with ESLint                        |
-| `npm run test`    | Run tests with Vitest                        |
-| `npm run test:ui` | Run tests with UI                            |
+| Command              | Action                                       |
+| :------------------- | :------------------------------------------- |
+| `npm install`        | Installs dependencies                        |
+| `npm run dev`        | Starts local dev server at `localhost:4321`  |
+| `npm run build`      | Build your production site to `./dist/`      |
+| `npm run preview`    | Preview your build locally, before deploying |
+| `npm run sync`       | Sync content types                           |
+| `npm run format`     | Format code with Prettier                    |
+| `npm run lint`       | Lint code with ESLint                        |
+| `npm run test`       | Run tests with Vitest                        |
+| `npm run test:ui`    | Run tests with UI                            |
+| `npm run set-drafts` | Set all blog posts to draft mode             |
 
 ## 🧪 Technologies
 

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.1] - 2024-05-13
+
+### Content Management Enhancement
+- **Scripts**
+  - Added `set-drafts.ts` utility script to manage blog post draft status
+  - Implemented comprehensive test suite for draft management functionality
+  - Added TypeScript type safety and error handling
+  - Included clear console output for script execution status
+
 ## [0.0.1] - 2024-05-10
 
 ### Search System Enhancement
