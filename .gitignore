@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # pagefind index
 public/index
+
+# coverage
+coverage/

@@ -2,9 +2,8 @@ import { v4 as uuidv4 } from "uuid";
 import { parse, stringify } from "yaml";
 import { readFileSync, writeFileSync, readdirSync, unlinkSync } from "fs";
 import { join } from "path";
-import { slugifyStr } from "../utils/slugify";
-import { CATEGORIES, GROUPS } from "../data/taxonomies";
-import type { Category } from "../data/taxonomies";
+import { GROUPS, type Category, CATEGORIES } from "@/data/taxonomies";
+import { slugifyStr } from "@/utils/slugify";
 
 type Group = (typeof GROUPS)[number];
 
@@ -34,7 +33,7 @@ interface BlogFrontmatter {
   favorites?: Favorites;
 }
 
-async function generateDescription(content: string): Promise<string> {
+export async function generateDescription(content: string): Promise<string> {
   // TODO: Implement ChatGPT integration
   // For now, return first 150 characters of content as description
   const plainText = content
@@ -45,16 +44,16 @@ async function generateDescription(content: string): Promise<string> {
   return plainText.slice(0, 150) + "...";
 }
 
-function capitalizeFirstLetter(str: string): string {
+export function capitalizeFirstLetter(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-function validateCategory(category: string): Category | undefined {
+export function validateCategory(category: string): Category | undefined {
   const normalizedCategory = capitalizeFirstLetter(category);
   return CATEGORIES.find(c => c === normalizedCategory);
 }
 
-function transformFrontmatter(
+export function transformFrontmatter(
   frontmatter: BlogFrontmatter,
   content: string
 ): BlogFrontmatter {
@@ -106,7 +105,7 @@ function transformFrontmatter(
   return transformed;
 }
 
-async function processMarkdownFile(filePath: string) {
+export async function processMarkdownFile(filePath: string) {
   try {
     const content = readFileSync(filePath, "utf-8");
     const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
@@ -135,7 +134,7 @@ async function processMarkdownFile(filePath: string) {
   }
 }
 
-function findMarkdownFiles(dir: string): string[] {
+export function findMarkdownFiles(dir: string): string[] {
   const files: string[] = [];
   const entries = readdirSync(dir, { withFileTypes: true });
 
@@ -151,7 +150,7 @@ function findMarkdownFiles(dir: string): string[] {
   return files;
 }
 
-async function processAndRenameFile(mdPath: string) {
+export async function processAndRenameFile(mdPath: string) {
   const mdxPath = mdPath.replace(/\.md$/, ".mdx");
 
   await processMarkdownFile(mdPath);
