@@ -90,6 +90,7 @@ export default defineConfig({
   vite: {
     optimizeDeps: {
       exclude: ["@resvg/resvg-js"], // Exclude specific dependencies from optimization
+      include: ["react-compiler-runtime"], // Include react-compiler-runtime for optimization
     },
   },
 
