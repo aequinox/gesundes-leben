@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@astrojs/rss": "4.0.11",
-    "@eslint/js": "^9.17.0",
+    "@eslint/js": "^9.18.0",
     "@iconify-json/tabler": "^1.2.14",
     "@iconify/tailwind": "^1.2.0",
     "@resvg/resvg-js": "^2.6.2",
@@ -54,7 +54,7 @@
     "aos": "^2.3.4",
     "astro-eslint-parser": "^1.1.0",
     "astro-icon": "^1.1.5",
-    "eslint": "^9.17.0",
+    "eslint": "^9.18.0",
     "eslint-plugin-astro": "^1.3.1",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "gray-matter": "^4.0.3",
