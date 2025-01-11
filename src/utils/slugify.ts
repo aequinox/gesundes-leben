@@ -95,7 +95,10 @@ export const ensureSlug = (
   options: Partial<SlugifyOptions> = {}
 ): string => {
   if (isValidSlug(str)) return str;
-  return slugifyStr(str, options);
+  const slug = slugifyStr(str, options);
+  // Remove trailing separators
+  const separator = options.replacement || DEFAULT_OPTIONS.replacement;
+  return slug.replace(new RegExp(`${separator}+$`), "");
 };
 
 /**
@@ -111,8 +114,16 @@ export const combineSlug = (
   if (!Array.isArray(parts) || parts.length === 0) {
     throw new Error("Invalid input: non-empty array required");
   }
-  return parts
+
+  // Filter out empty strings before slugification
+  const validParts = parts.filter(part => part && part.trim());
+  if (validParts.length === 0) {
+    throw new Error("No valid parts to combine");
+  }
+
+  const separator = options.replacement || DEFAULT_OPTIONS.replacement;
+  return validParts
     .map(part => slugifyStr(part, options))
     .filter(Boolean)
-    .join("-");
+    .join(separator);
 };

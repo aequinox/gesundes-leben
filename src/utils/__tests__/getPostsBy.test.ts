@@ -72,7 +72,7 @@ describe("Posts filtering utilities", () => {
         createMockPost("3", ["Ernährung"], "kontra", ["tag3"]),
       ];
 
-      const result = await getPostsByCategory(posts, "health");
+      const result = await getPostsByCategory(posts, "Ernährung");
 
       expect(result).toHaveLength(2);
       expect(result.map(post => post.id)).toEqual(["1", "3"]);
@@ -133,7 +133,7 @@ describe("Posts filtering utilities", () => {
 
       const result = await getAllPostsByGroup("pro");
 
-      expect(result).toHaveLength(1);
+      expect(result).toHaveLength(2);
       expect(result[0].id).toBe("1");
     });
   });

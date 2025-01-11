@@ -2,11 +2,17 @@ import { SITE } from "@/config";
 import satori from "satori";
 import loadGoogleFonts, { type FontOptions } from "../loadGoogleFont";
 
-export default async () => {
+export default async (
+  options: { width?: number; height?: number; background?: string } = {}
+) => {
+  const width = options.width || 1200;
+  const height = options.height || 630;
+  const background = options.background || "#fefbfb";
+
   return satori(
     <div
       style={{
-        background: "#fefbfb",
+        background,
         width: "100%",
         height: "100%",
         display: "flex",
@@ -86,12 +92,27 @@ export default async () => {
       </div>
     </div>,
     {
-      width: 1200,
-      height: 630,
+      width,
+      height,
       embedFont: true,
-      fonts: (await loadGoogleFonts(
-        SITE.title + SITE.desc + SITE.website
-      )) as FontOptions[],
+      fonts: await (async () => {
+        try {
+          return (await loadGoogleFonts(
+            SITE.title + SITE.desc + SITE.website
+          )) as FontOptions[];
+        } catch (error) {
+          // Fallback to system fonts if Google Fonts fail
+          // Create an empty ArrayBuffer as fallback font data
+          return [
+            {
+              name: "Arial",
+              data: new ArrayBuffer(0),
+              weight: 400,
+              style: "normal",
+            },
+          ] as FontOptions[];
+        }
+      })(),
     }
   );
 };

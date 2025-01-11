@@ -18,7 +18,7 @@ const dateFormatterCache = new Map<string, Intl.DateTimeFormat>();
 function getDateFormatter(
   options: Intl.DateTimeFormatOptions
 ): Intl.DateTimeFormat {
-  const key = JSON.stringify(options);
+  const key = JSON.stringify({ locale: LOCALE.langTag, ...options });
   let formatter = dateFormatterCache.get(key);
 
   if (!formatter) {
@@ -28,6 +28,9 @@ function getDateFormatter(
 
   return formatter;
 }
+
+// Export for testing
+export { dateFormatterCache, getDateFormatter };
 
 // Reusable date format options
 const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {

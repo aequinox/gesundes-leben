@@ -3,16 +3,17 @@ import type { CollectionEntry } from "astro:content";
 
 /**
  * Filters blog posts based on draft status and publication date.
- * @param post - The blog post to filter.
- * @returns True if the post should be included, false otherwise.
+ *
+ * @param {CollectionEntry<"blog">} post - The blog post to filter.
+ * @returns {boolean} True if the post should be included, false otherwise.
  */
 const filterBlogPosts = ({ data }: CollectionEntry<"blog">): boolean => {
-  const frontmatter = data;
+  const isDevelopment = import.meta.env.DEV;
+  const { draft, pubDatetime } = data;
+
   return (
-    import.meta.env.DEV ||
-    (!frontmatter.draft &&
-      frontmatter.pubDatetime?.getTime() <=
-        Date.now() - SITE.scheduledPostMargin)
+    isDevelopment ||
+    (!draft && pubDatetime?.getTime() <= Date.now() - SITE.scheduledPostMargin)
   );
 };
 

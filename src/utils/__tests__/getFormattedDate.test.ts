@@ -1,5 +1,10 @@
 import { describe, expect, test, vi, beforeEach } from "vitest";
-import { formattedDateTime, formatDate, formatTime } from "../getFormattedDate";
+import {
+  formattedDateTime,
+  formatDate,
+  formatTime,
+  dateFormatterCache,
+} from "../getFormattedDate";
 import type { DateTimeInput } from "@/types/datetime";
 
 // Mock the LOCALE import
@@ -117,6 +122,12 @@ describe("Date formatting utilities", () => {
 
   // Test formatter caching
   describe("formatter caching", () => {
+    beforeEach(() => {
+      // Clear the formatter cache before each test
+      dateFormatterCache.clear();
+      vi.clearAllMocks();
+    });
+
     test("reuses cached formatters", () => {
       const spy = vi.spyOn(Intl, "DateTimeFormat");
 

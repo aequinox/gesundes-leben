@@ -93,18 +93,20 @@ export function refreshAOS(): void {
   AOS.refresh();
 }
 
+// Store timeout ID outside function for proper debouncing
+let refreshTimeoutId: NodeJS.Timeout | undefined;
+
 /**
  * Refreshes AOS instances with a debounce
  * @param delay - Debounce delay in milliseconds
  */
 export function debouncedRefreshAOS(delay = 100): void {
-  let timeoutId: NodeJS.Timeout | undefined;
-
-  if (timeoutId) {
-    clearTimeout(timeoutId);
+  if (refreshTimeoutId) {
+    clearTimeout(refreshTimeoutId);
   }
 
-  timeoutId = setTimeout(() => {
+  refreshTimeoutId = setTimeout(() => {
     AOS.refresh();
+    refreshTimeoutId = undefined;
   }, delay);
 }

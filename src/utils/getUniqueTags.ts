@@ -13,15 +13,21 @@ const extractUniqueTags = (
   tag: string;
   tagName: string;
 }[] => {
-  const uniqueTags = new Set<string>();
-  return posts
+  const uniqueTags = new Map<string, string>();
+
+  posts
     .filter(postFilter)
     .flatMap(post => post.data.tags)
-    .map(tag => {
+    .forEach(tag => {
       const slugifiedTag = slugifyStr(tag);
-      uniqueTags.add(slugifiedTag);
-      return { tag: slugifiedTag, tagName: tag };
-    })
+      // Keep first occurrence of tag name for consistent display
+      if (!uniqueTags.has(slugifiedTag)) {
+        uniqueTags.set(slugifiedTag, tag);
+      }
+    });
+
+  return Array.from(uniqueTags.entries())
+    .map(([tag, tagName]) => ({ tag, tagName }))
     .sort((a, b) => a.tag.localeCompare(b.tag));
 };
 

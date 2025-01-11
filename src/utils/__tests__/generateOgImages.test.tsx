@@ -1,4 +1,4 @@
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, afterEach, describe, expect, test, vi } from "vitest";
 import {
   generateOgImageForPost,
   generateOgImageForSite,
@@ -21,6 +21,9 @@ vi.mock("@resvg/resvg-js", () => ({
   },
 }));
 
+import siteTemplate from "../og-templates/site";
+import postTemplate from "../og-templates/post";
+
 // Mock templates
 vi.mock("../og-templates/post", () => ({
   default: vi.fn().mockResolvedValue("<svg>Mock Post Template</svg>"),
@@ -29,6 +32,15 @@ vi.mock("../og-templates/post", () => ({
 vi.mock("../og-templates/site", () => ({
   default: vi.fn().mockResolvedValue("<svg>Mock Site Template</svg>"),
 }));
+
+beforeEach(() => {
+  vi.mocked(siteTemplate).mockResolvedValue("<svg>Mock Site Template</svg>");
+  vi.mocked(postTemplate).mockResolvedValue("<svg>Mock Post Template</svg>");
+});
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
 
 describe("OG Image Generation", () => {
   const createMockPost = (): CollectionEntry<"blog"> => ({
@@ -137,9 +149,15 @@ describe("OG Image Generation", () => {
     });
 
     test("handles template error", async () => {
-      vi.mock("../og-templates/site", () => ({
-        default: vi.fn().mockRejectedValue(new Error("Template error")),
-      }));
+      // Reset mocks and module cache
+      vi.clearAllMocks();
+      vi.resetModules();
+
+      // Mock the template to reject
+      vi.mocked(siteTemplate).mockRejectedValue(new Error("Template error"));
+
+      // Re-import the function to get fresh instance with new mock
+      const { generateOgImageForSite } = await import("../generateOgImages");
 
       await expect(generateOgImageForSite()).rejects.toThrow(
         "Failed to generate site OG image"

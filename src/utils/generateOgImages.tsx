@@ -140,8 +140,42 @@ export async function generateOgImageForSite(
 ): Promise<Buffer> {
   try {
     validateImageDimensions(options.width, options.height);
-    const svg = await siteOgImage();
-    return svgBufferToPngBuffer(svg, options);
+
+    // Pass relevant options to template
+    const svg = await siteOgImage({
+      width: options.width,
+      height: options.height,
+      background: options.background,
+    });
+
+    // Handle fit modes
+    const fitOptions = { ...options };
+    if (options.fitTo) {
+      switch (options.fitTo.mode) {
+        case "original":
+          delete fitOptions.fitTo;
+          break;
+        case "width":
+        case "height":
+        case "zoom":
+          // These modes are already handled by resvg
+          break;
+      }
+    }
+
+    // Handle font options
+    if (options.font) {
+      fitOptions.font = {
+        ...DEFAULT_OPTIONS.font,
+        ...options.font,
+        fontFiles: [
+          ...(DEFAULT_OPTIONS.font.fontFiles || []),
+          ...(options.font.fontFiles || []),
+        ],
+      };
+    }
+
+    return svgBufferToPngBuffer(svg, fitOptions);
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
