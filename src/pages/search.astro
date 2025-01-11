@@ -97,7 +97,7 @@ const searchProps: SearchProps = {
   }
 
   .pagefind-ui .pagefind-ui__search-input:focus-visible {
-    @apply border-skin-accent outline-2 outline-offset-1 outline-skin-accent shadow-lg;
+    @apply border-skin-accent shadow-lg outline-2 outline-offset-1 outline-skin-accent;
     transform: translateY(-1px);
   }
 
@@ -163,7 +163,7 @@ const searchProps: SearchProps = {
   }
 
   .pagefind-ui .pagefind-ui__result-excerpt {
-    @apply mt-3 text-base text-skin-base leading-relaxed;
+    @apply mt-3 text-base leading-relaxed text-skin-base;
     font-family: "Montserrat", sans-serif;
   }
 
@@ -173,7 +173,7 @@ const searchProps: SearchProps = {
   }
 
   .pagefind-ui mark {
-    @apply bg-skin-accent bg-opacity-20 px-1.5 py-0.5 text-skin-base rounded-md transition-colors duration-200;
+    @apply rounded-md bg-skin-accent bg-opacity-20 px-1.5 py-0.5 text-skin-base transition-colors duration-200;
   }
 
   /* Loading state */
@@ -183,7 +183,7 @@ const searchProps: SearchProps = {
 
   /* Results count */
   .pagefind-ui__results-count {
-    @apply text-sm text-skin-base opacity-75 mb-4;
+    @apply mb-4 text-sm text-skin-base opacity-75;
     font-family: "Montserrat", sans-serif;
   }
 </style>
