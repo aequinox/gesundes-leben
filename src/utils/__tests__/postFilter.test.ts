@@ -84,17 +84,17 @@ describe("filterBlogPosts", () => {
       expect(filterBlogPosts(futurePost)).toBe(false);
     });
 
-    test.skip("excludes posts within scheduled margin period", () => {
-      // Set a 24-hour margin
+    test("excludes posts outside the scheduled margin period", () => {
+      // Set a 15 minute margin
       vi.mock("@/config", () => ({
         SITE: {
-          scheduledPostMargin: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+          scheduledPostMargin: 15 * 60 * 1000, // 15 minutes in milliseconds
         },
       }));
 
-      // A post from 12 hours ago (within 24-hour margin)
-      const withinMargin = new Date(NOW - 12 * 60 * 60 * 1000);
-      const post = createMockPost(false, withinMargin);
+      // A post in the future outside the 15 minute margin
+      const outsideMargin = new Date(NOW + 20 * 60 * 1000);
+      const post = createMockPost(false, outsideMargin);
 
       expect(filterBlogPosts(post)).toBe(false);
     });

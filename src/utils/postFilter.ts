@@ -11,9 +11,13 @@ const filterBlogPosts = ({ data }: CollectionEntry<"blog">): boolean => {
   const isDevelopment = import.meta.env.DEV;
   const { draft, pubDatetime } = data;
 
+  if (!pubDatetime) {
+    return false;
+  }
+
   return (
     isDevelopment ||
-    (!draft && pubDatetime?.getTime() <= Date.now() - SITE.scheduledPostMargin)
+    (!draft && pubDatetime.getTime() <= Date.now() + SITE.scheduledPostMargin)
   );
 };
 
