@@ -2,7 +2,7 @@
  * @module postFilter
  * @description
  * Utility module for filtering blog posts based on draft status and publication date.
- * Handles environment-aware filtering (development vs. production) and scheduled posts.
+ * Uses the BlogPostProcessor for consistent content handling and filtering.
  *
  * @example
  * ```typescript
@@ -15,14 +15,12 @@
 
 import { SITE } from "@/config";
 import type { CollectionEntry } from "astro:content";
+import { createBlogPostProcessor } from "./core/content";
+import { handleAsync } from "./core/errors";
 
 /**
  * Filters blog posts based on draft status and publication date.
- * In development mode, all posts are included.
- * In production mode:
- * - Draft posts are excluded
- * - Posts with future publication dates are excluded (unless within margin)
- * - Posts without publication dates are excluded
+ * Uses BlogPostProcessor for consistent filtering logic.
  *
  * @param post - Blog post entry to evaluate
  * @returns Boolean indicating if the post should be included
@@ -42,14 +40,31 @@ import type { CollectionEntry } from "astro:content";
  *     return postDate >= threeMonthsAgo;
  *   });
  * ```
- *
- * @remarks
- * - Uses SITE.scheduledPostMargin for future post scheduling
- * - Development mode (import.meta.env.DEV) shows all posts
- * - Production mode enforces publication rules
- * - Posts must have a valid pubDatetime
  */
-const filterBlogPosts = ({ data }: CollectionEntry<"blog">): boolean => {
+const filterBlogPosts = async (
+  post: CollectionEntry<"blog">
+): Promise<boolean> => {
+  return handleAsync(async () => {
+    const processor = createBlogPostProcessor({
+      includeDrafts: import.meta.env.DEV,
+    });
+
+    // Process a single post to apply filtering
+    const filtered = await processor.processContent([post]);
+    return filtered.length > 0;
+  });
+};
+
+/**
+ * Synchronous version of filterBlogPosts.
+ * Use this when async operations are not possible.
+ *
+ * @param post - Blog post entry to evaluate
+ * @returns Boolean indicating if the post should be included
+ */
+export const filterBlogPostsSync = ({
+  data,
+}: CollectionEntry<"blog">): boolean => {
   const isDevelopment = import.meta.env.DEV;
   const { draft, pubDatetime } = data;
 
@@ -57,9 +72,14 @@ const filterBlogPosts = ({ data }: CollectionEntry<"blog">): boolean => {
     return false;
   }
 
+  const pubDate = new Date(pubDatetime);
+  if (isNaN(pubDate.getTime())) {
+    return false;
+  }
+
   return (
     isDevelopment ||
-    (!draft && pubDatetime.getTime() <= Date.now() + SITE.scheduledPostMargin)
+    (!draft && pubDate.getTime() <= Date.now() + SITE.scheduledPostMargin)
   );
 };
 

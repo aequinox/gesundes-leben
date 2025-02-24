@@ -2,7 +2,8 @@
  * @module getUniqueTags
  * @description
  * Utility module for extracting and managing unique tags from blog posts.
- * Handles tag deduplication, slugification, and sorting for consistent presentation.
+ * Uses the BlogPostProcessor for consistent content handling and filtering
+ * before extracting tags.
  *
  * @example
  * ```typescript
@@ -10,22 +11,27 @@
  *
  * const posts = await getCollection('blog');
  * const uniqueTags = extractUniqueTags(posts);
- * // Returns: [{ tag: 'typescript', tagName: 'TypeScript' }, ...]
  * ```
  */
 
 import { slugifyStr } from "./slugify";
 import type { CollectionEntry } from "astro:content";
-import postFilter from "./postFilter";
+import { createBlogPostProcessor } from "./core/content";
+import { handleAsync } from "./core/errors";
+
+/**
+ * Tag information with both slugified and original forms.
+ */
+export interface TagInfo {
+  /** Slugified form of the tag for URLs */
+  tag: string;
+  /** Original tag name for display */
+  tagName: string;
+}
 
 /**
  * Extracts and returns unique tags from a list of blog posts.
- * Performs the following operations:
- * 1. Filters posts using postFilter (removes drafts in production)
- * 2. Extracts all tags from filtered posts
- * 3. Slugifies tags for consistent comparison
- * 4. Deduplicates tags while preserving original tag names
- * 5. Sorts tags alphabetically
+ * Uses BlogPostProcessor for filtering posts before extracting tags.
  *
  * @param posts - Array of blog posts to extract tags from
  * @returns Array of unique tag objects containing slugified tag and original name
@@ -47,35 +53,37 @@ import postFilter from "./postFilter";
  *   tagCounts.set(slugged, (tagCounts.get(slugged) || 0) + 1);
  * });
  * ```
- *
- * @remarks
- * - Case-insensitive tag comparison
- * - Maintains original tag casing for display
- * - Handles special characters through slugification
- * - Sorts tags alphabetically for consistent presentation
  */
-const extractUniqueTags = (
+const extractUniqueTags = async (
   posts: CollectionEntry<"blog">[]
-): {
-  tag: string;
-  tagName: string;
-}[] => {
-  const uniqueTags = new Map<string, string>();
-
-  posts
-    .filter(postFilter)
-    .flatMap(post => post.data.tags)
-    .forEach(tag => {
-      const slugifiedTag = slugifyStr(tag);
-      // Keep first occurrence of tag name for consistent display
-      if (!uniqueTags.has(slugifiedTag)) {
-        uniqueTags.set(slugifiedTag, tag);
-      }
+): Promise<TagInfo[]> => {
+  return handleAsync(async () => {
+    // Create processor for filtering posts
+    const processor = createBlogPostProcessor({
+      includeDrafts: import.meta.env.DEV,
     });
 
-  return Array.from(uniqueTags.entries())
-    .map(([tag, tagName]) => ({ tag, tagName }))
-    .sort((a, b) => a.tag.localeCompare(b.tag));
+    // Filter posts first
+    const filteredPosts = await processor.processContent(posts);
+
+    // Extract and deduplicate tags
+    const uniqueTags = new Map<string, string>();
+
+    filteredPosts
+      .flatMap(post => post.data.tags || [])
+      .forEach(tag => {
+        const slugifiedTag = slugifyStr(tag);
+        // Keep first occurrence of tag name for consistent display
+        if (!uniqueTags.has(slugifiedTag)) {
+          uniqueTags.set(slugifiedTag, tag);
+        }
+      });
+
+    // Convert to array and sort alphabetically
+    return Array.from(uniqueTags.entries())
+      .map(([tag, tagName]) => ({ tag, tagName }))
+      .sort((a, b) => a.tag.localeCompare(b.tag));
+  });
 };
 
 export default extractUniqueTags;

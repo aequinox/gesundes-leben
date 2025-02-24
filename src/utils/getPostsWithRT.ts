@@ -2,8 +2,8 @@
  * @module getPostsWithRT
  * @description
  * Utility module for adding reading time data to blog posts.
- * Calculates and attaches reading time estimates to post metadata.
- * Reading time is calculated based on word count and average reading speed.
+ * Uses the BlogPostProcessor for consistent content handling
+ * and reading time calculation.
  *
  * @example
  * ```typescript
@@ -11,48 +11,51 @@
  *
  * const posts = await getCollection('blog');
  * const postsWithRT = await addReadingTimeToPosts(posts);
- * console.log(postsWithRT[0].data.readingTime); // e.g., "5 min read"
+ * console.log(postsWithRT[0].data.readingTime);
  * ```
  */
 
 import type { CollectionEntry } from "astro:content";
-import { contentManager } from "./content";
+import { createBlogPostProcessor } from "./core/content";
+import { handleAsync } from "./core/errors";
 
 /**
  * Adds reading time data to an array of blog posts.
- * Uses the content manager to calculate and update reading times.
- * The reading time calculation considers:
- * - Word count in the post content
- * - Average reading speed (configurable)
- * - Content complexity
+ * Uses the BlogPostProcessor's transform functionality to
+ * calculate and attach reading times.
  *
  * @param posts - Array of blog posts to process
- * @returns Promise resolving to posts with reading time data added
+ * @returns Promise resolving to posts with reading time data
  *
  * @example
  * ```typescript
  * // Basic usage
  * const postsWithRT = await addReadingTimeToPosts(posts);
  *
- * // Accessing reading time in templates
- * posts.map(post => (
- *   <article>
- *     <h1>{post.data.title}</h1>
- *     <span>{post.data.readingTime}</span>
- *   </article>
- * ));
- * ```
+ * // With filtering
+ * const publishedPostsWithRT = await addReadingTimeToPosts(
+ *   posts.filter(post => !post.data.draft)
+ * );
  *
- * @remarks
- * - Reading time is calculated once and cached
- * - Updates automatically when content changes
- * - Handles both markdown and MDX content
- * - Excludes code blocks from reading time calculation
+ * // Access reading time
+ * postsWithRT.forEach(post => {
+ *   console.log(`${post.data.title}: ${post.data.readingTime}`);
+ * });
+ * ```
  */
 const addReadingTimeToPosts = async (
   posts: CollectionEntry<"blog">[]
 ): Promise<CollectionEntry<"blog">[]> => {
-  return contentManager.posts.updateReadingTimes(posts);
+  return handleAsync(async () => {
+    const processor = createBlogPostProcessor({
+      // Only transform for reading time, no filtering or sorting
+      includeDrafts: true,
+      sortDirection: "asc",
+    });
+
+    // Use the processor's transform functionality directly
+    return processor.transform(posts);
+  });
 };
 
 export default addReadingTimeToPosts;

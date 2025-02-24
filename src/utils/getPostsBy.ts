@@ -2,25 +2,26 @@
  * @module getPostsBy
  * @description
  * Utility module for filtering and retrieving blog posts based on various criteria
- * such as tags, categories, and groups. Includes support for draft post handling
- * and case-insensitive matching.
+ * such as tags, categories, and groups. Uses the BlogPostProcessor for consistent
+ * content handling and processing.
  *
  * @example
  * ```typescript
  * import { getPostsByTag, getPostsByCategory } from './utils/getPostsBy';
  *
  * const tagPosts = await getPostsByTag(posts, 'typescript');
- * const categoryPosts = await getPostsByCategory(posts, 'tutorial');
+ * const categoryPosts = await getPostsByCategory(posts, 'Ernährung');
  * ```
  */
 
 import { getCollection, type CollectionEntry } from "astro:content";
-import getSortedPosts from "./getSortedPosts";
-import { slugifyAll, slugifyStr } from "./slugify";
+import { createBlogPostProcessor, type BlogCategory } from "./core/content";
+import { slugifyStr } from "./slugify";
+import { handleAsync } from "./core/errors";
 
 /**
  * Filters and sorts posts based on a specified type and its corresponding value.
- * Handles case-insensitive matching and proper slug comparison.
+ * Uses the BlogPostProcessor for consistent content handling.
  *
  * @param posts - Array of blog post entries to filter and sort
  * @param type - Type of filtering criteria ('tags', 'categories', or 'group')
@@ -35,13 +36,23 @@ const getPostsBy = async (
   value: string
 ): Promise<CollectionEntry<"blog">[]> => {
   const slugifiedValue = slugifyStr(value);
-  return await getSortedPosts(
-    type === "group"
-      ? posts.filter(post => slugifyStr(post.data[type]) === slugifiedValue)
-      : posts.filter(post =>
-          slugifyAll(post.data[type]).some(item => item === slugifiedValue)
-        )
-  );
+  const processor = createBlogPostProcessor({
+    includeDrafts: import.meta.env.DEV,
+  });
+
+  return handleAsync(async () => {
+    if (type === "group") {
+      return processor.processContent(
+        posts.filter(post => slugifyStr(post.data[type]) === slugifiedValue)
+      );
+    }
+
+    return processor.processContent(
+      posts.filter(post =>
+        post.data[type]?.some(item => slugifyStr(item) === slugifiedValue)
+      )
+    );
+  });
 };
 
 /**
@@ -54,13 +65,13 @@ const getPostsBy = async (
  *
  * @example
  * ```typescript
- * const tutorialPosts = await getPostsByCategory(posts, 'Tutorials');
- * const guidePosts = await getPostsByCategory(posts, 'Getting Started');
+ * const healthPosts = await getPostsByCategory(posts, 'Ernährung');
+ * const sciencePosts = await getPostsByCategory(posts, 'Wissenschaftliches');
  * ```
  */
 export const getPostsByCategory = async (
   posts: CollectionEntry<"blog">[],
-  value: string
+  value: BlogCategory
 ): Promise<CollectionEntry<"blog">[]> => {
   return await getPostsBy(posts, "categories", value);
 };
@@ -75,7 +86,7 @@ export const getPostsByCategory = async (
  *
  * @example
  * ```typescript
- * const seriesPosts = await getPostsByGroup(posts, 'TypeScript Series');
+ * const seriesPosts = await getPostsByGroup(posts, 'Health Series');
  * const featurePosts = await getPostsByGroup(posts, 'Featured');
  * ```
  */
@@ -105,17 +116,8 @@ export const getPostsByGroup = async (
 export const getAllPostsByGroup = async (
   value: string
 ): Promise<CollectionEntry<"blog">[]> => {
-  // Get all posts first
   const posts = await getCollection("blog");
-
-  // Filter by group
-  const groupPosts = await getPostsBy(posts, "group", value);
-
-  // Then filter by draft status based on environment
-  const isDevelopment = import.meta.env.DEV;
-  return isDevelopment
-    ? groupPosts
-    : groupPosts.filter(post => !post.data.draft);
+  return await getPostsByGroup(posts, value);
 };
 
 /**
@@ -128,8 +130,8 @@ export const getAllPostsByGroup = async (
  *
  * @example
  * ```typescript
- * const typescriptPosts = await getPostsByTag(posts, 'TypeScript');
- * const beginnerPosts = await getPostsByTag(posts, 'Beginner Friendly');
+ * const healthTips = await getPostsByTag(posts, 'health-tips');
+ * const nutrition = await getPostsByTag(posts, 'nutrition');
  * ```
  */
 export const getPostsByTag = async (
