@@ -6,6 +6,7 @@ import {
   getPostsByTag,
 } from "../getPostsBy";
 import type { CollectionEntry } from "astro:content";
+import type ts from "typescript";
 
 // Mock dependencies
 vi.mock("astro:content", () => ({
@@ -79,13 +80,14 @@ describe("Posts filtering utilities", () => {
     });
 
     test("handles empty posts array", async () => {
-      const result = await getPostsByCategory([], "health");
+      const result = await getPostsByCategory([], "Ernährung");
       expect(result).toEqual([]);
     });
 
     test("handles no matching category", async () => {
       const posts = [createMockPost("1", ["Ernährung"], "pro", ["tag1"])];
 
+      // @ts-ignore-next-line
       const result = await getPostsByCategory(posts, "nonexistent");
       expect(result).toEqual([]);
     });

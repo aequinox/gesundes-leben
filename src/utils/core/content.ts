@@ -135,6 +135,22 @@ export class BlogPostProcessor
   }
 
   /**
+   * Validates a post's publication date.
+   *
+   * @param post - Blog post to validate
+   * @returns Valid Date object or null
+   * @internal
+   */
+  private validatePostDate(post: CollectionEntry<"blog">): Date | null {
+    if (!post.data.pubDatetime) {
+      return null;
+    }
+
+    const pubDate = new Date(post.data.pubDatetime);
+    return isNaN(pubDate.getTime()) ? null : pubDate;
+  }
+
+  /**
    * Filters blog posts based on configuration.
    *
    * @param posts - Blog posts to filter
@@ -164,12 +180,9 @@ export class BlogPostProcessor
       }
 
       // Publication date filtering
-      const pubDate = new Date(post.data.pubDatetime);
-      if (isNaN(pubDate.getTime())) {
-        throw new ContentProcessingError("Invalid publication date", {
-          post: post.id,
-          date: post.data.pubDatetime,
-        });
+      const pubDate = this.validatePostDate(post);
+      if (!pubDate) {
+        return false;
       }
 
       return pubDate.getTime() <= Date.now();

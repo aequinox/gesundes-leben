@@ -3,7 +3,7 @@
  * @description
  * Utility module for filtering and retrieving blog posts based on various criteria
  * such as tags, categories, and groups. Uses the BlogPostProcessor for consistent
- * content handling and processing.
+ * content handling and filtering.
  *
  * @example
  * ```typescript
@@ -15,18 +15,17 @@
  */
 
 import { getCollection, type CollectionEntry } from "astro:content";
-import { createBlogPostProcessor, type BlogCategory } from "./core/content";
-import { slugifyStr } from "./slugify";
+import { slugifyAll, slugifyStr } from "./slugify";
 import { handleAsync } from "./core/errors";
 
 /**
  * Filters and sorts posts based on a specified type and its corresponding value.
- * Uses the BlogPostProcessor for consistent content handling.
+ * Maintains original post order after filtering.
  *
- * @param posts - Array of blog post entries to filter and sort
+ * @param posts - Array of blog posts to filter
  * @param type - Type of filtering criteria ('tags', 'categories', or 'group')
  * @param value - Value to filter by (will be slugified for comparison)
- * @returns Promise resolving to filtered and sorted blog post entries
+ * @returns Promise resolving to filtered blog post entries
  *
  * @internal
  */
@@ -35,23 +34,15 @@ const getPostsBy = async (
   type: "tags" | "categories" | "group",
   value: string
 ): Promise<CollectionEntry<"blog">[]> => {
-  const slugifiedValue = slugifyStr(value);
-  const processor = createBlogPostProcessor({
-    includeDrafts: import.meta.env.DEV,
-  });
-
   return handleAsync(async () => {
-    if (type === "group") {
-      return processor.processContent(
-        posts.filter(post => slugifyStr(post.data[type]) === slugifiedValue)
-      );
-    }
+    const slugifiedValue = slugifyStr(value);
 
-    return processor.processContent(
-      posts.filter(post =>
-        post.data[type]?.some(item => slugifyStr(item) === slugifiedValue)
-      )
-    );
+    // Filter posts while maintaining original order
+    return type === "group"
+      ? posts.filter(post => slugifyStr(post.data[type]) === slugifiedValue)
+      : posts.filter(post =>
+          post.data[type]?.some(item => slugifyStr(item) === slugifiedValue)
+        );
   });
 };
 
@@ -59,7 +50,7 @@ const getPostsBy = async (
  * Retrieves posts by category with case-insensitive matching.
  * Categories are slugified for consistent comparison.
  *
- * @param posts - Array of blog post entries to filter
+ * @param posts - Array of blog posts to filter
  * @param value - Category to filter by
  * @returns Promise resolving to array of posts in the category
  *
@@ -71,7 +62,7 @@ const getPostsBy = async (
  */
 export const getPostsByCategory = async (
   posts: CollectionEntry<"blog">[],
-  value: BlogCategory
+  value: string
 ): Promise<CollectionEntry<"blog">[]> => {
   return await getPostsBy(posts, "categories", value);
 };
@@ -80,14 +71,14 @@ export const getPostsByCategory = async (
  * Retrieves posts by group with case-insensitive matching.
  * Groups provide a way to organize related posts together.
  *
- * @param posts - Array of blog post entries to filter
+ * @param posts - Array of blog posts to filter
  * @param value - Group to filter by
  * @returns Promise resolving to array of posts in the group
  *
  * @example
  * ```typescript
- * const seriesPosts = await getPostsByGroup(posts, 'Health Series');
- * const featurePosts = await getPostsByGroup(posts, 'Featured');
+ * const seriesPosts = await getPostsByGroup(posts, 'pro');
+ * const featurePosts = await getPostsByGroup(posts, 'kontra');
  * ```
  */
 export const getPostsByGroup = async (
@@ -107,10 +98,10 @@ export const getPostsByGroup = async (
  * @example
  * ```typescript
  * // In production: only published posts
- * const publishedPosts = await getAllPostsByGroup('Featured');
+ * const publishedPosts = await getAllPostsByGroup('pro');
  *
  * // In development: includes draft posts
- * const allPosts = await getAllPostsByGroup('Featured');
+ * const allPosts = await getAllPostsByGroup('kontra');
  * ```
  */
 export const getAllPostsByGroup = async (
@@ -124,7 +115,7 @@ export const getAllPostsByGroup = async (
  * Retrieves posts by tag with case-insensitive matching.
  * Tags are slugified for consistent comparison.
  *
- * @param posts - Array of blog post entries to filter
+ * @param posts - Array of blog posts to filter
  * @param value - Tag to filter by
  * @returns Promise resolving to array of posts with the tag
  *

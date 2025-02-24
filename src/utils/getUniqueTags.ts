@@ -2,8 +2,7 @@
  * @module getUniqueTags
  * @description
  * Utility module for extracting and managing unique tags from blog posts.
- * Uses the BlogPostProcessor for consistent content handling and filtering
- * before extracting tags.
+ * Uses postFilter for consistent filtering of draft posts.
  *
  * @example
  * ```typescript
@@ -16,8 +15,7 @@
 
 import { slugifyStr } from "./slugify";
 import type { CollectionEntry } from "astro:content";
-import { createBlogPostProcessor } from "./core/content";
-import { handleAsync } from "./core/errors";
+import postFilter from "./postFilter";
 
 /**
  * Tag information with both slugified and original forms.
@@ -31,7 +29,7 @@ export interface TagInfo {
 
 /**
  * Extracts and returns unique tags from a list of blog posts.
- * Uses BlogPostProcessor for filtering posts before extracting tags.
+ * Filters out draft posts using postFilter.
  *
  * @param posts - Array of blog posts to extract tags from
  * @returns Array of unique tag objects containing slugified tag and original name
@@ -45,45 +43,29 @@ export interface TagInfo {
  * uniqueTags.map(({ tag, tagName }) => (
  *   <a href={`/tags/${tag}`}>{tagName}</a>
  * ));
- *
- * // Getting tag counts
- * const tagCounts = new Map();
- * posts.flatMap(post => post.data.tags).forEach(tag => {
- *   const slugged = slugifyStr(tag);
- *   tagCounts.set(slugged, (tagCounts.get(slugged) || 0) + 1);
- * });
  * ```
  */
-const extractUniqueTags = async (
-  posts: CollectionEntry<"blog">[]
-): Promise<TagInfo[]> => {
-  return handleAsync(async () => {
-    // Create processor for filtering posts
-    const processor = createBlogPostProcessor({
-      includeDrafts: import.meta.env.DEV,
+const extractUniqueTags = (posts: CollectionEntry<"blog">[]): TagInfo[] => {
+  // Filter posts using postFilter
+  const filteredPosts = posts.filter(postFilter);
+
+  // Extract and deduplicate tags
+  const uniqueTags = new Map<string, string>();
+
+  filteredPosts
+    .flatMap(post => post.data.tags || [])
+    .forEach(tag => {
+      const slugifiedTag = slugifyStr(tag);
+      // Keep first occurrence of tag name for consistent display
+      if (!uniqueTags.has(slugifiedTag)) {
+        uniqueTags.set(slugifiedTag, tag);
+      }
     });
 
-    // Filter posts first
-    const filteredPosts = await processor.processContent(posts);
-
-    // Extract and deduplicate tags
-    const uniqueTags = new Map<string, string>();
-
-    filteredPosts
-      .flatMap(post => post.data.tags || [])
-      .forEach(tag => {
-        const slugifiedTag = slugifyStr(tag);
-        // Keep first occurrence of tag name for consistent display
-        if (!uniqueTags.has(slugifiedTag)) {
-          uniqueTags.set(slugifiedTag, tag);
-        }
-      });
-
-    // Convert to array and sort alphabetically
-    return Array.from(uniqueTags.entries())
-      .map(([tag, tagName]) => ({ tag, tagName }))
-      .sort((a, b) => a.tag.localeCompare(b.tag));
-  });
+  // Convert to array and sort alphabetically
+  return Array.from(uniqueTags.entries())
+    .map(([tag, tagName]) => ({ tag, tagName }))
+    .sort((a, b) => a.tag.localeCompare(b.tag));
 };
 
 export default extractUniqueTags;

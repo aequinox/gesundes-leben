@@ -16,7 +16,6 @@
 import { SITE } from "@/config";
 import type { CollectionEntry } from "astro:content";
 import { createBlogPostProcessor } from "./core/content";
-import { handleAsync } from "./core/errors";
 
 /**
  * Filters blog posts based on draft status and publication date.
@@ -41,30 +40,7 @@ import { handleAsync } from "./core/errors";
  *   });
  * ```
  */
-const filterBlogPosts = async (
-  post: CollectionEntry<"blog">
-): Promise<boolean> => {
-  return handleAsync(async () => {
-    const processor = createBlogPostProcessor({
-      includeDrafts: import.meta.env.DEV,
-    });
-
-    // Process a single post to apply filtering
-    const filtered = await processor.processContent([post]);
-    return filtered.length > 0;
-  });
-};
-
-/**
- * Synchronous version of filterBlogPosts.
- * Use this when async operations are not possible.
- *
- * @param post - Blog post entry to evaluate
- * @returns Boolean indicating if the post should be included
- */
-export const filterBlogPostsSync = ({
-  data,
-}: CollectionEntry<"blog">): boolean => {
+const filterBlogPosts = ({ data }: CollectionEntry<"blog">): boolean => {
   const isDevelopment = import.meta.env.DEV;
   const { draft, pubDatetime } = data;
 
@@ -81,6 +57,30 @@ export const filterBlogPostsSync = ({
     isDevelopment ||
     (!draft && pubDate.getTime() <= Date.now() + SITE.scheduledPostMargin)
   );
+};
+
+/**
+ * Filters blog posts using the BlogPostProcessor.
+ * This version provides more advanced filtering capabilities
+ * but requires async/await usage.
+ *
+ * @param posts - Array of blog posts to filter
+ * @returns Promise resolving to filtered posts
+ *
+ * @example
+ * ```typescript
+ * const posts = await getCollection('blog');
+ * const filteredPosts = await filterBlogPostsAsync(posts);
+ * ```
+ */
+export const filterBlogPostsAsync = async (
+  posts: CollectionEntry<"blog">[]
+): Promise<CollectionEntry<"blog">[]> => {
+  const processor = createBlogPostProcessor({
+    includeDrafts: import.meta.env.DEV,
+  });
+
+  return processor.processContent(posts);
 };
 
 export default filterBlogPosts;
