@@ -9,6 +9,7 @@ import { SITE, SOCIALS } from "@/config";
 import Hr from "@/components/elements/Hr.astro";
 import BlogFilter from "@/components/filter/BlogFilter.astro";
 import Card from "@/components/sections/Card.astro";
+import LinkButton from "@/components/elements/LinkButton.astro";
 
 const posts = await getCollection("blog");
 
@@ -93,7 +94,7 @@ const socialCount = SOCIALS.filter(social => social.active).length;
 
     <!-- <BlogFilter client:visible /> -->
 
-    {
+    <!-- {
       featuredPosts.length > 0 && (
         <section id="featured">
           <h2>Ausgewählte Artikel</h2>
@@ -121,25 +122,25 @@ const socialCount = SOCIALS.filter(social => social.active).length;
           </section>
         </Fragment>
       )
-    }
+    } -->
 
     <Hr />
 
     <div class="all-posts-btn-wrapper">
-      <!-- <LinkButton href="/posts/"> -->
-      Alle Artikel
-      <svg xmlns="http://www.w3.org/2000/svg"
-        ><path
-          d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"
-        ></path>
-      </svg>
+      <LinkButton href="/posts/">
+        Alle Artikel
+        <svg xmlns="http://www.w3.org/2000/svg"
+          ><path
+            d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"
+          ></path>
+        </svg>
+      </LinkButton>
     </div>
   </main>
-</Layout>
 
-<Footer />
+  <Footer />
 
-<style lang="postcss">
+  <style lang="postcss">
     /* ===== Hero Section ===== */
     #hero {
       @apply pb-6;
@@ -178,3 +179,4 @@ const socialCount = SOCIALS.filter(social => social.active).length;
       @apply my-8 text-center;
     }
   </style>
+</Layout>

@@ -75,6 +75,11 @@ const components = { img: Image, blockquote: Blockquote, p: Paragraph };
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+
+// Generate unique view transition name for hero image
+const heroImageTransitionName = heroImage
+  ? `hero-image-${slugifyStr(title)}-${post.id}`
+  : undefined;
 ---
 
 <Layout {...layoutProps}>
@@ -140,7 +145,7 @@ const t = useTranslations(lang);
             sizes="(max-width: 800px) 400px, (max-width: 1200px) 800px, (max-width: 1600px) 1200px, 1600px"
             formats={["avif", "webp"]}
             fallbackFormat="png"
-            transition:name={slugifyStr(title + "-heroImage")}
+            transition:name={heroImageTransitionName}
             data-pagefind-index-attrs="title,alt"
           />
         )
