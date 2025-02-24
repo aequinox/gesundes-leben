@@ -1,5 +1,30 @@
+/**
+ * @module loadGoogleFont
+ * @description
+ * Utility module for loading Google Fonts for use in OpenGraph images.
+ * Handles font loading, subsetting, and caching for optimal performance.
+ * Supports multiple font weights and styles with proper error handling.
+ *
+ * @example
+ * ```typescript
+ * import loadGoogleFonts from './utils/loadGoogleFont';
+ *
+ * const fonts = await loadGoogleFonts('Hello World');
+ * // Returns array of font options with ArrayBuffer data
+ * ```
+ */
+
 import type { FontStyle, FontWeight } from "satori";
 
+/**
+ * Configuration options for loaded fonts.
+ * Used to specify font properties and data for rendering.
+ *
+ * @property name - Font family name for reference
+ * @property data - Font data as ArrayBuffer
+ * @property weight - Font weight (100-900)
+ * @property style - Font style (normal, italic)
+ */
 export interface FontOptions {
   name: string;
   data: ArrayBuffer;
@@ -7,6 +32,15 @@ export interface FontOptions {
   style: FontStyle;
 }
 
+/**
+ * Configuration for a specific font variant.
+ * Used to specify how a font should be loaded from Google Fonts.
+ *
+ * @property name - Font family name for reference
+ * @property font - Google Fonts family string (e.g., 'IBM+Plex+Mono:wght@700')
+ * @property weight - Font weight to load
+ * @property style - Font style to load
+ */
 interface FontConfig {
   name: string;
   font: string;
@@ -14,17 +48,33 @@ interface FontConfig {
   style: FontStyle;
 }
 
+/**
+ * Google Fonts API endpoint for font loading.
+ * @internal
+ */
 const GOOGLE_FONTS_API = "https://fonts.googleapis.com/css2";
 
+/**
+ * Default user agent for font loading requests.
+ * Required for proper font file URL extraction.
+ * @internal
+ */
 const DEFAULT_USER_AGENT =
   "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; de-at) AppleWebKit/533.21.1 (KHTML, like Gecko) Version/5.0.5 Safari/533.21.1";
 
 /**
- * Loads a Google Font and returns its data
- * @param font - Font family name
+ * Loads a single Google Font and returns its data.
+ * Handles font subsetting based on provided text.
+ *
+ * @param font - Font family name or identifier
  * @param text - Text to subset the font with
- * @returns Font data as ArrayBuffer
- * @throws {Error} If font loading fails
+ * @returns Promise resolving to font data as ArrayBuffer
+ * @throws {Error} If font loading or subsetting fails
+ *
+ * @example
+ * ```typescript
+ * const fontData = await loadGoogleFont('IBM+Plex+Mono', 'Hello');
+ * ```
  */
 async function loadGoogleFont(
   font: string,
@@ -69,7 +119,9 @@ async function loadGoogleFont(
 }
 
 /**
- * Default font configurations
+ * Default font configurations for common use cases.
+ * Provides regular and bold weights of IBM Plex Mono.
+ * @internal
  */
 const DEFAULT_FONTS: FontConfig[] = [
   {
@@ -87,11 +139,27 @@ const DEFAULT_FONTS: FontConfig[] = [
 ];
 
 /**
- * Loads multiple Google Fonts
+ * Loads multiple Google Fonts with proper error handling.
+ * Supports custom font configurations and text subsetting.
+ *
  * @param text - Text to subset the fonts with
  * @param configs - Optional custom font configurations
- * @returns Array of font options
+ * @returns Promise resolving to array of font options
  * @throws {Error} If any font fails to load
+ *
+ * @example
+ * ```typescript
+ * // Using default fonts
+ * const defaultFonts = await loadGoogleFonts('Hello World');
+ *
+ * // Using custom configurations
+ * const customFonts = await loadGoogleFonts('Hello', [{
+ *   name: 'Roboto',
+ *   font: 'Roboto:wght@300',
+ *   weight: 300,
+ *   style: 'normal'
+ * }]);
+ * ```
  */
 async function loadGoogleFonts(
   text: string,
@@ -114,9 +182,22 @@ async function loadGoogleFonts(
 }
 
 /**
- * Validates font configuration
+ * Validates font configuration object.
+ * Ensures all required properties are present and of correct type.
+ *
  * @param config - Font configuration to validate
  * @throws {Error} If configuration is invalid
+ *
+ * @example
+ * ```typescript
+ * const config = {
+ *   name: 'Roboto',
+ *   font: 'Roboto',
+ *   weight: 400,
+ *   style: 'normal'
+ * };
+ * validateFontConfig(config); // Throws if invalid
+ * ```
  */
 export function validateFontConfig(config: FontConfig): void {
   if (!config.name || typeof config.name !== "string") {

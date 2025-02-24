@@ -1,11 +1,46 @@
+/**
+ * @module theme
+ * @description
+ * Utility module for managing theme switching and persistence.
+ * Implements a singleton pattern for consistent theme management
+ * across the application. Handles system preferences, user choices,
+ * and theme transitions.
+ *
+ * @example
+ * ```typescript
+ * import { themeManager } from './utils/theme';
+ *
+ * themeManager.initThemeFeature();
+ * themeManager.toggleTheme();
+ * ```
+ */
+
+/**
+ * Valid theme values for the application.
+ * Restricts theme options to maintain consistency.
+ */
 export type Theme = "light" | "dark";
 
+/**
+ * Configuration interface for theme management.
+ * Controls theme behavior and persistence.
+ *
+ * @property storageKey - Key used for theme storage in localStorage
+ * @property defaultTheme - Default theme when no preference is set
+ * @property systemPreferenceQuery - Media query for system theme detection
+ */
 export interface ThemeConfig {
   storageKey: string;
   defaultTheme: Theme;
   systemPreferenceQuery: string;
 }
 
+/**
+ * Default configuration for theme management.
+ * Provides sensible defaults for most use cases.
+ *
+ * @internal
+ */
 const DEFAULT_CONFIG: ThemeConfig = {
   storageKey: "theme",
   defaultTheme: "light",
@@ -14,7 +49,14 @@ const DEFAULT_CONFIG: ThemeConfig = {
 
 /**
  * Theme Manager Class
- * Handles theme switching and persistence
+ * Handles theme switching and persistence using the Singleton pattern.
+ * Provides a centralized way to manage theme state across the application.
+ *
+ * Features:
+ * - Theme persistence in localStorage
+ * - System theme preference detection
+ * - Automatic theme color updates
+ * - Event-driven theme switching
  */
 export class ThemeManager {
   private static instance: ThemeManager;
@@ -22,6 +64,12 @@ export class ThemeManager {
   private mediaQuery: MediaQueryList | null = null;
   private currentTheme: Theme;
 
+  /**
+   * Private constructor to enforce singleton pattern.
+   * Initializes theme manager with configuration.
+   *
+   * @param config - Optional custom configuration
+   */
   private constructor(config: Partial<ThemeConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
     this.currentTheme = this.getPreferredTheme();
@@ -30,7 +78,11 @@ export class ThemeManager {
   }
 
   /**
-   * Gets the singleton instance of ThemeManager
+   * Gets the singleton instance of ThemeManager.
+   * Creates instance if it doesn't exist.
+   *
+   * @param config - Optional custom configuration
+   * @returns ThemeManager instance
    */
   public static getInstance(config: Partial<ThemeConfig> = {}): ThemeManager {
     if (!ThemeManager.instance) {
@@ -40,7 +92,10 @@ export class ThemeManager {
   }
 
   /**
-   * Gets the user's preferred theme
+   * Gets the user's preferred theme.
+   * Checks localStorage first, then system preference.
+   *
+   * @returns Current theme preference
    */
   public getPreferredTheme(): Theme {
     if (typeof window === "undefined") return this.config.defaultTheme;
@@ -56,7 +111,10 @@ export class ThemeManager {
   }
 
   /**
-   * Updates the meta theme color based on current theme
+   * Updates the meta theme color based on current theme.
+   * Ensures proper theme color in browser UI.
+   *
+   * @internal
    */
   private updateMetaThemeColor(): void {
     if (typeof window === "undefined") return;
@@ -74,7 +132,10 @@ export class ThemeManager {
   }
 
   /**
-   * Reflects the current theme preference in the DOM
+   * Reflects the current theme preference in the DOM.
+   * Updates data-theme attribute and button labels.
+   *
+   * @internal
    */
   private reflectPreference(): void {
     if (typeof window === "undefined") return;
@@ -90,7 +151,10 @@ export class ThemeManager {
   }
 
   /**
-   * Sets the theme
+   * Sets the theme and persists the choice.
+   * Updates DOM and localStorage.
+   *
+   * @param theme - Theme to set
    */
   public setTheme(theme: Theme): void {
     this.currentTheme = theme;
@@ -99,7 +163,8 @@ export class ThemeManager {
   }
 
   /**
-   * Toggles between light and dark themes
+   * Toggles between light and dark themes.
+   * Convenient method for theme switching.
    */
   public toggleTheme(): void {
     const newTheme: Theme = this.currentTheme === "light" ? "dark" : "light";
@@ -107,7 +172,11 @@ export class ThemeManager {
   }
 
   /**
-   * Handles system theme preference changes
+   * Handles system theme preference changes.
+   * Updates theme if no manual preference is set.
+   *
+   * @param event - Media query change event
+   * @internal
    */
   private handleSystemThemeChange(event: MediaQueryListEvent): void {
     if (!localStorage.getItem(this.config.storageKey)) {
@@ -117,7 +186,8 @@ export class ThemeManager {
   }
 
   /**
-   * Cleans up event listeners
+   * Cleans up event listeners.
+   * Should be called when theme manager is no longer needed.
    */
   public cleanup(): void {
     if (this.mediaQuery) {
@@ -129,7 +199,13 @@ export class ThemeManager {
   }
 
   /**
-   * Initializes theme functionality
+   * Initializes theme functionality.
+   * Sets up event listeners and initial theme.
+   *
+   * @example
+   * ```typescript
+   * themeManager.initThemeFeature();
+   * ```
    */
   public initThemeFeature(): void {
     if (typeof window === "undefined") return;
