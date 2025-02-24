@@ -1,15 +1,20 @@
 /**
- * Reference System Utilities
- * This module provides comprehensive utility functions for working with academic references.
- * It includes functionality for formatting citations, sorting, filtering, and validation
- * according to academic standards.
- *
  * @module references
- * @author Your Team
- * @version 1.0.0
+ * @description
+ * Comprehensive utility functions for working with academic references.
+ * Provides functionality for formatting citations, sorting, filtering,
+ * and validation according to academic standards.
+ *
+ * @example
+ * ```typescript
+ * import { formatCitation, CitationStyle } from './utils/references';
+ *
+ * const citation = formatCitation(reference, CitationStyle.APA);
+ * ```
  */
 
 import type { Reference } from "@/utils/content/types";
+import { handleAsync } from "./core/errors";
 
 /**
  * Author interface for citation formatting
@@ -264,18 +269,20 @@ export function filterReferences(
  * @returns Reference object or undefined if not found
  * @throws {Error} If references array or slug is invalid
  */
-export function getReferenceBySlug(
+export async function getReferenceBySlug(
   references: ReadonlyArray<Reference>,
   slug: string
-): Reference | undefined {
-  if (!Array.isArray(references)) {
-    throw new Error("References must be provided as an array");
-  }
-  if (!slug || typeof slug !== "string") {
-    throw new Error("Slug must be a non-empty string");
-  }
+): Promise<Reference | undefined> {
+  return handleAsync(async () => {
+    if (!Array.isArray(references)) {
+      throw new Error("References must be provided as an array");
+    }
+    if (!slug || typeof slug !== "string") {
+      throw new Error("Slug must be a non-empty string");
+    }
 
-  return references.find(ref => ref.id === slug);
+    return references.find(ref => ref.id === slug);
+  });
 }
 
 /**
@@ -295,38 +302,40 @@ export enum GroupBy {
  * @returns Record with group keys and arrays of references as values
  * @throws {Error} If references array is invalid
  */
-export function groupReferences(
+export async function groupReferences(
   references: ReadonlyArray<Reference>,
   groupBy: GroupBy = GroupBy.YEAR
-): Record<string | number, ReadonlyArray<Reference>> {
-  if (!Array.isArray(references)) {
-    throw new Error("References must be provided as an array");
-  }
+): Promise<Record<string | number, ReadonlyArray<Reference>>> {
+  return handleAsync(async () => {
+    if (!Array.isArray(references)) {
+      throw new Error("References must be provided as an array");
+    }
 
-  return references.reduce(
-    (groups, ref) => {
-      let key: string | number;
+    return references.reduce(
+      (groups, ref) => {
+        let key: string | number;
 
-      switch (groupBy) {
-        case GroupBy.JOURNAL:
-          key = ref.data.journal || "Unknown Journal";
-          break;
-        case GroupBy.AUTHOR:
-          key = formatAuthors(ref.data.authors);
-          break;
-        case GroupBy.YEAR:
-        default:
-          key = ref.data.year;
-      }
+        switch (groupBy) {
+          case GroupBy.JOURNAL:
+            key = ref.data.journal || "Unknown Journal";
+            break;
+          case GroupBy.AUTHOR:
+            key = formatAuthors(ref.data.authors);
+            break;
+          case GroupBy.YEAR:
+          default:
+            key = ref.data.year;
+        }
 
-      if (!groups[key]) {
-        groups[key] = [];
-      }
-      groups[key] = [...groups[key], ref];
-      return groups;
-    },
-    {} as Record<string | number, Reference[]>
-  );
+        if (!groups[key]) {
+          groups[key] = [];
+        }
+        groups[key] = [...groups[key], ref];
+        return groups;
+      },
+      {} as Record<string | number, Reference[]>
+    );
+  });
 }
 
 /**
@@ -338,88 +347,92 @@ export interface ValidationResult {
 }
 
 /**
- * Validates a reference object against the schema defined in config.ts
+ * Validates a reference object against the schema
  *
  * @param reference - Reference object to validate
  * @returns Validation result containing boolean status and array of error messages
  */
-export function validateReference(reference: unknown): ValidationResult {
-  const errors: string[] = [];
+export async function validateReference(
+  reference: unknown
+): Promise<ValidationResult> {
+  return handleAsync(async () => {
+    const errors: string[] = [];
 
-  if (!reference || typeof reference !== "object") {
+    if (!reference || typeof reference !== "object") {
+      return {
+        isValid: false,
+        errors: ["Reference must be an object"],
+      };
+    }
+
+    const ref = reference as Partial<Reference>;
+
+    // Required field validations
+    const data = (ref as Reference)?.data;
+
+    if (!data || typeof data !== "object") {
+      errors.push("Reference must have a data object");
+      return { isValid: false, errors };
+    }
+
+    if (!data.title || typeof data.title !== "string") {
+      errors.push("Title is required and must be a string");
+    }
+
+    if (!Array.isArray(data.authors) || data.authors.length === 0) {
+      errors.push("Authors must be a non-empty array");
+    }
+
+    if (
+      typeof data.year !== "number" ||
+      data.year < MIN_YEAR ||
+      data.year > CURRENT_YEAR
+    ) {
+      errors.push(
+        `Year must be a valid year between ${MIN_YEAR} and ${CURRENT_YEAR}`
+      );
+    }
+
+    if (!ref.id || typeof ref.id !== "string") {
+      errors.push("ID is required and must be a string");
+    }
+
+    // Optional field validations
+    if (data.journal && typeof data.journal !== "string") {
+      errors.push("Journal must be a string when provided");
+    }
+
+    if (data.volume && (!Number.isInteger(data.volume) || data.volume <= 0)) {
+      errors.push("Volume must be a positive integer when provided");
+    }
+
+    if (data.issue && (!Number.isInteger(data.issue) || data.issue <= 0)) {
+      errors.push("Issue must be a positive integer when provided");
+    }
+
+    if (data.pages && !PAGE_PATTERN.test(data.pages)) {
+      errors.push("Pages must be in format '1-10' or '5' when provided");
+    }
+
+    if (data.url && !isValidUrl(data.url)) {
+      errors.push("URL must be a valid URL string when provided");
+    }
+
+    if (data.doi && !DOI_PATTERN.test(data.doi)) {
+      errors.push(
+        "DOI must be in valid format (e.g., 10.1234/abc123) when provided"
+      );
+    }
+
+    if (data.pmid && !PMID_PATTERN.test(data.pmid)) {
+      errors.push("PMID must be a valid number when provided");
+    }
+
     return {
-      isValid: false,
-      errors: ["Reference must be an object"],
+      isValid: errors.length === 0,
+      errors,
     };
-  }
-
-  const ref = reference as Partial<Reference>;
-
-  // Required field validations
-  const data = (ref as Reference)?.data;
-
-  if (!data || typeof data !== "object") {
-    errors.push("Reference must have a data object");
-    return { isValid: false, errors };
-  }
-
-  if (!data.title || typeof data.title !== "string") {
-    errors.push("Title is required and must be a string");
-  }
-
-  if (!Array.isArray(data.authors) || data.authors.length === 0) {
-    errors.push("Authors must be a non-empty array");
-  }
-
-  if (
-    typeof data.year !== "number" ||
-    data.year < MIN_YEAR ||
-    data.year > CURRENT_YEAR
-  ) {
-    errors.push(
-      `Year must be a valid year between ${MIN_YEAR} and ${CURRENT_YEAR}`
-    );
-  }
-
-  if (!ref.id || typeof ref.id !== "string") {
-    errors.push("ID is required and must be a string");
-  }
-
-  // Optional field validations
-  if (data.journal && typeof data.journal !== "string") {
-    errors.push("Journal must be a string when provided");
-  }
-
-  if (data.volume && (!Number.isInteger(data.volume) || data.volume <= 0)) {
-    errors.push("Volume must be a positive integer when provided");
-  }
-
-  if (data.issue && (!Number.isInteger(data.issue) || data.issue <= 0)) {
-    errors.push("Issue must be a positive integer when provided");
-  }
-
-  if (data.pages && !PAGE_PATTERN.test(data.pages)) {
-    errors.push("Pages must be in format '1-10' or '5' when provided");
-  }
-
-  if (data.url && !isValidUrl(data.url)) {
-    errors.push("URL must be a valid URL string when provided");
-  }
-
-  if (data.doi && !DOI_PATTERN.test(data.doi)) {
-    errors.push(
-      "DOI must be in valid format (e.g., 10.1234/abc123) when provided"
-    );
-  }
-
-  if (data.pmid && !PMID_PATTERN.test(data.pmid)) {
-    errors.push("PMID must be a valid number when provided");
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
+  });
 }
 
 /**
@@ -427,6 +440,7 @@ export function validateReference(reference: unknown): ValidationResult {
  *
  * @param url - String to check
  * @returns Boolean indicating if string is a valid URL
+ * @internal
  */
 function isValidUrl(url: string): boolean {
   try {
