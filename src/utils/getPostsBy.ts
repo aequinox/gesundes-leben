@@ -15,7 +15,7 @@
  */
 
 import { getCollection, type CollectionEntry } from "astro:content";
-import { slugifyAll, slugifyStr } from "./slugify";
+import { slugService } from "@/services/format/SlugService";
 import { handleAsync } from "./core/errors";
 
 /**
@@ -35,13 +35,17 @@ const getPostsBy = async (
   value: string
 ): Promise<CollectionEntry<"blog">[]> => {
   return handleAsync(async () => {
-    const slugifiedValue = slugifyStr(value);
+    const slugifiedValue = slugService.slugifyStr(value);
 
     // Filter posts while maintaining original order
     return type === "group"
-      ? posts.filter(post => slugifyStr(post.data[type]) === slugifiedValue)
+      ? posts.filter(
+          post => slugService.slugifyStr(post.data[type]) === slugifiedValue
+        )
       : posts.filter(post =>
-          post.data[type]?.some(item => slugifyStr(item) === slugifiedValue)
+          post.data[type]?.some(
+            item => slugService.slugifyStr(item) === slugifiedValue
+          )
         );
   });
 };

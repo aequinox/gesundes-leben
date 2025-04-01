@@ -13,7 +13,7 @@
  * ```
  */
 
-import { slugifyStr } from "./slugify";
+import { slugService } from "@/services/format/SlugService";
 import type { CollectionEntry } from "astro:content";
 import postFilter from "./postFilter";
 
@@ -55,7 +55,7 @@ const extractUniqueTags = (posts: CollectionEntry<"blog">[]): TagInfo[] => {
   filteredPosts
     .flatMap(post => post.data.tags || [])
     .forEach(tag => {
-      const slugifiedTag = slugifyStr(tag);
+      const slugifiedTag = slugService.slugifyStr(tag);
       // Keep first occurrence of tag name for consistent display
       if (!uniqueTags.has(slugifiedTag)) {
         uniqueTags.set(slugifiedTag, tag);

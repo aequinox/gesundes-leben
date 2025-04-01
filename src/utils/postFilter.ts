@@ -44,19 +44,36 @@ const filterBlogPosts = ({ data }: CollectionEntry<"blog">): boolean => {
   const isDevelopment = import.meta.env.DEV;
   const { draft, pubDatetime } = data;
 
+  // Exclude posts with missing publication date
   if (!pubDatetime) {
     return false;
   }
 
+  // Exclude posts with invalid publication date
   const pubDate = new Date(pubDatetime);
   if (isNaN(pubDate.getTime())) {
     return false;
   }
 
-  return (
-    isDevelopment ||
-    (!draft && pubDate.getTime() <= Date.now() + SITE.scheduledPostMargin)
-  );
+  // In development mode, include all posts with valid dates
+  if (isDevelopment) {
+    return true;
+  }
+
+  // In production mode:
+  // 1. Exclude draft posts
+  if (draft) {
+    return false;
+  }
+
+  // 2. Exclude future posts outside the scheduled margin
+  const scheduledMargin = SITE.scheduledPostMargin || 0;
+  if (pubDate.getTime() > Date.now() + scheduledMargin) {
+    return false;
+  }
+
+  // Include all other posts
+  return true;
 };
 
 /**
