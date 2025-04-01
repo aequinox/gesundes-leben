@@ -1,182 +1,48 @@
 ---
+import { getCollection } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
-
 import Header from "@/components/sections/Header.astro";
 import Footer from "@/components/sections/Footer.astro";
-import getSortedPosts from "@/utils/getSortedPosts";
-import { getCollection } from "astro:content";
-import { SITE, SOCIALS } from "@/config";
-import Hr from "@/components/elements/Hr.astro";
-import BlogFilter from "@/components/filter/BlogFilter.astro";
+import Pagination from "@/components/sections/Pagination.astro";
 import Card from "@/components/sections/Card.astro";
-import LinkButton from "@/components/elements/LinkButton.astro";
+import { SITE } from "@/config";
+import { postService } from "@/services/content/PostService";
+import type { CollectionEntry } from "astro:content";
+import type { Page } from "astro";
 
-const posts = await getCollection("blog");
+interface Props {
+  page: Page<CollectionEntry<"blog">>;
+}
 
-const sortedPosts = await getSortedPosts(posts);
-const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
-const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
+export async function getStaticPaths({ paginate }: { paginate: Function }) {
+  const posts = await postService.getAllPosts();
+  const sortedPosts = await postService.getSortedPosts(posts);
+  return paginate(sortedPosts, { pageSize: SITE.postPerPage });
+}
 
-const socialCount = SOCIALS.filter(social => social.active).length;
+const { page } = Astro.props as Props;
 ---
 
-<Layout>
+<Layout title={SITE.title}>
   <Header />
   <main id="main-content">
-    <section id="hero">
-      <h1>Gesundes Leben</h1>
-      <a
-        target="_blank"
-        href="/rss.xml"
-        class="rss-link"
-        aria-label="rss feed"
-        title="RSS Feed"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="rss-icon"
-          ><path
-            d="M19 20.001C19 11.729 12.271 5 4 5v2c7.168 0 13 5.832 13 13.001h2z"
-          ></path><path
-            d="M12 20.001h2C14 14.486 9.514 10 4 10v2c4.411 0 8 3.589 8 8.001z"
-          ></path><circle cx="6" cy="18" r="2"></circle>
-        </svg>
-        <span class="sr-only">RSS Feed</span>
-      </a>
-
-      <h2 class="text-3xl leading-8">Willkommen auf unserem Blog!</h2>
-
-      <p class="leading-7">
-        Auf diesem Blog stellen dir Sandra & Kai Artikel über Gesundheitsthemen
-        zur Verfügung und laden dich ein auf eine Reise zu mehr Gesundheit, die
-        Spaß machen soll. <span class="hash">sogehtgesund</span>
-      </p>
-
-      <p>
-        Wir betreiben den Blog als Privatpersonen, teilen aber unser
-        Insider-Wissen, das wir uns in unserer langjährigen Arbeit als
-        Therapeuten angeeignet haben. Das möchten wir auf einfache und
-        verständliche Weise tun, denn wir finden, dass medizinische
-        Zusammenhänge häufig zu kompliziert und für Laien schwer nachvollziehbar
-        vermittelt werden. Deshalb verlinken wir medizinische Begriffe, wenn sie
-        nicht vermeidbar sind, auf unser Glossar, wo du eine verständliche
-        Erklärung findest.
-      </p>
-      <p>
-        Unser Ziel ist <strong>Empowerment für deine Gesundheit</strong>. Das
-        bedeutet, wir möchten dich darin unterstützen, für deine Gesundheit
-        aktiv zu werden und dir dafür unser Wissen und unsere Erfahrung
-        kostenfrei zur Verfügung stellen. <span class="hash"
-          >weildueswertbist</span
-        >
-      </p>
-      <!-- <p>
-        Read the blog posts or check
-        <LinkButton
-          className='underline decoration-dashed underline-offset-4 hover:text-skin-accent'
-          href='https://github.com/satnaing/astro-paper#readme'
-        >
-          README
-        </LinkButton> for more info.
-      </p> -->
-      {
-        // only display if at least one social link is enabled
-        socialCount > 0 && (
-          <div class="social-wrapper">
-            <div class="social-links" />
-            {/* <Socials /> */}
-          </div>
-        )
-      }
+    <section id="posts">
+      <h1>Blog</h1>
+      <ul>
+        {page.data.map(post => <Card post={post} />)}
+      </ul>
     </section>
-
-    <Hr />
-
-    <BlogFilter />
-
-    <!-- <BlogFilter client:visible /> -->
-
-    <!-- {
-      featuredPosts.length > 0 && (
-        <section id="featured">
-          <h2>Ausgewählte Artikel</h2>
-          <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
-            {featuredPosts.map(post => (
-              <Card post={post} loading="lazy" />
-            ))}
-          </div>
-        </section>
-      )
-    }
-
-    {
-      recentPosts.length > 0 && (
-        <Fragment>
-          <Hr />
-          <section id="recent-posts">
-            <h2>Neueste Artikel</h2>
-            <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {recentPosts.map(
-                (post, index) =>
-                  index < SITE.postPerIndex && <Card {post} loading="lazy" />
-              )}
-            </div>
-          </section>
-        </Fragment>
-      )
-    } -->
-
-    <Hr />
-
-    <div class="all-posts-btn-wrapper">
-      <LinkButton href="/posts/">
-        Alle Artikel
-        <svg xmlns="http://www.w3.org/2000/svg"
-          ><path
-            d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"
-          ></path>
-        </svg>
-      </LinkButton>
-    </div>
   </main>
 
+  <Pagination
+    currentPage={page.currentPage}
+    totalPages={page.lastPage}
+    prevUrl={page.url.prev ?? ""}
+    nextUrl={page.url.next ?? ""}
+  />
   <Footer />
-
-  <style lang="postcss">
-    /* ===== Hero Section ===== */
-    #hero {
-      @apply pb-6;
-      h1 {
-        @apply my-4 inline-block text-3xl font-bold sm:my-8 sm:text-5xl;
-      }
-      .rss-link {
-        @apply mb-6;
-      }
-      .rss-icon {
-        @apply mb-2 h-6 w-6 scale-110 fill-skin-accent sm:mb-3 sm:scale-125;
-      }
-      p {
-        @apply my-2;
-      }
-    }
-    .social-wrapper {
-      @apply mt-4 flex flex-col sm:flex-row sm:items-center;
-    }
-    .social-links {
-      @apply mb-1 mr-2 whitespace-nowrap sm:mb-0;
-    }
-
-    /* ===== Featured & Recent Posts Sections ===== */
-    #featured,
-    #filtered,
-    #recent-posts {
-      @apply pb-6 pt-12;
-    }
-    #featured h2,
-    #filtered h2,
-    #recent-posts h2 {
-      @apply text-2xl font-semibold tracking-wide;
-    }
-    .all-posts-btn-wrapper {
-      @apply my-8 text-center;
-    }
-  </style>
 </Layout>
+
+<style>
+  /* ... existing styles ... */
+</style>

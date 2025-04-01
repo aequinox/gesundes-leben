@@ -50,6 +50,11 @@ export interface IThemeService {
    * Clean up event listeners
    */
   cleanup(): void;
+
+  /**
+   * Reflect the current theme preference in the DOM
+   */
+  reflectPreference(): void;
 }
 
 /**
@@ -110,9 +115,9 @@ export class ThemeService implements IThemeService {
   }
 
   /**
-   * Reflects the current theme preference in the DOM
+   * Reflect the current theme preference in the DOM
    */
-  private reflectPreference(): void {
+  reflectPreference(): void {
     if (typeof window === "undefined") return;
 
     document.firstElementChild?.setAttribute("data-theme", this.currentTheme);

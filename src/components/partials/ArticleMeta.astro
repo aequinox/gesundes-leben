@@ -1,119 +1,35 @@
 ---
-import Author from "@/components/partials/Author.astro";
-import Datetime from "@/components/partials/Datetime.astro";
-import ReadingTime from "@/components/partials/ReadingTime.astro";
-import { getAuthorEntry } from "@/utils/getAuthor";
-import { slugifyStr } from "@/utils/slugify";
-import type { CollectionEntry } from "astro:content";
+import { type CollectionEntry } from "astro:content";
+import Datetime from "./Datetime.astro";
+import ReadingTime from "./ReadingTime.astro";
+import Author from "./Author.astro";
 
-/**
- * Type definitions for content collections
- */
-type PostType = CollectionEntry<"blog"> | CollectionEntry<"glossary">;
-
-/**
- * Component props interface with strict typing
- */
-interface Props {
-  /** The post entry from the content collection */
-  post: PostType;
-  /** Whether to show the datetime component */
-  withDatetime?: boolean;
-  /** Whether to show the reading time component */
-  withReadingTime?: boolean;
-  /** Whether to show the author component */
-  withAuthor?: boolean;
-  /** Size variant for child components */
-  size?: "sm" | "lg";
-  /** Additional CSS classes */
-  classes?: string;
+export interface Props {
+  post: CollectionEntry<"blog">;
+  showAuthor?: boolean;
+  showReadingTime?: boolean;
 }
 
-const {
-  post,
-  withDatetime = true,
-  withReadingTime = false,
-  withAuthor = false,
-  size = "sm",
-  classes = "",
-}: Props = Astro.props;
-
-const { title, author, pubDatetime, modDatetime } = post.data;
-
-/**
- * Type guard to check if post is a blog post with reading time
- */
-const isBlogPost = (post: PostType): post is CollectionEntry<"blog"> => {
-  return post.collection === "blog";
-};
-
-// Get reading time only if it's a blog post
-const readingTime = isBlogPost(post) ? post.data.readingTime : undefined;
-
-// Get author data asynchronously
-const authorEntry = await getAuthorEntry(author);
-
-/**
- * Generate unique transition names for view transitions API
- * @param suffix - String to append to the title for uniqueness
- */
-const getTransitionName = (suffix: string): string =>
-  slugifyStr(title + suffix);
-
-/**
- * Determine separator visibility based on enabled components
- */
-const showFirstSeparator = withDatetime && withReadingTime && readingTime;
-const showSecondSeparator =
-  (withDatetime || (withReadingTime && readingTime)) &&
-  withAuthor &&
-  authorEntry;
+const { post, showAuthor = true, showReadingTime = true } = Astro.props;
+const { pubDatetime, modDatetime, author } = post.data;
 ---
 
-<div
-  class:list={["flex flex-wrap items-center gap-2", classes.trim()]}
-  aria-label="Article metadata"
->
+<div class="flex flex-wrap items-center gap-2 text-sm opacity-80">
+  <Datetime datetime={pubDatetime} />
   {
-    withDatetime && (
-      <Datetime
-        pubDatetime={pubDatetime}
-        modDatetime={modDatetime}
-        size={size}
-        transition:name={getTransitionName(pubDatetime.toString())}
-      />
+    showAuthor && author && (
+      <>
+        <div class="mx-2 h-1 w-1 rounded-full bg-skin-fill" />
+        <Author author={author} />
+      </>
     )
   }
   {
-    showFirstSeparator && (
-      <span class="select-none opacity-80" aria-hidden="true">
-        |
-      </span>
-    )
-  }
-  {
-    withReadingTime && readingTime && (
-      <ReadingTime
-        readingTime={readingTime}
-        size={size}
-        transition:name={getTransitionName(readingTime.toString())}
-      />
-    )
-  }
-  {
-    showSecondSeparator && (
-      <span class="select-none opacity-80" aria-hidden="true">
-        |
-      </span>
-    )
-  }
-  {
-    withAuthor && authorEntry && (
-      <Author
-        author={authorEntry}
-        size={size}
-        transition:name={getTransitionName(authorEntry.data.name)}
-      />
+    showReadingTime && post.data.readingTime && (
+      <>
+        <div class="mx-2 h-1 w-1 rounded-full bg-skin-fill" />
+        <ReadingTime readingTime={post.data.readingTime} />
+      </>
     )
   }
 </div>

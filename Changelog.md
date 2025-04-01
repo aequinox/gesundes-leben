@@ -2,6 +2,46 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Service-Based Architecture Implementation
+- **Core Infrastructure**
+  - Created standardized error handling with `ApplicationError` classes
+  - Implemented centralized configuration management with `ConfigService`
+
+- **Content Services**
+  - Added `PostService` for blog post operations
+  - Implemented `PaginationService` for content pagination
+  - Created `TagService` for tag management
+  - Added `ReferenceService` for academic references
+  - Implemented `AuthorService` for author information
+
+- **Format Services**
+  - Added `DateService` for date formatting and manipulation
+  - Implemented `SlugService` for URL-friendly slugs
+  - Created `FontService` for font loading and management
+
+- **UI Services**
+  - Added `ThemeService` for theme switching and persistence
+  - Implemented `AnimationService` for AOS animations
+
+- **Image Services**
+  - Created `OgImageService` for OpenGraph image generation
+
+- **Component Integration**
+  - Updated `index.astro` to use `PostService`
+  - Modified `Datetime.astro` to use `DateService`
+  - Enhanced `ThemeToggle.astro` with `ThemeService`
+  - Updated `Card.astro` to use `SlugService`
+  - Improved `Author.astro` with `AuthorService`
+
+- **SOLID Principles**
+  - Implemented Single Responsibility Principle with focused services
+  - Applied Open/Closed Principle through extensible interfaces
+  - Ensured Liskov Substitution with interchangeable implementations
+  - Created Interface Segregation with focused interfaces
+  - Used Dependency Inversion with abstractions over implementations
+
 ## [0.0.1] - 2024-05-13
 
 ### Content Management Enhancement

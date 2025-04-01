@@ -2,13 +2,14 @@
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { Icon } from "astro-icon/components";
 import type { CollectionEntry } from "astro:content";
+import { authorService } from "@/services/content/AuthorService";
 
 /**
  * Component props interface with strict typing
  */
 interface Props {
-  /** The author entry from the content collection */
-  author: CollectionEntry<"authors">;
+  /** The author reference (string ID or reference object) */
+  author: string | { collection: "authors"; id: string };
   /** Size variant for the component */
   size?: "sm" | "lg";
   /** Additional CSS classes */
@@ -19,6 +20,9 @@ const { author, size = "sm", classes = "" }: Props = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+
+// Get author entry from service
+const authorEntry = await authorService.getAuthorEntry(author);
 
 // Precompute classes for better performance
 const iconClasses = [
@@ -31,7 +35,7 @@ const textClasses = ["italic", size === "sm" ? "text-sm" : "text-base"];
 ---
 
 {
-  author && (
+  authorEntry && (
     <div
       class:list={[
         "flex items-center gap-1 opacity-80 transition-opacity hover:opacity-100",
@@ -49,11 +53,11 @@ const textClasses = ["italic", size === "sm" ? "text-sm" : "text-base"];
           {t("author.from")}
         </span>
         <a
-          href={`/author/${author.slug}`}
+          href={`/author/${authorEntry.slug}`}
           class="rounded-sm hover:underline focus:outline-none focus:ring-2 focus:ring-skin-accent focus:ring-offset-2"
         >
           <span data-pagefind-filter={t("author.name")}>
-            {author.data.name}
+            {authorEntry.data.name}
           </span>
         </a>
       </span>
