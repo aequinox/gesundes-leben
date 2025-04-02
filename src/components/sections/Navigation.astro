@@ -359,6 +359,8 @@ const activeClasses = tw(
 </style>
 
 <script>
+  import { themeService } from "@/services/ui/ThemeService";
+
   /**
    * Enhanced navigation functionality with improved performance and accessibility
    *
@@ -367,6 +369,7 @@ const activeClasses = tw(
    * - Performance optimized with RAF
    * - Enhanced keyboard navigation
    * - Proper cleanup on page transitions
+   * - Theme persistence during navigation
    */
   class NavigationController {
     private menuBtn: HTMLElement | null;
@@ -374,6 +377,8 @@ const activeClasses = tw(
     private nav: HTMLElement | null;
     private scrollTimeout: number | null;
     private labels: { open: string; close: string };
+    private navLinks: NodeListOf<HTMLAnchorElement> | null;
+    private linkClickHandlers: Map<HTMLAnchorElement, EventListener>;
 
     constructor() {
       this.menuBtn = document.getElementById("hamburger-menu");
@@ -381,6 +386,8 @@ const activeClasses = tw(
       this.nav = document.querySelector(".nav-container");
       this.scrollTimeout = null;
       this.labels = this.getMenuLabels();
+      this.navLinks = document.querySelectorAll("nav a");
+      this.linkClickHandlers = new Map();
 
       if (!this.menuBtn || !this.menuItems || !this.nav) {
         console.warn("Navigation elements not found");
@@ -476,6 +483,17 @@ const activeClasses = tw(
       }
     }
 
+    private handleLinkClick = (evt: Event): void => {
+      // Store current theme in session storage for persistence during navigation
+      sessionStorage.setItem(
+        "theme-transition",
+        document.documentElement.getAttribute("data-theme") || ""
+      );
+
+      // Apply theme immediately before navigation to prevent flickering
+      themeService.applyThemeImmediately();
+    };
+
     private setupEventListeners(): void {
       // Menu toggle
       this.menuBtn?.addEventListener("click", this.toggleMenu);
@@ -502,10 +520,32 @@ const activeClasses = tw(
           this.toggleMenu();
         }
       });
+
+      // Handle link clicks to apply theme immediately before navigation
+      if (this.navLinks) {
+        this.navLinks.forEach(link => {
+          // Create a unique handler for each link and store it for cleanup
+          const handler = this.handleLinkClick.bind(this);
+          this.linkClickHandlers.set(link, handler);
+          link.addEventListener("click", handler, { capture: true });
+
+          // Add data attribute to mark links as processed
+          link.setAttribute("data-theme-processed", "true");
+        });
+      }
     }
 
     public cleanup(): void {
       this.menuBtn?.removeEventListener("click", this.toggleMenu);
+
+      // Clean up link click handlers
+      if (this.linkClickHandlers.size > 0) {
+        this.linkClickHandlers.forEach((handler, link) => {
+          link.removeEventListener("click", handler, { capture: true });
+        });
+        this.linkClickHandlers.clear();
+      }
+
       if (this.scrollTimeout) {
         cancelAnimationFrame(this.scrollTimeout);
       }
@@ -516,13 +556,27 @@ const activeClasses = tw(
   let controller: NavigationController | null = new NavigationController();
 
   // Handle Astro page transitions
-  document.addEventListener("astro:after-swap", () => {
+  document.addEventListener("astro:page-load", () => {
     controller?.cleanup();
     controller = new NavigationController();
+  });
+
+  // Apply theme at each stage of the view transition
+  document.addEventListener("astro:before-preparation", () => {
+    themeService.applyThemeImmediately();
+  });
+
+  document.addEventListener("astro:after-preparation", () => {
+    themeService.applyThemeImmediately();
   });
 
   document.addEventListener("astro:before-swap", () => {
     controller?.cleanup();
     controller = null;
+    themeService.applyThemeImmediately();
+  });
+
+  document.addEventListener("astro:after-swap", () => {
+    themeService.reflectPreference();
   });
 </script>

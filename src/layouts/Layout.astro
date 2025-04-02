@@ -58,6 +58,9 @@ const structuredData = {
   class={`${scrollSmooth && "scroll-smooth"}`}
 >
   <head>
+    {/* Theme initialization script - must be first for immediate execution */}
+    <script is:inline src="/theme-init.js"></script>
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -133,16 +136,36 @@ const structuredData = {
 
     <ClientRouter />
 
-    <script is:inline src="/toggle-theme.js"></script>
-
     <script>
+      import { themeService } from "@/services/ui/ThemeService";
       import { aosInit } from "@/utils/aos";
+
+      // Initialize theme on page load
+      if (typeof window !== "undefined") {
+        // Apply theme immediately to prevent flickering
+        themeService.applyThemeImmediately();
+
+        // Set up theme persistence
+        document.addEventListener("astro:before-preparation", () => {
+          themeService.applyThemeImmediately();
+        });
+
+        document.addEventListener("astro:after-preparation", () => {
+          themeService.applyThemeImmediately();
+        });
+
+        document.addEventListener("astro:before-swap", () => {
+          themeService.applyThemeImmediately();
+        });
+
+        document.addEventListener("astro:after-swap", () => {
+          themeService.reflectPreference();
+          aosInit();
+        });
+      }
+
       // runs on initial page load
       aosInit();
-      // runs on view transitions navigation
-      document.addEventListener("astro:after-swap", () => {
-        aosInit();
-      });
     </script>
   </head>
 

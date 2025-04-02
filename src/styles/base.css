@@ -17,11 +17,44 @@
 @layer base {
   html {
     scroll-padding-top: 4rem;
+    /* Theme transition settings */
+    --theme-transition-duration: 0.2s;
+    --theme-transition-timing: cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+
+  /* Apply transitions to all theme-related properties */
+  html[data-theme] {
+    /* Critical properties that should transition smoothly */
+    transition-property: background-color, color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: var(--theme-transition-timing);
+    transition-duration: var(--theme-transition-duration, 0.2s);
+  }
+  
+  /* Apply transitions to specific elements that need theme transitions */
+  .nav-container, 
+  .action-button, 
+  button,
+  a,
+  svg,
+  [class*="bg-skin-"],
+  [class*="text-skin-"],
+  [class*="border-skin-"],
+  [class*="fill-skin-"] {
+    transition-property: background-color, color, border-color, fill, stroke;
+    transition-timing-function: var(--theme-transition-timing);
+    transition-duration: var(--theme-transition-duration, 0.2s);
+  }
+
+  /* Disable transitions when user prefers reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    html, body, .nav-container, .action-button, [data-theme] * {
+      transition-duration: 0.001ms !important;
+    }
   }
 
   :root,
   html[data-theme="light"] {
-    --transition-cubic: cubic-bezier(0.165, 0.84, 0.44, 1);
+    --transition-cubic: var(--theme-transition-timing);
     /* oklch(99% 0.005 145); */
     --color-fill: 99% 0.005 145;
     /* oklch(27% 0.002 325); */

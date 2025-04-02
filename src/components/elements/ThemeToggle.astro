@@ -28,16 +28,6 @@ const t = useTranslations(lang);
   // Initialize theme functionality
   themeService.initThemeFeature();
 
-  // Handle theme toggle click
-  document.getElementById("theme-btn")?.addEventListener("click", () => {
-    themeService.toggleTheme();
-  });
-
-  // Handle Astro view transitions
-  document.addEventListener("astro:after-swap", () => {
-    themeService.reflectPreference();
-  });
-
   // Clean up on page unload
   window.addEventListener("beforeunload", () => {
     themeService.cleanup();

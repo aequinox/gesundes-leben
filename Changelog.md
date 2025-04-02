@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Enhanced Theme Switching System
+- **Theme Persistence**
+  - Fixed navbar flickering issue during navigation in dark mode
+  - Implemented aggressive theme persistence strategy during view transitions
+  - Added session storage for reliable theme state preservation
+  - Created early theme initialization script for immediate theme application
+
+- **Performance Optimization**
+  - Added targeted CSS transitions for theme-related properties
+  - Implemented transition disabling during navigation to prevent flickering
+  - Enhanced event handling with capture-phase listeners
+  - Added mutation observer to ensure theme consistency
+
+- **Code Quality**
+  - Consolidated duplicate theme logic into ThemeService
+  - Enhanced TypeScript type safety and error handling
+  - Improved event listener cleanup and memory management
+  - Added comprehensive documentation
+
 ### Service-Based Architecture Implementation
 - **Core Infrastructure**
   - Created standardized error handling with `ApplicationError` classes
