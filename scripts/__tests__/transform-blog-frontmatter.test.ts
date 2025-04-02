@@ -1,54 +1,38 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { readFileSync, writeFileSync, readdirSync, unlinkSync } from 'fs';
-import type { Category } from '@/data/taxonomies';
 
-// Mock external dependencies
-vi.mock('fs', () => ({
-  promises: {
-    readFile: vi.fn(),
-    writeFile: vi.fn(),
-    readdir: vi.fn(),
-    unlink: vi.fn(),
+// Mock dependencies
+vi.mock('@/services/content/ContentFileService', () => ({
+  contentFileService: {
+    getContentDir: vi.fn(() => 'test/content'),
+    findIndexMarkdownFiles: vi.fn(),
+    readMarkdownFile: vi.fn(),
+    writeMarkdownFile: vi.fn(),
+    convertToMdx: vi.fn(),
   },
-  readFileSync: vi.fn(),
-  writeFileSync: vi.fn(),
-  readdirSync: vi.fn(),
-  unlinkSync: vi.fn(),
 }));
 
-vi.mock('path', async () => {
-  const actual = await vi.importActual('path') as typeof import('path');
-  return {
-    ...actual,
-    join: vi.fn((...args) => args.join('/')),
-  };
-});
-
-vi.mock('uuid', () => ({
-  v4: vi.fn(() => 'mock-uuid'),
+vi.mock('@/services/content/FrontmatterService', () => ({
+  frontmatterService: {
+    transformBlogFrontmatter: vi.fn(),
+    generateDescription: vi.fn(),
+    validateCategory: vi.fn(),
+    capitalizeFirstLetter: vi.fn(),
+  },
+  BlogFrontmatter: {},
 }));
 
-// Mock taxonomies
-vi.mock('@/data/taxonomies', () => ({
-  GROUPS: ['fragezeiten', 'pro', 'kontra'],
-  CATEGORIES: [
-    'Ernährung',
-    'Immunsystem',
-    'Lesenswertes',
-    'Lifestyle & Psyche',
-    'Mikronährstoffe',
-    'Organsysteme',
-    'Wissenschaftliches',
-    'Wissenswertes'
-  ],
+vi.mock('@/core/errors/handleAsync', () => ({
+  handleAsync: vi.fn((fn) => fn()),
 }));
 
-// Mock slugify utility
-vi.mock('@/utils/slugify', () => ({
-  slugifyStr: vi.fn((str: string) => str.toLowerCase().replace(/\s+/g, '-')),
-}));
+// Import after mocks
+import * as transformBlogFrontmatter from '../transform-blog-frontmatter';
+import { contentFileService } from '@/services/content/ContentFileService';
+import { frontmatterService } from '@/services/content/FrontmatterService';
+import type { BlogFrontmatter } from '@/services/content/FrontmatterService';
 
 describe('transform-blog-frontmatter', () => {
+  const { processMarkdownFile, processAndRenameFile, main } = transformBlogFrontmatter;
   beforeEach(() => {
     vi.clearAllMocks();
     console.log = vi.fn();
@@ -59,190 +43,147 @@ describe('transform-blog-frontmatter', () => {
     vi.resetModules();
   });
 
-  describe('transformFrontmatter', () => {
-    it('should transform frontmatter with all fields', async () => {
-      const { transformFrontmatter } = await import('../transform-blog-frontmatter');
-      const input = {
+  describe('processMarkdownFile', () => {
+    it('should process and transform markdown content', async () => {
+      const mockData: BlogFrontmatter = {
         title: 'Test Post',
-        coverImage: 'test.jpg',
         date: '2024-01-01',
-        categories: ['Ernährung', 'Immunsystem'] as Category[],
-        tags: ['test', 'example'],
+        categories: ['Ernährung'],
       };
-
-      const result = transformFrontmatter(input, '');
-
-      expect(result).toEqual({
+      
+      const mockTransformed: BlogFrontmatter = {
         id: 'mock-uuid',
         title: 'Test Post',
         author: 'sandra-pfeiffer',
         slug: 'test-post',
-        description: '',
-        heroImage: {
-          src: './images/test.jpg',
-          alt: 'Test Post',
-        },
+        description: 'Test description',
         pubDatetime: '2024-01-01T00:00:00.000Z',
         modDatetime: '2024-01-01T00:00:00.000Z',
         draft: true,
         featured: false,
         group: 'fragezeiten',
-        categories: ['Ernährung', 'Immunsystem'],
-        tags: ['test', 'example'],
+        categories: ['Ernährung'],
+        tags: [],
         favorites: {},
+      };
+
+      vi.mocked(contentFileService.readMarkdownFile).mockResolvedValue({
+        data: mockData,
+        content: 'Test content',
+        isEmpty: false,
       });
-    });
 
-    it('should handle missing optional fields', async () => {
-      const { transformFrontmatter } = await import('../transform-blog-frontmatter');
-      const input = {
-        title: 'Test Post',
-      };
-
-      const result = transformFrontmatter(input, '');
-
-      expect(result.id).toBe('mock-uuid');
-      expect(result.heroImage).toBeUndefined();
-      expect(result.tags).toEqual([]);
-      expect(result.categories).toEqual([]);
-    });
-
-    it('should validate and normalize categories', async () => {
-      const { transformFrontmatter } = await import('../transform-blog-frontmatter');
-      const input = {
-        title: 'Test Post',
-        categories: ['ernährung', 'invalid', 'Immunsystem'] as unknown as Category[],
-      };
-
-      const result = transformFrontmatter(input, '');
-
-      expect(result.categories).toEqual(['Ernährung', 'Immunsystem']);
-    });
-  });
-
-  describe('generateDescription', () => {
-    it('should generate description from content', async () => {
-      const { generateDescription } = await import('../transform-blog-frontmatter');
-      const content = `---
-title: Test
----
-# Heading
-This is a test content with more than 150 characters to ensure that the description is properly truncated at the specified length limit while maintaining readability and context.`;
-
-      const description = await generateDescription(content);
-
-      expect(description).toBe('Heading This is a test content with more than 150 characters to ensure that the description is properly truncated at the specified length limit while ...');
-    });
-
-    it('should handle content with markdown syntax', async () => {
-      const { generateDescription } = await import('../transform-blog-frontmatter');
-      const content = `---
-title: Test
----
-# Main Title
-**Bold text** and *italic text* with \`code\` blocks.`;
-
-      const description = await generateDescription(content);
-
-      expect(description).toBe('Main Title Bold text and italic text with code blocks....');
-    });
-  });
-
-  describe('findMarkdownFiles', () => {
-    it('should find markdown files recursively', async () => {
-      const { findMarkdownFiles } = await import('../transform-blog-frontmatter');
-      const mockFiles = [
-        { name: 'index.md', isDirectory: () => false },
-        { name: 'subdir', isDirectory: () => true },
-      ];
-      const mockSubdirFiles = [
-        { name: 'index.md', isDirectory: () => false },
-      ];
-
-      vi.mocked(readdirSync)
-        .mockImplementationOnce(() => mockFiles as any)
-        .mockImplementationOnce(() => mockSubdirFiles as any);
-
-      const files = findMarkdownFiles('content');
-
-      expect(files).toEqual([
-        'content/index.md',
-        'content/subdir/index.md',
-      ]);
-      expect(readdirSync).toHaveBeenCalledTimes(3);
-    });
-  });
-
-  describe('processMarkdownFile', () => {
-    it('should process and transform markdown content', async () => {
-      const { processMarkdownFile } = await import('../transform-blog-frontmatter');
-      const mockContent = `---
-title: Test Post
-date: 2024-01-01
-categories: Ernährung
----
-Test content`;
-
-      vi.mocked(readFileSync).mockReturnValue(mockContent);
+      vi.mocked(frontmatterService.transformBlogFrontmatter).mockResolvedValue(mockTransformed);
 
       await processMarkdownFile('test.md');
 
-      expect(writeFileSync).toHaveBeenCalledWith(
-        'test.md',
-        expect.stringContaining('title: Test Post')
+      expect(contentFileService.readMarkdownFile).toHaveBeenCalledWith('test.md');
+      expect(frontmatterService.transformBlogFrontmatter).toHaveBeenCalledWith(
+        mockData,
+        'Test content'
       );
-      expect(writeFileSync).toHaveBeenCalledWith(
+      expect(contentFileService.writeMarkdownFile).toHaveBeenCalledWith(
         'test.md',
-        expect.stringContaining('author: sandra-pfeiffer')
+        mockTransformed,
+        'Test content'
+      );
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining('Successfully processed')
       );
     });
 
-    it('should handle files without frontmatter', async () => {
-      const { processMarkdownFile } = await import('../transform-blog-frontmatter');
-      const mockContent = 'Test content without frontmatter';
+    it('should handle files without title in frontmatter', async () => {
+      vi.mocked(contentFileService.readMarkdownFile).mockResolvedValue({
+        data: {} as BlogFrontmatter,
+        content: 'Test content',
+        isEmpty: false,
+      });
 
-      vi.mocked(readFileSync).mockReturnValue(mockContent);
+      await processMarkdownFile('test.md');
+
+      expect(frontmatterService.transformBlogFrontmatter).not.toHaveBeenCalled();
+      expect(contentFileService.writeMarkdownFile).not.toHaveBeenCalled();
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining('No title found')
+      );
+    });
+
+    it('should handle errors gracefully', async () => {
+      vi.mocked(contentFileService.readMarkdownFile).mockRejectedValue(new Error('Test error'));
 
       await processMarkdownFile('test.md');
 
       expect(console.error).toHaveBeenCalledWith(
-        expect.stringContaining('No frontmatter found')
+        expect.stringContaining('Error processing'),
+        expect.any(Error)
       );
-      expect(writeFileSync).not.toHaveBeenCalled();
     });
   });
 
   describe('processAndRenameFile', () => {
-    it('should process and rename .md to .mdx', async () => {
-      const { processAndRenameFile } = await import('../transform-blog-frontmatter');
-      const mockContent = `---
-title: Test Post
----
-Content`;
-
-      vi.mocked(readFileSync).mockReturnValue(mockContent);
-
-      await processAndRenameFile('test.md');
-
-      expect(writeFileSync).toHaveBeenCalledWith(
-        'test.mdx',
-        expect.any(String)
-      );
-      expect(unlinkSync).toHaveBeenCalledWith('test.md');
-    });
-
-    it('should handle errors during renaming', async () => {
-      const { processAndRenameFile } = await import('../transform-blog-frontmatter');
-      vi.mocked(unlinkSync).mockImplementation(() => {
-        throw new Error('Rename error');
+    it('should process and convert .md to .mdx', async () => {
+      vi.mocked(contentFileService.readMarkdownFile).mockResolvedValue({
+        data: { title: 'Test Post' } as BlogFrontmatter,
+        content: 'Test content',
+        isEmpty: false,
       });
 
       await processAndRenameFile('test.md');
 
+      expect(contentFileService.convertToMdx).toHaveBeenCalledWith('test.md');
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining('Successfully converted')
+      );
+    });
+
+    it('should handle errors gracefully', async () => {
+      vi.mocked(contentFileService.readMarkdownFile).mockRejectedValue(new Error('Test error'));
+
+      await processAndRenameFile('test.md');
+
       expect(console.error).toHaveBeenCalledWith(
-        'Error renaming file:',
+        expect.stringContaining('Error processing'),
         expect.any(Error)
       );
+    });
+  });
+
+  describe('main', () => {
+    it('should process all markdown files', async () => {
+      const mockFiles = [
+        'test/content/file1/index.md',
+        'test/content/file2/index.md',
+      ];
+
+      vi.mocked(contentFileService.findIndexMarkdownFiles).mockResolvedValue(mockFiles);
+      vi.mocked(contentFileService.readMarkdownFile).mockResolvedValue({
+        data: { title: 'Test Post' } as BlogFrontmatter,
+        content: 'Test content',
+        isEmpty: false,
+      });
+
+      await main();
+
+      expect(contentFileService.findIndexMarkdownFiles).toHaveBeenCalledWith('test/content');
+      expect(contentFileService.convertToMdx).toHaveBeenCalledTimes(2);
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining('Found 2 markdown files'));
+    });
+
+    it('should handle errors gracefully', async () => {
+      vi.mocked(contentFileService.findIndexMarkdownFiles).mockRejectedValue(new Error('Test error'));
+
+      // Mock process.exit to prevent test from exiting
+      const mockExit = vi.spyOn(process, 'exit').mockImplementation((() => {}) as any);
+
+      await main();
+
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining('Fatal error:'),
+        expect.any(Error)
+      );
+      expect(mockExit).toHaveBeenCalledWith(1);
+
+      mockExit.mockRestore();
     });
   });
 });

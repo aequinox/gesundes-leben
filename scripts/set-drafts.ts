@@ -1,57 +1,49 @@
-import { promises as fs } from "fs";
-import path from "path";
-import matter from "gray-matter";
-
-const CONTENT_DIR = path.join(process.cwd(), "src/content");
-
 /**
- * Recursively get all markdown files from a directory
+ * @module set-drafts
+ * @description
+ * Script to set all markdown files in the content directory to draft: true.
+ * Uses the ContentFileService for file operations following SOLID principles.
  */
-export async function getMarkdownFiles(dir: string): Promise<string[]> {
-  const files: string[] = [];
-  const entries = await fs.readdir(dir, { withFileTypes: true });
 
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    
-    if (entry.isDirectory()) {
-      files.push(...await getMarkdownFiles(fullPath));
-    } else if (entry.isFile() && /\.(md|mdx)$/.test(entry.name)) {
-      files.push(fullPath);
-    }
-  }
-
-  return files;
-}
+import path from "path";
+import { contentFileService } from "@/services/content/ContentFileService";
+import { handleAsync } from "@/core/errors/handleAsync";
 
 /**
  * Update frontmatter to set draft: true
  */
 export async function updateFrontmatter(filePath: string): Promise<void> {
   try {
-    const content = await fs.readFile(filePath, "utf-8");
-    const { data, content: markdown } = matter(content);
+    const contentDir = contentFileService.getContentDir();
+    const relativePath = path.relative(contentDir, filePath);
     
-    // Only modify if draft isn't already true
-    if (data.draft !== true) {
-      data.draft = true;
-      const updatedContent = matter.stringify(markdown, data);
-      await fs.writeFile(filePath, updatedContent);
-      console.log(`✓ Updated ${path.relative(CONTENT_DIR, filePath)}`);
+    const updated = await contentFileService.updateFrontmatter(filePath, (data) => {
+      // Only modify if draft isn't already true
+      if (data.draft !== true) {
+        return { ...data, draft: true };
+      }
+      return data;
+    });
+    
+    if (updated) {
+      console.log(`✓ Updated ${relativePath}`);
     } else {
-      console.log(`⚡ Skipped ${path.relative(CONTENT_DIR, filePath)} (already draft: true)`);
+      console.log(`⚡ Skipped ${relativePath} (already draft: true)`);
     }
   } catch (error) {
     console.error(`✗ Error processing ${filePath}:`, error);
   }
 }
 
-// Only run main() if this file is being executed directly
-if (require.main === module) {
-  (async () => {
+/**
+ * Main function to process all markdown files
+ */
+export async function main(): Promise<void> {
+  return handleAsync(async () => {
     try {
+      const contentDir = contentFileService.getContentDir();
       console.log("Finding markdown files...");
-      const files = await getMarkdownFiles(CONTENT_DIR);
+      const files = await contentFileService.findMarkdownFiles(contentDir);
       
       console.log(`Found ${files.length} markdown files. Processing...`);
       await Promise.all(files.map(updateFrontmatter));
@@ -61,5 +53,10 @@ if (require.main === module) {
       console.error("Fatal error:", error);
       process.exit(1);
     }
-  })();
+  });
+}
+
+// Only run main() if this file is being executed directly
+if (require.main === module) {
+  main();
 }
