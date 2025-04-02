@@ -4,7 +4,7 @@ import Header from "@/components/sections/Header.astro";
 import Footer from "@/components/sections/Footer.astro";
 import Tag from "@/components/elements/Tag.astro";
 import { type CollectionEntry } from "astro:content";
-import { slugifyStr } from "@/utils/slugify";
+import { slugService } from "@/services/format/SlugService";
 import ShareLinks from "@/components/socials/ShareLinks.astro";
 import { SITE } from "@/config";
 import Image from "@/components/elements/Image.astro";
@@ -13,7 +13,7 @@ import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { Picture } from "astro:assets";
 import ArticleMeta from "@/components/partials/ArticleMeta.astro";
 import Paragraph from "@/components/elements/Paragraph.astro";
-import { getAuthorEntry } from "@/utils/getAuthor";
+import { authorService } from "@/services/content/AuthorService";
 
 interface PostProps {
   post: CollectionEntry<"blog">;
@@ -49,13 +49,13 @@ const {
   },
 } = post;
 
-const authorEntry = await getAuthorEntry(author);
+const authorEntry = await authorService.getAuthorEntry(author);
 // const reference = await getReference(title);
 const { Content } = await post.render();
 
 const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
 const ogUrl = new URL(
-  ogImageUrl ?? `/posts/${slugifyStr(title)}.png`,
+  ogImageUrl ?? `/posts/${slugService.slugifyStr(title)}.png`,
   Astro.url.origin
 ).href;
 
@@ -78,7 +78,7 @@ const t = useTranslations(lang);
 
 // Generate unique view transition name for hero image
 const heroImageTransitionName = heroImage
-  ? `hero-image-${slugifyStr(title)}-${post.id}`
+  ? `hero-image-${slugService.slugifyStr(title)}-${post.id}`
   : undefined;
 ---
 
@@ -111,7 +111,7 @@ const heroImageTransitionName = heroImage
           categories &&
             categories.map((category: string) => (
               <div
-                transition:name={slugifyStr(title + category)}
+                transition:name={slugService.slugifyStr(title + category)}
                 class="mb-1 mr-[0.125rem] inline-flex items-center text-sm font-medium text-skin-accent after:[&:not(:last-child)]:ml-[0.125rem] after:[&:not(:last-child)]:content-['|']"
                 data-pagefind-filter={t("category.name")}
               >
@@ -123,14 +123,14 @@ const heroImageTransitionName = heroImage
 
       <!-- Title -->
       <h1
-        transition:name={slugifyStr(title)}
+        transition:name={slugService.slugifyStr(title)}
         class="mb-4 text-xl font-semibold lg:text-3xl"
       >
         {title}
       </h1>
 
       <!-- Article Meta -->
-      <ArticleMeta post={post} withAuthor={true} withReadingTime={true} />
+      <ArticleMeta post={post} showAuthor={true} showReadingTime={true} />
 
       <!-- Hero Image -->
       {
@@ -161,7 +161,11 @@ const heroImageTransitionName = heroImage
 
       <!-- Tags -->
       <ul class="my-8 flex flex-wrap gap-2" role="list" aria-label="Tags">
-        {tags.map((tag: string) => <Tag tag={slugifyStr(tag)} tagName={tag} />)}
+        {
+          tags.map((tag: string) => (
+            <Tag tag={slugService.slugifyStr(tag)} tagName={tag} />
+          ))
+        }
       </ul>
 
       <!-- Navigation and Share Links -->

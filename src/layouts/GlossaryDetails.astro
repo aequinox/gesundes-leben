@@ -3,7 +3,7 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/sections/Header.astro";
 import Footer from "@/components/sections/Footer.astro";
 import { type CollectionEntry } from "astro:content";
-import { slugifyStr } from "@/utils/slugify";
+import { slugService } from "@/services/format/SlugService";
 import ShareLinks from "@/components/socials/ShareLinks.astro";
 import { SITE } from "@/config";
 import Image from "@/components/elements/Image.astro";
@@ -11,7 +11,7 @@ import Blockquote from "@/components/elements/Blockquote.astro";
 import { getLangFromUrl, useTranslations } from "i18n/utils";
 import ArticleMeta from "@/components/partials/ArticleMeta.astro";
 import Paragraph from "@/components/elements/Paragraph.astro";
-import { getAuthorEntry } from "@/utils/getAuthor";
+import { authorService } from "@/services/content/AuthorService";
 
 interface Props {
   glossaryEntry: CollectionEntry<"glossary">;
@@ -32,7 +32,7 @@ const {
   data: { title, author, pubDatetime, modDatetime },
 } = glossaryEntry;
 
-const authorEntry = await getAuthorEntry(author);
+const authorEntry = await authorService.getAuthorEntry(author);
 
 const { Content } = await glossaryEntry.render();
 
@@ -60,7 +60,7 @@ const t = useTranslations(lang);
         class="col-span-12 mx-auto w-full max-w-content px-4 pb-12"
       >
         <h1
-          transition:name={slugifyStr(title)}
+          transition:name={slugService.slugifyStr(title)}
           class="mb-4 text-xl font-semibold lg:text-3xl"
         >
           {title}
@@ -68,8 +68,8 @@ const t = useTranslations(lang);
 
         <ArticleMeta
           post={glossaryEntry}
-          withAuthor={true}
-          withReadingTime={false}
+          showAuthor={true}
+          showReadingTime={false}
         />
 
         <article id="article" class="prose mx-auto mt-6 max-w-content">

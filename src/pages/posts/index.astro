@@ -1,14 +1,12 @@
 ---
-import { getCollection } from "astro:content";
 import Posts from "@/layouts/Posts.astro";
-import getSortedPosts from "@/utils/getSortedPosts";
+import { postService } from "@/services/content/PostService";
 import getPagination from "@/utils/getPagination";
 import type { Pagination } from "@/types/pagination";
 import type { CollectionEntry } from "astro:content";
 
-const posts = await getCollection("blog");
-
-const sortedPosts = await getSortedPosts(posts);
+const posts = await postService.getAllPosts();
+const sortedPosts = await postService.getSortedPosts(posts);
 const pagination: Pagination<CollectionEntry<"blog">> = getPagination({
   posts: sortedPosts,
   page: 1,

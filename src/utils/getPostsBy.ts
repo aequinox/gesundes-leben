@@ -44,7 +44,7 @@ const getPostsBy = async (
         )
       : posts.filter(post =>
           post.data[type]?.some(
-            item => slugService.slugifyStr(item) === slugifiedValue
+            (item: string) => slugService.slugifyStr(item) === slugifiedValue
           )
         );
   });

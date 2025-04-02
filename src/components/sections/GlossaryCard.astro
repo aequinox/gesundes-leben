@@ -16,7 +16,7 @@
  */
 
 import { type CollectionEntry } from "astro:content";
-import { slugifyStr } from "@/utils/slugify";
+import { slugService } from "@/services/format/SlugService";
 import { Icon } from "astro-icon/components";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 
@@ -82,7 +82,7 @@ const excerptAriaLabel = t("glossary.excerpt");
         <h2
           id={`glossary-title-${slug}`}
           class={titleClasses}
-          transition:name={slugifyStr(title)}
+          transition:name={slugService.slugifyStr(title)}
         >
           {title}
         </h2>

@@ -17,9 +17,9 @@ import Hr from "@/components/elements/Hr.astro";
 import Socials from "@/components/sections/Socials.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { SITE } from "@/config";
-import { getAuthorEntry } from "@/utils/getAuthor";
+import { authorService } from "@/services/content/AuthorService";
 
-const author = await getAuthorEntry(SITE.author);
+const author = await authorService.getAuthorEntry(SITE.author);
 
 interface Props {
   /** Whether to remove the top margin */

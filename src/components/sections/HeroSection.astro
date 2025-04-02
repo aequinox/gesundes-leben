@@ -1,0 +1,110 @@
+---
+/**
+ * HeroSection Component
+ *
+ * A reusable hero section for the homepage that displays:
+ * - Main heading
+ * - RSS feed link
+ * - Welcome message
+ * - Introduction text
+ * - Social links (if enabled)
+ *
+ * @component
+ */
+
+import { SITE, SOCIALS } from "@/config";
+import LinkButton from "@/components/elements/LinkButton.astro";
+import Socials from "@/components/socials/Socials.astro";
+
+// Count active social links for conditional rendering
+const socialCount = SOCIALS.filter(social => social.active).length;
+---
+
+<section id="hero">
+  <h1>Gesundes Leben</h1>
+  <a
+    target="_blank"
+    href="/rss.xml"
+    class="rss-link"
+    aria-label="rss feed"
+    title="RSS Feed"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" class="rss-icon"
+      ><path
+        d="M19 20.001C19 11.729 12.271 5 4 5v2c7.168 0 13 5.832 13 13.001h2z"
+      ></path><path
+        d="M12 20.001h2C14 14.486 9.514 10 4 10v2c4.411 0 8 3.589 8 8.001z"
+      ></path><circle cx="6" cy="18" r="2"></circle>
+    </svg>
+    <span class="sr-only">RSS Feed</span>
+  </a>
+
+  <h2 class="text-3xl leading-8">Willkommen auf unserem Blog!</h2>
+
+  <p class="leading-7">
+    Auf diesem Blog stellen dir Sandra & Kai Artikel über Gesundheitsthemen zur
+    Verfügung und laden dich ein auf eine Reise zu mehr Gesundheit, die Spaß
+    machen soll. <span class="hash">sogehtgesund</span>
+  </p>
+
+  <p>
+    Wir betreiben den Blog als Privatpersonen, teilen aber unser Insider-Wissen,
+    das wir uns in unserer langjährigen Arbeit als Therapeuten angeeignet haben.
+    Das möchten wir auf einfache und verständliche Weise tun, denn wir finden,
+    dass medizinische Zusammenhänge häufig zu kompliziert und für Laien schwer
+    nachvollziehbar vermittelt werden. Deshalb verlinken wir medizinische
+    Begriffe, wenn sie nicht vermeidbar sind, auf unser Glossar, wo du eine
+    verständliche Erklärung findest.
+  </p>
+  <p>
+    Unser Ziel ist <strong>Empowerment für deine Gesundheit</strong>. Das
+    bedeutet, wir möchten dich darin unterstützen, für deine Gesundheit aktiv zu
+    werden und dir dafür unser Wissen und unsere Erfahrung kostenfrei zur
+    Verfügung stellen. <span class="hash">weildueswertbist</span>
+  </p>
+
+  {
+    // only display if at least one social link is enabled
+    socialCount > 0 && (
+      <div class="social-wrapper">
+        <div class="social-links">
+          <Socials />
+        </div>
+      </div>
+    )
+  }
+</section>
+
+<style>
+  /* Hero section styles */
+  #hero {
+    @apply pb-6;
+    h1 {
+      @apply my-4 inline-block text-3xl font-bold sm:my-8 sm:text-5xl;
+    }
+    .rss-link {
+      @apply mb-6;
+    }
+    .rss-icon {
+      @apply mb-2 h-6 w-6 scale-110 fill-skin-accent sm:mb-3 sm:scale-125;
+    }
+    p {
+      @apply my-2;
+    }
+  }
+
+  /* Social links wrapper */
+  .social-wrapper {
+    @apply mt-4 flex flex-col sm:flex-row sm:items-center;
+  }
+
+  /* Social links container */
+  .social-links {
+    @apply mb-1 mr-2 whitespace-nowrap sm:mb-0;
+  }
+
+  /* Hash tag styling */
+  .hash {
+    @apply font-medium text-skin-accent;
+  }
+</style>

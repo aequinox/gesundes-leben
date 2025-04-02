@@ -1,48 +1,102 @@
 ---
-import { getCollection } from "astro:content";
+/**
+ * Homepage Component
+ *
+ * The main landing page for the Gesundes Leben blog.
+ * Features a hero section, blog filter, and link to all posts.
+ */
+
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/sections/Header.astro";
 import Footer from "@/components/sections/Footer.astro";
-import Pagination from "@/components/sections/Pagination.astro";
-import Card from "@/components/sections/Card.astro";
 import { SITE } from "@/config";
+import Hr from "@/components/elements/Hr.astro";
+import BlogFilter from "@/components/filter/BlogFilter.astro";
+import Card from "@/components/sections/Card.astro";
+import LinkButton from "@/components/elements/LinkButton.astro";
+import HeroSection from "@/components/sections/HeroSection.astro";
 import { postService } from "@/services/content/PostService";
-import type { CollectionEntry } from "astro:content";
-import type { Page } from "astro";
 
-interface Props {
-  page: Page<CollectionEntry<"blog">>;
-}
+// Fetch and process posts using the PostService
+const posts = await postService.getAllPosts();
+const sortedPosts = await postService.getSortedPosts(posts);
 
-export async function getStaticPaths({ paginate }: { paginate: Function }) {
-  const posts = await postService.getAllPosts();
-  const sortedPosts = await postService.getSortedPosts(posts);
-  return paginate(sortedPosts, { pageSize: SITE.postPerPage });
-}
-
-const { page } = Astro.props as Props;
+// Get featured and recent posts using the PostService
+const featuredPosts = await postService.getFeaturedPosts(sortedPosts);
+const recentPosts = await postService.getRecentPosts(sortedPosts);
 ---
 
-<Layout title={SITE.title}>
+<Layout>
   <Header />
   <main id="main-content">
-    <section id="posts">
-      <h1>Blog</h1>
-      <ul>
-        {page.data.map(post => <Card post={post} />)}
-      </ul>
-    </section>
+    <HeroSection />
+
+    <Hr />
+
+    <BlogFilter />
+
+    {
+      featuredPosts.length > 0 && (
+        <section id="featured">
+          <h2>Ausgewählte Artikel</h2>
+          <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
+            {featuredPosts.map(post => (
+              <Card post={post} loading="lazy" />
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      recentPosts.length > 0 && (
+        <>
+          <Hr />
+          <section id="recent-posts">
+            <h2>Neueste Artikel</h2>
+            <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {recentPosts.map(
+                (post, index) =>
+                  index < SITE.postPerIndex && (
+                    <Card post={post} loading="lazy" />
+                  )
+              )}
+            </div>
+          </section>
+        </>
+      )
+    }
+
+    <Hr />
+
+    <div class="all-posts-btn-wrapper">
+      <LinkButton href="/posts/">
+        Alle Artikel
+        <svg xmlns="http://www.w3.org/2000/svg"
+          ><path
+            d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"
+          ></path>
+        </svg>
+      </LinkButton>
+    </div>
   </main>
 
-  <Pagination
-    currentPage={page.currentPage}
-    totalPages={page.lastPage}
-    prevUrl={page.url.prev ?? ""}
-    nextUrl={page.url.next ?? ""}
-  />
   <Footer />
-</Layout>
 
-<style>
-  /* ... existing styles ... */
-</style>
+  <style lang="postcss">
+    /* ===== Featured & Recent Posts Sections ===== */
+    #featured,
+    #filtered,
+    #recent-posts {
+      @apply pb-6 pt-12;
+    }
+    #featured h2,
+    #filtered h2,
+    #recent-posts h2 {
+      @apply text-2xl font-semibold tracking-wide;
+    }
+    .all-posts-btn-wrapper {
+      @apply my-8 text-center;
+    }
+  </style>
+</Layout>

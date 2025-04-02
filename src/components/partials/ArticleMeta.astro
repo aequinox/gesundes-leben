@@ -5,7 +5,7 @@ import ReadingTime from "./ReadingTime.astro";
 import Author from "./Author.astro";
 
 export interface Props {
-  post: CollectionEntry<"blog">;
+  post: CollectionEntry<"blog"> | CollectionEntry<"glossary">;
   showAuthor?: boolean;
   showReadingTime?: boolean;
 }
@@ -25,7 +25,7 @@ const { pubDatetime, modDatetime, author } = post.data;
     )
   }
   {
-    showReadingTime && post.data.readingTime && (
+    showReadingTime && "readingTime" in post.data && post.data.readingTime && (
       <>
         <div class="mx-2 h-1 w-1 rounded-full bg-skin-fill" />
         <ReadingTime readingTime={post.data.readingTime} />
