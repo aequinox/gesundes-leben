@@ -6,6 +6,7 @@ const https = require('https');
 const luxon = require('luxon');
 const path = require('path');
 const Buffer = require('buffer').Buffer;
+const sharp = require('sharp');
 
 const shared = require('./shared');
 const settings = require('./settings');
@@ -226,6 +227,11 @@ async function writeImageFilesPromise(posts, config) {
   }
 }
 
+// Global map to store image dimensions
+if (!global.imageDimensions) {
+  global.imageDimensions = new Map();
+}
+
 /**
  * Load image data from URL
  * @param {string} imageUrl - URL to load image from
@@ -253,7 +259,22 @@ async function loadImageFilePromise(imageUrl) {
 
   try {
     const response = await axios(config);
-    return Buffer.from(response.data, 'binary');
+    const imageBuffer = Buffer.from(response.data, 'binary');
+    
+    // Extract image dimensions using Sharp
+    try {
+      const filename = shared.getFilenameFromUrl(imageUrl);
+      const metadata = await sharp(imageBuffer).metadata();
+      const { width, height } = metadata;
+      
+      // Store dimensions in the global map
+      global.imageDimensions.set(filename, { width, height });
+      console.log(chalk.blue('[INFO]') + ` Image dimensions for ${filename}: ${width}x${height}`);
+    } catch (dimensionError) {
+      console.log(chalk.yellow('[WARNING]') + ` Failed to extract dimensions for ${shared.getFilenameFromUrl(imageUrl)}: ${dimensionError.message}`);
+    }
+    
+    return imageBuffer;
   } catch (error) {
     if (error.response) {
       // request was made, but server responded with an error status code

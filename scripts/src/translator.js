@@ -1,6 +1,7 @@
 const turndown = require('turndown');
 const turndownPluginGfm = require('turndown-plugin-gfm');
 const { ConversionError } = require('./errors');
+const shared = require('./shared');
 
 /**
  * @typedef {Object} TurndownService
@@ -14,6 +15,9 @@ const { ConversionError } = require('./errors');
  * @returns {TurndownService} Configured TurndownService instance
  */
 function initTurndownService() {
+  // Initialize alternating image alignment
+  let alternateRight = true;
+  
   const turndownService = new turndown({
     headingStyle: 'atx',
     bulletListMarker: '-',
@@ -68,24 +72,91 @@ function initTurndownService() {
     },
   });
 
-  // preserve <figure> when it contains a <figcaption>
+  // Handle figure with figcaption for images
   turndownService.addRule('figure', {
-    filter: 'figure',
+    filter: node => {
+      return node.nodeName === 'FIGURE' && 
+             node.querySelector('img') && 
+             node.querySelector('figcaption');
+    },
     replacement: (content, node) => {
-      if (node.querySelector('figcaption')) {
-        // extra newlines are necessary for markdown and HTML to render correctly together
-        const result = '\n\n<figure>\n\n' + content + '\n\n</figure>\n\n';
-        return result.replace('\n\n\n\n', '\n\n'); // collapse quadruple newlines
-      } else {
-        // does not contain <figcaption>, do not preserve
+      const img = node.querySelector('img');
+      const figcaption = node.querySelector('figcaption');
+      
+      if (!img || !figcaption) {
         return content;
       }
+      
+      // Extract image attributes
+      const src = img.getAttribute('src') || '';
+      const alt = img.getAttribute('alt') || '';
+      let caption = figcaption.textContent.trim();
+      
+      // Get filename from src
+      const filename = src.split('/').pop();
+      
+      // Determine alignment based on aspect ratio
+      let alignmentMarker = '_'; // Default to center
+      
+      // Check if we have dimensions for this image
+      if (global.imageDimensions && global.imageDimensions.has(filename)) {
+        const { width, height } = global.imageDimensions.get(filename);
+        
+        if (width && height) {
+          const aspectRatio = width / height;
+          
+          if (aspectRatio >= 0.8 && aspectRatio <= 1.2) {
+            // Square-ish image - alternate between left and right
+            alignmentMarker = alternateRight ? '>' : '<';
+            alternateRight = !alternateRight; // Toggle for next image
+          } else if (aspectRatio > 1.5) {
+            // Wide image (16:9, 4:1, etc.) - center
+            alignmentMarker = '_';
+          } else {
+            // Default to alternating for other aspect ratios
+            alignmentMarker = alternateRight ? '>' : '<';
+            alternateRight = !alternateRight; // Toggle for next image
+          }
+        } else {
+          // If dimensions are invalid, use alternating pattern
+          alignmentMarker = alternateRight ? '>' : '<';
+          alternateRight = !alternateRight; // Toggle for next image
+        }
+      } else {
+        // If dimensions unknown, use alternating pattern
+        alignmentMarker = alternateRight ? '>' : '<';
+        alternateRight = !alternateRight; // Toggle for next image
+      }
+      
+      // Add the alignment marker to the caption
+      caption = alignmentMarker + caption;
+      
+      // Return the markdown image with alignment in caption
+      return `![${alt}](${src.replace(/^.*\/([^/]+)$/, 'images/$1')} "${caption}")`;
     },
   });
 
-  // preserve <figcaption>
+  // preserve <figure> when it contains a <figcaption> but no image
+  turndownService.addRule('figureNoImage', {
+    filter: node => {
+      return node.nodeName === 'FIGURE' && 
+             !node.querySelector('img') && 
+             node.querySelector('figcaption');
+    },
+    replacement: (content, node) => {
+      // extra newlines are necessary for markdown and HTML to render correctly together
+      const result = '\n\n<figure>\n\n' + content + '\n\n</figure>\n\n';
+      return result.replace('\n\n\n\n', '\n\n'); // collapse quadruple newlines
+    },
+  });
+
+  // preserve <figcaption> for non-image figures
   turndownService.addRule('figcaption', {
-    filter: 'figcaption',
+    filter: node => {
+      return node.nodeName === 'FIGCAPTION' && 
+             (!node.parentNode || node.parentNode.nodeName !== 'FIGURE' || 
+              !node.parentNode.querySelector('img'));
+    },
     replacement: content => {
       // extra newlines are necessary for markdown and HTML to render correctly together
       return '\n\n<figcaption>\n\n' + content + '\n\n</figcaption>\n\n';
@@ -102,6 +173,71 @@ function initTurndownService() {
       const language = node.getAttribute('data-wetm-language') || '';
       return '\n\n```' + language + '\n' + node.textContent + '\n```\n\n';
     },
+  });
+
+
+  // Custom rule for standalone images (not in figure)
+  turndownService.addRule('image', {
+    filter: node => {
+      return node.nodeName === 'IMG' && 
+             (!node.parentNode || node.parentNode.nodeName !== 'FIGURE');
+    },
+    replacement: function(content, node) {
+      // Extract image attributes
+      const src = node.getAttribute('src') || '';
+      const alt = node.getAttribute('alt') || '';
+      let title = node.getAttribute('title') || '';
+      
+      // Get filename from src
+      const filename = src.split('/').pop();
+      
+      // Determine alignment based on aspect ratio
+      let alignmentMarker = '_'; // Default to center
+      
+      // Check if we have dimensions for this image
+      if (global.imageDimensions && global.imageDimensions.has(filename)) {
+        const { width, height } = global.imageDimensions.get(filename);
+        
+        if (width && height) {
+          const aspectRatio = width / height;
+          
+          if (aspectRatio >= 0.8 && aspectRatio <= 1.2) {
+            // Square-ish image - alternate between left and right
+            alignmentMarker = alternateRight ? '>' : '<';
+            alternateRight = !alternateRight; // Toggle for next image
+          } else if (aspectRatio > 1.5) {
+            // Wide image (16:9, 4:1, etc.) - center
+            alignmentMarker = '_';
+          } else {
+            // Default to alternating for other aspect ratios
+            alignmentMarker = alternateRight ? '>' : '<';
+            alternateRight = !alternateRight; // Toggle for next image
+          }
+        } else {
+          // If dimensions are invalid, use alternating pattern
+          alignmentMarker = alternateRight ? '>' : '<';
+          alternateRight = !alternateRight; // Toggle for next image
+        }
+      } else {
+        // If dimensions unknown, use alternating pattern
+        alignmentMarker = alternateRight ? '>' : '<';
+        alternateRight = !alternateRight; // Toggle for next image
+      }
+      
+      // Remove any existing alignment markers from title
+      title = title.replace(/^[<>_]/, '');
+      
+      // Add the alignment marker to the title
+      if (title) {
+        title = alignmentMarker + title;
+      } else {
+        // If no title, add a minimal title with alignment
+        title = alignmentMarker + 'Image';
+      }
+      
+      // Return the markdown image with alignment in title
+      return `![${alt}](${src} "${title}")`;
+    }
   });
 
   return turndownService;
