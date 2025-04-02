@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Categories Page Implementation
+- **New Categories Page**
+  - Added dedicated categories page to browse posts by category
+  - Implemented responsive grid layout for category sections
+  - Added category filtering with proper pagination
+  - Enhanced posts page to support category filtering via query parameters
+  - Created pagination system that preserves category filters
+  - Improved user experience with clear category headings and navigation
+
 ### Navigation Redesign
 - **Modern Navbar Enhancement**
   - Removed dividing line for a cleaner, more cohesive design

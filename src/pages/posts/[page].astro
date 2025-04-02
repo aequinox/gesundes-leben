@@ -1,14 +1,27 @@
 ---
+import { getCollection } from "astro:content";
 import Posts from "@/layouts/Posts.astro";
 import { postService } from "@/services/content/PostService";
 import getPagination from "@/utils/getPagination";
-import type { Pagination } from "@/types/pagination";
-import type { CollectionEntry } from "astro:content";
+import getPageNumbers from "@/utils/getPageNumbers";
 import { getPostsByCategory } from "@/utils/getPostsBy";
 import { slugService } from "@/services/format/SlugService";
 
+export async function getStaticPaths() {
+  const posts = await postService.getAllPosts();
+  const sortedPosts = await postService.getSortedPosts(posts);
+  const totalPages = getPageNumbers(sortedPosts.length);
+
+  return totalPages.map(page => ({
+    params: { page: page.toString() },
+  }));
+}
+
+const { page } = Astro.params;
+const { url } = Astro;
+
 // Get category from query parameter if it exists
-const categoryParam = Astro.url.searchParams.get("category");
+const categoryParam = url.searchParams.get("category");
 
 // Get all posts
 const allPosts = await postService.getAllPosts();
@@ -34,10 +47,11 @@ if (categoryParam) {
   }
 }
 
-const pagination: Pagination<CollectionEntry<"blog">> = getPagination({
+// Get pagination for the current page
+const pagination = getPagination({
   posts: filteredPosts,
-  page: 1,
-  isIndex: true,
+  page,
+  isIndex: false,
 });
 ---
 

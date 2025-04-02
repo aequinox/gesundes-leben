@@ -1,0 +1,101 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/sections/Header.astro";
+import Footer from "@/components/sections/Footer.astro";
+import Hr from "@/components/elements/Hr.astro";
+import Card from "@/components/sections/Card.astro";
+import { SITE } from "@/config";
+import { postService } from "@/services/content/PostService";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import type { TranslationKey } from "@/i18n/ui";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Get all posts
+const allPosts = await postService.getAllPosts();
+const sortedPosts = await postService.getSortedPosts(allPosts);
+
+// Extract all unique categories from posts
+const categories = [
+  ...new Set(sortedPosts.flatMap(post => post.data.categories || [])),
+].sort();
+
+// Group posts by category
+const postsByCategory = categories.reduce(
+  (acc, category) => {
+    acc[category] = sortedPosts.filter(
+      post => post.data.categories && post.data.categories.includes(category)
+    );
+    return acc;
+  },
+  {} as Record<string, typeof sortedPosts>
+);
+
+// Page title and description
+const pageTitle = "Kategorien";
+const pageDescription = "Durchsuche unsere Artikel nach Kategorien";
+---
+
+<Layout title={`${pageTitle} | ${SITE.title}`}>
+  <Header activeNav="categories" />
+
+  <main id="main-content">
+    <section class="mx-auto max-w-content px-4">
+      <h1 class="text-3xl font-bold leading-tight tracking-wider sm:text-4xl">
+        {pageTitle}
+      </h1>
+      <p class="mt-3 text-lg leading-relaxed text-skin-base opacity-90">
+        {pageDescription}
+      </p>
+
+      <div class="my-8">
+        <Hr />
+      </div>
+
+      <div class="categories-container">
+        {
+          categories.map(category => (
+            <section id={`category-${category}`} class="mb-12">
+              <h2 class="mb-6 text-2xl font-semibold tracking-wide">
+                {category}
+              </h2>
+
+              <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {postsByCategory[category]
+                  .slice(0, SITE.postPerIndex || 6)
+                  .map(post => (
+                    <Card post={post} loading="lazy" />
+                  ))}
+              </div>
+
+              {postsByCategory[category].length > (SITE.postPerIndex || 6) && (
+                <div class="mt-4 text-right">
+                  <a
+                    href={`/posts/?category=${category.toLowerCase().replace(/\s+/g, "-")}`}
+                    class="inline-block text-skin-accent hover:underline"
+                  >
+                    Alle Artikel in "{category}" ansehen →
+                  </a>
+                </div>
+              )}
+            </section>
+          ))
+        }
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style lang="postcss">
+  #main-content {
+    @apply mx-auto max-w-content px-4 pb-12 pt-8;
+  }
+  
+  .categories-container {
+    @apply mt-8;
+  }
+</style>
