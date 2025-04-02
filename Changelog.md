@@ -274,3 +274,8 @@ All notable changes to this project will be documented in this file.
   - Implemented DOM selector caching
   - Enhanced event handling
   - Added lazy loading support
+
+## [2025-04-02]
+
+### Changed
+- Updated WordPress to Markdown exporter script to support configurable package managers (npm, bun, pnpm, etc.)

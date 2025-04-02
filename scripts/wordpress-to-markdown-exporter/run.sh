@@ -2,6 +2,9 @@
 
 # WordPress to Markdown Exporter Run Script
 
+# Package manager to use (npm, bun, pnpm, yarn, etc.)
+PACKAGE_MANAGER="bun"
+
 # Print colored messages
 print_info() {
   echo -e "\033[1;34m[INFO]\033[0m $1"
@@ -15,16 +18,16 @@ print_error() {
   echo -e "\033[1;31m[ERROR]\033[0m $1"
 }
 
-# Check if npm is installed
-if ! command -v npm &> /dev/null; then
-  print_error "npm is not installed. Please install Node.js and npm first."
+# Check if the specified package manager is installed
+if ! command -v $PACKAGE_MANAGER &> /dev/null; then
+  print_error "$PACKAGE_MANAGER is not installed. Please install it first."
   exit 1
 fi
 
 # Check if the project is built
 if [ ! -d "dist" ]; then
   print_info "Building the project..."
-  npm run build
+  $PACKAGE_MANAGER run build
   
   if [ $? -ne 0 ]; then
     print_error "Failed to build the project."
