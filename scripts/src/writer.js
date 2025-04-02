@@ -10,6 +10,7 @@ const Buffer = require('buffer').Buffer;
 const shared = require('./shared');
 const settings = require('./settings');
 const { ConversionError } = require('./errors');
+const postProcessor = require('./post-processor');
 
 /**
  * @typedef {Object} Payload
@@ -29,6 +30,19 @@ const { ConversionError } = require('./errors');
 async function writeFilesPromise(posts, config) {
   await writeMarkdownFilesPromise(posts, config);
   await writeImageFilesPromise(posts, config);
+  
+  // Post-process the generated markdown files to ensure Astro compatibility
+  try {
+    console.log('\nPost-processing markdown files for Astro compatibility...');
+    const processedCount = await postProcessor.processDirectory(config.output, {
+      extension: '.mdx',
+      recursive: true
+    });
+    console.log(`Post-processed ${processedCount} files for Astro compatibility.`);
+  } catch (error) {
+    console.log(chalk.yellow('[WARNING]') + ' Post-processing failed: ' + error.message);
+    console.log('You may need to run the fix-markdown.js script manually.');
+  }
 }
 
 /**
@@ -137,11 +151,23 @@ function loadMarkdownFilePromise(post) {
     if (Array.isArray(value)) {
       if (value.length > 0) {
         // array of one or more strings
-        outputValue = value.reduce((list, item) => `${list}\n  - "${item}"`, '');
+        outputValue = value.reduce((list, item) => {
+          const itemStr = typeof item === 'string' ? item : String(item);
+          const escapedItem = itemStr.replace(/"/g, '\\"');
+          return `${list}\n  - "${escapedItem}"`;
+        }, '');
       }
+    } else if (typeof value === 'object' && value !== null) {
+      // object value (like heroImage)
+      outputValue = '\n' + Object.entries(value).reduce((objStr, [k, v]) => {
+        const vStr = typeof v === 'string' ? v : String(v);
+        const escapedV = vStr.replace(/"/g, '\\"');
+        return `${objStr}  ${k}: "${escapedV}"\n`;
+      }, '');
     } else {
-      // single string value
-      const escapedValue = (value || '').replace(/"/g, '\\"');
+      // single value (string, number, boolean, etc.)
+      const valueStr = typeof value === 'string' ? value : String(value);
+      const escapedValue = valueStr.replace(/"/g, '\\"');
       if (escapedValue.length > 0) {
         outputValue = `"${escapedValue}"`;
       }

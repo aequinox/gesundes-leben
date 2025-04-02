@@ -278,9 +278,39 @@ function mergeImagesIntoPosts(images, posts) {
 }
 
 /**
+ * Validate frontmatter values against expected schemas
+ * @param {Object} frontmatter - Frontmatter object to validate
+ * @returns {string[]} Array of validation errors
+ */
+function validateFrontmatter(frontmatter) {
+  const errors = [];
+
+  // Validate heroImage is an object with src and alt properties
+  if (frontmatter.heroImage !== undefined) {
+    if (typeof frontmatter.heroImage !== 'object' || frontmatter.heroImage === null) {
+      errors.push('heroImage: Expected type "object", received "' + typeof frontmatter.heroImage + '"');
+    } else if (!frontmatter.heroImage.src) {
+      errors.push('heroImage.src: Required field is missing');
+    } else if (!frontmatter.heroImage.alt) {
+      errors.push('heroImage.alt: Required field is missing');
+    }
+  }
+
+  // Validate group is one of the valid values
+  if (frontmatter.group !== undefined) {
+    const validGroups = ['pro', 'kontra', 'fragezeiten'];
+    if (!validGroups.includes(frontmatter.group)) {
+      errors.push('group: Expected one of ["pro", "kontra", "fragezeiten"], received "' + frontmatter.group + '"');
+    }
+  }
+
+  return errors;
+}
+
+/**
  * Populate post frontmatter with data from each post
  * @param {Omit<Post, 'frontmatter'>[]} posts - Array of posts to populate frontmatter for
- * @throws {ConversionError} When frontmatter getter is not found
+ * @throws {ConversionError} When frontmatter getter is not found or validation fails
  */
 function populateFrontmatter(posts) {
   posts.forEach(post => {
@@ -295,6 +325,14 @@ function populateFrontmatter(posts) {
 
       frontmatter[alias || key] = frontmatterGetter(post);
     });
+
+    // Validate frontmatter
+    const validationErrors = validateFrontmatter(frontmatter);
+    if (validationErrors.length > 0) {
+      logger.info(`Validation warnings for post "${post.meta.slug}":`);
+      validationErrors.forEach(error => logger.info(`- ${error}`));
+    }
+
     post.frontmatter = frontmatter;
   });
 }

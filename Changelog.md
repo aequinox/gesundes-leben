@@ -279,3 +279,12 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Updated WordPress to Markdown exporter script to support configurable package managers (npm, bun, pnpm, etc.)
+- Fixed WordPress to Markdown exporter to properly handle Astro content collection schema requirements:
+  - Modified `coverImage.js` to return an object with `src` and `alt` properties instead of a string
+  - Updated `taxonomy.js` to return a single string value from the enum: 'pro', 'kontra', or 'fragezeiten'
+  - Added validation function to check frontmatter values against expected schemas
+  - Created post-processor module to fix schema issues in existing markdown files
+  - Added fix-markdown.js script to process existing markdown files
+  - Integrated post-processor into the main workflow for automatic fixes
+  - Fixed TypeError in writer.js when handling non-string values in frontmatter
+  - Fixed image paths in heroImage to include './images/' prefix

@@ -1,22 +1,28 @@
 const { ConversionError } = require('../errors');
 
 /**
- * Get array of decoded taxonomy terms
- * Filters category data to only include beitragsart domain
- * Uses nicename attribute instead of name
- *
+ * Get the first taxonomy term from beitragsart domain
+ * Maps to one of the valid group values: 'pro', 'kontra', 'fragezeiten'
+ * 
  * @param {import('../parser').Post} post - Post object
- * @returns {string[]} Array of taxonomy terms
+ * @returns {string} Taxonomy term or default value
  */
 module.exports = post => {
   if (!post.data.category) {
-    return [];
+    return "fragezeiten"; // Default value
   }
 
   try {
-    return post.data.category
+    const taxonomies = post.data.category
       .filter(category => category.$ && category.$.domain === 'beitragsart')
       .map(({ $: attributes }) => decodeURIComponent(attributes.nicename));
+    
+    // Get the first taxonomy or default to "fragezeiten"
+    const taxonomy = taxonomies[0] || "fragezeiten";
+    
+    // Ensure it's one of the valid values
+    const validGroups = ["pro", "kontra", "fragezeiten"];
+    return validGroups.includes(taxonomy) ? taxonomy : "fragezeiten";
   } catch (error) {
     throw new ConversionError('Failed to process post taxonomy', error);
   }
