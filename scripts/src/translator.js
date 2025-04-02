@@ -3,6 +3,8 @@ const turndownPluginGfm = require('turndown-plugin-gfm');
 const { ConversionError } = require('./errors');
 const shared = require('./shared');
 
+// Using shared functions for image filename normalization
+
 /**
  * @typedef {Object} TurndownService
  * @property {function} addRule - Add a custom rule for HTML to Markdown conversion
@@ -131,8 +133,11 @@ function initTurndownService() {
       // Add the alignment marker to the caption
       caption = alignmentMarker + caption;
       
+      // Normalize the image path to use base filename instead of resized version
+      const normalizedSrc = shared.getNormalizedImagePath(src);
+      
       // Return the markdown image with alignment in caption
-      return `![${alt}](${src.replace(/^.*\/([^/]+)$/, 'images/$1')} "${caption}")`;
+      return `![${alt}](${normalizedSrc.replace(/^.*\/([^/]+)$/, 'images/$1')} "${caption}")`;
     },
   });
 
@@ -235,8 +240,11 @@ function initTurndownService() {
         title = alignmentMarker + 'Image';
       }
       
+      // Normalize the image path to use base filename instead of resized version
+      const normalizedSrc = shared.getNormalizedImagePath(src);
+      
       // Return the markdown image with alignment in title
-      return `![${alt}](${src} "${title}")`;
+      return `![${alt}](${normalizedSrc} "${title}")`;
     }
   });
 
@@ -267,8 +275,16 @@ function getPostContent(postData, turndownService, config) {
     content = content.replace(/(\r?\n){2}/g, '\n<div></div>\n');
 
     if (config.saveScrapedImages) {
-      // writeImageFile() will save all content images to a relative /images
-      // folder so update references in post content to match
+      // First normalize image paths to use base filenames instead of resized versions
+      content = content.replace(
+        /(<img[^>]*src=").*?([^/"]+\.(?:gif|jpe?g|png|webp))("[^>]*>)/gi,
+        (match, prefix, filename, suffix) => {
+          const baseFilename = shared.getBaseFilenameIfResized(filename);
+          return prefix + (baseFilename || filename) + suffix;
+        }
+      );
+      
+      // Then update references in post content to match the images folder
       content = content.replace(
         /(<img[^>]*src=").*?([^/"]+\.(?:gif|jpe?g|png|webp))("[^>]*>)/gi,
         '$1images/$2$3'

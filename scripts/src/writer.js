@@ -183,6 +183,8 @@ function loadMarkdownFilePromise(post) {
   return output;
 }
 
+// Using shared functions for image filename normalization
+
 /**
  * Write image files for posts
  * @param {import('./parser').Post[]} posts - Array of posts to write
@@ -193,26 +195,68 @@ async function writeImageFilesPromise(posts, config) {
   // collect image data from all posts into a single flattened array of payloads
   let skipCount = 0;
   let delay = 0;
+  
+  // Track which base images we've already processed
+  const processedBaseImages = new Set();
+  
+  // First pass: collect all image URLs and identify base images
+  const allImageUrls = posts.flatMap(post => post.meta.imageUrls);
+  const baseImageMap = new Map();
+  
+  allImageUrls.forEach(imageUrl => {
+    const filename = shared.getFilenameFromUrl(imageUrl);
+    const baseFilename = shared.getBaseFilenameIfResized(filename);
+    
+    if (baseFilename) {
+      // This is a resized version, add it to the map
+      if (!baseImageMap.has(baseFilename)) {
+        baseImageMap.set(baseFilename, []);
+      }
+      baseImageMap.get(baseFilename).push({ url: imageUrl, filename });
+    }
+  });
+  
+  // Second pass: create payloads, prioritizing base images and skipping resized versions
   const payloads = posts.flatMap(post => {
     const postPath = getPostPath(post, config);
     const imagesDir = path.join(path.dirname(postPath), 'images');
+    
     return post.meta.imageUrls.flatMap(imageUrl => {
       const filename = shared.getFilenameFromUrl(imageUrl);
       const destinationPath = path.join(imagesDir, filename);
+      
+      // Check if this is a resized version
+      const baseFilename = shared.getBaseFilenameIfResized(filename);
+      
+      // Skip if the file already exists
       if (checkFile(destinationPath)) {
-        // already exists, don't need to save again
         skipCount++;
         return [];
-      } else {
-        const payload = {
-          item: imageUrl,
-          name: filename,
-          destinationPath,
-          delay,
-        };
-        delay += settings.image_file_request_delay;
-        return [payload];
       }
+      
+      // Skip if this is a resized version and we've already processed the base image
+      if (baseFilename && processedBaseImages.has(baseFilename)) {
+        console.log(chalk.blue('[INFO]') + ` Skipping resized version: ${filename} (base: ${baseFilename})`);
+        skipCount++;
+        return [];
+      }
+      
+      // If this is a base image, mark it as processed
+      if (!baseFilename) {
+        // Check if any resized versions of this image exist in the map
+        if (baseImageMap.has(filename)) {
+          processedBaseImages.add(filename);
+        }
+      }
+      
+      const payload = {
+        item: imageUrl,
+        name: filename,
+        destinationPath,
+        delay,
+      };
+      delay += settings.image_file_request_delay;
+      return [payload];
     });
   });
 

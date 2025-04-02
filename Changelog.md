@@ -288,3 +288,10 @@ All notable changes to this project will be documented in this file.
   - Integrated post-processor into the main workflow for automatic fixes
   - Fixed TypeError in writer.js when handling non-string values in frontmatter
   - Fixed image paths in heroImage to include './images/' prefix
+- Fixed image downloader to prevent downloading duplicate resized versions of the same image:
+  - Added detection for WordPress image naming patterns (e.g., image-name-123x456.jpg)
+  - Implemented intelligent filtering to prioritize base images over resized versions
+  - Added logging to show when resized versions are skipped
+  - Updated HTML-to-Markdown converter to normalize image references to base filenames
+  - Enhanced post-processor to fix image references in existing markdown files
+  - Fixed module import errors by ensuring consistent image filenames

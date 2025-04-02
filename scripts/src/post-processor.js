@@ -10,6 +10,9 @@ const path = require('path');
 const yaml = require('js-yaml');
 const logger = require('./logger');
 const { ConversionError } = require('./errors');
+const shared = require('./shared');
+
+// Using shared functions for image filename normalization
 
 /**
  * Process a single markdown file to ensure Astro compatibility
@@ -45,10 +48,20 @@ async function processMarkdownFile(filePath) {
     
     // Fix heroImage if it's a string
     if (frontmatter.heroImage && typeof frontmatter.heroImage === 'string') {
+      // Extract filename from heroImage
+      const filename = frontmatter.heroImage.split('/').pop();
+      
+      // Check if this is a resized version and normalize if needed
+      const baseFilename = shared.getBaseFilenameIfResized(filename);
+      const normalizedFilename = baseFilename || filename;
+      
+      // If it was a resized version, log the change
+      if (baseFilename) {
+        logger.info(`Normalized heroImage in ${filePath}: ${filename} -> ${baseFilename}`);
+      }
+      
       // Add ./images/ prefix if not already present
-      const imagePath = frontmatter.heroImage.startsWith('./images/') 
-        ? frontmatter.heroImage 
-        : `./images/${frontmatter.heroImage}`;
+      const imagePath = `./images/${normalizedFilename}`;
       
       frontmatter.heroImage = {
         src: imagePath,
@@ -56,12 +69,29 @@ async function processMarkdownFile(filePath) {
       };
       modified = true;
     } 
-    // Fix heroImage if it's an object but missing ./images/ prefix
+    // Fix heroImage if it's an object
     else if (frontmatter.heroImage && typeof frontmatter.heroImage === 'object' && 
-             frontmatter.heroImage.src && typeof frontmatter.heroImage.src === 'string' &&
-             !frontmatter.heroImage.src.startsWith('./images/')) {
-      frontmatter.heroImage.src = `./images/${frontmatter.heroImage.src}`;
-      modified = true;
+             frontmatter.heroImage.src && typeof frontmatter.heroImage.src === 'string') {
+      
+      // Extract filename from heroImage.src
+      const src = frontmatter.heroImage.src;
+      const filename = src.split('/').pop();
+      
+      // Check if this is a resized version and normalize if needed
+      const baseFilename = shared.getBaseFilenameIfResized(filename);
+      
+      // If it was a resized version, update the src
+      if (baseFilename) {
+        frontmatter.heroImage.src = src.replace(filename, baseFilename);
+        logger.info(`Normalized heroImage.src in ${filePath}: ${filename} -> ${baseFilename}`);
+        modified = true;
+      }
+      
+      // Add ./images/ prefix if not already present
+      if (!frontmatter.heroImage.src.startsWith('./images/')) {
+        frontmatter.heroImage.src = `./images/${frontmatter.heroImage.src.split('/').pop()}`;
+        modified = true;
+      }
     }
     
     // Fix group if it's an array
@@ -90,14 +120,48 @@ async function processMarkdownFile(filePath) {
       modified = true;
     }
     
-    // If no changes were made, return
-    if (!modified) {
+    // Process markdown content to normalize image references
+    let markdownContent = parts.slice(2).join('---\n');
+    const originalMarkdownContent = markdownContent;
+    
+    // Find and normalize image references in markdown content
+    // Match patterns like: ![alt](images/image-name-123x456.jpg "title")
+    markdownContent = markdownContent.replace(
+      /!\[([^\]]*)\]\(([^)]+\.(?:gif|jpe?g|png|webp))(?:\s+"([^"]*)")?\)/g,
+      (match, alt, src, title) => {
+        // Extract filename from src
+        const filename = src.split('/').pop();
+        const baseFilename = shared.getBaseFilenameIfResized(filename);
+        
+        if (baseFilename) {
+          // Replace the filename in the src
+          const normalizedSrc = src.replace(filename, baseFilename);
+          logger.info(`Normalized image reference in ${filePath}: ${filename} -> ${baseFilename}`);
+          
+          // Reconstruct the markdown image reference
+          if (title) {
+            return `![${alt}](${normalizedSrc} "${title}")`;
+          } else {
+            return `![${alt}](${normalizedSrc})`;
+          }
+        }
+        
+        // If not a resized image, return the original match
+        return match;
+      }
+    );
+    
+    // Check if markdown content was modified
+    const markdownModified = markdownContent !== originalMarkdownContent;
+    
+    // If no changes were made to either frontmatter or markdown, return
+    if (!modified && !markdownModified) {
       return false;
     }
     
     // Write the updated file
     const updatedFrontmatter = yaml.dump(frontmatter, { lineWidth: -1 });
-    const updatedContent = `---\n${updatedFrontmatter}---\n${parts.slice(2).join('---\n')}`;
+    const updatedContent = `---\n${updatedFrontmatter}---\n${markdownContent}`;
     
     await fs.promises.writeFile(filePath, updatedContent, 'utf8');
     logger.info(`Updated frontmatter in ${filePath}`);
