@@ -99,16 +99,14 @@ const tw = (...classes: string[]) => classes.filter(Boolean).join(" ");
 // Component-specific class compositions
 const navClasses = tw(
   "nav-container h-16",
-  "bg-skin-fill/85 backdrop-blur-lg",
-  "transition-all duration-200 ease-in-out",
-  "border-b border-skin-line/10",
-  "shadow-sm"
+  "bg-skin-fill/90 backdrop-blur-lg",
+  "transition-all duration-200 ease-in-out"
 );
 
 const menuButtonClasses = tw(
   "flex h-16 items-center p-2 md:hidden",
   "hover:text-skin-accent focus:text-skin-accent",
-  "transition-colors duration-200"
+  "transition-all duration-200"
 );
 
 const menuItemsClasses = tw(
@@ -123,19 +121,19 @@ const menuItemsClasses = tw(
 const menuListClasses = tw(
   "grid w-44 grid-cols-2 grid-rows-4 gap-2 p-4",
   "md:flex md:w-auto md:grid-cols-none md:grid-rows-none",
-  "md:items-center md:gap-x-5 md:gap-y-0 md:p-0"
+  "md:items-center md:gap-x-6 md:gap-y-0 md:p-0"
 );
 
 const linkClasses = tw(
   "w-full px-4 py-3 text-center font-medium",
-  "transition-colors duration-200",
+  "transition-all duration-200",
   "hover:text-skin-accent focus:text-skin-accent",
-  "md:my-0 md:w-auto md:px-2 md:py-1"
+  "md:my-0 md:w-auto md:px-3 md:py-2 md:rounded-md"
 );
 
 const activeClasses = tw(
-  "text-skin-accent",
-  "underline decoration-wavy decoration-2 underline-offset-4"
+  "text-skin-accent font-semibold",
+  "bg-skin-accent/10 md:rounded-md"
 );
 ---
 
@@ -265,29 +263,32 @@ const activeClasses = tw(
 
   /* Action button styles */
   :global(.action-button) {
-    @apply flex items-center justify-center p-2;
-    @apply transition-colors duration-200 ease-in-out;
-    @apply hover:text-skin-accent focus:text-skin-accent;
+    @apply flex items-center justify-center p-2 rounded-full;
+    @apply transition-all duration-200 ease-in-out;
+    @apply hover:text-skin-accent hover:bg-skin-accent/10 focus:text-skin-accent;
   }
 
   :global(.action-button.active) {
-    @apply text-skin-accent;
+    @apply text-skin-accent bg-skin-accent/10;
   }
 
   :global(.action-button svg) {
-    @apply h-6 w-6;
+    @apply h-5 w-5;
   }
 
   /* Navigation container styles */
   .nav-container {
     @apply px-4 py-3;
     @apply transition-all duration-200 ease-in-out;
-    border-bottom: 2px solid transparent;
+    @apply bg-gradient-to-b from-skin-fill/95 to-skin-fill/90;
+    @apply backdrop-blur-md;
   }
 
   .nav-container.scrolled {
-    @apply border-b-2 border-skin-accent px-4 py-1;
-    @apply shadow-md;
+    @apply px-4 py-1;
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.07),
+      0 2px 4px -1px rgba(0, 0, 0, 0.05);
   }
 
   /* Focus styles */
@@ -323,7 +324,13 @@ const activeClasses = tw(
 
   /* Dark mode optimizations */
   :global(.dark) .nav-container {
-    @apply bg-skin-fill/90;
+    @apply bg-gradient-to-b from-skin-fill/95 to-skin-fill/90;
+  }
+
+  :global(.dark) .nav-container.scrolled {
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.2),
+      0 2px 4px -1px rgba(0, 0, 0, 0.15);
   }
 
   /* Mobile menu animations */

@@ -76,14 +76,12 @@ const skipLinkClasses = tw(
 <style>
   /* Base styles with modern glass effect and theme transition handling */
   header {
-    @apply bg-skin-fill/85 backdrop-blur-lg;
+    @apply bg-transparent;
     /* Optimize transitions for better performance */
     @apply will-change-transform;
     @apply transform-gpu;
     /* Smoother theme transitions */
     @apply transition-[background-color,border-color,box-shadow] duration-150 ease-in-out;
-    @apply border-b border-skin-line/10;
-    @apply shadow-sm;
   }
 
   /* Enhanced glass effect on scroll with optimized transitions */
@@ -125,8 +123,7 @@ const skipLinkClasses = tw(
 
   /* Dark mode optimizations with smoother transitions */
   :global(.dark) header {
-    @apply bg-skin-fill/90;
-    @apply border-skin-line/5;
+    @apply bg-transparent;
   }
 
   /* Prevent FOUC during theme transitions */

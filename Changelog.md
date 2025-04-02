@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Navigation Redesign
+- **Modern Navbar Enhancement**
+  - Removed dividing line for a cleaner, more cohesive design
+  - Implemented glass-morphism effect with subtle gradient background
+  - Enhanced active state indicators with background highlighting
+  - Improved action buttons with rounded styling and hover effects
+  - Updated theme toggle button to match the new design language
+  - Ensured consistent styling between light and dark modes
+
 ### Enhanced Theme Switching System
 - **Theme Persistence**
   - Fixed navbar flickering issue during navigation in dark mode
