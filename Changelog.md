@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Configuration Refactoring
+- **Astro Configuration Enhancement**
+  - Refactored `astro.config.ts` to follow SOLID principles
+  - Implemented modular configuration with separate sections
+  - Added TypeScript type safety with AstroUserConfig types
+  - Enhanced documentation with JSDoc comments
+  - Enabled syntax highlighting with Shiki
+  - Integrated rehype plugins for improved HTML transformation
+  - Improved code organization and maintainability
+
+## [Unreleased]
+
 ### Categories Page Implementation
 - **New Categories Page**
   - Added dedicated categories page to browse posts by category
