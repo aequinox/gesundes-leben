@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### WordPress to Markdown Exporter Refactoring
+- **Service-Oriented Architecture**
+  - Refactored WordPress exporter to TypeScript with SOLID principles
+  - Implemented dependency injection with Inversify
+  - Created domain-driven design with clear separation of concerns
+  - Added comprehensive error handling with Result pattern
+  - Enhanced type safety with TypeScript interfaces and models
+  - Improved maintainability with modular services
+
+- **Feature Enhancements**
+  - Added support for Astro content collections
+  - Implemented image downloading and processing
+  - Enhanced frontmatter generation
+  - Added interactive configuration wizard
+  - Created command-line interface with Commander
+  - Improved HTML to Markdown conversion with Turndown
+
 ### Configuration Refactoring
 - **Astro Configuration Enhancement**
   - Refactored `astro.config.ts` to follow SOLID principles
