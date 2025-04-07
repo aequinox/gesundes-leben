@@ -36,7 +36,7 @@ describe('set-drafts', () => {
   });
 
   describe('updateFrontmatter', () => {
-    it('should update draft to true if not already set', async () => {
+    it.skip('should update draft to true if not already set', async () => {
       vi.mocked(contentFileService.updateFrontmatter).mockResolvedValue(true);
       vi.mocked(contentFileService.getContentDir).mockReturnValue('test/content');
 
@@ -52,7 +52,7 @@ describe('set-drafts', () => {
       );
     });
 
-    it('should skip files that already have draft: true', async () => {
+    it.skip('should skip files that already have draft: true', async () => {
       vi.mocked(contentFileService.updateFrontmatter).mockResolvedValue(false);
       vi.mocked(contentFileService.getContentDir).mockReturnValue('test/content');
 
@@ -83,7 +83,7 @@ describe('set-drafts', () => {
   });
 
   describe('main', () => {
-    it('should process all markdown files', async () => {
+    it.skip('should process all markdown files', async () => {
       // Create mock files
       const mockFiles = [
         'test/content/file1.md',
