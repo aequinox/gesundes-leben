@@ -1,0 +1,58 @@
+---
+import { type CollectionEntry } from "astro:content";
+
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import Card from "@/components/sections/Card.astro";
+import Footer from "@/components/sections/Footer.astro";
+import Header from "@/components/sections/Header.astro";
+import Pagination from "@/components/sections/Pagination.astro";
+import { SITE } from "@/config";
+import Layout from "./Layout.astro";
+import Main from "./Main.astro";
+import { authorService } from "@/services/content/AuthorService";
+
+export interface Props {
+  currentPage: number;
+  totalPages: number;
+  paginatedPosts: CollectionEntry<"blog">[];
+  author: string;
+  authorName: string;
+}
+
+const { currentPage, totalPages, paginatedPosts, author, authorName } =
+  Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Get author data for additional information
+const authorEntry = await authorService.getAuthorEntry(author);
+const authorBio = authorEntry?.data?.bio || "";
+---
+
+<Layout title={`${t("author.name")}: ${authorName} | ${SITE.title}`}>
+  <Header activeNav="posts" />
+  <Main
+    pageTitle={[`${t("author.name")}:`, `${authorName}`]}
+    titleTransition={author}
+    pageDesc={authorBio || `${t("post.withTag")} "${authorName}".`}
+    data-pagefind-ignore="all"
+  >
+    <h1 slot="title" transition:name={author}>
+      {`${t("author.name")}: ${authorName}`}
+    </h1>
+    <ul>
+      {paginatedPosts.map(post => <Card {post} withHeroImage={false} />)}
+    </ul>
+  </Main>
+
+  <Pagination
+    {currentPage}
+    {totalPages}
+    prevUrl={`/author/${author}${
+      currentPage - 1 !== 1 ? "/" + (currentPage - 1) : ""
+    }/`}
+    nextUrl={`/author/${author}/${currentPage + 1}/`}
+  />
+
+  <Footer noMarginTop={totalPages > 1} />
+</Layout>

@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Author Pages Implementation
+- **New Feature**
+  - Added dedicated author pages to display posts by specific authors
+  - Created author listing page at `/author` to browse all authors
+  - Implemented `AuthorPosts.astro` layout for consistent author page styling
+  - Enhanced `getPostsBy.ts` utility with `getPostsByAuthor` function
+  - Fixed 404 error when accessing author pages
+  - Added proper author links in post metadata
+  - Ensured consistent handling of author IDs with or without file extensions
+  - Improved author name display with proper formatting
+
 ### Footer Component Fix
 - **Bug Fix**
   - Fixed author name display in Footer component by enhancing AuthorService

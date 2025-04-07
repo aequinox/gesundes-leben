@@ -1,0 +1,40 @@
+---
+import { getCollection } from "astro:content";
+import AuthorPosts from "@/layouts/AuthorPosts.astro";
+import getPagination from "@/utils/getPagination";
+import { getPostsByAuthor } from "@/utils/getPostsBy";
+import { authorService } from "@/services/content/AuthorService";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  const authors = await authorService.getAllAuthors();
+
+  // Log author IDs for debugging
+  console.log(
+    "Author IDs:",
+    authors.map(author => author.id)
+  );
+
+  // Make sure to handle file extensions in author IDs
+  return authors.map(author => {
+    // Remove file extension if present
+    const authorId = author.id.replace(/\.(md|mdx)$/, "");
+    return {
+      params: { author: authorId },
+      props: { author: authorId, authorName: author.data.name, posts },
+    };
+  });
+}
+
+const { author, authorName, posts } = Astro.props;
+
+const postsByAuthor = await getPostsByAuthor(posts, author);
+
+const pagination = getPagination({
+  posts: postsByAuthor,
+  page: 1,
+  isIndex: true,
+});
+---
+
+<AuthorPosts {...pagination} {author} {authorName} />

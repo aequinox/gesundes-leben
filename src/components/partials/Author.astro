@@ -53,7 +53,7 @@ const textClasses = ["italic", size === "sm" ? "text-sm" : "text-base"];
           {t("author.from")}
         </span>
         <a
-          href={`/author/${authorEntry.slug}`}
+          href={`/author/${authorEntry.id.replace(/\.(md|mdx)$/, "")}`}
           class="rounded-sm hover:underline focus:outline-none focus:ring-2 focus:ring-skin-accent focus:ring-offset-2"
         >
           <span data-pagefind-filter={t("author.name")}>

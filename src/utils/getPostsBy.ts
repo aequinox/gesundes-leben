@@ -2,15 +2,16 @@
  * @module getPostsBy
  * @description
  * Utility module for filtering and retrieving blog posts based on various criteria
- * such as tags, categories, and groups. Uses the BlogPostProcessor for consistent
+ * such as tags, categories, groups, and authors. Uses the BlogPostProcessor for consistent
  * content handling and filtering.
  *
  * @example
  * ```typescript
- * import { getPostsByTag, getPostsByCategory } from './utils/getPostsBy';
+ * import { getPostsByTag, getPostsByCategory, getPostsByAuthor } from './utils/getPostsBy';
  *
  * const tagPosts = await getPostsByTag(posts, 'typescript');
  * const categoryPosts = await getPostsByCategory(posts, 'Ernährung');
+ * const authorPosts = await getPostsByAuthor(posts, 'sandra-pfeiffer');
  * ```
  */
 
@@ -134,4 +135,42 @@ export const getPostsByTag = async (
   value: string
 ): Promise<CollectionEntry<"blog">[]> => {
   return await getPostsBy(posts, "tags", value);
+};
+
+/**
+ * Retrieves posts by author with case-insensitive matching.
+ * Handles both string author slugs and reference objects.
+ *
+ * @param posts - Array of blog posts to filter
+ * @param authorSlug - Author slug to filter by
+ * @returns Promise resolving to array of posts by the author
+ *
+ * @example
+ * ```typescript
+ * const authorPosts = await getPostsByAuthor(posts, 'sandra-pfeiffer');
+ * ```
+ */
+export const getPostsByAuthor = async (
+  posts: CollectionEntry<"blog">[],
+  authorSlug: string
+): Promise<CollectionEntry<"blog">[]> => {
+  return handleAsync(async () => {
+    // Normalize author slug by removing file extension and slugifying
+    const normalizedAuthorSlug = slugService.slugifyStr(
+      authorSlug.replace(/\.(md|mdx)$/, "")
+    );
+
+    return posts.filter(post => {
+      const postAuthor = post.data.author;
+
+      // Handle both string and reference objects
+      let postAuthorSlug =
+        typeof postAuthor === "string" ? postAuthor : postAuthor.id;
+
+      // Normalize post author slug by removing file extension
+      postAuthorSlug = postAuthorSlug.replace(/\.(md|mdx)$/, "");
+
+      return slugService.slugifyStr(postAuthorSlug) === normalizedAuthorSlug;
+    });
+  });
 };

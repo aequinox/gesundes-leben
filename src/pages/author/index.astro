@@ -1,0 +1,53 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/sections/Header.astro";
+import Footer from "@/components/sections/Footer.astro";
+import { SITE } from "@/config";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { authorService } from "@/services/content/AuthorService";
+import { Icon } from "astro-icon/components";
+
+const authors = await authorService.getAllAuthors();
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const pageTitle = "Authors";
+---
+
+<Layout title={`${pageTitle} | ${SITE.title}`}>
+  <Header activeNav="posts" />
+  <main id="main-content">
+    <section class="prose mx-auto max-w-3xl">
+      <h1 class="mb-6 text-center text-2xl font-semibold sm:text-3xl">
+        {pageTitle}
+      </h1>
+      <ul class="grid gap-4 sm:grid-cols-2">
+        {
+          authors.map(author => (
+            <li class="flex items-center rounded-lg border border-skin-line p-4 shadow-sm transition-all hover:shadow-md">
+              <a
+                href={`/author/${author.id.replace(/\.(md|mdx)$/, "")}`}
+                class="flex w-full items-center gap-4"
+              >
+                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-skin-accent/10 text-skin-accent">
+                  <Icon name="tabler:user" class="h-6 w-6" />
+                </div>
+                <div>
+                  <h2 class="text-lg font-medium">{author.data.name}</h2>
+                  {author.data.bio && (
+                    <p class="line-clamp-2 text-sm opacity-80">
+                      {author.data.bio}
+                    </p>
+                  )}
+                </div>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </main>
+  <Footer />
+</Layout>
