@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Footer Component Fix
+- **Bug Fix**
+  - Fixed author name display in Footer component by enhancing AuthorService
+  - Added robust author name resolution with proper fallback mechanism
+  - Implemented caching for better performance
+  - Enhanced error handling and logging
+  - Added formatAuthorName utility to convert slugs to display names
+
 ### WordPress to Markdown Exporter Refactoring
 - **Service-Oriented Architecture**
   - Refactored WordPress exporter to TypeScript with SOLID principles

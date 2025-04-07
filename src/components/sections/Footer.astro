@@ -19,7 +19,8 @@ import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { SITE } from "@/config";
 import { authorService } from "@/services/content/AuthorService";
 
-const author = await authorService.getAuthorEntry(SITE.author);
+// Get the author display name using the enhanced service
+const authorDisplayName = await authorService.getAuthorDisplayName(SITE.author);
 
 interface Props {
   /** Whether to remove the top margin */
@@ -58,7 +59,7 @@ const copyrightClasses = [
     <div class={copyrightClasses}>
       <span>
         {t("footer.copyright")} &#169; {currentYear}
-        {SITE.author && ` ${author?.data.name ?? SITE.author}`}
+        {SITE.author && ` ${authorDisplayName}`}
       </span>
       <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
       <span>{t("footer.rights")}</span>
