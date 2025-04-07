@@ -40,12 +40,17 @@ const { title, items, titleClasses = "" }: Props = Astro.props;
 const sectionClasses = [
   "relative mx-auto -mb-4 mt-8",
   "box-border overflow-hidden hyphens-auto",
-  "rounded-md",
+  "rounded-lg shadow-sm",
   "bg-gradient-to-b from-skin-card via-skin-card/50 to-transparent",
   "p-6 text-lg",
+  "backdrop-blur-sm",
 ].join(" ");
 
-const titleBaseClasses = ["text-2xl font-normal text-skin-base", titleClasses]
+const titleBaseClasses = [
+  "text-2xl font-medium text-skin-accent mb-4",
+  "border-b border-skin-accent/20 pb-2",
+  titleClasses,
+]
   .filter(Boolean)
   .join(" ");
 
@@ -82,12 +87,12 @@ const titleId = title ? `${sectionId}-title` : undefined;
   <div class={listClasses}>
     <ul class="mb-20" role="list">
       {
-        items.map((item: Item) => (
-          <li>
+        items.map((item: Item, index) => (
+          <li data-index={index} class="list-item">
             {item.intro && (
               <strong class="font-semibold">{item.intro}:&nbsp;</strong>
             )}
-            {item.content}
+            <span class="item-content">{item.content}</span>
           </li>
         ))
       }
@@ -111,16 +116,98 @@ const titleId = title ? `${sectionId}-title` : undefined;
 
   /* List styles */
   ul {
-    @apply list-none pl-0;
+    @apply list-none pl-0 space-y-1;
   }
 
   li {
-    @apply relative mb-4 pl-6;
+    @apply relative pl-8 py-1 transition-all duration-300 ease-in-out;
+    @apply flex items-start;
   }
 
+  /* Remove the bullet point we were adding */
   li::before {
-    content: "";
-    @apply absolute left-0 top-[0.6em] h-2 w-2 rounded-full bg-skin-accent;
+    content: none;
+  }
+
+  .item-content {
+    @apply leading-normal;
+  }
+
+  /* Staggered animation for list items */
+  .list-item {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeIn 0.5s ease-out forwards;
+    animation-delay: calc(var(--index, 0) * 100ms);
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Set animation delay based on index */
+  li[data-index="0"] {
+    --index: 0;
+  }
+  li[data-index="1"] {
+    --index: 1;
+  }
+  li[data-index="2"] {
+    --index: 2;
+  }
+  li[data-index="3"] {
+    --index: 3;
+  }
+  li[data-index="4"] {
+    --index: 4;
+  }
+  li[data-index="5"] {
+    --index: 5;
+  }
+  li[data-index="6"] {
+    --index: 6;
+  }
+  li[data-index="7"] {
+    --index: 7;
+  }
+  li[data-index="8"] {
+    --index: 8;
+  }
+  li[data-index="9"] {
+    --index: 9;
+  }
+  li[data-index="10"] {
+    --index: 10;
+  }
+  li[data-index="11"] {
+    --index: 11;
+  }
+  li[data-index="12"] {
+    --index: 12;
+  }
+  li[data-index="13"] {
+    --index: 13;
+  }
+  li[data-index="14"] {
+    --index: 14;
+  }
+  li[data-index="15"] {
+    --index: 15;
+  }
+  li[data-index="16"] {
+    --index: 16;
+  }
+  li[data-index="17"] {
+    --index: 17;
+  }
+  li[data-index="18"] {
+    --index: 18;
+  }
+  li[data-index="19"] {
+    --index: 19;
   }
 
   /* Focus styles */
