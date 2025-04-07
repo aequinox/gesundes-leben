@@ -32,9 +32,22 @@ interface Props {
   items: Item[];
   /** Optional CSS classes for the title */
   titleClasses?: string;
+  /** Number of columns on large screens (1-4, default: auto-responsive) */
+  columns?: number;
 }
 
-const { title, items, titleClasses = "" }: Props = Astro.props;
+const { title, items, titleClasses = "", columns }: Props = Astro.props;
+
+// Determine column classes based on the columns prop
+const getColumnClass = () => {
+  if (!columns) return ""; // Use default responsive behavior
+
+  // Limit columns to a reasonable range
+  const cols = Math.min(Math.max(1, columns), 4);
+  return `columns-${cols}`;
+};
+
+const columnClass = getColumnClass();
 
 // Memoize common class names
 const sectionClasses = [
@@ -85,7 +98,7 @@ const titleId = title ? `${sectionId}-title` : undefined;
   }
 
   <div class={listClasses}>
-    <ul class="mb-20" role="list">
+    <ul class={`mb-20 ${columnClass}`} role="list">
       {
         items.map((item: Item, index) => (
           <li data-index={index} class="list-item">
@@ -116,12 +129,37 @@ const titleId = title ? `${sectionId}-title` : undefined;
 
   /* List styles */
   ul {
-    @apply list-none pl-0 space-y-1;
+    @apply list-none pl-0;
+
+    /* Single column by default (mobile) */
+    column-count: 1;
+    column-gap: 2rem;
+    column-fill: balance;
+  }
+
+  /* Multi-column layout for larger screens */
+  @media (min-width: 768px) {
+    ul {
+      column-count: 2;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    ul {
+      column-count: 3;
+    }
   }
 
   li {
-    @apply relative pl-8 py-1 transition-all duration-300 ease-in-out;
-    @apply flex items-start;
+    @apply relative pl-8 py-1 mb-3 transition-all duration-300 ease-in-out;
+    display: block; /* Change from flex to block for better column compatibility */
+    break-inside: avoid; /* Prevent items from breaking across columns */
+    page-break-inside: avoid; /* For older browsers */
+  }
+
+  /* Style for the content inside list items */
+  li > * {
+    @apply inline-block align-top;
   }
 
   /* Remove the bullet point we were adding */

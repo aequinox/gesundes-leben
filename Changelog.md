@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### List Component Enhancement
+- **Feature & UI Improvement**
+  - Added multi-column layout support for List component on larger screens
+  - Implemented responsive column layout that adapts to screen size:
+    - Single column on mobile devices
+    - Two columns on tablets (768px+)
+    - Three columns on desktops (1280px+)
+  - Added `columns` prop to allow manual control of column count (1-4)
+  - Fixed doubled bullet points in List component by removing CSS-generated bullets
+  - Improved list item styling with better spacing and typography
+  - Enhanced compatibility with CSS columns using proper break-inside properties
+  - Ensured consistent styling across different screen sizes
+
+### List Component Enhancement
 - **Bug Fix & UI Improvement**
   - Fixed doubled bullet points in List component by removing CSS-generated bullets
   - Redesigned List component with modern styling:
