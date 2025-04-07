@@ -12,7 +12,6 @@ export interface Props {
 
 const { post, showAuthor = true, showReadingTime = true } = Astro.props;
 const { pubDatetime, modDatetime, author } = post.data;
-console.log("Post data:", post.data);
 ---
 
 <div class="flex flex-wrap items-center gap-2 text-sm opacity-80">
