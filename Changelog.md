@@ -4,15 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-### PostUtils Class Enhancement
+### Service-Based Architecture Refactoring
 - **Code Refactoring**
-  - Replaced standalone utility functions with PostUtils class methods
-  - Added `addReadingTimeToPosts` method to PostUtils class
-  - Added `sortPostsByDate` method to PostUtils class
+  - Replaced standalone utility functions with service class methods
   - Deprecated `getPostsWithRT.ts` utility in favor of PostUtils.addReadingTimeToPosts
   - Deprecated `getSortedPosts.ts` utility in favor of PostUtils.sortPostsByDate
-  - Enhanced error handling with PostError class
-  - Added comprehensive JSDoc documentation with examples
+  - Deprecated `getPageNumbers.ts` utility in favor of PaginationService.calculatePageNumbers
+  - Deprecated `getPagination.ts` utility in favor of PaginationService.generatePagination
+  - Deprecated `getPostsBy.ts` utility in favor of PostService methods
+  - Deprecated `getUniqueTags.ts` utility in favor of TagService.extractUniqueTags
+  - Deprecated `postFilter.ts` utility in favor of PostService.getAllPosts
+  - Added backward compatibility with deprecation warnings
+  - Enhanced error handling with custom error classes
+  - Added comprehensive JSDoc documentation with migration examples
   - Improved code organization following SOLID principles
 
 ### Author Pages Implementation

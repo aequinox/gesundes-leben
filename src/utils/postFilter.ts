@@ -2,45 +2,46 @@
  * @module postFilter
  * @description
  * Utility module for filtering blog posts based on draft status and publication date.
- * Uses the BlogPostProcessor for consistent content handling and filtering.
+ *
+ * @deprecated This module is deprecated. Please use the PostService.getAllPosts method instead.
  *
  * @example
  * ```typescript
+ * // DEPRECATED - Use PostService instead
  * import filterBlogPosts from './utils/postFilter';
  *
- * const posts = await getCollection('blog');
- * const publishedPosts = posts.filter(filterBlogPosts);
+ * // RECOMMENDED
+ * import { postService } from '@/services/content/PostService';
+ * const posts = await postService.getAllPosts(import.meta.env.DEV);
  * ```
  */
 
 import { SITE } from "@/config";
 import type { CollectionEntry } from "astro:content";
-import { createBlogPostProcessor } from "./core/content";
+import { postService } from "@/services/content/PostService";
 
 /**
  * Filters blog posts based on draft status and publication date.
- * Uses BlogPostProcessor for consistent filtering logic.
+ *
+ * @deprecated This function is deprecated. Please use PostService.getAllPosts instead.
  *
  * @param post - Blog post entry to evaluate
  * @returns Boolean indicating if the post should be included
  *
  * @example
  * ```typescript
- * // Basic filtering
+ * // DEPRECATED
  * const publishedPosts = posts.filter(filterBlogPosts);
  *
- * // With additional criteria
- * const recentPublishedPosts = posts
- *   .filter(filterBlogPosts)
- *   .filter(post => {
- *     const postDate = new Date(post.data.pubDatetime);
- *     const threeMonthsAgo = new Date();
- *     threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
- *     return postDate >= threeMonthsAgo;
- *   });
+ * // RECOMMENDED
+ * const publishedPosts = await postService.getAllPosts(import.meta.env.DEV);
  * ```
  */
 const filterBlogPosts = ({ data }: CollectionEntry<"blog">): boolean => {
+  console.warn(
+    "Warning: filterBlogPosts is deprecated. Please use postService.getAllPosts instead."
+  );
+
   const isDevelopment = import.meta.env.DEV;
   const { draft, pubDatetime } = data;
 
@@ -78,26 +79,46 @@ const filterBlogPosts = ({ data }: CollectionEntry<"blog">): boolean => {
 
 /**
  * Filters blog posts using the BlogPostProcessor.
- * This version provides more advanced filtering capabilities
- * but requires async/await usage.
+ *
+ * @deprecated This function is deprecated. Please use PostService.getAllPosts instead.
  *
  * @param posts - Array of blog posts to filter
  * @returns Promise resolving to filtered posts
  *
  * @example
  * ```typescript
- * const posts = await getCollection('blog');
+ * // DEPRECATED
  * const filteredPosts = await filterBlogPostsAsync(posts);
+ *
+ * // RECOMMENDED
+ * const filteredPosts = await postService.getAllPosts(import.meta.env.DEV);
  * ```
  */
 export const filterBlogPostsAsync = async (
   posts: CollectionEntry<"blog">[]
 ): Promise<CollectionEntry<"blog">[]> => {
-  const processor = createBlogPostProcessor({
-    includeDrafts: import.meta.env.DEV,
-  });
+  console.warn(
+    "Warning: filterBlogPostsAsync is deprecated. Please use postService.getAllPosts instead."
+  );
 
-  return processor.processContent(posts);
+  // Since we're given posts already, we'll filter them directly rather than fetching new ones
+  const includeDrafts = import.meta.env.DEV;
+  const now = Date.now();
+  const scheduledPostMargin = SITE.scheduledPostMargin || 0;
+
+  return posts.filter(post => {
+    const { draft, pubDatetime } = post.data;
+
+    if (!pubDatetime) return false;
+
+    const pubDate = new Date(pubDatetime);
+    if (isNaN(pubDate.getTime())) return false;
+
+    return (
+      includeDrafts ||
+      (!draft && pubDate.getTime() <= now + scheduledPostMargin)
+    );
+  });
 };
 
 export default filterBlogPosts;

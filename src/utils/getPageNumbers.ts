@@ -2,23 +2,27 @@
  * @module getPageNumbers
  * @description
  * Utility module for calculating pagination numbers based on the total number of posts.
- * Provides a simple and efficient way to generate page numbers for content pagination.
+ *
+ * @deprecated This module is deprecated. Please use the PaginationService.calculatePageNumbers method instead.
  *
  * @example
  * ```typescript
+ * // DEPRECATED - Use PaginationService instead
  * import calculatePageNumbers from './utils/getPageNumbers';
  *
- * // For 25 posts with 10 posts per page
- * const pages = calculatePageNumbers(25);
+ * // RECOMMENDED
+ * import { paginationService } from '@/services/content/PaginationService';
+ * const pages = paginationService.calculatePageNumbers(25);
  * // Returns: [1, 2, 3]
  * ```
  */
 
-import { SITE } from "@/config";
+import { paginationService } from "@/services/content/PaginationService";
 
 /**
  * Calculates an array of sequential page numbers based on the total number of posts.
- * Uses the SITE.postPerPage configuration to determine the number of pages needed.
+ *
+ * @deprecated This function is deprecated. Please use PaginationService.calculatePageNumbers instead.
  *
  * @param numberOfPosts - The total number of posts to paginate
  * @returns Array of sequential page numbers starting from 1
@@ -26,21 +30,18 @@ import { SITE } from "@/config";
  *
  * @example
  * ```typescript
- * // With SITE.postPerPage = 10
+ * // DEPRECATED
  * calculatePageNumbers(25); // Returns: [1, 2, 3]
- * calculatePageNumbers(8);  // Returns: [1]
- * calculatePageNumbers(0);  // Returns: []
+ *
+ * // RECOMMENDED
+ * paginationService.calculatePageNumbers(25); // Returns: [1, 2, 3]
  * ```
  */
 const calculatePageNumbers = (numberOfPosts: number): number[] => {
-  if (numberOfPosts < 0) {
-    throw new Error("Number of posts cannot be negative");
-  }
-
-  const numberOfPages = Math.ceil(numberOfPosts / Number(SITE.postPerPage));
-
-  // Create an array from 1 to numberOfPages
-  return Array.from({ length: numberOfPages }, (_, index) => index + 1);
+  console.warn(
+    "Warning: calculatePageNumbers is deprecated. Please use paginationService.calculatePageNumbers instead."
+  );
+  return paginationService.calculatePageNumbers(numberOfPosts);
 };
 
 export default calculatePageNumbers;

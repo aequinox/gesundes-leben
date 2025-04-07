@@ -2,13 +2,17 @@
  * @module getPagination
  * @description
  * Utility module for handling content pagination with type safety and flexibility.
- * Provides pagination metadata and paginated content slicing with proper validation.
+ *
+ * @deprecated This module is deprecated. Please use the PaginationService.generatePagination method instead.
  *
  * @example
  * ```typescript
+ * // DEPRECATED - Use PaginationService instead
  * import generatePagination from './utils/getPagination';
  *
- * const result = generatePagination({
+ * // RECOMMENDED
+ * import { paginationService } from '@/services/content/PaginationService';
+ * const result = paginationService.generatePagination({
  *   posts: allPosts,
  *   page: '2',
  *   isIndex: false
@@ -17,39 +21,19 @@
  * ```
  */
 
-import { SITE } from "@/config";
+import { paginationService } from "@/services/content/PaginationService";
+import type {
+  PaginationProps,
+  PaginationResult,
+} from "@/services/content/PaginationService";
 
-/**
- * Properties required for pagination generation.
- *
- * @typeParam T - Type of items being paginated (must have an id property)
- * @property posts - Array of items to paginate
- * @property page - Current page number (string or number)
- * @property isIndex - Whether this is the index/home page
- */
-export interface PaginationProps<T> {
-  posts: T[];
-  page: string | number;
-  isIndex?: boolean;
-}
-
-/**
- * Result of pagination generation containing metadata and paginated content.
- *
- * @typeParam T - Type of items being paginated
- * @property totalPages - Total number of pages
- * @property currentPage - Current page number (validated)
- * @property paginatedPosts - Slice of posts for current page
- */
-export interface PaginationResult<T> {
-  totalPages: number;
-  currentPage: number;
-  paginatedPosts: T[];
-}
+// Re-export interfaces for backward compatibility
+export type { PaginationProps, PaginationResult };
 
 /**
  * Generates pagination metadata and paginated posts.
- * Handles page validation, boundary checking, and content slicing.
+ *
+ * @deprecated This function is deprecated. Please use PaginationService.generatePagination instead.
  *
  * @typeParam T - Type of items being paginated (must have an id property)
  * @param props - Pagination properties including posts and page number
@@ -57,17 +41,16 @@ export interface PaginationResult<T> {
  *
  * @example
  * ```typescript
- * // For blog posts
- * const { totalPages, currentPage, paginatedPosts } = generatePagination({
+ * // DEPRECATED
+ * const pagination = generatePagination({
  *   posts: blogPosts,
  *   page: '2'
  * });
  *
- * // For index page
- * const indexPagination = generatePagination({
+ * // RECOMMENDED
+ * const pagination = paginationService.generatePagination({
  *   posts: blogPosts,
- *   page: '1',
- *   isIndex: true
+ *   page: '2'
  * });
  * ```
  */
@@ -76,21 +59,14 @@ const generatePagination = <T extends { id: string | number }>({
   page,
   isIndex = false,
 }: PaginationProps<T>): PaginationResult<T> => {
-  const totalPages = Math.ceil(posts.length / SITE.postPerPage);
-  const currentPage = isIndex ? 1 : Number(page) || 1;
-
-  // Ensure currentPage is within valid range
-  const validatedPage = Math.max(1, Math.min(currentPage, totalPages));
-
-  const startPost = (validatedPage - 1) * SITE.postPerPage;
-  const endPost = startPost + SITE.postPerPage;
-  const paginatedPosts = posts.slice(startPost, endPost);
-
-  return {
-    totalPages,
-    currentPage: validatedPage,
-    paginatedPosts,
-  };
+  console.warn(
+    "Warning: generatePagination is deprecated. Please use paginationService.generatePagination instead."
+  );
+  return paginationService.generatePagination({
+    posts,
+    page,
+    isIndex,
+  });
 };
 
 export default generatePagination;

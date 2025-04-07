@@ -2,42 +2,43 @@
  * @module getUniqueTags
  * @description
  * Utility module for extracting and managing unique tags from blog posts.
- * Uses postFilter for consistent filtering of draft posts.
+ *
+ * @deprecated This module is deprecated. Please use the TagService.extractUniqueTags method instead.
  *
  * @example
  * ```typescript
+ * // DEPRECATED - Use TagService instead
  * import extractUniqueTags from './utils/getUniqueTags';
  *
+ * // RECOMMENDED
+ * import { tagService } from '@/services/content/TagService';
  * const posts = await getCollection('blog');
- * const uniqueTags = extractUniqueTags(posts);
+ * const uniqueTags = tagService.extractUniqueTags(posts);
  * ```
  */
 
-import { slugService } from "@/services/format/SlugService";
+import { tagService } from "@/services/content/TagService";
 import type { CollectionEntry } from "astro:content";
-import postFilter from "./postFilter";
+import type { TagInfo } from "@/services/content/TagService";
 
-/**
- * Tag information with both slugified and original forms.
- */
-export interface TagInfo {
-  /** Slugified form of the tag for URLs */
-  tag: string;
-  /** Original tag name for display */
-  tagName: string;
-}
+// Re-export interface for backward compatibility
+export type { TagInfo };
 
 /**
  * Extracts and returns unique tags from a list of blog posts.
- * Filters out draft posts using postFilter.
+ *
+ * @deprecated This function is deprecated. Please use TagService.extractUniqueTags instead.
  *
  * @param posts - Array of blog posts to extract tags from
  * @returns Array of unique tag objects containing slugified tag and original name
  *
  * @example
  * ```typescript
- * // Basic usage
+ * // DEPRECATED
  * const uniqueTags = extractUniqueTags(posts);
+ *
+ * // RECOMMENDED
+ * const uniqueTags = tagService.extractUniqueTags(posts);
  *
  * // Using in templates
  * uniqueTags.map(({ tag, tagName }) => (
@@ -46,26 +47,10 @@ export interface TagInfo {
  * ```
  */
 const extractUniqueTags = (posts: CollectionEntry<"blog">[]): TagInfo[] => {
-  // Filter posts using postFilter
-  const filteredPosts = posts.filter(postFilter);
-
-  // Extract and deduplicate tags
-  const uniqueTags = new Map<string, string>();
-
-  filteredPosts
-    .flatMap(post => post.data.tags || [])
-    .forEach(tag => {
-      const slugifiedTag = slugService.slugifyStr(tag);
-      // Keep first occurrence of tag name for consistent display
-      if (!uniqueTags.has(slugifiedTag)) {
-        uniqueTags.set(slugifiedTag, tag);
-      }
-    });
-
-  // Convert to array and sort alphabetically
-  return Array.from(uniqueTags.entries())
-    .map(([tag, tagName]) => ({ tag, tagName }))
-    .sort((a, b) => a.tag.localeCompare(b.tag));
+  console.warn(
+    "Warning: extractUniqueTags is deprecated. Please use tagService.extractUniqueTags instead."
+  );
+  return tagService.extractUniqueTags(posts);
 };
 
 export default extractUniqueTags;
