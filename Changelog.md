@@ -17,6 +17,9 @@ All notable changes to this project will be documented in this file.
     - Added decorative elements to site name display
     - Improved overall visual hierarchy and composition
   - Fixed rendering issues with special characters in all text elements
+  - Added hardcoded mapping for post type display names to ensure proper rendering
+  - Fixed React warnings by adding key props to mapped elements
+  - Ensured zIndex is properly specified as a unitless value
   - Implemented comprehensive font loading with multiple weights
   - Enhanced TypeScript type safety throughout the template
 

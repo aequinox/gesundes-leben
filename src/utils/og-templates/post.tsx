@@ -60,6 +60,16 @@ export default async (post: CollectionEntry<"blog">) => {
     text: "#ffffff",
   };
 
+  // Determine the display text based on the color (more reliable than using the postType directly)
+  let displayText = "POST";
+  if (typeColorSet.primary === COLORS.types.pro.primary) {
+    displayText = "PRO";
+  } else if (typeColorSet.primary === COLORS.types.kontra.primary) {
+    displayText = "KONTRA";
+  } else if (typeColorSet.primary === COLORS.types.fragezeiten.primary) {
+    displayText = "FRAGEZEITEN";
+  }
+
   // Prepare category labels
   const categories = (post.data.categories || []).slice(0, 3);
 
@@ -68,7 +78,7 @@ export default async (post: CollectionEntry<"blog">) => {
     post.data.title,
     authorName,
     SITE.title,
-    postType,
+    displayText, // Use our hardcoded display text instead of postType
     ...categories,
   ].join(" ");
 
@@ -142,7 +152,7 @@ export default async (post: CollectionEntry<"blog">) => {
           width: "88%",
           height: "76%",
           overflow: "hidden",
-          zIndex: 10,
+          zIndex: 10, // zIndex should be unitless
         }}
       >
         {/* Top section with post type indicator */}
@@ -189,8 +199,8 @@ export default async (post: CollectionEntry<"blog">) => {
                   marginRight: "8px",
                 }}
               />
-              {/* Use ASCII text for the type to ensure rendering */}
-              {postType.toUpperCase()}
+              {/* Use hardcoded text based on color to ensure rendering */}
+              {displayText}
             </div>
           )}
         </div>
@@ -225,8 +235,9 @@ export default async (post: CollectionEntry<"blog">) => {
                 gap: "10px",
               }}
             >
-              {categories.map((category: string) => (
+              {categories.map((category: string, index: number) => (
                 <span
+                  key={`category-${index}`}
                   style={{
                     background: typeColorSet.secondary,
                     color: typeColorSet.primary,
