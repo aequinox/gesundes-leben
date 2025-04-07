@@ -1,14 +1,14 @@
 ---
 import { getCollection } from "astro:content";
 import TagPosts from "@/layouts/TagPosts.astro";
-import getPagination from "@/utils/getPagination";
-import getUniqueTags from "@/utils/getUniqueTags";
-import { getPostsByTag } from "@/utils/getPostsBy";
+import { paginationService } from "@/services/content/PaginationService";
+import { tagService } from "@/services/content/TagService";
+import { postService } from "@/services/content/PostService";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
 
-  const tags = getUniqueTags(posts);
+  const tags = tagService.extractUniqueTags(posts);
 
   return tags.map(({ tag, tagName }) => {
     return {
@@ -20,9 +20,9 @@ export async function getStaticPaths() {
 
 const { tag, tagName, posts } = Astro.props;
 
-const postsByTag = await getPostsByTag(posts, tag);
+const postsByTag = await postService.getPostsByTag(posts, tag);
 
-const pagination = getPagination({
+const pagination = paginationService.generatePagination({
   posts: postsByTag,
   page: 1,
   isIndex: true,

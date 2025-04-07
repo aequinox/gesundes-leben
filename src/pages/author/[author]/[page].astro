@@ -1,8 +1,6 @@
 ---
 import { getCollection } from "astro:content";
 import AuthorPosts from "@/layouts/AuthorPosts.astro";
-import getPagination from "@/utils/getPagination";
-import { getPostsByAuthor } from "@/utils/getPostsBy";
 import { authorService } from "@/services/content/AuthorService";
 
 export async function getStaticPaths({ paginate }: any) {
@@ -12,7 +10,16 @@ export async function getStaticPaths({ paginate }: any) {
   return authors.flatMap(author => {
     // Remove file extension if present
     const authorId = author.id.replace(/\.(md|mdx)$/, "");
-    const authorPosts = getPostsByAuthor(posts, authorId);
+    // Since there's no direct equivalent in PostService for getPostsByAuthor,
+    // we'll implement a custom solution based on the original implementation
+    const authorPosts = posts.filter(post => {
+      const postAuthor = post.data.author;
+      let postAuthorSlug =
+        typeof postAuthor === "string" ? postAuthor : postAuthor.id;
+      postAuthorSlug = postAuthorSlug.replace(/\.(md|mdx)$/, "").toLowerCase();
+
+      return postAuthorSlug === authorId.toLowerCase();
+    });
     return paginate(authorPosts, {
       params: { author: authorId },
       props: { author: authorId, authorName: author.data.name },

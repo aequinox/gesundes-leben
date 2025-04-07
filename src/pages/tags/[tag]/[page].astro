@@ -1,10 +1,9 @@
 ---
 import { type CollectionEntry, getCollection } from "astro:content";
 import TagPosts from "@/layouts/TagPosts.astro";
-import getUniqueTags from "@/utils/getUniqueTags";
-import getPageNumbers from "@/utils/getPageNumbers";
-import getPagination from "@/utils/getPagination";
-import { getPostsByTag } from "@/utils/getPostsBy";
+import { tagService } from "@/services/content/TagService";
+import { paginationService } from "@/services/content/PaginationService";
+import { postService } from "@/services/content/PostService";
 
 export interface Props {
   post: CollectionEntry<"blog">;
@@ -14,12 +13,14 @@ export interface Props {
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
-  const tags = getUniqueTags(posts);
+  const tags = tagService.extractUniqueTags(posts);
 
   const paths = await Promise.all(
     tags.map(async ({ tag, tagName }) => {
-      const tagPosts = await getPostsByTag(posts, tag);
-      const totalPages = getPageNumbers(tagPosts.length);
+      const tagPosts = await postService.getPostsByTag(posts, tag);
+      const totalPages = paginationService.calculatePageNumbers(
+        tagPosts.length
+      );
 
       return totalPages.map(page => ({
         params: { tag, page: page.toString() },
@@ -39,9 +40,9 @@ const posts = await getCollection(
   ({ data }: { data: CollectionEntry<"blog">["data"] }) => !data.draft
 );
 
-const postsByTag = await getPostsByTag(posts, tag);
+const postsByTag = await postService.getPostsByTag(posts, tag);
 
-const pagination = getPagination({
+const pagination = paginationService.generatePagination({
   posts: postsByTag,
   page,
 });

@@ -1,10 +1,9 @@
 ---
 import Posts from "@/layouts/Posts.astro";
 import { postService } from "@/services/content/PostService";
-import getPagination from "@/utils/getPagination";
+import { paginationService } from "@/services/content/PaginationService";
 import type { Pagination } from "@/types/pagination";
 import type { CollectionEntry } from "astro:content";
-import { getPostsByCategory } from "@/utils/getPostsBy";
 import { slugService } from "@/services/format/SlugService";
 
 // Get category from query parameter if it exists
@@ -29,16 +28,20 @@ if (categoryParam) {
   );
 
   if (matchedCategory) {
-    filteredPosts = await getPostsByCategory(sortedPosts, matchedCategory);
+    filteredPosts = await postService.getPostsByCategory(
+      sortedPosts,
+      matchedCategory
+    );
     pageTitle = `Kategorie: ${matchedCategory}`;
   }
 }
 
-const pagination: Pagination<CollectionEntry<"blog">> = getPagination({
-  posts: filteredPosts,
-  page: 1,
-  isIndex: true,
-});
+const pagination: Pagination<CollectionEntry<"blog">> =
+  paginationService.generatePagination({
+    posts: filteredPosts,
+    page: 1,
+    isIndex: true,
+  });
 ---
 
 <Posts {...pagination} pageTitle={pageTitle} />

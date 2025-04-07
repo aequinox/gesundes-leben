@@ -14,7 +14,7 @@
  */
 
 import { CATEGORIES } from "@/data/taxonomies";
-import getSortedPosts from "@/utils/getSortedPosts";
+import { postService } from "@/services/content/PostService";
 import { getCollection } from "astro:content";
 import Card from "@/components/sections/Card.astro";
 import GroupSelector, {
@@ -39,7 +39,7 @@ const allCategories = ["Alle", ...CATEGORIES];
 
 // Fetch and prepare blog posts
 const posts = await getCollection("blog");
-const sortedPosts = await getSortedPosts(posts);
+const sortedPosts = await postService.getSortedPosts(posts);
 
 // Extract unique categories from posts
 const usedCategories: string[] = [

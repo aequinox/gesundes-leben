@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Deprecated Utility Function Removal
+- **Code Refactoring**
+  - Replaced deprecated utility function calls with service-based methods
+  - Updated `src/pages/posts/index.astro` to use PaginationService and PostService
+  - Updated `src/pages/posts/[page].astro` to use PaginationService and PostService
+  - Updated `src/pages/posts/[slug]/index.astro` to use PaginationService and PostService
+  - Updated `src/pages/tags/index.astro` to use TagService
+  - Updated `src/pages/tags/[tag]/index.astro` to use TagService, PaginationService, and PostService
+  - Updated `src/pages/tags/[tag]/[page].astro` to use TagService, PaginationService, and PostService
+  - Updated `src/pages/author/[author]/index.astro` to use PaginationService
+  - Updated `src/pages/author/[author]/[page].astro` to use custom implementation for author filtering
+  - Updated `src/pages/rss.xml.ts` to use PostService
+  - Updated `src/components/filter/BlogFilter.astro` to use PostService
+  - Updated test files to use service-based methods
+  - Implemented custom author filtering solution where no direct service method was available
+  - Removed deprecation warnings from console output
+
 ### Service-Based Architecture Refactoring
 - **Code Refactoring**
   - Replaced standalone utility functions with service class methods

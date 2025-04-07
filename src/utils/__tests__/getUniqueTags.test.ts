@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from "vitest";
-import extractUniqueTags from "../getUniqueTags";
+import { tagService } from "@/services/content/TagService";
 import type { CollectionEntry } from "astro:content";
 
 // Mock dependencies
@@ -11,7 +11,7 @@ vi.mock("@/utils/postFilter", () => ({
   default: (post: CollectionEntry<"blog">) => !post.data.draft,
 }));
 
-describe("extractUniqueTags", () => {
+describe("tagService.extractUniqueTags", () => {
   test("extracts unique tags from posts", () => {
     const mockPosts = [
       {
@@ -68,7 +68,7 @@ describe("extractUniqueTags", () => {
       },
     ] as CollectionEntry<"blog">[];
 
-    const result = extractUniqueTags(mockPosts);
+    const result = tagService.extractUniqueTags(mockPosts);
 
     expect(result).toEqual([
       { tag: "tag-one", tagName: "Tag One" },
@@ -133,13 +133,13 @@ describe("extractUniqueTags", () => {
       },
     ] as CollectionEntry<"blog">[];
 
-    const result = extractUniqueTags(mockPosts);
+    const result = tagService.extractUniqueTags(mockPosts);
 
     expect(result).toEqual([{ tag: "tag-one", tagName: "Tag One" }]);
   });
 
   test("handles empty posts array", () => {
-    const result = extractUniqueTags([]);
+    const result = tagService.extractUniqueTags([]);
     expect(result).toEqual([]);
   });
 
@@ -173,7 +173,7 @@ describe("extractUniqueTags", () => {
       },
     ] as CollectionEntry<"blog">[];
 
-    const result = extractUniqueTags(mockPosts);
+    const result = tagService.extractUniqueTags(mockPosts);
     expect(result).toEqual([]);
   });
 
@@ -233,7 +233,7 @@ describe("extractUniqueTags", () => {
       },
     ] as CollectionEntry<"blog">[];
 
-    const result = extractUniqueTags(mockPosts);
+    const result = tagService.extractUniqueTags(mockPosts);
 
     expect(result).toEqual([{ tag: "tag-one", tagName: "Tag One" }]);
   });
@@ -268,7 +268,7 @@ describe("extractUniqueTags", () => {
       },
     ] as CollectionEntry<"blog">[];
 
-    const result = extractUniqueTags(mockPosts);
+    const result = tagService.extractUniqueTags(mockPosts);
 
     expect(result).toEqual([
       { tag: "apple", tagName: "Apple" },

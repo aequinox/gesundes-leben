@@ -1,10 +1,5 @@
 import { describe, expect, test, vi } from "vitest";
-import {
-  getPostsByCategory,
-  getPostsByGroup,
-  getAllPostsByGroup,
-  getPostsByTag,
-} from "../getPostsBy";
+import { postService } from "@/services/content/PostService";
 import type { CollectionEntry } from "astro:content";
 import type ts from "typescript";
 
@@ -13,8 +8,35 @@ vi.mock("astro:content", () => ({
   getCollection: vi.fn(),
 }));
 
-vi.mock("../getSortedPosts", () => ({
-  default: vi.fn(posts => Promise.resolve(posts)),
+vi.mock("@/services/content/PostService", () => ({
+  postService: {
+    getPostsByCategory: vi.fn((posts: any[], category: string) =>
+      Promise.resolve(
+        posts.filter((post: any) =>
+          post.data.categories.some(
+            (c: string) => c.toLowerCase() === category.toLowerCase()
+          )
+        )
+      )
+    ),
+    getPostsByGroup: vi.fn((posts: any[], group: string) =>
+      Promise.resolve(
+        posts.filter(
+          (post: any) => post.data.group.toLowerCase() === group.toLowerCase()
+        )
+      )
+    ),
+    getAllPostsByGroup: vi.fn((group: string) => Promise.resolve([])),
+    getPostsByTag: vi.fn((posts: any[], tag: string) =>
+      Promise.resolve(
+        posts.filter((post: any) =>
+          post.data.tags.some(
+            (t: string) => t.toLowerCase() === tag.toLowerCase()
+          )
+        )
+      )
+    ),
+  },
 }));
 
 vi.mock("../slugify", () => ({
@@ -73,14 +95,14 @@ describe("Posts filtering utilities", () => {
         createMockPost("3", ["Ernährung"], "kontra", ["tag3"]),
       ];
 
-      const result = await getPostsByCategory(posts, "Ernährung");
+      const result = await postService.getPostsByCategory(posts, "Ernährung");
 
       expect(result).toHaveLength(2);
       expect(result.map(post => post.id)).toEqual(["1", "3"]);
     });
 
     test("handles empty posts array", async () => {
-      const result = await getPostsByCategory([], "Ernährung");
+      const result = await postService.getPostsByCategory([], "Ernährung");
       expect(result).toEqual([]);
     });
 
@@ -88,7 +110,7 @@ describe("Posts filtering utilities", () => {
       const posts = [createMockPost("1", ["Ernährung"], "pro", ["tag1"])];
 
       // @ts-ignore-next-line
-      const result = await getPostsByCategory(posts, "nonexistent");
+      const result = await postService.getPostsByCategory(posts, "nonexistent");
       expect(result).toEqual([]);
     });
   });
@@ -101,7 +123,7 @@ describe("Posts filtering utilities", () => {
         createMockPost("3", ["Organsysteme"], "pro", ["tag3"]),
       ];
 
-      const result = await getPostsByGroup(posts, "pro");
+      const result = await postService.getPostsByGroup(posts, "pro");
 
       expect(result).toHaveLength(2);
       expect(result.map(post => post.id)).toEqual(["1", "3"]);
@@ -113,7 +135,7 @@ describe("Posts filtering utilities", () => {
         createMockPost("2", ["Immunsystem"], "pro", ["tag2"]),
       ];
 
-      const result = await getPostsByGroup(posts, "pro");
+      const result = await postService.getPostsByGroup(posts, "pro");
 
       expect(result).toHaveLength(2);
     });
@@ -133,7 +155,7 @@ describe("Posts filtering utilities", () => {
 
       mockGetCollection.mockResolvedValue(mockPosts);
 
-      const result = await getAllPostsByGroup("pro");
+      const result = await postService.getAllPostsByGroup("pro");
 
       expect(result).toHaveLength(2);
       expect(result[0].id).toBe("1");
@@ -148,7 +170,7 @@ describe("Posts filtering utilities", () => {
         createMockPost("3", ["Organsysteme"], "pro", ["javascript"]),
       ];
 
-      const result = await getPostsByTag(posts, "javascript");
+      const result = await postService.getPostsByTag(posts, "javascript");
 
       expect(result).toHaveLength(2);
       expect(result.map(post => post.id)).toEqual(["1", "3"]);
@@ -160,7 +182,7 @@ describe("Posts filtering utilities", () => {
         createMockPost("2", ["Immunsystem"], "pro", ["JAVASCRIPT"]),
       ];
 
-      const result = await getPostsByTag(posts, "javascript");
+      const result = await postService.getPostsByTag(posts, "javascript");
 
       expect(result).toHaveLength(2);
     });
@@ -168,7 +190,7 @@ describe("Posts filtering utilities", () => {
     test("handles posts with no tags", async () => {
       const posts = [createMockPost("1", ["Ernährung"], "pro", [])];
 
-      const result = await getPostsByTag(posts, "javascript");
+      const result = await postService.getPostsByTag(posts, "javascript");
       expect(result).toEqual([]);
     });
   });

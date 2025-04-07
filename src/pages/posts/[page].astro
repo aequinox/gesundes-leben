@@ -2,15 +2,13 @@
 import { getCollection } from "astro:content";
 import Posts from "@/layouts/Posts.astro";
 import { postService } from "@/services/content/PostService";
-import getPagination from "@/utils/getPagination";
-import getPageNumbers from "@/utils/getPageNumbers";
-import { getPostsByCategory } from "@/utils/getPostsBy";
+import { paginationService } from "@/services/content/PaginationService";
 import { slugService } from "@/services/format/SlugService";
 
 export async function getStaticPaths() {
   const posts = await postService.getAllPosts();
   const sortedPosts = await postService.getSortedPosts(posts);
-  const totalPages = getPageNumbers(sortedPosts.length);
+  const totalPages = paginationService.calculatePageNumbers(sortedPosts.length);
 
   return totalPages.map(page => ({
     params: { page: page.toString() },
@@ -42,13 +40,16 @@ if (categoryParam) {
   );
 
   if (matchedCategory) {
-    filteredPosts = await getPostsByCategory(sortedPosts, matchedCategory);
+    filteredPosts = await postService.getPostsByCategory(
+      sortedPosts,
+      matchedCategory
+    );
     pageTitle = `Kategorie: ${matchedCategory}`;
   }
 }
 
 // Get pagination for the current page
-const pagination = getPagination({
+const pagination = paginationService.generatePagination({
   posts: filteredPosts,
   page,
   isIndex: false,

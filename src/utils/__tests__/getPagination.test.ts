@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
-import generatePagination from "../getPagination";
-import type { PaginationProps } from "../getPagination";
+import { paginationService } from "@/services/content/PaginationService";
+import type { PaginationProps } from "@/services/content/PaginationService";
 
 // Mock SITE config
 vi.mock("@/config", () => ({
@@ -9,7 +9,7 @@ vi.mock("@/config", () => ({
   },
 }));
 
-describe("generatePagination", () => {
+describe("paginationService.generatePagination", () => {
   // Helper to create mock posts
   const createMockPosts = (count: number) =>
     Array.from({ length: count }, (_, i) => ({
@@ -24,7 +24,7 @@ describe("generatePagination", () => {
       page: 1,
     };
 
-    const result = generatePagination(props);
+    const result = paginationService.generatePagination(props);
 
     expect(result.totalPages).toBe(2);
     expect(result.currentPage).toBe(1);
@@ -39,7 +39,7 @@ describe("generatePagination", () => {
       page: 2,
     };
 
-    const result = generatePagination(props);
+    const result = paginationService.generatePagination(props);
 
     expect(result.totalPages).toBe(2);
     expect(result.currentPage).toBe(2);
@@ -55,7 +55,7 @@ describe("generatePagination", () => {
       isIndex: true,
     };
 
-    const result = generatePagination(props);
+    const result = paginationService.generatePagination(props);
 
     expect(result.currentPage).toBe(1);
     expect(result.paginatedPosts).toHaveLength(3);
@@ -69,7 +69,7 @@ describe("generatePagination", () => {
       page: "2",
     };
 
-    const result = generatePagination(props);
+    const result = paginationService.generatePagination(props);
 
     expect(result.currentPage).toBe(2);
     expect(result.paginatedPosts).toHaveLength(2);
@@ -82,7 +82,7 @@ describe("generatePagination", () => {
       page: 999,
     };
 
-    const result = generatePagination(props);
+    const result = paginationService.generatePagination(props);
 
     expect(result.currentPage).toBe(2); // Clamps to max page
     expect(result.paginatedPosts).toHaveLength(2);
@@ -95,7 +95,7 @@ describe("generatePagination", () => {
       page: -1,
     };
 
-    const result = generatePagination(props);
+    const result = paginationService.generatePagination(props);
 
     expect(result.currentPage).toBe(1); // Clamps to min page
     expect(result.paginatedPosts).toHaveLength(3);
@@ -107,7 +107,7 @@ describe("generatePagination", () => {
       page: 1,
     };
 
-    const result = generatePagination(props);
+    const result = paginationService.generatePagination(props);
 
     expect(result.totalPages).toBe(0);
     expect(result.currentPage).toBe(1);
@@ -121,7 +121,7 @@ describe("generatePagination", () => {
       page: 2,
     };
 
-    const result = generatePagination(props);
+    const result = paginationService.generatePagination(props);
 
     expect(result.totalPages).toBe(2);
     expect(result.currentPage).toBe(2);
@@ -135,7 +135,7 @@ describe("generatePagination", () => {
       page: "invalid",
     };
 
-    const result = generatePagination(props);
+    const result = paginationService.generatePagination(props);
 
     expect(result.currentPage).toBe(1); // Falls back to first page
     expect(result.paginatedPosts).toHaveLength(3);
@@ -148,7 +148,7 @@ describe("generatePagination", () => {
       page: 1,
     };
 
-    const result = generatePagination(props);
+    const result = paginationService.generatePagination(props);
 
     expect(result.totalPages).toBe(1);
     expect(result.currentPage).toBe(1);
