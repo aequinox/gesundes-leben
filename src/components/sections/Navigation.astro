@@ -263,13 +263,13 @@ const activeClasses = tw(
 
   /* Action button styles */
   :global(.action-button) {
-    @apply flex items-center justify-center p-2 rounded-full;
+    @apply flex items-center justify-center rounded-full p-2;
     @apply transition-all duration-200 ease-in-out;
-    @apply hover:text-skin-accent hover:bg-skin-accent/10 focus:text-skin-accent;
+    @apply hover:bg-skin-accent/10 hover:text-skin-accent focus:text-skin-accent;
   }
 
   :global(.action-button.active) {
-    @apply text-skin-accent bg-skin-accent/10;
+    @apply bg-skin-accent/10 text-skin-accent;
   }
 
   :global(.action-button svg) {

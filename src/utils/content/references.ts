@@ -27,6 +27,7 @@ export class ReferenceUtils {
    * Clears the reference cache
    * @private
    */
+  // tslint:ignore-next-line
   private static clearCache(): void {
     ReferenceUtils.referenceCache = null;
   }

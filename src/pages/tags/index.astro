@@ -20,7 +20,7 @@ let tags = tagService.extractUniqueTags(posts);
 
 <Layout title={`Tags | ${SITE.title}`}>
   <Header activeNav="tags" />
-  <Main pageTitle="Tags" pageDesc={t("post.allTags")}>
+  <Main pageTitle={t("nav.tags")} pageDesc={t("post.allTags")}>
     <ul>
       {tags.map(({ tag, tagName }) => <Tag {tag} {tagName} size="lg" />)}
     </ul>

@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Breadcrumbs Translation Fix
+- **Bug Fix**
+  - Fixed breadcrumb item labels not being translated properly in non-English languages
+  - Added translation support for common navigation segments (categories, tags, posts, etc.)
+  - Removed hardcoded category label that was causing incorrect display
+  - Improved i18n integration in the breadcrumb component
+
 ### OG Image Template Redesign
 - **UI Enhancement & Bug Fix**
   - Completely redesigned Open Graph image templates with premium modern aesthetics:

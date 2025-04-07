@@ -61,6 +61,7 @@ interface UITranslations {
 
   // Posts
   "post.allTags": string;
+  "post.allCategories": string;
   "post.minuteRead": string;
   "post.minutesRead": string;
   "post.publishDate": string;
@@ -186,6 +187,7 @@ export const ui: Record<
 
     // Posts
     "post.allTags": "All Tags",
+    "post.allCategories": "All Categories",
     "post.minuteRead": "minute read",
     "post.minutesRead": "minutes read",
     "post.publishDate": "Published:",
@@ -311,6 +313,7 @@ export const ui: Record<
 
     // Posts
     "post.allTags": "Alle Tags",
+    "post.allCategories": "Alle Kategorien",
     "post.minuteRead": "Minute Lesezeit",
     "post.minutesRead": "Minuten Lesezeit",
     "post.publishDate": "Veröffentlicht:",

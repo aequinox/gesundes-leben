@@ -25,14 +25,15 @@
   /* Apply transitions to all theme-related properties */
   html[data-theme] {
     /* Critical properties that should transition smoothly */
-    transition-property: background-color, color, border-color, text-decoration-color, fill, stroke;
+    transition-property: background-color, color, border-color,
+      text-decoration-color, fill, stroke;
     transition-timing-function: var(--theme-transition-timing);
     transition-duration: var(--theme-transition-duration, 0.2s);
   }
-  
+
   /* Apply transitions to specific elements that need theme transitions */
-  .nav-container, 
-  .action-button, 
+  .nav-container,
+  .action-button,
   button,
   a,
   svg,
@@ -47,7 +48,11 @@
 
   /* Disable transitions when user prefers reduced motion */
   @media (prefers-reduced-motion: reduce) {
-    html, body, .nav-container, .action-button, [data-theme] * {
+    html,
+    body,
+    .nav-container,
+    .action-button,
+    [data-theme] * {
       transition-duration: 0.001ms !important;
     }
   }

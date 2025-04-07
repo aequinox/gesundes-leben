@@ -26,6 +26,22 @@ const pathSegments = currentUrlPath.split("/").filter(Boolean);
  * Formats a breadcrumb label based on the segment and its context
  */
 function formatBreadcrumbLabel(segment: string, index: number): string {
+  // Handle common navigation segments that need translation
+  const commonSegments: Record<string, string> = {
+    categories: "nav.categories",
+    tags: "nav.tags",
+    posts: "nav.posts",
+    glossary: "nav.glossary",
+    references: "nav.references",
+    search: "nav.search",
+    archives: "nav.archives",
+  };
+
+  // Translate common segments
+  if (segment in commonSegments) {
+    return t(commonSegments[segment] as any);
+  }
+
   // Handle posts pagination
   if (segment === "posts" && pathSegments[index + 1]) {
     const pageNum = pathSegments[index + 1];
@@ -97,12 +113,12 @@ const breadcrumbItems = buildBreadcrumbItems();
               {item.label}
             </span>
           ) : (
-            <>
+            <Fragment>
               <a href={item.href} class="capitalize">
                 {item.label}
               </a>
               <span aria-hidden="true">&raquo;</span>
-            </>
+            </Fragment>
           )}
         </li>
       ))

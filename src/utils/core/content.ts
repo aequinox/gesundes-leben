@@ -15,7 +15,6 @@
  */
 
 import type { CollectionEntry } from "astro:content";
-import { ContentProcessingError } from "./errors";
 import { ConfigManager, type ConfigObject } from "./config";
 import { handleAsync } from "./errors";
 
