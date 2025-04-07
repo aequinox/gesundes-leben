@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Table of Contents and List Improvements
+- **Bug Fix & UI Enhancement**
+  - Fixed doubled bullet points in lists by modifying text extraction logic
+  - Improved TOC display with proper scrolling for long content
+  - Enhanced TOC scrollbar with ultra-thin design in primary accent color
+  - Enhanced TOC accessibility with proper ARIA attributes and semantic HTML
+  - Added smooth scrolling for TOC links with proper focus management
+  - Implemented multi-column layout for lists on larger screens
+  - Fixed text extraction to prevent duplicate text in TOC entries
+  - Improved overall readability and user experience
+
 ### List Component Enhancement
 - **Feature & UI Improvement**
   - Added multi-column layout support for List component on larger screens

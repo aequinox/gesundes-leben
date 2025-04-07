@@ -199,8 +199,9 @@ const heroImageTransitionName = heroImage
     <!-- Table of Contents Sidebar -->
     <aside
       data-pagefind-ignore="all"
-      class="sticky top-24 hidden h-fit self-start rounded-lg bg-skin-card/5 p-4 shadow-sm 2xl:col-span-4 2xl:block 3xl:col-span-3"
+      class="sticky top-24 hidden h-auto self-start rounded-lg bg-skin-card/5 p-4 shadow-sm 2xl:col-span-4 2xl:block 3xl:col-span-3"
       aria-label="Table of contents"
+      style="position: sticky; height: calc(100vh - 120px);"
     >
       <!-- Mobile Progress Bar -->
       <div
@@ -232,13 +233,20 @@ const heroImageTransitionName = heroImage
         <!-- TOC Navigation -->
         <nav
           id="toc"
-          class="mx-4 rounded-lg bg-skin-card/30 px-4 py-6 shadow-md"
+          class="mx-4 rounded-lg bg-skin-card/30 px-4 py-6 shadow-md h-full"
           aria-label="Table of contents"
+          style="height: calc(100vh - 160px);"
         >
-          <p class="mb-4 font-medium text-skin-base">{t("toc.title")}</p>
+          <h2
+            class="mb-4 font-medium text-skin-base text-base"
+            id="toc-heading"
+          >
+            {t("toc.title")}
+          </h2>
           <ul
-            class="space-y-3 text-pretty text-sm transition duration-300 ease-in-out"
+            class="space-y-2 text-pretty text-sm transition duration-300 ease-in-out"
             role="list"
+            aria-labelledby="toc-heading"
           >
           </ul>
         </nav>
@@ -330,7 +338,47 @@ const heroImageTransitionName = heroImage
       private createLink(heading: HTMLElement): HTMLAnchorElement {
         const link = document.createElement("a");
         link.href = `#${heading.id}`;
-        link.textContent = heading.textContent?.trim() || "";
+
+        // Get only the direct text content, not including nested elements
+        // This prevents duplication of text in headings with nested elements
+        const textNodes = Array.from(heading.childNodes)
+          .filter(node => node.nodeType === Node.TEXT_NODE)
+          .map(node => node.textContent?.trim())
+          .filter(text => text) // Filter out empty strings
+          .join(" ");
+
+        // If there's direct text content, use it; otherwise fall back to textContent
+        link.textContent = textNodes || heading.textContent?.trim() || "";
+
+        // Add accessibility attributes
+        link.setAttribute("aria-label", `Jump to section: ${link.textContent}`);
+
+        // Add smooth scrolling behavior
+        link.addEventListener("click", e => {
+          e.preventDefault();
+          const targetId = link.getAttribute("href")?.substring(1);
+          if (targetId) {
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+              // Smooth scroll to the target
+              targetElement.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+
+              // Update URL without causing a page jump
+              history.pushState(null, "", link.href);
+
+              // Set focus to the target for accessibility
+              targetElement.setAttribute("tabindex", "-1");
+              targetElement.focus({ preventScroll: true });
+
+              // Update selected state in TOC
+              this.setSelectedLinkById(targetId);
+            }
+          }
+        });
+
         return link;
       }
 
@@ -436,13 +484,17 @@ const heroImageTransitionName = heroImage
     }
 
     #toc {
-      max-height: calc(100vh - 200px);
+      /* Fixed height TOC with internal scrolling */
+      height: calc(100vh - 160px);
+      max-height: calc(100vh - 160px);
       overflow-y: auto;
-      scrollbar-width: none;
-      scrollbar-color: rgba(var(--color-accent), 0.5) transparent;
+      
+      /* Ultra-thin scrollbar */
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-accent) transparent;
 
       &::-webkit-scrollbar {
-        width: 6px;
+        width: 3px; /* Make scrollbar as small as possible */
       }
 
       &::-webkit-scrollbar-track {
@@ -450,7 +502,8 @@ const heroImageTransitionName = heroImage
       }
 
       &::-webkit-scrollbar-thumb {
-        @apply rounded-full bg-skin-accent/50;
+        @apply rounded-full;
+        background-color: var(--color-accent); /* Use primary color */
       }
 
       li {
