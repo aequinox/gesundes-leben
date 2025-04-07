@@ -9,10 +9,25 @@ All notable changes to this project will be documented in this file.
   - Fixed doubled bullet points in lists by modifying text extraction logic
   - Improved TOC display with proper scrolling for long content
   - Enhanced TOC scrollbar with ultra-thin design in primary accent color
-  - Enhanced TOC accessibility with proper ARIA attributes and semantic HTML
-  - Added smooth scrolling for TOC links with proper focus management
-  - Implemented multi-column layout for lists on larger screens
+  - Fixed invalid href attributes and missing content in scroll observer
+  
+- **Accessibility Enhancements**
+  - Added comprehensive ARIA attributes for screen readers
+  - Implemented keyboard navigation with arrow keys for TOC
+  - Added screen reader announcements for section navigation
+  - Ensured all headings have valid IDs for proper linking
+  - Added error handling and fallbacks for navigation
+  - Fixed invalid tabindex on non-interactive elements
+  - Implemented proper focus management with temporary tabindex
+  - Added Home/End key support for keyboard navigation
+  - Added sr-only utility class for screen reader content
   - Fixed text extraction to prevent duplicate text in TOC entries
+  - Ensured all headings and anchors have accessible names
+  - Added proper accessible name extraction from aria-label, aria-labelledby, img alt, and svg title
+  - Added title elements to SVGs for better accessibility
+  
+- **Visual Improvements**
+  - Implemented multi-column layout for lists on larger screens
   - Improved overall readability and user experience
 
 ### List Component Enhancement

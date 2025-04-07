@@ -185,6 +185,7 @@ const heroImageTransitionName = heroImage
             viewBox="0 0 24 24"
             aria-hidden="true"
           >
+            <title>Back to top arrow</title>
             <path
               d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
             ></path>
@@ -331,12 +332,20 @@ const heroImageTransitionName = heroImage
         svg.setAttribute("stroke", "currentColor");
         svg.setAttribute("aria-hidden", "true");
         svg.innerHTML =
-          '<path stroke-linecap="round" stroke-linejoin="round" d="m12.75 15 3-3m0 0-3-3m3 3h-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />';
+          '<title>Section indicator</title><path stroke-linecap="round" stroke-linejoin="round" d="m12.75 15 3-3m0 0-3-3m3 3h-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />';
         return svg;
       }
 
       private createLink(heading: HTMLElement): HTMLAnchorElement {
         const link = document.createElement("a");
+
+        // Ensure the heading has a valid ID and accessible name
+        if (!heading.id) {
+          // Get accessible name from heading
+          const headingText = this.getAccessibleName(heading);
+          heading.id = this.generateSafeId(headingText);
+        }
+
         link.href = `#${heading.id}`;
 
         // Get only the direct text content, not including nested elements
@@ -348,33 +357,77 @@ const heroImageTransitionName = heroImage
           .join(" ");
 
         // If there's direct text content, use it; otherwise fall back to textContent
-        link.textContent = textNodes || heading.textContent?.trim() || "";
+        const linkText = textNodes || heading.textContent?.trim() || "";
 
-        // Add accessibility attributes
-        link.setAttribute("aria-label", `Jump to section: ${link.textContent}`);
+        // Ensure the link has an accessible name (inner text)
+        link.textContent = linkText;
 
-        // Add smooth scrolling behavior
+        // Add comprehensive accessibility attributes
+        // Note: aria-label is not needed if the link has proper inner text
+        // but we add it for additional context
+        link.setAttribute("aria-label", `Jump to section: ${linkText}`);
+        link.setAttribute("aria-describedby", `toc-heading`);
+
+        // Add ARIA current for the active item
+        if (window.location.hash === `#${heading.id}`) {
+          link.setAttribute("aria-current", "location");
+        }
+
+        // Add smooth scrolling behavior with error handling
         link.addEventListener("click", e => {
           e.preventDefault();
           const targetId = link.getAttribute("href")?.substring(1);
           if (targetId) {
             const targetElement = document.getElementById(targetId);
             if (targetElement) {
-              // Smooth scroll to the target
-              targetElement.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-              });
+              try {
+                // Smooth scroll to the target
+                targetElement.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
 
-              // Update URL without causing a page jump
-              history.pushState(null, "", link.href);
+                // Update URL without causing a page jump
+                history.pushState(null, "", link.href);
 
-              // Set focus to the target for accessibility
-              targetElement.setAttribute("tabindex", "-1");
-              targetElement.focus({ preventScroll: true });
+                // Set focus to the target for accessibility
+                // Only add tabindex temporarily and remove it after focus
+                const hadTabIndex = targetElement.hasAttribute("tabindex");
+                const oldTabIndex = targetElement.getAttribute("tabindex");
 
-              // Update selected state in TOC
-              this.setSelectedLinkById(targetId);
+                targetElement.setAttribute("tabindex", "-1");
+                targetElement.focus({ preventScroll: true });
+
+                // Remove the tabindex after a short delay to prevent leaving
+                // non-interactive elements permanently in the tab order
+                setTimeout(() => {
+                  if (hadTabIndex && oldTabIndex) {
+                    targetElement.setAttribute("tabindex", oldTabIndex);
+                  } else {
+                    targetElement.removeAttribute("tabindex");
+                  }
+                }, 100);
+
+                // Announce to screen readers
+                const announcement = document.createElement("div");
+                announcement.setAttribute("aria-live", "polite");
+                announcement.setAttribute("class", "sr-only");
+                announcement.textContent = `Navigated to section: ${linkText}`;
+                document.body.appendChild(announcement);
+                setTimeout(() => document.body.removeChild(announcement), 1000);
+
+                // Update selected state in TOC
+                this.setSelectedLinkById(targetId);
+              } catch (error) {
+                console.error(
+                  `Error navigating to section ${targetId}:`,
+                  error
+                );
+                // Fallback to standard navigation if smooth scroll fails
+                window.location.hash = targetId;
+              }
+            } else {
+              console.warn(`Target element with ID ${targetId} not found`);
             }
           }
         });
@@ -398,15 +451,130 @@ const heroImageTransitionName = heroImage
       private initialize(): void {
         if (!this.tocList || !this.headings.length) return;
 
-        this.headings.slice(1).forEach(heading => {
+        // Ensure headings have IDs for proper linking
+        this.headings.slice(1).forEach((heading, index) => {
+          // Generate an ID if the heading doesn't have one
+          if (!heading.id) {
+            const headingText =
+              heading.textContent?.trim() || `heading-${index}`;
+            heading.id = this.generateSafeId(headingText);
+          }
+
           const listItem = this.createListItem(heading);
           this.tocList?.appendChild(listItem);
-          this.observer.observe(heading);
+
+          // Only observe elements that exist in the DOM
+          try {
+            this.observer.observe(heading);
+          } catch (error) {
+            console.error(`Failed to observe heading: ${heading.id}`, error);
+          }
         });
+
+        // Add keyboard navigation for accessibility
+        this.addKeyboardNavigation();
 
         window.addEventListener("beforeunload", () => {
           this.observer.disconnect();
         });
+      }
+
+      /**
+       * Gets the accessible name of an element
+       * @param element The element to get the accessible name from
+       * @returns The accessible name
+       */
+      private getAccessibleName(element: HTMLElement): string {
+        // Check for aria-label
+        const ariaLabel = element.getAttribute("aria-label");
+        if (ariaLabel) return ariaLabel;
+
+        // Check for aria-labelledby
+        const ariaLabelledBy = element.getAttribute("aria-labelledby");
+        if (ariaLabelledBy) {
+          const labelElement = document.getElementById(ariaLabelledBy);
+          if (labelElement && labelElement.textContent) {
+            return labelElement.textContent.trim();
+          }
+        }
+
+        // Check for img with alt text
+        const img = element.querySelector("img");
+        if (img) {
+          const altText = img.getAttribute("alt");
+          if (altText) return altText;
+        }
+
+        // Check for SVG with title
+        const svg = element.querySelector("svg");
+        if (svg) {
+          const titleElement = svg.querySelector("title");
+          if (titleElement && titleElement.textContent) {
+            return titleElement.textContent.trim();
+          }
+        }
+
+        // Fall back to inner text
+        return element.textContent?.trim() || "section";
+      }
+
+      /**
+       * Generates a safe ID from heading text
+       * @param text The heading text
+       * @returns A safe ID string
+       */
+      private generateSafeId(text: string): string {
+        // Convert to lowercase, replace spaces with hyphens, remove special chars
+        return (
+          text
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/[^\w-]/g, "")
+            .replace(/--+/g, "-")
+            .replace(/^-+|-+$/g, "") || "section"
+        );
+      }
+
+      /**
+       * Adds keyboard navigation to the TOC for accessibility
+       */
+      private addKeyboardNavigation(): void {
+        if (!this.tocList) return;
+
+        // Add keyboard event listeners to each link instead of the list
+        const links = Array.from(this.tocList.querySelectorAll("a"));
+
+        links.forEach((link, index) => {
+          // Ensure links are properly focusable (they are by default)
+          link.addEventListener("keydown", event => {
+            const items = links;
+            if (!items.length) return;
+
+            switch (event.key) {
+              case "ArrowDown":
+                event.preventDefault();
+                const nextIndex = index < items.length - 1 ? index + 1 : 0;
+                (items[nextIndex] as HTMLElement).focus();
+                break;
+              case "ArrowUp":
+                event.preventDefault();
+                const prevIndex = index > 0 ? index - 1 : items.length - 1;
+                (items[prevIndex] as HTMLElement).focus();
+                break;
+              case "Home":
+                event.preventDefault();
+                (items[0] as HTMLElement).focus();
+                break;
+              case "End":
+                event.preventDefault();
+                (items[items.length - 1] as HTMLElement).focus();
+                break;
+            }
+          });
+        });
+
+        // Add ARIA role to the list for better screen reader support
+        this.tocList.setAttribute("role", "navigation");
       }
     }
 
@@ -479,6 +647,19 @@ const heroImageTransitionName = heroImage
   </script>
 
   <style is:global lang="postcss">
+    /* Screen reader only class for accessibility */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+    
     main {
       @apply mx-auto w-full max-w-none px-4 pb-12;
     }
