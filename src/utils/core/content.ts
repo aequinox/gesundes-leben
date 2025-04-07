@@ -220,12 +220,33 @@ export class BlogPostProcessor
     posts: CollectionEntry<"blog">[]
   ): Promise<CollectionEntry<"blog">[]> {
     return handleAsync(async () => {
-      // Here we could add more transformations like:
-      // - Calculate reading times
-      // - Process markdown content
-      // - Generate excerpts
-      // - Add metadata
-      return posts;
+      // Process each post to add reading time if not already present
+      return Promise.all(
+        posts.map(async post => {
+          // Skip if reading time is already calculated
+          if (post.data.readingTime) {
+            return post;
+          }
+
+          try {
+            // Calculate reading time based on post content
+            const { remarkPluginFrontmatter } = await post.render();
+
+            // If the remark plugin has already calculated reading time, use it
+            if (remarkPluginFrontmatter?.readingTime) {
+              post.data.readingTime = remarkPluginFrontmatter.readingTime;
+            }
+
+            return post;
+          } catch (error) {
+            console.error(
+              `Error calculating reading time for post ${post.id}:`,
+              error
+            );
+            return post;
+          }
+        })
+      );
     });
   }
 }

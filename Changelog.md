@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Reading Time Display Fix
+- **Bug Fix**
+  - Fixed reading time not showing in article metadata
+  - Enabled remarkReadingTime plugin in remark plugins configuration
+  - Updated BlogPostProcessor.transform method to properly calculate reading time
+  - Fixed logical error in ArticleMeta.astro component
+  - Added direct reading time calculation in post pages
+
 ### Deprecated Utility Function Removal
 - **Code Refactoring**
   - Replaced deprecated utility function calls with service-based methods

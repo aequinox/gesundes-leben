@@ -12,6 +12,7 @@ export interface Props {
 
 const { post, showAuthor = true, showReadingTime = true } = Astro.props;
 const { pubDatetime, modDatetime, author } = post.data;
+console.log("Post data:", post.data);
 ---
 
 <div class="flex flex-wrap items-center gap-2 text-sm opacity-80">
@@ -19,7 +20,7 @@ const { pubDatetime, modDatetime, author } = post.data;
   {
     showAuthor && author && (
       <>
-        <div class="mx-2 h-1 w-1 rounded-full bg-skin-fill" />
+        <div class="h-1 w-1 rounded-full bg-skin-fill" />
         <Author author={author} />
       </>
     )
@@ -27,7 +28,7 @@ const { pubDatetime, modDatetime, author } = post.data;
   {
     showReadingTime && "readingTime" in post.data && post.data.readingTime && (
       <>
-        <div class="mx-2 h-1 w-1 rounded-full bg-skin-fill" />
+        <div class="h-1 w-1 rounded-full bg-skin-fill" />
         <ReadingTime readingTime={post.data.readingTime} />
       </>
     )

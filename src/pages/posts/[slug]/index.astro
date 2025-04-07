@@ -5,6 +5,7 @@ import PostDetails from "@/layouts/PostDetails.astro";
 import { postService } from "@/services/content/PostService";
 import { paginationService } from "@/services/content/PaginationService";
 import type { Pagination } from "@/types/pagination";
+import { PostUtils } from "@/utils/content/posts";
 
 export interface Props {
   post: CollectionEntry<"blog">;
@@ -13,7 +14,15 @@ export interface Props {
 export async function getStaticPaths() {
   const posts = await getCollection("blog", ({ data }: any) => !data.draft);
 
-  const postsWithRT = await postService.getSortedPosts(posts);
+  // Process each post to add reading time
+  const postsWithRT = await Promise.all(
+    posts.map(async post => {
+      if (!post.data.readingTime) {
+        post.data.readingTime = PostUtils.calculateReadingTime(post.body);
+      }
+      return post;
+    })
+  );
 
   const postResult = postsWithRT.map((post: CollectionEntry<"blog">) => ({
     params: { slug: post.slug },
@@ -31,6 +40,11 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const { post } = Astro.props;
+
+// Add reading time to the current post if it doesn't have one
+if (post && !post.data.readingTime) {
+  post.data.readingTime = PostUtils.calculateReadingTime(post.body);
+}
 
 const posts = await getCollection("blog");
 
