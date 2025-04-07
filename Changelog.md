@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### PostUtils Class Enhancement
+- **Code Refactoring**
+  - Replaced standalone utility functions with PostUtils class methods
+  - Added `addReadingTimeToPosts` method to PostUtils class
+  - Added `sortPostsByDate` method to PostUtils class
+  - Deprecated `getPostsWithRT.ts` utility in favor of PostUtils.addReadingTimeToPosts
+  - Deprecated `getSortedPosts.ts` utility in favor of PostUtils.sortPostsByDate
+  - Enhanced error handling with PostError class
+  - Added comprehensive JSDoc documentation with examples
+  - Improved code organization following SOLID principles
+
 ### Author Pages Implementation
 - **New Feature**
   - Added dedicated author pages to display posts by specific authors

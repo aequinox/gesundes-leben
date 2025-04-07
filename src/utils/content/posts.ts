@@ -301,4 +301,74 @@ export class PostUtils {
       return false;
     }
   }
+
+  /**
+   * Adds reading time data to an array of blog posts.
+   * Direct replacement for the getPostsWithRT utility.
+   *
+   * @param posts - Array of blog posts to process
+   * @returns Promise resolving to posts with reading time data
+   *
+   * @example
+   * ```typescript
+   * // Basic usage
+   * const postsWithRT = await PostUtils.addReadingTimeToPosts(posts);
+   *
+   * // With filtering
+   * const publishedPostsWithRT = await PostUtils.addReadingTimeToPosts(
+   *   posts.filter(post => !post.data.draft)
+   * );
+   *
+   * // Access reading time
+   * postsWithRT.forEach(post => {
+   *   console.log(`${post.data.title}: ${post.data.readingTime}`);
+   * });
+   * ```
+   */
+  public static async addReadingTimeToPosts(
+    posts: ReadonlyArray<Blog>
+  ): Promise<Blog[]> {
+    try {
+      return PostUtils.updateReadingTimes(posts);
+    } catch (error) {
+      throw new PostError("Failed to add reading times to posts", error);
+    }
+  }
+
+  /**
+   * Sorts blog posts by date and adds reading time data.
+   * Direct replacement for the getSortedPosts utility.
+   *
+   * @param posts - Array of blog posts to sort
+   * @returns Promise resolving to sorted array of blog posts with reading time
+   *
+   * @example
+   * ```typescript
+   * // Basic usage
+   * const sortedPosts = await PostUtils.sortPostsByDate(posts);
+   *
+   * // With filtering
+   * const recentPosts = await PostUtils.sortPostsByDate(
+   *   posts.filter(post => !post.data.draft)
+   * );
+   *
+   * // Access sorted posts
+   * sortedPosts.forEach(post => {
+   *   console.log(
+   *     post.data.title,
+   *     post.data.modDatetime || post.data.pubDatetime
+   *   );
+   * });
+   * ```
+   */
+  public static async sortPostsByDate(
+    posts: ReadonlyArray<Blog>
+  ): Promise<Blog[]> {
+    try {
+      const postsWithReadingTime = await PostUtils.updateReadingTimes(posts);
+      return PostUtils.sortByDate(postsWithReadingTime) as Blog[];
+    } catch (error) {
+      throw new PostError("Failed to sort posts by date", error);
+    }
+  }
 }

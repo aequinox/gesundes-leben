@@ -5,7 +5,7 @@ import getPagination from "@/utils/getPagination";
 import { getPostsByAuthor } from "@/utils/getPostsBy";
 import { authorService } from "@/services/content/AuthorService";
 
-export async function getStaticPaths({ paginate }) {
+export async function getStaticPaths({ paginate }: any) {
   const posts = await getCollection("blog");
   const authors = await authorService.getAllAuthors();
 
