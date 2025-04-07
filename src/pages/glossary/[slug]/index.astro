@@ -2,8 +2,7 @@
 import { type CollectionEntry, getCollection } from "astro:content";
 import Glossary from "@/layouts/Glossary.astro";
 import GlossaryDetails from "@/layouts/GlossaryDetails.astro";
-import getPageNumbers from "@/utils/getPageNumbers";
-import getPagination from "@/utils/getPagination";
+import { paginationService } from "@/services/content/PaginationService";
 
 export interface Props {
   glossaryEntry: CollectionEntry<"glossary">;
@@ -18,9 +17,11 @@ export async function getStaticPaths() {
     props: { glossaryEntry },
   }));
 
-  const pagePaths = getPageNumbers(glossaryEntries.length).map(pageNum => ({
-    params: { slug: String(pageNum) },
-  }));
+  const pagePaths = paginationService
+    .calculatePageNumbers(glossaryEntries.length)
+    .map(pageNum => ({
+      params: { slug: String(pageNum) },
+    }));
 
   return [...glossaryEntryResult, ...pagePaths];
 }
@@ -35,7 +36,7 @@ const sortedGlossaryEntries = glossaryEntries.sort((a, b) =>
   a.data.title.localeCompare(b.data.title)
 );
 
-const pagination = getPagination({
+const pagination = paginationService.generatePagination({
   posts: sortedGlossaryEntries,
   page: slug,
 });

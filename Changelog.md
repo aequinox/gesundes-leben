@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed Missing Utility Modules
+- **Bug Fix**
+  - Fixed TypeScript errors related to missing utility modules
+  - Updated files to use the service-based architecture instead of non-existent utility modules:
+    - Fixed "Cannot find module 'utils/getPagination'" by updating these files to use PaginationService:
+      - `src/pages/pro.astro`
+      - `src/pages/kontra.astro`
+      - `src/pages/fragezeiten.astro`
+      - `src/pages/glossary/index.astro`
+      - `src/pages/glossary/[slug]/index.astro`
+    - Updated `src/pages/glossary/[slug]/index.astro` to use PaginationService.calculatePageNumbers instead of the non-existent getPageNumbers utility
+    - Fixed "Cannot find module '../getAuthor'" in `src/utils/og-templates/post.tsx` by using AuthorService
+    - Fixed "Cannot find module 'utils/slugify'" in these files by using SlugService:
+      - `src/pages/posts/[slug]/index.png.ts`
+      - `src/pages/glossary/[slug]/index.png.ts`
+    - Added proper type annotations to fix implicit any type errors
+  - Ensured consistent use of service-based architecture throughout the project
+
 ### SEO Meta Tags Implementation
 - **Feature Enhancement**
   - Implemented SEO meta tags system based on astro-seo-meta package

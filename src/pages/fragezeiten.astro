@@ -1,10 +1,10 @@
 ---
 import Posts from "@/layouts/Posts.astro";
-import getPagination from "@/utils/getPagination";
-import { getAllPostsByGroup } from "@/utils/getPostsBy";
+import { paginationService } from "@/services/content/PaginationService";
+import { postService } from "@/services/content/PostService";
 
-const posts = await getAllPostsByGroup("fragezeiten");
-const pagination = getPagination({
+const posts = await postService.getAllPostsByGroup("fragezeiten");
+const pagination = paginationService.generatePagination({
   posts: posts,
   page: 1,
   isIndex: true,

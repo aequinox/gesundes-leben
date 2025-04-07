@@ -1,15 +1,16 @@
 import type { APIRoute } from "astro";
 import { getCollection, type CollectionEntry } from "astro:content";
 import { generateOgImageForPost } from "@/utils/generateOgImages";
-import { slugifyStr } from "@/utils/slugify";
+import { slugService } from "@/services/format/SlugService";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog").then(p =>
-    p.filter(({ data }) => !data.draft && !data.ogImage)
+  const posts = await getCollection("blog").then(
+    (p: CollectionEntry<"blog">[]) =>
+      p.filter(({ data }) => !data.draft && !data.ogImage)
   );
 
-  return posts.map(post => ({
-    params: { slug: slugifyStr(post.data.title) },
+  return posts.map((post: CollectionEntry<"blog">) => ({
+    params: { slug: slugService.slugifyStr(post.data.title) },
     props: post,
   }));
 }

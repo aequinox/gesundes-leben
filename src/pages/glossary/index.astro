@@ -1,7 +1,7 @@
 ---
 import Glossary from "@/layouts/Glossary.astro";
 import type { Pagination } from "@/types/pagination";
-import getPagination from "@/utils/getPagination";
+import { paginationService } from "@/services/content/PaginationService";
 import { getCollection, type CollectionEntry } from "astro:content";
 
 const glossaryEntries = await getCollection("glossary");
@@ -9,11 +9,12 @@ const glossaryEntries = await getCollection("glossary");
 const sortedGlossaryEntries = [...glossaryEntries].sort((a, b) =>
   a.data.title.localeCompare(b.data.title)
 );
-const pagination: Pagination<CollectionEntry<"glossary">> = getPagination({
-  posts: sortedGlossaryEntries,
-  page: 1,
-  isIndex: true,
-});
+const pagination: Pagination<CollectionEntry<"glossary">> =
+  paginationService.generatePagination({
+    posts: sortedGlossaryEntries,
+    page: 1,
+    isIndex: true,
+  });
 ---
 
 <Glossary {...pagination} title="Glossar" />

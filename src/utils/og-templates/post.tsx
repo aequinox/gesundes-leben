@@ -2,10 +2,10 @@ import satori from "satori";
 import type { CollectionEntry } from "astro:content";
 import { SITE } from "@/config";
 import loadGoogleFonts, { type FontOptions } from "@/utils/loadGoogleFont";
-import { getAuthorEntry } from "../getAuthor";
+import { authorService } from "@/services/content/AuthorService";
 
 export default async (post: CollectionEntry<"blog">) => {
-  const authorEntry = await getAuthorEntry(post.data.author);
+  const authorEntry = await authorService.getAuthorEntry(post.data.author);
   const authorName = authorEntry?.data?.name || SITE.author;
 
   return satori(
