@@ -13,7 +13,6 @@
  *   node fix-markdown.js ./src/content/blog --extension=.mdx
  */
 
-const path = require('path');
 const { processDirectory } = require('./src/post-processor');
 const logger = require('./src/logger');
 

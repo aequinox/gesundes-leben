@@ -1,10 +1,5 @@
 ---
-import {
-  getCollection,
-  InferEntrySchema,
-  Render,
-  RenderedContent,
-} from "astro:content";
+import type { InferEntrySchema, Render, RenderedContent } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/sections/Header.astro";
 import Footer from "@/components/sections/Footer.astro";
@@ -13,7 +8,6 @@ import Card from "@/components/sections/Card.astro";
 import { SITE } from "@/config";
 import { postService } from "@/services/content/PostService";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
-import type { TranslationKey } from "@/i18n/ui";
 import Main from "@/layouts/Main.astro";
 
 const lang = getLangFromUrl(Astro.url);
@@ -40,13 +34,13 @@ const postsByCategory = categories.reduce(
 );
 
 // Page title and description
-const pageTitle = "Kategorien";
-const pageDescription = "Durchsuche unsere Artikel nach Kategorien";
+const pageTitle = t("nav.categories");
+const pageDescription = t("post.allCategories");
 ---
 
 <Layout title={`${pageTitle} | ${SITE.title}`}>
   <Header activeNav="categories" />
-  <Main pageTitle={t("nav.categories")} pageDesc={t("post.allCategories")}>
+  <Main pageTitle={pageTitle} pageDesc={pageDescription}>
     <section class="mx-auto max-w-content px-4">
       <!-- <h1 class="text-3xl font-bold leading-tight tracking-wider sm:text-4xl">
         {pageTitle}

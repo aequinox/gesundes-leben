@@ -1,5 +1,4 @@
 import { getCollection, getEntry } from "astro:content";
-import { AuthorUtils } from "./authors";
 import type { Glossary } from "./types";
 
 /**

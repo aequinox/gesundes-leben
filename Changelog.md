@@ -4,12 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-### Breadcrumbs Translation Fix
+### ESLint Fixes and Breadcrumbs Translation
 - **Bug Fix**
   - Fixed breadcrumb item labels not being translated properly in non-English languages
   - Added translation support for common navigation segments (categories, tags, posts, etc.)
   - Removed hardcoded category label that was causing incorrect display
   - Improved i18n integration in the breadcrumb component
+  - Fixed ESLint errors in multiple files:
+    - Added proper block scoping for case statements in switch blocks in PostDetails.astro
+    - Removed unused event parameter in Navigation.astro
+    - Fixed unnecessary escape character in post-processor.js
 
 ### OG Image Template Redesign
 - **UI Enhancement & Bug Fix**

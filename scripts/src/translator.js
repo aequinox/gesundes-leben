@@ -148,7 +148,8 @@ function initTurndownService() {
              !node.querySelector('img') && 
              node.querySelector('figcaption');
     },
-    replacement: (content, node) => {
+
+    replacement: (content) => {
       // extra newlines are necessary for markdown and HTML to render correctly together
       const result = '\n\n<figure>\n\n' + content + '\n\n</figure>\n\n';
       return result.replace('\n\n\n\n', '\n\n'); // collapse quadruple newlines

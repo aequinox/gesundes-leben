@@ -16,6 +16,7 @@ interface UITranslations {
   // Navigation
   "nav.skipToContent": string;
   "nav.about": string;
+  "nav.authors": string;
   "nav.posts": string;
   "nav.tags": string;
   "nav.categories": string;
@@ -60,6 +61,7 @@ interface UITranslations {
   "socials.visitProfile": string;
 
   // Posts
+  "post.allAuthors": string;
   "post.allTags": string;
   "post.allCategories": string;
   "post.minuteRead": string;
@@ -142,6 +144,7 @@ export const ui: Record<
     // Navigation
     "nav.skipToContent": "Skip to content",
     "nav.about": "About",
+    "nav.authors": "Authors",
     "nav.posts": "Posts",
     "nav.tags": "Tags",
     "nav.search": "Search",
@@ -186,6 +189,7 @@ export const ui: Record<
     "socials.visitProfile": "Visit {platform} profile",
 
     // Posts
+    "post.allAuthors": "All Authors",
     "post.allTags": "All Tags",
     "post.allCategories": "All Categories",
     "post.minuteRead": "minute read",
@@ -268,6 +272,7 @@ export const ui: Record<
     // Navigation
     "nav.skipToContent": "Zum Inhalt springen",
     "nav.about": "Über uns",
+    "nav.authors": "Autoren",
     "nav.posts": "Beiträge",
     "nav.tags": "Tags",
     "nav.search": "Suche",
@@ -312,6 +317,7 @@ export const ui: Record<
     "socials.visitProfile": "{platform} Profil besuchen",
 
     // Posts
+    "post.allAuthors": "Alle Autoren",
     "post.allTags": "Alle Tags",
     "post.allCategories": "Alle Kategorien",
     "post.minuteRead": "Minute Lesezeit",

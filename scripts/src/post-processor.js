@@ -109,7 +109,7 @@ async function processMarkdownFile(filePath) {
     } else if (!frontmatter.description) {
       // Create a description from the first 150 characters of content
       const markdown = parts.slice(2).join('---\n');
-      const textContent = markdown.replace(/[#*`_\[\]()]/g, '').trim();
+      const textContent = markdown.replace(/[#*`_[\]()]/g, '').trim();
       frontmatter.description = textContent.substring(0, 150) + (textContent.length > 150 ? '...' : '');
       modified = true;
     }

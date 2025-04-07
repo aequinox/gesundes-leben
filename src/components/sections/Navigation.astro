@@ -384,8 +384,8 @@ const activeClasses = tw(
     private nav: HTMLElement | null;
     private scrollTimeout: number | null;
     private labels: { open: string; close: string };
-    private navLinks: NodeListOf<HTMLAnchorElement> | null;
-    private linkClickHandlers: Map<HTMLAnchorElement, EventListener>;
+    private navLinks: HTMLAnchorElement[] | null;
+    private linkClickHandlers: Map<HTMLAnchorElement, () => void>;
 
     constructor() {
       this.menuBtn = document.getElementById("hamburger-menu");
@@ -393,7 +393,7 @@ const activeClasses = tw(
       this.nav = document.querySelector(".nav-container");
       this.scrollTimeout = null;
       this.labels = this.getMenuLabels();
-      this.navLinks = document.querySelectorAll("nav a");
+      this.navLinks = Array.from(document.querySelectorAll("nav a"));
       this.linkClickHandlers = new Map();
 
       if (!this.menuBtn || !this.menuItems || !this.nav) {
@@ -490,7 +490,7 @@ const activeClasses = tw(
       }
     }
 
-    private handleLinkClick = (evt: Event): void => {
+    private handleLinkClick = (): void => {
       // Store current theme in session storage for persistence during navigation
       sessionStorage.setItem(
         "theme-transition",
