@@ -4,12 +4,45 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### OG Image Template Redesign
+- **UI Enhancement & Bug Fix**
+  - Completely redesigned Open Graph image templates with premium modern aesthetics:
+    - Enhanced post type indicator with icon and text badge for better readability
+    - Added subtle geometric decorative elements for visual interest
+    - Improved glass-morphism effect with increased opacity and blur
+    - Enhanced color system with type-specific color palettes
+    - Upgraded typography with optimized font sizes, weights, and spacing
+    - Redesigned category tags with type-specific colors and subtle shadows
+    - Enhanced author avatar with improved styling and border
+    - Added decorative elements to site name display
+    - Improved overall visual hierarchy and composition
+  - Fixed rendering issues with special characters in all text elements
+  - Implemented comprehensive font loading with multiple weights
+  - Enhanced TypeScript type safety throughout the template
+
+### OG Image Templates Modernization
+- **UI Enhancement**
+  - Redesigned Open Graph image templates with modern styling:
+    - Added glass-morphism effect with subtle gradient background
+    - Implemented accent color bar at the top of images
+    - Created card-like container with rounded corners and subtle shadow
+    - Added post type indicators with appropriate colors (pro, contra, fragezeiten)
+    - Enhanced typography with improved spacing and hierarchy
+    - Added author avatar placeholder with first letter of name
+    - Included category tags when available
+    - Created consistent footer with author and site information
+    - Improved overall visual hierarchy and readability
+    - Ensured consistent styling between post and site templates
+  - Enhanced color system with theme-aware colors
+  - Improved responsive design for different screen sizes and devices
+  - Added proper font loading with fallbacks
+
 ### Fixed Missing Utility Modules
 - **Bug Fix**
   - Fixed TypeScript errors related to missing utility modules
   - Updated files to use the service-based architecture instead of non-existent utility modules:
     - Fixed "Cannot find module 'utils/getPagination'" by updating these files to use PaginationService:
-      - `src/pages/pro.astro`
+      - `src/pages/pro.astro`&
       - `src/pages/kontra.astro`
       - `src/pages/fragezeiten.astro`
       - `src/pages/glossary/index.astro`
