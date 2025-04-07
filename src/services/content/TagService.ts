@@ -84,8 +84,8 @@ export class TagService implements ITagService {
    * Extract unique tags from a list of blog posts
    */
   extractUniqueTags(posts: CollectionEntry<"blog">[]): TagInfo[] {
-    // Filter posts
-    const filteredPosts = this.filterPosts(posts);
+    // Filter out draft posts
+    const filteredPosts = posts.filter(post => !post.data.draft);
 
     // Extract and deduplicate tags
     const uniqueTags = new Map<string, string>();
@@ -117,7 +117,7 @@ export class TagService implements ITagService {
 
     return posts.filter(post =>
       post.data.tags?.some(
-        postTag => slugService.slugifyStr(postTag) === slugifiedTag
+        (postTag: string) => slugService.slugifyStr(postTag) === slugifiedTag
       )
     );
   }
@@ -133,7 +133,7 @@ export class TagService implements ITagService {
 
     // Count tags
     filteredPosts.forEach(post => {
-      post.data.tags?.forEach(tag => {
+      post.data.tags?.forEach((tag: string) => {
         const slugifiedTag = slugService.slugifyStr(tag);
         const currentCount = tagCounts.get(slugifiedTag) || 0;
         tagCounts.set(slugifiedTag, currentCount + 1);

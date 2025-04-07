@@ -8,6 +8,49 @@ vi.mock("astro:content", () => ({
   getCollection: vi.fn(),
 }));
 
+// Define the createMockPost function before using it in mocks
+const createMockPost = (
+  id: string,
+  categories: (
+    | "Ernährung"
+    | "Immunsystem"
+    | "Lesenswertes"
+    | "Lifestyle & Psyche"
+    | "Mikronährstoffe"
+    | "Organsysteme"
+    | "Wissenschaftliches"
+    | "Wissenswertes"
+  )[],
+  group: "pro" | "kontra" | "fragezeiten",
+  tags: string[],
+  draft = false
+): CollectionEntry<"blog"> => ({
+  id,
+  slug: id,
+  body: "Test content",
+  collection: "blog",
+  data: {
+    title: `Post ${id}`,
+    author: "test-author",
+    description: "Test description",
+    pubDatetime: new Date(),
+    draft,
+    heroImage: {
+      src: {
+        src: "test.jpg",
+        width: 100,
+        height: 100,
+        format: "jpg" as const,
+      },
+      alt: "Test image",
+    },
+    categories,
+    group,
+    tags,
+  },
+  render: vi.fn(),
+});
+
 vi.mock("@/services/content/PostService", () => ({
   postService: {
     getPostsByCategory: vi.fn((posts: any[], category: string) =>
@@ -26,7 +69,21 @@ vi.mock("@/services/content/PostService", () => ({
         )
       )
     ),
-    getAllPostsByGroup: vi.fn((group: string) => Promise.resolve([])),
+    getAllPostsByGroup: vi.fn((group: string) => {
+      // Mock implementation that returns non-draft posts with matching group
+      const mockPosts = [
+        createMockPost("1", ["Ernährung"], "pro", ["tag1"]),
+        createMockPost("2", ["Immunsystem"], "pro", ["tag2"], true), // draft
+        createMockPost("3", ["Organsysteme"], "kontra", ["tag3"]),
+        createMockPost("4", ["Ernährung"], "pro", ["tag4"]), // Add another non-draft pro post
+      ];
+
+      return Promise.resolve(
+        mockPosts
+          .filter(post => !post.data.draft)
+          .filter(post => post.data.group.toLowerCase() === group.toLowerCase())
+      );
+    }),
     getPostsByTag: vi.fn((posts: any[], tag: string) =>
       Promise.resolve(
         posts.filter((post: any) =>
@@ -45,48 +102,6 @@ vi.mock("../slugify", () => ({
 }));
 
 describe("Posts filtering utilities", () => {
-  const createMockPost = (
-    id: string,
-    categories: (
-      | "Ernährung"
-      | "Immunsystem"
-      | "Lesenswertes"
-      | "Lifestyle & Psyche"
-      | "Mikronährstoffe"
-      | "Organsysteme"
-      | "Wissenschaftliches"
-      | "Wissenswertes"
-    )[],
-    group: "pro" | "kontra" | "fragezeiten",
-    tags: string[],
-    draft = false
-  ): CollectionEntry<"blog"> => ({
-    id,
-    slug: id,
-    body: "Test content",
-    collection: "blog",
-    data: {
-      title: `Post ${id}`,
-      author: "test-author",
-      description: "Test description",
-      pubDatetime: new Date(),
-      draft,
-      heroImage: {
-        src: {
-          src: "test.jpg",
-          width: 100,
-          height: 100,
-          format: "jpg" as const,
-        },
-        alt: "Test image",
-      },
-      categories,
-      group,
-      tags,
-    },
-    render: vi.fn(),
-  });
-
   describe("getPostsByCategory", () => {
     test("filters posts by category", async () => {
       const posts = [

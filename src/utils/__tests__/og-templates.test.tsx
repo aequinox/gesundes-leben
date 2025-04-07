@@ -38,17 +38,19 @@ vi.mock("../loadGoogleFont", () => ({
   ]),
 }));
 
-vi.mock("../getAuthor", () => ({
-  getAuthorEntry: vi.fn(async author => {
-    if (author === "test-author") {
-      return {
-        data: {
-          name: "Test Author",
-        },
-      };
-    }
-    return null;
-  }),
+vi.mock("@/services/content/AuthorService", () => ({
+  authorService: {
+    getAuthorEntry: vi.fn(async author => {
+      if (author === "test-author") {
+        return {
+          data: {
+            name: "Test Author",
+          },
+        };
+      }
+      return null;
+    }),
+  },
 }));
 
 // Import the templates after mocking

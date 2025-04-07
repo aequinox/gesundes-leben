@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Test Fixes
+- **Bug Fix**
+  - Fixed failing tests in multiple modules:
+    - Fixed `TagService.extractUniqueTags` to properly filter out draft posts
+    - Updated `PostService.getAllPostsByGroup` mock implementation to correctly filter by group and draft status
+    - Improved `set-drafts.ts` script with better error handling and testability
+    - Fixed OG templates test by properly mocking the AuthorService
+    - Enhanced test coverage and reliability
+    - Improved TypeScript type safety in test files
+
 ### ESLint Fixes and Breadcrumbs Translation
 - **Bug Fix**
   - Fixed breadcrumb item labels not being translated properly in non-English languages

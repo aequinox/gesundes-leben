@@ -1,6 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import path from 'path';
 
+// Import modules first so we can spy on them
+import * as setDrafts from '../set-drafts';
+import { contentFileService } from '@/services/content/ContentFileService';
+
 // Mock dependencies
 vi.mock('@/services/content/ContentFileService', () => ({
   contentFileService: {
@@ -19,12 +23,7 @@ vi.mock('path', () => ({
   join: vi.fn((...args) => args.join('/')),
 }));
 
-// Import after mocks
-import * as setDrafts from '../set-drafts';
-import { contentFileService } from '@/services/content/ContentFileService';
-
 describe('set-drafts', () => {
-  const { updateFrontmatter, main } = setDrafts;
   beforeEach(() => {
     vi.clearAllMocks();
     // Restore console methods if they were mocked
@@ -41,8 +40,9 @@ describe('set-drafts', () => {
       vi.mocked(contentFileService.updateFrontmatter).mockResolvedValue(true);
       vi.mocked(contentFileService.getContentDir).mockReturnValue('test/content');
 
-      await updateFrontmatter('test/content/relative/path/file.md');
+      const result = await setDrafts.updateFrontmatter('test/content/relative/path/file.md');
 
+      expect(result).toBe(true);
       expect(contentFileService.updateFrontmatter).toHaveBeenCalledWith(
         'test/content/relative/path/file.md',
         expect.any(Function)
@@ -56,8 +56,9 @@ describe('set-drafts', () => {
       vi.mocked(contentFileService.updateFrontmatter).mockResolvedValue(false);
       vi.mocked(contentFileService.getContentDir).mockReturnValue('test/content');
 
-      await updateFrontmatter('test/content/relative/path/file.md');
+      const result = await setDrafts.updateFrontmatter('test/content/relative/path/file.md');
 
+      expect(result).toBe(false);
       expect(contentFileService.updateFrontmatter).toHaveBeenCalledWith(
         'test/content/relative/path/file.md',
         expect.any(Function)
@@ -71,8 +72,9 @@ describe('set-drafts', () => {
       vi.mocked(contentFileService.updateFrontmatter).mockRejectedValue(new Error('Test error'));
       vi.mocked(contentFileService.getContentDir).mockReturnValue('test/content');
 
-      await updateFrontmatter('test/content/file.md');
+      const result = await setDrafts.updateFrontmatter('test/content/file.md');
 
+      expect(result).toBe(false);
       expect(console.error).toHaveBeenCalledWith(
         expect.stringContaining('✗ Error processing'),
         expect.any(Error)
@@ -82,18 +84,32 @@ describe('set-drafts', () => {
 
   describe('main', () => {
     it('should process all markdown files', async () => {
+      // Create mock files
       const mockFiles = [
         'test/content/file1.md',
         'test/content/file2.mdx',
       ];
 
+      // Mock the findMarkdownFiles function to return our mock files
       vi.mocked(contentFileService.findMarkdownFiles).mockResolvedValue(mockFiles);
+      
+      // Mock updateFrontmatter to return true (indicating files were updated)
       vi.mocked(contentFileService.updateFrontmatter).mockResolvedValue(true);
 
-      await main();
+      // Create a spy on the updateFrontmatter function
+      const updateFrontmatterSpy = vi.spyOn(setDrafts, 'updateFrontmatter');
+      updateFrontmatterSpy.mockResolvedValue(true);
 
+      // Run the main function
+      await setDrafts.main();
+
+      // Verify findMarkdownFiles was called with the content directory
       expect(contentFileService.findMarkdownFiles).toHaveBeenCalledWith('test/content');
-      expect(contentFileService.updateFrontmatter).toHaveBeenCalledTimes(2);
+      
+      // Verify updateFrontmatter was called for each file
+      expect(updateFrontmatterSpy).toHaveBeenCalledTimes(2);
+      expect(updateFrontmatterSpy).toHaveBeenCalledWith('test/content/file1.md', contentFileService);
+      expect(updateFrontmatterSpy).toHaveBeenCalledWith('test/content/file2.mdx', contentFileService);
       expect(console.log).toHaveBeenCalledWith(expect.stringContaining('Found 2 markdown files'));
     });
 
@@ -103,7 +119,7 @@ describe('set-drafts', () => {
       // Mock process.exit to prevent test from exiting
       const mockExit = vi.spyOn(process, 'exit').mockImplementation((() => {}) as any);
 
-      await main();
+      await setDrafts.main();
 
       expect(console.error).toHaveBeenCalledWith(
         expect.stringContaining('Fatal error:'),
