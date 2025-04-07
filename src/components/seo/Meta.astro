@@ -1,0 +1,29 @@
+---
+export interface Props {
+  title?: string;
+  description?: string;
+  keywords?: string[];
+  icon?: string;
+  themeColor?: string;
+  colorScheme?: string;
+  robots?: string;
+}
+
+const { title, description, keywords, icon, themeColor, colorScheme, robots } =
+  Astro.props;
+---
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+{title && <title>{title}</title>}
+{title && <meta name="title" content={title} />}
+{description && <meta name="description" content={description} />}
+{
+  keywords && keywords.length > 0 && (
+    <meta name="keywords" content={keywords.join(", ")} />
+  )
+}
+{icon && <link rel="icon" type="image/svg+xml" href={icon} />}
+{themeColor && <meta name="theme-color" content={themeColor} />}
+{colorScheme && <meta name="color-scheme" content={colorScheme} />}
+{robots && <meta name="robots" content={robots} />}

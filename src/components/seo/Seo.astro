@@ -1,0 +1,63 @@
+---
+import Facebook from "./Facebook.astro";
+import Meta from "./Meta.astro";
+import Twitter from "./Twitter.astro";
+
+export interface Props {
+  title?: string;
+  description?: string;
+  keywords?: string[];
+  icon?: string;
+  themeColor?: string;
+  colorScheme?: string;
+  robots?: string;
+  facebook?: {
+    image?: string;
+    url?: string;
+    type?: string;
+  };
+  twitter?: {
+    image?: string;
+    site?: string;
+    card?: string;
+  };
+}
+
+const {
+  title,
+  description,
+  keywords,
+  icon,
+  themeColor,
+  colorScheme,
+  facebook,
+  twitter,
+  robots,
+} = Astro.props;
+---
+
+<Fragment>
+  <Meta
+    title={title}
+    description={description}
+    keywords={keywords}
+    icon={icon}
+    themeColor={themeColor}
+    colorScheme={colorScheme}
+    robots={robots}
+  />
+  <Facebook
+    title={title}
+    description={description}
+    image={facebook?.image}
+    url={facebook?.url}
+    type={facebook?.type}
+  />
+  <Twitter
+    title={title}
+    description={description}
+    image={twitter?.image}
+    site={twitter?.site}
+    card={twitter?.card}
+  />
+</Fragment>

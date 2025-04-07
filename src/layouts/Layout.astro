@@ -3,6 +3,7 @@ import "@/styles/base.css";
 import { ClientRouter } from "astro:transitions";
 import SizeIndicator from "@/components/SizeIndicator.astro";
 import { SITE, LOCALE } from "@/config";
+import Seo from "@/components/seo/Seo.astro";
 
 const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
 
@@ -61,24 +62,26 @@ const structuredData = {
     {/* Theme initialization script - must be first for immediate execution */}
     <script is:inline src="/theme-init.js"></script>
 
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <Seo
+      title={title}
+      description={description}
+      icon="/favicon.svg"
+      facebook={{
+        image: socialImageURL,
+        url: canonicalURL,
+        type: pubDatetime ? "article" : "website",
+      }}
+      twitter={{
+        image: socialImageURL,
+        card: "summary_large_image",
+        site: SITE.website,
+      }}
+    />
+
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
-
-    <!-- General Meta Tags -->
-    <title>{title}</title>
-    <meta name="title" content={title} />
-    <meta name="description" content={description} />
     <meta name="author" content={author} />
     <link rel="sitemap" href="/sitemap-index.xml" />
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonicalURL} />
-    <meta property="og:image" content={socialImageURL} />
 
     <!-- Article Published/Modified time -->
     {
@@ -97,13 +100,6 @@ const structuredData = {
         />
       )
     }
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={canonicalURL} />
-    <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={socialImageURL} />
 
     <!-- Google JSON-LD Structured data -->
     <script
