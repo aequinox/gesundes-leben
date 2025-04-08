@@ -8,8 +8,11 @@ All notable changes to this project will be documented in this file.
 - **Code Refactoring & Bug Fix**
   - Implemented a centralized slug generation system based on post titles:
     - Added `getPostSlug` method to SlugService to provide a single source of truth for post slugs
+    - Ensured date prefixes (YYYY-MM-DD-) are automatically removed from titles when generating slugs
     - Updated all routes and OG image generation to use the centralized slug method
-    - Fixed 404 errors for OG images by ensuring consistent slug generation
+    - Fixed Card component to use consistent slug generation for post URLs
+    - Updated PostUtils.postExists to use centralized slug generation
+    - Fixed 404 errors for OG images and post links by ensuring consistent slug generation
     - Created migration script to handle transition from explicit slugs to title-based slugs
     - Added redirect system for backward compatibility with old URLs
     - Improved developer experience by removing the need to manually specify slugs in frontmatter

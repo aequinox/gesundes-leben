@@ -174,7 +174,7 @@ export class PostUtils {
       const posts = await PostUtils.getAllPosts();
       const normalizedTag = tag.toLowerCase();
       return posts.filter(post =>
-        post.data.tags.some(t => t.toLowerCase() === normalizedTag)
+        post.data.tags.some((t: string) => t.toLowerCase() === normalizedTag)
       );
     } catch (error) {
       throw new PostError(`Failed to fetch posts for tag: ${tag}`, error);
@@ -296,7 +296,9 @@ export class PostUtils {
   public static async postExists(slug: string): Promise<boolean> {
     try {
       const posts = await PostUtils.getAllPosts();
-      return posts.some(post => post.slug === slug);
+      // Import slugService dynamically to avoid circular dependencies
+      const { slugService } = await import("@/services/format/SlugService");
+      return posts.some(post => slugService.getPostSlug(post) === slug);
     } catch {
       return false;
     }

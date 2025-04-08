@@ -93,13 +93,18 @@ export class SlugService implements ISlugService {
    * Get the canonical slug for a blog post
    * This becomes the single source of truth for post slugs
    * @param post The blog post entry
-   * @returns A consistent slug derived from the post title
+   * @returns A consistent slug derived from the post title, without date prefix
    */
   getPostSlug(post: any): string {
     if (!post || !post.data || !post.data.title) {
       throw new Error("Invalid post object or missing title");
     }
-    return this.slugifyStr(post.data.title);
+
+    // Get the title and remove any date prefix (YYYY-MM-DD-)
+    const title = post.data.title;
+    const titleWithoutDate = title.replace(/^\d{4}-\d{2}-\d{2}-\s*/, "");
+
+    return this.slugifyStr(titleWithoutDate);
   }
 
   /**

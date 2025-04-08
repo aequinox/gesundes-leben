@@ -42,12 +42,11 @@ interface GroupConfig {
 const { post, withHeroImage = true, loading = "eager" }: Props = Astro.props;
 
 const {
-  slug,
   data: { title, heroImage, description, categories, group: groupProp },
 } = post;
 
-// Generate the post URL
-const href = `/posts/${slug}/`;
+// Generate the post URL using the centralized slug service
+const href = `/posts/${slugService.getPostSlug(post)}/`;
 
 // Map group types to their configurations
 const groupConfigs: Record<string, GroupConfig> = {
@@ -98,7 +97,7 @@ const readMoreClasses = [
   class={cardClasses}
   data-categories={categories?.join("|")}
   data-group={groupConfig.type}
-  aria-labelledby={`post-title-${slug}`}
+  aria-labelledby={`post-title-${slugService.getPostSlug(post)}`}
 >
   <header class="w-full group-hover:opacity-80">
     {
@@ -147,7 +146,7 @@ const readMoreClasses = [
 
         <a href={href} aria-label={`Read more about ${title}`}>
           <h2
-            id={`post-title-${slug}`}
+            id={`post-title-${slugService.getPostSlug(post)}`}
             class={titleClasses}
             transition:name={slugService.slugifyStr(title)}
           >

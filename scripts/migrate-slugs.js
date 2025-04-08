@@ -31,6 +31,13 @@ function slugifyStr(str) {
   });
 }
 
+// Function to get post slug without date prefix
+function getPostSlug(title) {
+  // Remove any date prefix (YYYY-MM-DD-)
+  const titleWithoutDate = title.replace(/^\d{4}-\d{2}-\d{2}-\s*/, "");
+  return slugifyStr(titleWithoutDate);
+}
+
 // Function to recursively get all files in a directory
 async function getFiles(dir) {
   const dirents = await readdir(dir, { withFileTypes: true });
@@ -93,7 +100,7 @@ async function main() {
     }
     
     const oldSlug = frontmatter.slug;
-    const newSlug = slugifyStr(frontmatter.title);
+    const newSlug = getPostSlug(frontmatter.title);
     
     if (oldSlug && oldSlug !== newSlug) {
       slugMap[oldSlug] = newSlug;
