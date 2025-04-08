@@ -9,6 +9,13 @@ vi.mock("astro:content", () => ({
   getCollection: vi.fn(),
 }));
 
+// Mock SlugService
+vi.mock("@/services/format/SlugService", () => ({
+  slugService: {
+    getPostSlug: vi.fn(post => post.slug),
+  },
+}));
+
 describe("PostUtils", () => {
   // Sample test data
   const mockPostData: Blog["data"] = {
