@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### OG Template SVG Icon Fix
+- **Bug Fix**
+  - Fixed SVG icon display in Open Graph templates to show only the appropriate icon:
+    - Implemented conditional rendering based on post type (PRO, KONTRA, FRAGEZEITEN)
+    - Replaced multiple SVG icons with conditional logic to display only the relevant icon
+    - Enhanced code readability with clear comments
+    - Improved visual consistency in social media previews
+
 ### Test Fixes
 - **Bug Fix**
   - Fixed failing tests in multiple modules:

@@ -5,8 +5,8 @@ import { slugService } from "@/services/format/SlugService";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog").then(
-    (p: CollectionEntry<"blog">[]) =>
-      p.filter(({ data }) => !data.draft && !data.ogImage)
+    (post: CollectionEntry<"blog">[]) =>
+      post.filter(({ data }) => !data.draft && !data.ogImage)
   );
 
   return posts.map((post: CollectionEntry<"blog">) => ({

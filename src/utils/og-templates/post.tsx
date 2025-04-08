@@ -152,7 +152,7 @@ export default async (post: CollectionEntry<"blog">) => {
           width: "88%",
           height: "76%",
           overflow: "hidden",
-          zIndex: 10, // zIndex should be unitless
+          zIndex: 10,
         }}
       >
         {/* Top section with post type indicator */}
@@ -164,68 +164,6 @@ export default async (post: CollectionEntry<"blog">) => {
             marginBottom: "24px",
           }}
         >
-          {/* Left side accent bar */}
-          <div
-            style={{
-              width: "80px",
-              height: "6px",
-              background: typeColorSet.primary,
-              borderRadius: "3px",
-            }}
-          />
-
-          {/* Post type badge - with icon and text */}
-          {postType && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                background: typeColorSet.primary,
-                color: typeColorSet.text,
-                padding: "8px 16px",
-                borderRadius: "20px",
-                fontSize: 16,
-                fontWeight: "bold",
-                boxShadow: `0 2px 8px ${COLORS.light.shadow}`,
-              }}
-            >
-              {/* Circle icon */}
-              <div
-                style={{
-                  width: "12px",
-                  height: "12px",
-                  borderRadius: "50%",
-                  background: "#ffffff",
-                  marginRight: "8px",
-                }}
-              />
-              {/* Use hardcoded text based on color to ensure rendering */}
-              {displayText}
-            </div>
-          )}
-        </div>
-
-        {/* Title section */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "28px",
-            marginBottom: "auto",
-          }}
-        >
-          <h1
-            style={{
-              fontSize: 68,
-              fontWeight: "bold",
-              color: COLORS.light.text,
-              lineHeight: 1.15,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            {post.data.title}
-          </h1>
-
           {/* Categories/tags with enhanced styling */}
           {categories.length > 0 && (
             <div
@@ -253,6 +191,154 @@ export default async (post: CollectionEntry<"blog">) => {
               ))}
             </div>
           )}
+
+          {/* Left side accent bar */}
+          {/* <div
+            style={{
+              width: "80px",
+              height: "6px",
+              background: typeColorSet.primary,
+              borderRadius: "3px",
+            }}
+          /> */}
+
+          {/* Post type badge - with icon and text */}
+          {postType && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                background: typeColorSet.primary,
+                color: typeColorSet.text,
+                padding: "8px 16px",
+                borderRadius: "20px",
+                fontSize: 16,
+                fontWeight: "bold",
+                boxShadow: `0 2px 8px ${COLORS.light.shadow}`,
+              }}
+            >
+              {/* Circle icon */}
+              {/* <div
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  borderRadius: "50%",
+                  background: "#ffffff",
+                  marginRight: "8px",
+                }}
+              /> */}
+              {/* Use hardcoded text based on color to ensure rendering */}
+              {displayText}
+
+              {/* Conditionally render the appropriate SVG based on displayText */}
+              <span style={{ marginLeft: "8px" }}>
+                {displayText === "KONTRA" && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    className="icon icon-tabler icons-tabler-outline icon-tabler-thumb-down"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M7 11v8a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-7a1 1 0 0 1 1 -1h3a4 4 0 0 0 4 -4v-1a2 2 0 0 1 4 0v5h3a2 2 0 0 1 2 2l-1 5a2 3 0 0 1 -2 2h-7a3 3 0 0 1 -3 -3" />
+                  </svg>
+                )}
+
+                {displayText === "PRO" && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    className="icon icon-tabler icons-tabler-outline icon-tabler-thumb-up"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M7 11v8a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-7a1 1 0 0 1 1 -1h3a4 4 0 0 0 4 -4v-1a2 2 0 0 1 4 0v5h3a2 2 0 0 1 2 2l-1 5a2 3 0 0 1 -2 2h-7a3 3 0 0 1 -3 -3" />
+                  </svg>
+                )}
+
+                {displayText === "FRAGEZEITEN" && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    className="icon icon-tabler icons-tabler-outline icon-tabler-question-mark"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M8 8a3.5 3 0 0 1 3.5 -3h1a3.5 3 0 0 1 3.5 3a3 3 0 0 1 -2 3a3 4 0 0 0 -2 4" />
+                    <path d="M12 19l0 .01" />
+                  </svg>
+                )}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Title section */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "28px",
+            marginBottom: "auto",
+          }}
+        >
+          <h1
+            style={{
+              fontSize: 68,
+              fontWeight: "bold",
+              color: COLORS.light.text,
+              lineHeight: 1.15,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            {post.data.title}
+          </h1>
+
+          {/* Categories/tags with enhanced styling */}
+          {/* {categories.length > 0 && (
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "10px",
+              }}
+            >
+              {categories.map((category: string, index: number) => (
+                <span
+                  key={`category-${index}`}
+                  style={{
+                    background: typeColorSet.secondary,
+                    color: typeColorSet.primary,
+                    padding: "6px 14px",
+                    borderRadius: "8px",
+                    fontSize: 16,
+                    fontWeight: "medium",
+                    boxShadow: `0 2px 4px ${COLORS.light.shadow}`,
+                  }}
+                >
+                  {category}
+                </span>
+              ))}
+            </div>
+          )} */}
         </div>
 
         {/* Footer with enhanced styling */}
@@ -325,14 +411,14 @@ export default async (post: CollectionEntry<"blog">) => {
             </span>
 
             {/* Small decorative element */}
-            <div
+            {/* <div
               style={{
                 width: "8px",
                 height: "8px",
                 borderRadius: "50%",
                 background: typeColorSet.primary,
               }}
-            />
+            /> */}
           </div>
         </div>
       </div>
