@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Slug System Redesign
+- **Code Refactoring & Bug Fix**
+  - Implemented a centralized slug generation system based on post titles:
+    - Added `getPostSlug` method to SlugService to provide a single source of truth for post slugs
+    - Updated all routes and OG image generation to use the centralized slug method
+    - Fixed 404 errors for OG images by ensuring consistent slug generation
+    - Created migration script to handle transition from explicit slugs to title-based slugs
+    - Added redirect system for backward compatibility with old URLs
+    - Improved developer experience by removing the need to manually specify slugs in frontmatter
+    - Enhanced maintainability with consistent slug generation across the application
+
 ### OG Template SVG Icon Fix
 - **Bug Fix**
   - Fixed SVG icon display in Open Graph templates to show only the appropriate icon:

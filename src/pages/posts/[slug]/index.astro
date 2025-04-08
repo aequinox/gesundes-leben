@@ -4,6 +4,7 @@ import Posts from "@/layouts/Posts.astro";
 import PostDetails from "@/layouts/PostDetails.astro";
 import { postService } from "@/services/content/PostService";
 import { paginationService } from "@/services/content/PaginationService";
+import { slugService } from "@/services/format/SlugService";
 import type { Pagination } from "@/types/pagination";
 import { PostUtils } from "@/utils/content/posts";
 
@@ -25,7 +26,7 @@ export async function getStaticPaths() {
   );
 
   const postResult = postsWithRT.map((post: CollectionEntry<"blog">) => ({
-    params: { slug: post.slug },
+    params: { slug: slugService.getPostSlug(post) },
     props: { post },
   }));
 

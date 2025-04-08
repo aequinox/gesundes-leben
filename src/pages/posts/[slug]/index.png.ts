@@ -10,7 +10,7 @@ export async function getStaticPaths() {
   );
 
   return posts.map((post: CollectionEntry<"blog">) => ({
-    params: { slug: slugService.slugifyStr(post.data.title) },
+    params: { slug: slugService.getPostSlug(post) },
     props: post,
   }));
 }

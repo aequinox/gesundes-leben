@@ -90,6 +90,19 @@ export class SlugService implements ISlugService {
   constructor(private config: IConfigService = configService) {}
 
   /**
+   * Get the canonical slug for a blog post
+   * This becomes the single source of truth for post slugs
+   * @param post The blog post entry
+   * @returns A consistent slug derived from the post title
+   */
+  getPostSlug(post: any): string {
+    if (!post || !post.data || !post.data.title) {
+      throw new Error("Invalid post object or missing title");
+    }
+    return this.slugifyStr(post.data.title);
+  }
+
+  /**
    * Convert a string to a URL-friendly slug
    */
   slugifyStr(str: string, options: Partial<SlugifyOptions> = {}): string {
