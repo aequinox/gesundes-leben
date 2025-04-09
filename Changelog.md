@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### About Page Implementation
+- **New Feature**
+  - Added comprehensive "About Us" page based on the original website content:
+    - Created responsive layout with clear sections for mission, team information, and values
+    - Implemented hero section with gradient background
+    - Added sections for "What We Want", "Who We Are", "Who We Are Not", "Personal", and "Professional"
+    - Created founder cards with actual portrait images from the original website
+    - Implemented responsive design for all screen sizes
+    - Added proper dark mode support with theme-aware styling
+    - Ensured accessibility with semantic HTML structure
+    - Integrated with existing navigation system
+    - Aligned "Mehr erfahren" buttons at the same height for better visual consistency
+    - Fixed portrait image display to match the original website with black circular frames, proper size (300x300px), and consistent styling
+
 ### WordPress Exporter TypeScript Conversion and Fixes
 - **Code Refactoring**
   - Converted `scripts/src/wizard.js` to TypeScript with SOLID and DRY principles:
