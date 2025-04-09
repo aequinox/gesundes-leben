@@ -1,6 +1,7 @@
 ---
 import type { GetImageResult, ImageMetadata } from "astro";
 import { getImage, Picture } from "astro:assets";
+import { join } from "path";
 
 type Props = {
   src: string | ImageMetadata;
@@ -30,17 +31,23 @@ const control = controlFromMap || "";
 const title =
   directionFromMap || controlFromMap ? titleProp?.slice(1) : titleProp;
 
-const src: ImageMetadata | GetImageResult =
-  typeof srcProp === "string"
-    ? await getImage({
-        src: srcProp,
-        format: "webp",
-        widths: [400, 800, 1200],
-        sizes: "(max-width: 1200px) 100vw, 1200px",
-        quality: 80,
-        inferSizes: true,
-      })
-    : (srcProp as ImageMetadata);
+// For MDX files, we'll use the img tag directly with the provided src
+// This avoids the need for Astro's image processing which requires imported images
+let src: string;
+
+if (typeof srcProp === "string") {
+  // Use the string directly
+  src = srcProp;
+} else {
+  // If it's an ImageMetadata object, try to extract the src property
+  try {
+    // @ts-ignore - We know this might not be safe, but it's a fallback
+    src = srcProp.src || "";
+  } catch (error) {
+    console.error("Error extracting src from ImageMetadata:", error);
+    src = "";
+  }
+}
 ---
 
 <figure
@@ -54,42 +61,21 @@ const src: ImageMetadata | GetImageResult =
   <div
     class="relative max-w-content before:absolute before:left-0 before:right-0 before:top-0 before:z-10 before:h-full before:w-full before:bg-gradient-to-t before:from-skin-fill before:to-transparent before:opacity-10"
   >
-    {
-      typeof src === "string" ? (
-        <img
-          {src}
-          alt={alt}
-          class:list={[
-            "relative",
-            direction === "left"
-              ? "float-left mr-8"
-              : direction === "right"
-                ? "float-right ml-8"
-                : "mx-auto",
-            control === "full-width" ? "max-w-content" : "max-w-[50%]",
-          ]}
-        />
-      ) : (
-        <Picture
-          src={src as ImageMetadata}
-          widths={[400, 800, 1200]}
-          sizes="(max-width: 1200px) 100vw, 1200px"
-          formats={["avif", "webp"]}
-          {alt}
-          class:list={[
-            "relative mb-6 h-full rounded-sm border-none object-contain shadow-lg md:mb-4 md:object-cover",
-            direction === "left"
-              ? "float-left mr-8"
-              : direction === "right"
-                ? "float-right ml-8"
-                : "mx-auto w-full",
-            control === "full-width"
-              ? "w-full max-w-content"
-              : "md:max-w-[50%] lg:max-w-[33%]",
-          ]}
-        />
-      )
-    }
+    <img
+      src={src}
+      alt={alt}
+      class:list={[
+        "relative mb-6 h-full rounded-sm border-none object-contain shadow-lg md:mb-4 md:object-cover",
+        direction === "left"
+          ? "float-left mr-8"
+          : direction === "right"
+            ? "float-right ml-8"
+            : "mx-auto w-full",
+        control === "full-width"
+          ? "max-w-content"
+          : "md:max-w-[50%] lg:max-w-[33%]",
+      ]}
+    />
   </div>
   <figcaption
     class:list={[

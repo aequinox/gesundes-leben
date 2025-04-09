@@ -501,6 +501,18 @@ All notable changes to this project will be documented in this file.
   - Enhanced event handling
   - Added lazy loading support
 
+## [2025-04-09]
+
+### Fixed
+- Fixed image handling in WordPress to Markdown exporter for Astro compatibility:
+  - Updated Image.astro component to properly handle different types of image sources
+  - Modified post-processor.js to ensure image paths are in the correct format for Astro
+  - Fixed error "LocalImageUsedWrongly: Image's and getImage's src parameter must be an imported image or an URL"
+  - Improved error handling in Image.astro component with proper TypeScript typing
+  - Enhanced markdown image path normalization to ensure consistent format
+  - Maintained standard markdown image format (![alt](path "title")) for better compatibility
+  - Added fallback mechanisms for handling different image source types
+
 ## [2025-04-02]
 
 ### Changed

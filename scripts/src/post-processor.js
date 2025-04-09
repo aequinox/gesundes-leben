@@ -60,11 +60,9 @@ async function processMarkdownFile(filePath) {
         logger.info(`Normalized heroImage in ${filePath}: ${filename} -> ${baseFilename}`);
       }
       
-      // Add ./images/ prefix if not already present
-      const imagePath = `./images/${normalizedFilename}`;
-      
+      // For Astro compatibility, use a URL format
       frontmatter.heroImage = {
-        src: imagePath,
+        src: `images/${normalizedFilename}`,
         alt: frontmatter.title || "Featured Image"
       };
       modified = true;
@@ -79,19 +77,16 @@ async function processMarkdownFile(filePath) {
       
       // Check if this is a resized version and normalize if needed
       const baseFilename = shared.getBaseFilenameIfResized(filename);
+      const normalizedFilename = baseFilename || filename;
       
-      // If it was a resized version, update the src
+      // If it was a resized version, log the change
       if (baseFilename) {
-        frontmatter.heroImage.src = src.replace(filename, baseFilename);
         logger.info(`Normalized heroImage.src in ${filePath}: ${filename} -> ${baseFilename}`);
-        modified = true;
       }
       
-      // Add ./images/ prefix if not already present
-      if (!frontmatter.heroImage.src.startsWith('./images/')) {
-        frontmatter.heroImage.src = `./images/${frontmatter.heroImage.src.split('/').pop()}`;
-        modified = true;
-      }
+      // For Astro compatibility, use a URL format
+      frontmatter.heroImage.src = `images/${normalizedFilename}`;
+      modified = true;
     }
     
     // Fix group if it's an array
@@ -148,6 +143,22 @@ async function processMarkdownFile(filePath) {
         
         // If not a resized image, return the original match
         return match;
+      }
+    );
+    
+    // Ensure all image paths use the correct format
+    markdownContent = markdownContent.replace(
+      /!\[([^\]]*)\]\((?!images\/|https?:\/\/)([^)]+\.(?:gif|jpe?g|png|webp))(?:\s+"([^"]*)")?\)/g,
+      (match, alt, src, title) => {
+        // Add images/ prefix if not already present
+        const normalizedSrc = `images/${src}`;
+        
+        // Reconstruct the markdown image reference
+        if (title) {
+          return `![${alt}](${normalizedSrc} "${title}")`;
+        } else {
+          return `![${alt}](${normalizedSrc})`;
+        }
       }
     );
     
