@@ -8,6 +8,7 @@
     "start": "astro dev",
     "build": "astro check && astro build",
     "postbuild": "pagefind --site dist  --output-subdir index --exclude-selectors 'details, #toc, #inhaltsverzeichnis'",
+    "deploy": "git checkout --orphan gh-pages && git --work-tree dist add --all && git --work-tree dist commit -m 'Deploy' && git push github gh-pages --force && git checkout -f main && git branch -D gh-pages",
     "preview": "astro preview",
     "sync": "astro sync",
     "astro": "astro",
