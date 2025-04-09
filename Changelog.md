@@ -4,6 +4,40 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### WordPress Exporter TypeScript Conversion and Fixes
+- **Code Refactoring**
+  - Converted `scripts/src/wizard.js` to TypeScript with SOLID and DRY principles:
+    - Created a service-oriented architecture with clear separation of concerns
+    - Implemented dependency injection for better testability and maintainability
+    - Added proper TypeScript interfaces and type safety
+    - Created specialized services for validation, coercion, and configuration
+    - Applied Single Responsibility Principle with focused service classes
+    - Enhanced error handling with proper TypeScript error types
+    - Improved code organization and readability
+    - Added comprehensive JSDoc documentation
+    - Maintained backward compatibility with the original API
+  - Fixed `scripts/wordpress-to-markdown-exporter.ts` to work with the TypeScript wizard:
+    - Updated imports to use the proper types
+    - Fixed type compatibility issues between modules
+    - Added type assertions where needed for cross-module compatibility
+    - Ensured proper error handling with TypeScript error types
+  - Enhanced date formatting in WordPress exporter:
+    - Fixed date parsing to properly handle RFC2822 format dates from WordPress exports
+    - Added support for multiple date formats with graceful fallbacks
+    - Improved error messages for date parsing failures
+    - Enhanced robustness of date handling in frontmatter generation
+  - Fixed image directory structure in WordPress exporter:
+    - Updated image storage to place images in each post's directory instead of a common directory
+    - Improved image organization for better content management
+    - Enhanced compatibility with Astro's image handling
+    - Ensured proper relative paths for images in markdown content
+  - Added support for WordPress Kadence image blocks:
+    - Fixed conversion of Kadence image blocks to proper Markdown format
+    - Added specific rule for handling wp-block-kadence-image figures
+    - Improved image alt text preservation
+    - Enhanced compatibility with WordPress block editor content
+    - Fixed image filename format to use correct size suffix (e.g., -1024x984.png)
+
 ### Slug System Redesign
 - **Code Refactoring & Bug Fix**
   - Implemented a centralized slug generation system based on post titles:
