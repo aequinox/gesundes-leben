@@ -512,6 +512,7 @@ All notable changes to this project will be documented in this file.
   - Enhanced markdown image path normalization to ensure consistent format
   - Maintained standard markdown image format (![alt](path "title")) for better compatibility
   - Added fallback mechanisms for handling different image source types
+  - Updated internal links in markdown content to use the new domain (gesundes-leben.vision)
 
 ## [2025-04-02]
 
