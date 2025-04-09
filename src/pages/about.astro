@@ -11,7 +11,7 @@ import Header from "@/components/sections/Header.astro";
 import Footer from "@/components/sections/Footer.astro";
 import { SITE } from "@/config";
 import Hr from "@/components/elements/Hr.astro";
-import Image from "@/components/elements/Image.astro";
+import VisionImage from "@/components/elements/VisionImage.astro";
 
 // Import founder images
 import imageSandra from "@/assets/images/about/Portrait-Sandra-1.1-GIT-round-1-300x300.png";
@@ -35,175 +35,227 @@ const pageDescription =
 
     <Hr />
 
-    <section id="mission" class="content-section">
-      <h2>Was wir wollen</h2>
-      <div class="content-wrapper">
-        <div class="text-content">
-          <p>
-            Wir haben es uns zur Aufgabe gemacht, unsere Motivation und
-            Begeisterung für ein gesundes Leben weiterzugeben, und unsere
-            Erfahrungen sowie alternativ-medizinisches und naturheilkundliches
-            Wissen zu teilen.
-          </p>
-          <p>
-            Dabei geht es nicht um zähneknirschenden Verzicht und
-            Selbstkasteiung. Im Gegenteil – wir möchten vermitteln, dass ein
-            gesundes Leben Spaß macht, und dir einen großen persönlichen Gewinn
-            bringen kann. Sei es im Lebensgefühl, Körpergefühl, der
-            Lebensqualität, durch die Linderung, Heilung oder auch die
-            Prävention von Krankheiten.
-          </p>
-          <p>
-            Wir möchten Wissen teilen und Handlungsspielräume anbieten, damit du
-            dein eigenes Maß und deinen eigenen Weg findest. <strong
-              >#weilduwertvollbist</strong
-            >
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <Hr />
-
-    <section id="who-we-are" class="content-section">
-      <h2>Wer wir sind</h2>
-      <div class="content-wrapper">
-        <div class="text-content">
-          <p>
-            Wir sind ein Ehepaar und arbeiten im tagtäglichen Leben als
-            Heilpraktiker, bzw. Heilpraktikerin und systemische Therapeutin,
-            d.h. als Therapeuten. So begleiten wir Patienten auf Ihrem
-            individuellen Weg.
-          </p>
-          <p>
-            Den Blog betreiben wir als Privatpersonen, mit viel Begeisterung für
-            unsere Gesundheit, und der Überzeugung, dass alles, was man teilt,
-            uns alle reicher werden lässt.
-          </p>
-          <p>
-            Teile auch du – diesen Blog, einzelne Artikel, deine Rückmeldung.
-            Wir freuen uns darauf!
-          </p>
-          <p>
-            Hass-Kommentare und destruktive Beiträge jedoch werden wir löschen
-            und nicht beantworten, denn wir betreiben Psychohygiene und führen
-            ein positives Leben, zu dem so eine Einstellung nicht passt. Und zu
-            unseren Lesern passt es auch nicht. <strong
-              >#weilduwertvollbist</strong
-            >
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <Hr />
-
-    <section id="who-we-are-not" class="content-section">
-      <h2>Wer wir nicht sind</h2>
-      <div class="content-wrapper">
-        <div class="text-content">
-          <p>
-            Heiler, Retter, Esoteriker, Medizin-Gegner, Übermenschen oder
-            Alleswisser. Wir haben keine Wunderwaffe gegen Krebs, keine
-            Allheilmittel und nicht auf alles eine Antwort.
-          </p>
-          <p>
-            Wir bemühen uns nach bestem Wissen und Gewissen, das zu vermitteln,
-            was nachgewiesene Wirksamkeit aufweist, wissenschaftlich bestätigt
-            ist, sich in der Praxis bewährt hat, und von dem wir nach Anwendung
-            überzeugt sind. Und wir lernen laufend dazu. <strong
-              >#weilduwertvollbist</strong
-            >
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <Hr />
-
-    <section id="personal" class="content-section">
-      <h2>Persönliches</h2>
-      <div class="content-wrapper founders-section">
-        <div class="founder-card">
-          <div class="founder-avatar">
-            <Image src={imageSandra} alt="Portrait von Sandra Pfeiffer" />
-          </div>
-          <div class="founder-info">
-            <h3>Sandra Pfeiffer</h3>
-            <p class="founder-title">GRÜNDERIN, REDAKTEURIN UND AUTORIN</p>
-            <p class="founder-description">
-              Loslacherin in unpassenden Momenten; Fettnäpfchen-Treterin; sehr
-              herzlich und offen; liebt zu reisen und im Leben unterwegs zu
-              sein; kann nicht stillsitzen und liebt Bewegung; gräbt ihre Hände
-              in Erde, wenn sie wütend ist; trällert meistens ein Liedchen.
-              Darüber hinaus viel Liebe für Menschen, Kreativsein und das
-              Schreiben.
-            </p>
-          </div>
-        </div>
-
-        <div class="founder-card">
-          <div class="founder-avatar">
-            <Image src={imageKai} alt="Portrait von Kai Renner" />
-          </div>
-          <div class="founder-info">
-            <h3>Kai Renner</h3>
-            <p class="founder-title">GRÜNDER, IT-MANAGER UND AUTOR</p>
-            <p class="founder-description">
-              Homöopath aus Leidenschaft; stoischer Stillsitzer und ewig
-              Studierender; bringt Sandra dazu, über sich selbst zu lachen; gibt
-              alles für andere; sehr kreativ, aber das nächste Mal schneller;
-              Katzen und Hunde Betörer; Brandung. Darüber hinaus ein kluger Kopf
-              mit riesigem Gedächtnis und ein großzügiger Teiler seines Wissens.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <Hr />
-
-    <section id="professional" class="content-section">
-      <h2>Professionelles</h2>
-      <div class="content-wrapper founders-section">
-        <div class="founder-card">
-          <div class="founder-info">
-            <h3>HEILPRAKTIKERIN, SYSTEMISCHE THERAPEUTIN</h3>
-            <div class="content-button-wrapper">
-              <p class="founder-description">
-                Ursprünglich im Business als Marketing Kommunikations-Managerin
-                erfolgreich wollte Sandra näher ans echte Leben und an Menschen
-                rücken. Seit 2012 arbeitet sie als Heilpraktikerin mit den
-                Schwerpunkten manuelle Therapie und Schmerztherapie.
-                Psychotherapeutisch arbeitet sie als Systemische
-                Therapeutin(SG), Mediatorin und Trauma Therapeutin (PITT).
+    <div class="about-grid">
+      <section id="mission" class="content-section">
+        <div class="grid-card">
+          <div class="card-content">
+            <h2>Was wir wollen</h2>
+            <div class="text-content">
+              <p>
+                Wir haben es uns zur Aufgabe gemacht, unsere Motivation und
+                Begeisterung für ein gesundes Leben weiterzugeben, und unsere
+                Erfahrungen sowie alternativ-medizinisches und
+                naturheilkundliches Wissen zu teilen.
               </p>
-              <div class="button-container">
-                <a href="#" class="more-link">Mehr erfahren</a>
+              <p>
+                Dabei geht es nicht um zähneknirschenden Verzicht und
+                Selbstkasteiung. Im Gegenteil – wir möchten vermitteln, dass ein
+                gesundes Leben Spaß macht, und dir einen großen persönlichen
+                Gewinn bringen kann. Sei es im Lebensgefühl, Körpergefühl, der
+                Lebensqualität, durch die Linderung, Heilung oder auch die
+                Prävention von Krankheiten.
+              </p>
+              <p>
+                Wir möchten Wissen teilen und Handlungsspielräume anbieten,
+                damit du dein eigenes Maß und deinen eigenen Weg findest. <strong
+                  >#weilduwertvollbist</strong
+                >
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="who-we-are" class="content-section">
+        <div class="grid-card">
+          <div class="card-content">
+            <h2>Wer wir sind</h2>
+            <div class="text-content">
+              <p>
+                Wir sind ein Ehepaar und arbeiten im tagtäglichen Leben als
+                Heilpraktiker, bzw. Heilpraktikerin und systemische Therapeutin,
+                d.h. als Therapeuten. So begleiten wir Patienten auf Ihrem
+                individuellen Weg.
+              </p>
+              <p>
+                Den Blog betreiben wir als Privatpersonen, mit viel Begeisterung
+                für unsere Gesundheit, und der Überzeugung, dass alles, was man
+                teilt, uns alle reicher werden lässt.
+              </p>
+              <p>
+                Teile auch du – diesen Blog, einzelne Artikel, deine
+                Rückmeldung. Wir freuen uns darauf!
+              </p>
+              <p>
+                Hass-Kommentare und destruktive Beiträge jedoch werden wir
+                löschen und nicht beantworten, denn wir betreiben Psychohygiene
+                und führen ein positives Leben, zu dem so eine Einstellung nicht
+                passt. Und zu unseren Lesern passt es auch nicht. <strong
+                  >#weilduwertvollbist</strong
+                >
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="who-we-are-not" class="content-section">
+        <div class="grid-card">
+          <div class="card-content">
+            <h2>Wer wir nicht sind</h2>
+            <div class="text-content">
+              <p>
+                Heiler, Retter, Esoteriker, Medizin-Gegner, Übermenschen oder
+                Alleswisser. Wir haben keine Wunderwaffe gegen Krebs, keine
+                Allheilmittel und nicht auf alles eine Antwort.
+              </p>
+              <p>
+                Wir bemühen uns nach bestem Wissen und Gewissen, das zu
+                vermitteln, was nachgewiesene Wirksamkeit aufweist,
+                wissenschaftlich bestätigt ist, sich in der Praxis bewährt hat,
+                und von dem wir nach Anwendung überzeugt sind. Und wir lernen
+                laufend dazu. <strong>#weilduwertvollbist</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="personal" class="content-section">
+        <h2>Persönliches</h2>
+        <div class="founders-grid">
+          <div class="grid-card">
+            <div class="card-content">
+              <div class="founder-header">
+                <div class="founder-avatar">
+                  <VisionImage
+                    src={imageSandra}
+                    alt="Portrait von Sandra Pfeiffer"
+                  />
+                </div>
+                <div>
+                  <h3>Sandra Pfeiffer</h3>
+                  <p class="founder-title">
+                    GRÜNDERIN, REDAKTEURIN UND AUTORIN
+                  </p>
+                </div>
+              </div>
+              <div class="text-content">
+                <p class="founder-description">
+                  Loslacherin in unpassenden Momenten; Fettnäpfchen-Treterin;
+                  sehr herzlich und offen; liebt zu reisen und im Leben
+                  unterwegs zu sein; kann nicht stillsitzen und liebt Bewegung;
+                  gräbt ihre Hände in Erde, wenn sie wütend ist; trällert
+                  meistens ein Liedchen. Darüber hinaus viel Liebe für Menschen,
+                  Kreativsein und das Schreiben.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-card">
+            <div class="card-content">
+              <div class="founder-header">
+                <div class="founder-avatar">
+                  <VisionImage src={imageKai} alt="Portrait von Kai Renner" />
+                </div>
+                <div>
+                  <h3>Kai Renner</h3>
+                  <p class="founder-title">GRÜNDER, IT-MANAGER UND AUTOR</p>
+                </div>
+              </div>
+              <div class="text-content">
+                <p class="founder-description">
+                  Homöopath aus Leidenschaft; stoischer Stillsitzer und ewig
+                  Studierender; bringt Sandra dazu, über sich selbst zu lachen;
+                  gibt alles für andere; sehr kreativ, aber das nächste Mal
+                  schneller; Katzen und Hunde Betörer; Brandung. Darüber hinaus
+                  ein kluger Kopf mit riesigem Gedächtnis und ein großzügiger
+                  Teiler seines Wissens.
+                </p>
               </div>
             </div>
           </div>
         </div>
+      </section>
 
-        <div class="founder-card">
-          <div class="founder-info">
-            <h3>HEILPRAKTIKER, HOMÖOPATH, BIOLOGE</h3>
-            <div class="content-button-wrapper">
-              <p class="founder-description">
-                Ursprünglich Biologe, dann einige Jahre lang Astrologe, hat Kai
-                seine Berufung im Umgang mit seinen Patienten gefunden. Seit
-                2012 arbeitet er als Heilpraktiker mit den Schwerpunkten
-                klassische Homöopathie, Akupunktur, Orthomolekulare Medizin
-                (Mikronährstoffe) und Labor.
-              </p>
-              <div class="button-container">
-                <a href="#" class="more-link">Mehr erfahren</a>
+      <section id="professional" class="content-section">
+        <h2>Professionelles</h2>
+        <div class="founders-grid">
+          <div class="grid-card">
+            <div class="card-content">
+              <h3>HEILPRAKTIKERIN, SYSTEMISCHE THERAPEUTIN</h3>
+              <div class="text-content">
+                <p class="founder-description">
+                  Ursprünglich im Business als Marketing
+                  Kommunikations-Managerin erfolgreich wollte Sandra näher ans
+                  echte Leben und an Menschen rücken. Seit 2012 arbeitet sie als
+                  Heilpraktikerin mit den Schwerpunkten manuelle Therapie und
+                  Schmerztherapie. Psychotherapeutisch arbeitet sie als
+                  Systemische Therapeutin(SG), Mediatorin und Trauma Therapeutin
+                  (PITT).
+                </p>
+                <div class="button-container">
+                  <a href="#" class="more-link">
+                    <span>Mehr erfahren</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="ml-2 h-5 w-5"
+                    >
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-card">
+            <div class="card-content">
+              <h3>HEILPRAKTIKER, HOMÖOPATH, BIOLOGE</h3>
+              <div class="text-content">
+                <p class="founder-description">
+                  Ursprünglich Biologe, dann einige Jahre lang Astrologe, hat
+                  Kai seine Berufung im Umgang mit seinen Patienten gefunden.
+                  Seit 2012 arbeitet er als Heilpraktiker mit den Schwerpunkten
+                  klassische Homöopathie, Akupunktur, Orthomolekulare Medizin
+                  (Mikronährstoffe) und Labor.
+                </p>
+                <div class="button-container">
+                  <a href="#" class="more-link">
+                    <span>Mehr erfahren</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="ml-2 h-5 w-5"
+                    >
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   </main>
 
   <Footer />
@@ -212,7 +264,7 @@ const pageDescription =
 <style>
   /* Hero section styles */
   .hero-section {
-    @apply relative flex min-h-[300px] w-full items-center justify-center overflow-hidden rounded-lg bg-gradient-to-r from-teal-500 to-blue-500 p-8 text-center text-white;
+    @apply relative flex min-h-[300px] w-full items-center justify-center overflow-hidden rounded-lg bg-gradient-to-r from-purple-500 to-blue-600 p-8 text-center text-white;
   }
 
   .hero-content {
@@ -232,54 +284,55 @@ const pageDescription =
     @apply text-xl font-light md:text-2xl;
   }
 
-  /* Content section styles */
-  .content-section {
-    @apply py-12;
+  /* About grid layout */
+  .about-grid {
+    @apply max-w-7xl mx-auto px-4 space-y-16;
   }
 
-  .content-section h2 {
-    @apply mb-8 text-3xl font-bold text-center;
+  /* Grid card styles */
+  .grid-card {
+    @apply bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-xl;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
   }
 
-  .content-wrapper {
-    @apply mx-auto max-w-4xl;
+  .grid-card:hover {
+    @apply shadow-2xl;
+    transform: translateY(-5px);
+  }
+
+  .card-content {
+    @apply p-8 flex flex-col justify-center;
+  }
+
+  .card-content h2 {
+    @apply text-3xl font-bold mb-6 text-left border-l-4 border-skin-accent pl-4;
   }
 
   .text-content {
-    @apply space-y-6 text-lg;
+    @apply space-y-4 text-lg;
   }
 
   .text-content p {
     @apply leading-relaxed;
   }
 
-  /* Founders section styles */
-  .founders-section {
-    @apply grid gap-12 md:grid-cols-2;
+  /* Founders grid styles */
+  .founders-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-8;
   }
 
-  .founder-card {
-    @apply flex flex-col items-center text-center h-full;
+  .founder-header {
+    @apply flex flex-col sm:flex-row items-center gap-6 mb-6;
   }
 
   .founder-avatar {
-    @apply mb-8 w-full h-full mx-auto overflow-hidden;
-  }
-
-  .founder-avatar :global(figure > div) {
-    @apply w-full h-full;
+    @apply w-40 h-40 overflow-hidden rounded-full shadow-lg;
   }
 
   .founder-avatar :global(img) {
-    @apply w-full h-full object-cover rounded-full shadow-lg transition-transform duration-300 hover:scale-105;
-  }
-
-  .avatar-placeholder {
-    @apply flex h-full w-full items-center justify-center bg-skin-accent text-4xl font-bold text-white;
-  }
-
-  .founder-info {
-    @apply flex flex-col h-full w-full;
+    @apply w-full h-full object-cover rounded-full transition-transform duration-300 hover:scale-105;
   }
 
   .founder-info h3 {
@@ -287,38 +340,50 @@ const pageDescription =
   }
 
   .founder-title {
-    @apply mb-4 text-sm font-semibold uppercase tracking-wider text-gray-600;
-  }
-
-  .content-button-wrapper {
-    @apply flex flex-col h-full;
+    @apply text-sm font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400;
   }
 
   .founder-description {
-    @apply text-base leading-relaxed flex-grow;
+    @apply text-base leading-relaxed;
   }
 
   .button-container {
-    @apply mt-6 flex justify-center items-end;
+    @apply mt-6 flex justify-start;
   }
 
   .more-link {
-    @apply inline-block rounded-md bg-skin-accent px-6 py-2 font-medium text-white transition-colors hover:opacity-80;
+    @apply flex items-center justify-center rounded-lg bg-skin-accent hover:bg-skin-accent/90 text-white font-medium py-3 px-6 transition-all;
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
   }
 
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .founders-section {
-      @apply grid-cols-1;
-    }
+  .more-link:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .more-link svg {
+    @apply ml-2 transition-transform;
+  }
+
+  .more-link:hover svg {
+    transform: translateX(4px);
+  }
+
+  /* Content section styles */
+  .content-section {
+    @apply py-6;
+  }
+
+  .content-section > h2 {
+    @apply text-3xl font-bold mb-8 text-center;
   }
 
   /* Dark mode adjustments */
   :global(.dark) .founder-title {
     @apply text-gray-400;
-  }
-
-  :global(.dark) .more-link {
-    @apply bg-skin-accent text-white hover:opacity-80;
   }
 </style>

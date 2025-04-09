@@ -5,6 +5,7 @@ export type NavigationLink =
   | "categories"
   | "glossary"
   | "groups"
+  | "our-vision"
   | "posts"
   | "references"
   | "search"

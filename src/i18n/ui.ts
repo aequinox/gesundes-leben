@@ -24,6 +24,7 @@ interface UITranslations {
   "nav.search": string;
   "nav.archives": string;
   "nav.glossary": string;
+  "nav.ourVision": string;
   "nav.prev": string;
   "nav.next": string;
   "nav.mainNavigation": string;
@@ -152,6 +153,7 @@ export const ui: Record<
     "nav.categories": "Categories",
     "nav.references": "References",
     "nav.glossary": "Glossary",
+    "nav.ourVision": "Our Vision",
     "nav.prev": "Previous",
     "nav.next": "Next",
     "nav.mainNavigation": "Main navigation",
@@ -280,6 +282,7 @@ export const ui: Record<
     "nav.categories": "Kategorien",
     "nav.references": "Quellen",
     "nav.glossary": "Glossar",
+    "nav.ourVision": "Unsere Vision",
     "nav.prev": "Zurück",
     "nav.next": "Weiter",
     "nav.mainNavigation": "Hauptnavigation",

@@ -1,0 +1,414 @@
+---
+/**
+ * Our Vision Page Component
+ *
+ * Provides information about the site's vision, mission, and values.
+ * Structured with clear sections and responsive design.
+ */
+
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/sections/Header.astro";
+import Footer from "@/components/sections/Footer.astro";
+import { SITE } from "@/config";
+import Hr from "@/components/elements/Hr.astro";
+import VisionImage from "@/components/elements/VisionImage.astro";
+
+// Import vision images
+import jumpingPersonImage from "@/assets/images/our-vision/victor-rodriguez-pWOdBS_l9LQ-unsplash-1-1536x1020.jpg";
+import tuebingenImage from "@/assets/images/our-vision/lasma-artmane-fNUGvjwkhmM-unsplash-1-1536x1024.jpg";
+import qualityImage from "@/assets/images/our-vision/pexels-rodnae-productions-7563653-1-1536x1024.jpg";
+import booksImage from "@/assets/images/our-vision/Glossar_pexels-pixabay-261909-1-1536x1097.jpg";
+
+// Define the page metadata
+const pageTitle = "Unsere Vision | " + SITE.title;
+const pageDescription =
+  "Erfahren Sie mehr über unsere Vision und Mission für Ihre Gesundheit.";
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <Header />
+  <main id="main-content">
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1>Unsere Vision</h1>
+        <p class="subtitle">Empowerment für deine Gesundheit</p>
+      </div>
+    </section>
+
+    <Hr />
+
+    <div class="vision-grid">
+      <section id="empowerment" class="content-section">
+        <div class="grid-card">
+          <div class="card-content">
+            <h2>Empowerment</h2>
+            <div class="text-content">
+              <p>
+                Wir laden dich auf eine Reise ein – hin zu neuen
+                Handlungsspielräumen, um deine Gesundheit auf positive Weise zu
+                beeinflussen, und Erkrankungen vorzubeugen, Linderung oder
+                Heilung für vorhandene Belastungen anzustreben.
+              </p>
+              <p>
+                Denn es gibt nicht nur einen Weg, sondern viele, die auf
+                unterschiedliche Weise erfolgen. Diese Vielfalt zusammen mit der
+                Verbindung von Schulmedizin und Alternativmedizin möchten wir
+                gerne mit dir teilen auf dieser "spannende Reise". <strong
+                  >#weilduwertvollbist</strong
+                >
+              </p>
+            </div>
+          </div>
+          <div class="card-image">
+            <VisionImage
+              src={jumpingPersonImage}
+              alt="Person springt mit ausgebreiteten Armen vor einem Bergsee"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section id="sources" class="content-section">
+        <div class="grid-card reverse">
+          <div class="card-content">
+            <h2>Was nutzen wir als Quellen</h2>
+            <div class="text-content">
+              <p>
+                Was wir dir auf dem Blog vorstellen, ist weitestgehend
+                wissenschaftlich basiert, und durch Studien und Referenzen
+                untermauert.
+              </p>
+              <p>
+                Wenn einmal keine wissenschaftlichen Studien angegeben sind,
+                basiert der Artikel auf (medizinischen) Wissensinhalten und
+                Erfahrungen, die wir uns über die Jahre als Therapeuten
+                angeeignet haben, oder die sich in unserer Praxis bewährt haben.
+              </p>
+              <p>
+                Oder auch auf unseren persönlichen Erfahrungen, weil wir vieles
+                von dem anwenden, wovon wir schreiben, denn <strong
+                  >#sogehtgesund</strong
+                >.
+              </p>
+            </div>
+          </div>
+          <div class="card-image">
+            <VisionImage
+              src={booksImage}
+              alt="Stapel von Büchern und Referenzmaterialien"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section id="tuebingen" class="content-section">
+        <div class="grid-card">
+          <div class="card-content">
+            <h2>Warum in Tübingen</h2>
+            <div class="text-content">
+              <p>
+                Natürlich steht Gesundheit in Tübingen nicht nur Tübingern zur
+                Verfügung.
+              </p>
+              <p>
+                Jedoch sind wir Wahl-Tübinger und lieben unsere Stadt und seine
+                Einwohner, weshalb wir sie im Besonderen fördern möchten.
+              </p>
+            </div>
+          </div>
+          <div class="card-image">
+            <VisionImage
+              src={tuebingenImage}
+              alt="Blick auf die Altstadt von Tübingen"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section id="recommendations" class="content-section">
+        <div class="grid-card reverse">
+          <div class="card-content">
+            <h2>Worauf beruhen unsere Empfehlungen?</h2>
+            <div class="text-content">
+              <p>
+                Die Produktempfehlungen, auf die wir verlinken, basieren häufig
+                auf eigenen Erfahrungen mit den Produkten. Das bedeutet, die
+                empfohlenen Produkte sind natürlich nicht die einzigen, die es
+                gibt. Aber es sind Produkte, mit denen wir gute Erfahrungen
+                gemacht haben (häufig am eigenen Leib), die wir per vorheriger
+                Recherche evaluiert haben, oder die bestimmte Bedingungen
+                erfüllen, die essenziell sind (wie z.B. ausreichende Dosierung,
+                Vermeidung von Schadstoffen, gute Qualität, gutes
+                Preis-Leistungs-Verhältnis, etc.).
+              </p>
+              <p>
+                Die Einnahmen, die wir durch manche der Empfehlungen erzielen,
+                kommen dem Blog zugute, denn nur so können wir uns leisten, die
+                Zeit neben unserer beruflichen Tätigkeit einzubringen, die nötig
+                ist, um dir unser Therapeuten-Wissen zugänglich zu machen. <strong
+                  >#weilduwertvollbist</strong
+                >
+              </p>
+            </div>
+          </div>
+          <div class="card-image">
+            <VisionImage
+              src={qualityImage}
+              alt="Gute Qualität und guter Preis"
+            />
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <Hr />
+
+    <section id="contact" class="content-section">
+      <div class="contact-card">
+        <div class="contact-header">
+          <h2>Dein Feedback</h2>
+          <p class="contact-intro">
+            Wenn du gute Ideen hast, wie wir unsere gemeinsame Reise noch
+            verbessern können, schreib uns. Am liebsten ist uns das Wachsen im
+            gemeinsamen Austausch, und wir freuen uns auf dein konstruktives
+            Feedback.
+          </p>
+        </div>
+        <div class="contact-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Dein Name"
+              />
+            </div>
+            <div class="form-group">
+              <label for="email">E-Mail Adresse</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Deine E-Mail"
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="message">Deine Nachricht</label>
+            <textarea
+              id="message"
+              name="message"
+              rows="5"
+              placeholder="Deine Nachricht an uns"></textarea>
+          </div>
+          <button type="submit" class="submit-button">
+            <span>Absenden</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="ml-2 h-5 w-5"
+            >
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  /* Hero section styles */
+  .hero-section {
+    @apply relative flex min-h-[300px] w-full items-center justify-center overflow-hidden rounded-lg bg-gradient-to-r from-purple-500 to-blue-600 p-8 text-center text-white;
+  }
+
+  .hero-content {
+    @apply relative z-10 max-w-3xl;
+  }
+
+  .hero-section::before {
+    content: "";
+    @apply absolute inset-0 bg-black/40;
+  }
+
+  .hero-section h1 {
+    @apply mb-4 text-4xl font-bold md:text-5xl;
+  }
+
+  .subtitle {
+    @apply text-xl font-light md:text-2xl;
+  }
+
+  /* Vision grid layout */
+  .vision-grid {
+    @apply max-w-7xl mx-auto px-4 space-y-16;
+  }
+
+  /* Grid card styles */
+  .grid-card {
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-xl;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  .grid-card:hover {
+    @apply shadow-2xl;
+    transform: translateY(-5px);
+  }
+
+  .card-content {
+    @apply p-8 flex flex-col justify-center;
+  }
+
+  .card-content h2 {
+    @apply text-3xl font-bold mb-6 text-left border-l-4 border-skin-accent pl-4;
+  }
+
+  .text-content {
+    @apply space-y-4 text-lg;
+  }
+
+  .text-content p {
+    @apply leading-relaxed;
+  }
+
+  .card-image {
+    @apply h-full w-full overflow-hidden;
+    min-height: 400px;
+  }
+
+  .card-image :global(img) {
+    @apply w-full h-full object-cover;
+    min-height: 400px;
+  }
+
+  /* Reverse layout for alternating sections */
+  .grid-card.reverse {
+    @apply lg:grid-flow-col lg:grid-cols-2;
+  }
+
+  .grid-card.reverse .card-content {
+    @apply lg:order-2;
+  }
+
+  .grid-card.reverse .card-image {
+    @apply lg:order-1;
+  }
+
+  /* Content section styles */
+  .content-section {
+    @apply py-6;
+  }
+
+  .content-wrapper {
+    @apply mx-auto max-w-4xl;
+  }
+
+  /* Contact form styles */
+  .contact-card {
+    @apply max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden;
+  }
+
+  .contact-header {
+    @apply p-8 bg-gradient-to-r from-purple-500 to-blue-600 text-white;
+  }
+
+  .contact-header h2 {
+    @apply text-3xl font-bold mb-4 text-center;
+  }
+
+  .contact-intro {
+    @apply text-center text-lg max-w-3xl mx-auto;
+  }
+
+  .contact-form {
+    @apply p-8;
+  }
+
+  .form-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6 mb-6;
+  }
+
+  .form-group {
+    @apply mb-6;
+  }
+
+  .form-group label {
+    @apply block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    @apply w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white;
+    transition:
+      border-color 0.3s,
+      box-shadow 0.3s;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    @apply border-skin-accent outline-none ring-2 ring-skin-accent/20;
+  }
+
+  .submit-button {
+    @apply flex items-center justify-center w-full bg-skin-accent hover:bg-skin-accent/90 text-white font-medium py-3 px-6 rounded-lg transition-all;
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .submit-button:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .submit-button svg {
+    @apply ml-2 transition-transform;
+  }
+
+  .submit-button:hover svg {
+    transform: translateX(4px);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .content-wrapper.with-image {
+      @apply flex-col;
+    }
+
+    .text-content,
+    .image-container {
+      @apply w-full;
+    }
+
+    .image-container {
+      @apply order-first;
+    }
+
+    /* Alternate image position for even sections */
+    .content-section:nth-child(even) .image-container {
+      @apply order-first;
+    }
+  }
+
+  /* Dark mode adjustments */
+  :global(.dark) .contact-form {
+    @apply bg-gray-800 border border-gray-700;
+  }
+</style>

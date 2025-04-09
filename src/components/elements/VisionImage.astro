@@ -1,0 +1,29 @@
+---
+import type { ImageMetadata } from "astro";
+
+type Props = {
+  src: string | ImageMetadata;
+  alt: string;
+};
+
+const { src: srcProp, alt }: Props = Astro.props;
+
+// For MDX files, we'll use the img tag directly with the provided src
+let src: string;
+
+if (typeof srcProp === "string") {
+  // Use the string directly
+  src = srcProp;
+} else {
+  // If it's an ImageMetadata object, try to extract the src property
+  try {
+    // @ts-ignore - We know this might not be safe, but it's a fallback
+    src = srcProp.src || "";
+  } catch (error) {
+    console.error("Error extracting src from ImageMetadata:", error);
+    src = "";
+  }
+}
+---
+
+<img src={src} alt={alt} class="w-full h-full object-cover" />
