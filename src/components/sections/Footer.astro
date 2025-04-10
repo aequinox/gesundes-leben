@@ -56,6 +56,9 @@ const copyrightClasses = [
   <Hr noPadding />
   <div class={footerClasses}>
     <Socials centered />
+    <div class="footer-links">
+      <a href="/impressum" class="footer-link">{t("footer.imprint")}</a>
+    </div>
     <div class={copyrightClasses}>
       <span>
         {t("footer.copyright")} &#169; {currentYear}
@@ -85,6 +88,15 @@ const copyrightClasses = [
 
   .link-button :global(svg) {
     @apply scale-125;
+  }
+
+  /* Footer links styles */
+  .footer-links {
+    @apply my-2 flex items-center justify-center;
+  }
+
+  .footer-link {
+    @apply text-skin-base hover:text-skin-accent transition-colors duration-200 px-3 py-1 rounded-md hover:bg-skin-card;
   }
 
   /* Reduced motion */

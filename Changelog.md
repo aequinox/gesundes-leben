@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Impressum Page Implementation
+- **New Feature**
+  - Added modern styled Impressum (legal information) page:
+    - Created responsive layout with clear sections for legal information
+    - Implemented hero section with gradient background and overlay
+    - Designed card-based layout for different legal sections
+    - Added contact information in a responsive grid layout
+    - Styled legal text with improved typography and readability
+    - Ensured proper dark mode support with theme-aware styling
+    - Added link to Impressum in the footer of all pages
+    - Maintained accessibility with semantic HTML structure
+    - Implemented responsive design for all screen sizes
+
 ### Glossary System Redesign
 - **UI Enhancement**
   - Redesigned Glossary pages with modern 2025 design:

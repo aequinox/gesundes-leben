@@ -107,6 +107,7 @@ interface UITranslations {
   // Footer
   "footer.copyright": string;
   "footer.rights": string;
+  "footer.imprint": string;
 
   // Glossary
   "glossary.all": string;
@@ -237,6 +238,7 @@ export const ui: Record<
     // Footer
     "footer.copyright": "Copyright",
     "footer.rights": "All rights reserved.",
+    "footer.imprint": "Imprint",
 
     // Glossary
     "glossary.all": "All glossary entries",
@@ -366,6 +368,7 @@ export const ui: Record<
     // Footer
     "footer.copyright": "Copyright",
     "footer.rights": "Alle Rechte vorbehalten.",
+    "footer.imprint": "Impressum",
 
     // Glossary
     "glossary.all": "Alle Glossareinträge",
