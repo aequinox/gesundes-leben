@@ -216,8 +216,9 @@ function generateMarkdownContent(post: Post): string {
   try {
     // Ensure consistent key order and proper quoting
     const frontmatterYaml = yaml.dump(post.frontmatter, {
+      indent: 2,
       lineWidth: -1,
-      sortKeys: true,
+      sortKeys: false,
       noRefs: true,
       quotingType: '"'
     });
