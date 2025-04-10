@@ -224,6 +224,10 @@ const usedCategories: string[] = [
     GROUP_TYPES.CONTRA,
   ];
 
+  // State to track current selections
+  let currentSelectedGroup: GroupType | null = null; // No group selected by default
+  let currentSelectedCategory: string = "Alle"; // Default category
+
   /**
    * Initializes DOM elements and returns them as a typed object
    * @returns {DOMElements} Object containing all necessary DOM elements
@@ -271,49 +275,42 @@ const usedCategories: string[] = [
   }
 
   /**
-   * Handles the visibility of articles based on selected group
+   * Applies both group and category filters simultaneously
    * @param {HTMLElement[]} articleCards - All article card elements
-   * @param {GroupType} selectedGroup - The selected group type
+   * @param {GroupType | null} selectedGroup - The selected group type or null for all groups
+   * @param {string} selectedCategory - The selected category
    */
-  function updateArticleVisibility(
+  function applyFilters(
     articleCards: HTMLElement[],
-    selectedGroup: GroupType
-  ): void {
-    articleCards.forEach(card => {
-      const isMatchingGroup =
-        (card.dataset as CardDataset).group === selectedGroup;
-      card.classList.toggle("hide", !isMatchingGroup);
-      card.classList.toggle("show", isMatchingGroup);
-      card.toggleAttribute("data-aos", isMatchingGroup);
-    });
-  }
-
-  /**
-   * Handles filtering articles by category
-   * @param {HTMLElement[]} articleCards - All article card elements
-   * @param {string} category - The selected category
-   */
-  function handleCategoryFilter(
-    articleCards: HTMLElement[],
-    category: string
+    selectedGroup: GroupType | null,
+    selectedCategory: string
   ): void {
     // Update active state of category buttons
     const categoryButtons = document.querySelectorAll(".category-button");
     categoryButtons.forEach(button => {
       button.setAttribute(
         "data-active",
-        (button.getAttribute("data-category") === category).toString()
+        (button.getAttribute("data-category") === selectedCategory).toString()
       );
     });
 
     articleCards.forEach(card => {
-      const cardCategories =
-        (card.dataset as CardDataset).categories?.split("|") || [];
-      const shouldShow =
-        category === "Alle" || cardCategories.includes(category);
+      const cardDataset = card.dataset as CardDataset;
+      // If selectedGroup is null (when "Alle" is clicked), show all groups
+      const isMatchingGroup =
+        selectedGroup === null || cardDataset.group === selectedGroup;
+
+      const cardCategories = cardDataset.categories?.split("|") || [];
+      const isMatchingCategory =
+        selectedCategory === "Alle" ||
+        cardCategories.includes(selectedCategory);
+
+      // Show only if BOTH conditions are met
+      const shouldShow = isMatchingGroup && isMatchingCategory;
 
       card.classList.toggle("hide", !shouldShow);
       card.classList.toggle("show", shouldShow);
+      card.toggleAttribute("data-aos", shouldShow);
     });
   }
 
@@ -330,8 +327,24 @@ const usedCategories: string[] = [
       if (!button) return;
 
       button.addEventListener("click", () => {
-        orderGroupSelectors(button, groupSelectors);
-        updateArticleVisibility(articleCards, group);
+        // If the same group is clicked again, deselect it
+        if (currentSelectedGroup === group) {
+          currentSelectedGroup = null;
+          // Reset visual state of group selectors
+          groupSelectors.forEach(selector => {
+            selector.classList.remove("left", "middle", "right");
+          });
+        } else {
+          // Select the new group
+          orderGroupSelectors(button, groupSelectors);
+          currentSelectedGroup = group;
+        }
+
+        applyFilters(
+          articleCards,
+          currentSelectedGroup,
+          currentSelectedCategory
+        );
       });
     });
 
@@ -340,7 +353,20 @@ const usedCategories: string[] = [
       button.addEventListener("click", () => {
         const category = button.dataset.category;
         if (category) {
-          handleCategoryFilter(articleCards, category);
+          currentSelectedCategory = category;
+
+          // If "Alle" category is selected, reset group filter to show all groups
+          if (category === "Alle") {
+            // Show all articles regardless of group
+            applyFilters(articleCards, null, currentSelectedCategory);
+          } else {
+            // Apply normal filtering with current group
+            applyFilters(
+              articleCards,
+              currentSelectedGroup,
+              currentSelectedCategory
+            );
+          }
         }
       });
     });
@@ -351,6 +377,13 @@ const usedCategories: string[] = [
     try {
       const elements = initializeDOMElements();
       initializeEventListeners(elements);
+
+      // Apply initial filtering to show all articles
+      applyFilters(
+        elements.articleCards,
+        currentSelectedGroup,
+        currentSelectedCategory
+      );
     } catch (error) {
       console.error("Failed to initialize blog filter:", error);
     }
