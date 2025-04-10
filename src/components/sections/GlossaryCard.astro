@@ -1,16 +1,15 @@
 ---
 /**
- * GlossaryCard Component
+ * GlossaryCard Component - 2025 Modern Design
  *
  * A card component for displaying glossary entries with title, content,
- * and navigation. Supports view transitions and accessibility features.
+ * and navigation. Features modern design elements with interactive hover effects.
  *
  * @component
  * @example
  * ```astro
  * <GlossaryCard
  *   post={glossaryEntry}
- *   loading="lazy"
  * />
  * ```
  */
@@ -30,7 +29,6 @@ export interface Props {
 }
 
 const { post }: Props = Astro.props;
-// const { post, loading = "lazy" }: Props = Astro.props;
 
 const {
   slug,
@@ -45,144 +43,148 @@ const href = `/glossary/${slug}/`;
 // Get rendered content
 const { Content } = await post.render();
 
-// Memoize common class names
-const cardClasses = [
-  "article-card",
-  "flex flex-col justify-between",
-  "overflow-hidden rounded-sm",
-  "bg-skin-card/10 hover:bg-skin-card/30",
-  "hover:shadow-lg",
-  "transition-all duration-300",
-].join(" ");
-
-const titleClasses = [
-  "text-lg font-medium",
-  "transition-colors duration-300",
-  "hover:text-skin-accent",
-].join(" ");
-
-const readMoreClasses = [
-  "mr-2 mt-4",
-  "inline-flex items-center gap-2",
-  "text-sm font-bold uppercase",
-  "transition-colors duration-300",
-  "group-hover:text-skin-accent",
-].join(" ");
-
 // Memoize translated strings
 const readMoreLabel = t("glossary.readMoreLabel");
 const readMoreAriaLabel = t("glossary.readMore").replace("{title}", title);
 const excerptAriaLabel = t("glossary.excerpt");
 ---
 
-<article class={cardClasses} aria-labelledby={`glossary-title-${slug}`}>
-  <div class="w-full">
-    <div class="p-4">
-      <div class="mb-4">
-        <h2
-          id={`glossary-title-${slug}`}
-          class={titleClasses}
-          transition:name={slugService.slugifyStr(title)}
-        >
-          {title}
-        </h2>
-
-        <div
-          class="prose prose-sm mt-2 line-clamp-3 text-skin-base/80"
-          aria-label={excerptAriaLabel}
-        >
-          <Content />
-        </div>
+<article class="glossary-card" aria-labelledby={`glossary-title-${slug}`}>
+  <div class="card-content">
+    <div class="card-header">
+      <div class="card-icon">
+        <Icon name="tabler:book" class="icon" aria-hidden="true" />
       </div>
+      <h2
+        id={`glossary-title-${slug}`}
+        class="card-title"
+        transition:name={slugService.slugifyStr(title)}
+      >
+        {title}
+      </h2>
     </div>
 
-    <div class="group mt-auto pb-4 pl-4">
-      <a href={href} class={readMoreClasses} aria-label={readMoreAriaLabel}>
-        {readMoreLabel}
-        <Icon
-          name="tabler:arrow-right"
-          class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
-          aria-hidden="true"
-        />
+    <div class="card-excerpt" aria-label={excerptAriaLabel}>
+      <Content />
+    </div>
+
+    <div class="card-footer">
+      <a href={href} class="read-more-link" aria-label={readMoreAriaLabel}>
+        <span>{readMoreLabel}</span>
+        <Icon name="tabler:arrow-right" class="arrow-icon" aria-hidden="true" />
       </a>
     </div>
   </div>
 </article>
 
 <style>
-  /* Animation keyframes */
-  @keyframes hide {
-    from {
-      opacity: 1;
-      transform: scale(1);
-    }
-    to {
-      opacity: 0;
-      transform: scale(0);
-    }
+  /* Card styles */
+  .glossary-card {
+    @apply overflow-hidden rounded-xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl dark:bg-gray-800;
   }
 
-  @keyframes show {
-    from {
-      opacity: 0;
-      transform: scale(0);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
+  .card-content {
+    @apply flex h-full flex-col p-6;
   }
 
-  /* Animation classes */
-  .hide {
-    display: none;
-    animation: hide 100ms ease-in-out;
+  .card-header {
+    @apply mb-4 flex items-center gap-4;
   }
 
-  .show {
-    display: block;
-    animation: show 400ms ease-in-out;
+  .card-icon {
+    @apply flex h-12 w-12 items-center justify-center rounded-full bg-skin-accent/10 transition-all duration-300;
+  }
+
+  .icon {
+    @apply h-6 w-6 fill-skin-accent transition-all duration-300;
+  }
+
+  .card-title {
+    @apply text-xl font-semibold text-skin-base transition-all duration-300;
+  }
+
+  .card-excerpt {
+    @apply line-clamp-3 text-skin-base/80;
+  }
+
+  /* Apply prose styles without nesting */
+  .card-excerpt :global(p) {
+    @apply text-sm leading-relaxed;
+    margin-bottom: 0.75em;
+  }
+
+  .card-excerpt :global(a) {
+    @apply text-skin-accent underline;
+  }
+
+  .card-excerpt :global(strong) {
+    @apply font-semibold;
+  }
+
+  .card-excerpt :global(em) {
+    @apply italic;
+  }
+
+  .card-footer {
+    @apply mt-auto pt-4;
+  }
+
+  .read-more-link {
+    @apply inline-flex items-center gap-2 font-medium text-skin-accent no-underline transition-all duration-300 hover:text-skin-accent/80;
+  }
+
+  .arrow-icon {
+    @apply h-5 w-5 transition-transform duration-300;
+  }
+
+  /* Hover effects */
+  .glossary-card:hover .card-icon {
+    @apply bg-skin-accent;
+  }
+
+  .glossary-card:hover .icon {
+    @apply fill-white;
+  }
+
+  .glossary-card:hover .read-more-link .arrow-icon {
+    @apply translate-x-1;
   }
 
   /* Focus styles */
-  article:focus-within {
+  .glossary-card:focus-within {
     @apply ring-2 ring-skin-accent ring-offset-2;
   }
 
-  /* Link focus styles */
-  a:focus-visible {
+  .read-more-link:focus-visible {
     @apply outline-none ring-2 ring-skin-accent ring-offset-2;
   }
 
   /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
-    .transition-all,
-    .transition-colors,
-    .transition-transform,
-    .group-hover\:translate-x-1 {
+    .glossary-card,
+    .card-icon,
+    .icon,
+    .card-title,
+    .read-more-link,
+    .arrow-icon {
       @apply transform-none transition-none;
-    }
-
-    .hide,
-    .show {
-      animation: none;
     }
   }
 
   /* Print styles */
   @media print {
-    article {
+    .glossary-card {
       @apply break-inside-avoid shadow-none;
     }
 
-    .group-hover\:translate-x-1 {
+    .arrow-icon {
       @apply transform-none;
     }
   }
 
   /* High contrast mode */
   @media (forced-colors: active) {
-    article {
+    .glossary-card {
       @apply border border-[CanvasText];
     }
   }

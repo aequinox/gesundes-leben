@@ -1,12 +1,19 @@
 ---
+/**
+ * Glossary Layout Component - 2025 Modern Design
+ *
+ * Displays glossary entries in a visually appealing grid layout
+ * with modern design elements and interactive features.
+ */
+
 import Footer from "@/components/sections/Footer.astro";
 import GlossaryCard from "@/components/sections/GlossaryCard.astro";
 import Header from "@/components/sections/Header.astro";
 import Pagination from "@/components/sections/Pagination.astro";
+import Hr from "@/components/elements/Hr.astro";
 import { SITE } from "@/config";
 import type { CollectionEntry } from "astro:content";
 import Layout from "./Layout.astro";
-import Main from "./Main.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 
 export interface Props {
@@ -33,18 +40,85 @@ const pageTitle = propTitle ? propTitle : t("glossary.all");
 
 <Layout title={title}>
   <Header activeNav="glossary" />
-  <Main pageTitle={pageTitle} pageDesc={t("glossary.description")}>
-    <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
-      {paginatedPosts.map(post => <GlossaryCard {post} />)}
-    </div>
-  </Main>
 
-  <Pagination
-    {currentPage}
-    {totalPages}
-    prevUrl={`/glossary${currentPage - 1 !== 1 ? "/" + (currentPage - 1) : ""}/`}
-    nextUrl={`/glossary/${currentPage + 1}/`}
-  />
+  <main id="main-content">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1>{pageTitle}</h1>
+        <p class="subtitle">{t("glossary.description")}</p>
+      </div>
+    </section>
+
+    <Hr />
+
+    <!-- Glossary Grid Section -->
+    <section class="glossary-section">
+      <div class="glossary-container">
+        <p class="glossary-intro">
+          Entdecke unser Glossar mit wichtigen Begriffen und Definitionen.
+          Klicke auf einen Eintrag, um mehr zu erfahren.
+        </p>
+
+        <div class="glossary-grid">
+          {paginatedPosts.map(post => <GlossaryCard {post} />)}
+        </div>
+      </div>
+    </section>
+
+    <Pagination
+      {currentPage}
+      {totalPages}
+      prevUrl={`/glossary${currentPage - 1 !== 1 ? "/" + (currentPage - 1) : ""}/`}
+      nextUrl={`/glossary/${currentPage + 1}/`}
+    />
+  </main>
 
   <Footer noMarginTop={totalPages > 1} />
 </Layout>
+
+<style>
+  /* Hero section styles */
+  .hero-section {
+    @apply relative flex min-h-[250px] w-full items-center justify-center overflow-hidden rounded-lg bg-gradient-to-r from-purple-500 to-blue-600 p-8 text-center text-white;
+  }
+
+  .hero-content {
+    @apply relative z-10 max-w-3xl;
+  }
+
+  .hero-section::before {
+    content: "";
+    @apply absolute inset-0 bg-black/40;
+  }
+
+  .hero-section h1 {
+    @apply mb-4 text-4xl font-bold md:text-5xl;
+  }
+
+  .subtitle {
+    @apply text-xl font-light md:text-2xl;
+  }
+
+  /* Glossary section styles */
+  .glossary-section {
+    @apply py-12;
+  }
+
+  .glossary-container {
+    @apply mx-auto max-w-content px-4;
+  }
+
+  .glossary-intro {
+    @apply mb-10 text-center text-lg italic text-skin-base opacity-80;
+  }
+
+  .glossary-grid {
+    @apply grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3;
+  }
+
+  /* Main content styles */
+  #main-content {
+    @apply mx-auto w-full max-w-content;
+  }
+</style>

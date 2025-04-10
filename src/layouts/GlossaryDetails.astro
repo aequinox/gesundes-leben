@@ -1,7 +1,15 @@
 ---
+/**
+ * GlossaryDetails Layout Component - 2025 Modern Design
+ *
+ * Displays a single glossary entry with modern styling and interactive elements.
+ * Features a hero section, content area, and sharing options.
+ */
+
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/sections/Header.astro";
 import Footer from "@/components/sections/Footer.astro";
+import Hr from "@/components/elements/Hr.astro";
 import { type CollectionEntry } from "astro:content";
 import { slugService } from "@/services/format/SlugService";
 import ShareLinks from "@/components/socials/ShareLinks.astro";
@@ -12,6 +20,7 @@ import { getLangFromUrl, useTranslations } from "i18n/utils";
 import ArticleMeta from "@/components/partials/ArticleMeta.astro";
 import Paragraph from "@/components/elements/Paragraph.astro";
 import { authorService } from "@/services/content/AuthorService";
+import { Icon } from "astro-icon/components";
 
 interface Props {
   glossaryEntry: CollectionEntry<"glossary">;
@@ -53,56 +62,192 @@ const t = useTranslations(lang);
 <Layout {...layoutProps}>
   <Header />
 
-  <div class="relative mx-auto grid max-w-content grid-cols-12 gap-8">
-    <div class="col-span-12 mx-auto flex w-full max-w-content px-2">
-      <main
-        id="main-content"
-        class="col-span-12 mx-auto w-full max-w-content px-4 pb-12"
-      >
-        <h1
-          transition:name={slugService.slugifyStr(title)}
-          class="mb-4 text-xl font-semibold lg:text-3xl"
-        >
-          {title}
-        </h1>
-
+  <main id="main-content">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1 transition:name={slugService.slugifyStr(title)}>{title}</h1>
         <ArticleMeta
           post={glossaryEntry}
           showAuthor={true}
           showReadingTime={false}
         />
+      </div>
+    </section>
 
-        <article id="article" class="prose mx-auto mt-6 max-w-content">
+    <Hr />
+
+    <!-- Content Section -->
+    <section class="content-section">
+      <div class="content-container">
+        <article id="article" class="article-content mx-auto">
           <Content components={components} />
         </article>
 
-        <div
-          class="flex flex-col-reverse items-center justify-between gap-6 sm:flex-row-reverse sm:items-end sm:gap-4"
-        >
+        <div class="article-footer">
           <button
             id="back-to-top"
-            class="focus-outline flex items-center gap-2 whitespace-nowrap py-1 hover:opacity-75"
+            class="back-to-top-button"
             aria-label={t("nav.backToTop")}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="rotate-90"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
-              ></path>
-            </svg>
+            <Icon name="tabler:arrow-up" class="icon" aria-hidden="true" />
             <span>{t("nav.backToTop")}</span>
           </button>
 
-          <ShareLinks />
+          <div class="share-container">
+            <p class="share-text">Teilen Sie diesen Eintrag:</p>
+            <ShareLinks />
+          </div>
         </div>
-      </main>
-    </div>
-  </div>
+      </div>
+    </section>
+  </main>
+
   <Footer />
 </Layout>
+
+<style>
+  /* Hero section styles */
+  .hero-section {
+    @apply relative flex min-h-[250px] w-full items-center justify-center overflow-hidden rounded-lg bg-gradient-to-r from-purple-500 to-blue-600 p-8 text-center text-white;
+  }
+
+  .hero-content {
+    @apply relative z-10 max-w-3xl;
+  }
+
+  .hero-section::before {
+    content: "";
+    @apply absolute inset-0 bg-black/40;
+  }
+
+  .hero-section h1 {
+    @apply mb-4 text-4xl font-bold md:text-5xl;
+  }
+
+  /* Override ArticleMeta styles for hero section */
+  .hero-section :global(.article-meta) {
+    @apply text-white/90;
+  }
+
+  .hero-section :global(.article-meta a) {
+    @apply text-white hover:text-white/80;
+  }
+
+  /* Content section styles */
+  .content-section {
+    @apply py-12;
+  }
+
+  .content-container {
+    @apply mx-auto max-w-content px-4;
+  }
+
+  /* Article footer styles */
+  .article-footer {
+    @apply mt-12 flex flex-col items-center justify-between gap-8 border-t border-skin-line pt-8 sm:flex-row;
+  }
+
+  .back-to-top-button {
+    @apply flex items-center gap-2 rounded-lg bg-skin-card px-4 py-2 font-medium text-skin-base transition-all duration-300 hover:-translate-y-1 hover:bg-skin-accent hover:text-white focus-outline;
+  }
+
+  .back-to-top-button .icon {
+    @apply h-5 w-5;
+  }
+
+  .share-container {
+    @apply flex flex-col items-center gap-2 sm:items-end;
+  }
+
+  .share-text {
+    @apply text-sm font-medium text-skin-base/70;
+  }
+
+  /* Article content styles */
+  .article-content {
+    @apply text-skin-base;
+  }
+
+  .article-content :global(h2) {
+    @apply mb-4 mt-8 text-2xl font-semibold;
+  }
+
+  .article-content :global(h3) {
+    @apply mb-3 mt-6 text-xl font-medium;
+  }
+
+  .article-content :global(p) {
+    @apply mb-6 leading-relaxed;
+  }
+
+  .article-content :global(ul) {
+    @apply mb-6 ml-6 list-disc;
+  }
+
+  .article-content :global(ol) {
+    @apply mb-6 ml-6 list-decimal;
+  }
+
+  .article-content :global(li) {
+    @apply mb-2;
+  }
+
+  .article-content :global(a) {
+    @apply text-skin-accent underline decoration-skin-accent underline-offset-2 transition-colors hover:decoration-wavy;
+  }
+
+  .article-content :global(blockquote) {
+    @apply border-l-4 border-skin-accent bg-skin-card/30 pl-4 italic;
+  }
+
+  .article-content :global(code) {
+    @apply rounded bg-skin-card px-1 py-0.5 text-sm;
+  }
+
+  .article-content :global(pre) {
+    @apply mb-6 overflow-x-auto rounded-lg bg-skin-card p-4;
+  }
+
+  .article-content :global(img) {
+    @apply mx-auto my-6 max-w-full rounded-lg;
+  }
+
+  .article-content :global(hr) {
+    @apply my-8 border-skin-line;
+  }
+
+  .article-content :global(table) {
+    @apply mb-6 w-full border-collapse;
+  }
+
+  .article-content :global(th),
+  .article-content :global(td) {
+    @apply border border-skin-line p-2;
+  }
+
+  .article-content :global(th) {
+    @apply bg-skin-card font-semibold;
+  }
+
+  /* Main content styles */
+  #main-content {
+    @apply mx-auto w-full max-w-content;
+  }
+</style>
+
+<script>
+  // Back to top button functionality
+  document.addEventListener("DOMContentLoaded", () => {
+    const backToTopButton = document.getElementById("back-to-top");
+
+    if (backToTopButton) {
+      backToTopButton.addEventListener("click", () => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      });
+    }
+  });
+</script>
