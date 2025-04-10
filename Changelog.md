@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Hero Section Component Refactoring
+- **Code Refactoring & UI Enhancement**
+  - Created reusable PageHero component for consistent hero sections across pages:
+    - Implemented configurable gradient colors via props (fromColor, toColor)
+    - Added support for optional background images with 16:9 aspect ratio
+    - Made component use gradient as fallback when no image is provided
+    - Implemented sensible defaults for all optional properties
+    - Added TypeScript interfaces for proper type safety
+    - Replaced duplicate hero sections in imprint.astro, about.astro, and our-vision.astro
+    - Improved maintainability with centralized styling
+    - Enhanced flexibility with configurable min-height
+    - Ensured consistent visual appearance across all pages
+
 ### About Page Fixes
 - **UI Enhancement & Bug Fix**
   - Fixed alignment of "Mehr erfahren" buttons on the About page:

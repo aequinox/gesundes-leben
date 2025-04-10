@@ -1,0 +1,86 @@
+---
+/**
+ * PageHero Component
+ *
+ * A reusable hero section for content pages that displays:
+ * - Main heading
+ * - Subtitle
+ * - Optional background image (16:9 ratio)
+ * - Configurable gradient colors
+ *
+ * @component
+ */
+
+interface Props {
+  title: string;
+  subtitle: string;
+  minHeight?: string; // Optional min-height, defaults to 300px
+  image?: ImageMetadata | string; // Optional background image
+  fromColor?: string; // Optional gradient start color
+  toColor?: string; // Optional gradient end color
+}
+
+const {
+  title,
+  subtitle,
+  minHeight = "300px",
+  image,
+  fromColor = "purple-500",
+  toColor = "blue-600",
+}: Props = Astro.props;
+
+// Determine if we're using an image or gradient background
+const hasImage = !!image;
+const gradientStyle = `bg-gradient-to-r from-${fromColor} to-${toColor}`;
+const backgroundStyle = hasImage ? "" : gradientStyle;
+---
+
+<section
+  class={`hero-section ${backgroundStyle}`}
+  style={`min-height: ${minHeight};`}
+>
+  {
+    hasImage && (
+      <div class="hero-image">
+        <img src={image instanceof Object ? image.src : image} alt="" />
+      </div>
+    )
+  }
+  <div class="hero-content">
+    <h1>{title}</h1>
+    <p class="subtitle">{subtitle}</p>
+  </div>
+</section>
+
+<style>
+  /* Hero section styles */
+  .hero-section {
+    @apply relative flex w-full items-center justify-center overflow-hidden rounded-lg p-8 text-center text-white;
+  }
+
+  .hero-content {
+    @apply relative z-10 max-w-3xl;
+  }
+
+  .hero-section::before {
+    content: "";
+    @apply absolute inset-0 bg-black/40;
+  }
+
+  .hero-image {
+    @apply absolute inset-0 w-full h-full overflow-hidden;
+  }
+
+  .hero-image img {
+    @apply w-full h-full object-cover;
+    aspect-ratio: 16/9;
+  }
+
+  .hero-section h1 {
+    @apply mb-4 text-4xl font-bold md:text-5xl;
+  }
+
+  .subtitle {
+    @apply text-xl font-light md:text-2xl;
+  }
+</style>

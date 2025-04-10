@@ -11,6 +11,7 @@ import Header from "@/components/sections/Header.astro";
 import Footer from "@/components/sections/Footer.astro";
 import { SITE } from "@/config";
 import Hr from "@/components/elements/Hr.astro";
+import PageHero from "@/components/sections/PageHero.astro";
 import VisionImage from "@/components/elements/VisionImage.astro";
 
 // Import vision images
@@ -28,12 +29,13 @@ const pageDescription =
 <Layout title={pageTitle} description={pageDescription}>
   <Header />
   <main id="main-content">
-    <section class="hero-section">
-      <div class="hero-content">
-        <h1>Unsere Vision</h1>
-        <p class="subtitle">Empowerment für deine Gesundheit</p>
-      </div>
-    </section>
+    <PageHero
+      title="Unsere Vision"
+      subtitle="Empowerment für deine Gesundheit"
+      minHeight="300px"
+      fromColor="purple-500"
+      toColor="blue-600"
+    />
 
     <Hr />
 
@@ -230,28 +232,6 @@ const pageDescription =
 </Layout>
 
 <style>
-  /* Hero section styles */
-  .hero-section {
-    @apply relative flex min-h-[300px] w-full items-center justify-center overflow-hidden rounded-lg bg-gradient-to-r from-purple-500 to-blue-600 p-8 text-center text-white;
-  }
-
-  .hero-content {
-    @apply relative z-10 max-w-3xl;
-  }
-
-  .hero-section::before {
-    content: "";
-    @apply absolute inset-0 bg-black/40;
-  }
-
-  .hero-section h1 {
-    @apply mb-4 text-4xl font-bold md:text-5xl;
-  }
-
-  .subtitle {
-    @apply text-xl font-light md:text-2xl;
-  }
-
   /* Vision grid layout */
   .vision-grid {
     @apply max-w-7xl mx-auto px-4 space-y-16;
