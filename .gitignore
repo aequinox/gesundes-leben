@@ -28,3 +28,6 @@ public/index
 
 # coverage
 coverage/
+
+# content
+posts/
