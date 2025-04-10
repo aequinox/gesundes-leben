@@ -2,7 +2,7 @@
 import path from 'path';
 import { argv } from 'process';
 import { getConfig } from './src/wizard';
-import { parseFilePromise, type Post as ParserPost } from './src/parser';
+import { parseFilePromise } from './src/parser';
 import { writeFiles } from './src/writer';
 import logger from './src/logger';
 import { ConversionError } from './src/errors';

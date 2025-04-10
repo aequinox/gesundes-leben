@@ -128,7 +128,7 @@ async function writeMarkdownFile(file: MarkdownFile): Promise<void> {
     // Ensure consistent key order and no unnecessary quotes
     const frontmatterYaml = yaml.dump(frontmatter, {
         lineWidth: -1,
-        sortKeys: true, // Keep frontmatter consistent
+        sortKeys: false, // Keep frontmatter consistent
         noRefs: true, // Avoid YAML references
         quotingType: '"' // Use double quotes for consistency
     });

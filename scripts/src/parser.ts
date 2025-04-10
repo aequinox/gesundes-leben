@@ -97,21 +97,21 @@ interface FrontmatterGettersMap {
 // Manually create the map to replace requireDirectory
 // Assuming default exports from the JS files for now
 const frontmatterGetters: FrontmatterGettersMap = {
+  id: (id as any).default,
+  title: (title as any).default,
   author: (author as any).default,
+  pubDatetime: (pubDatetime as any).default,
+  modDatetime: (modDatetime as any).default,
   categories: (categories as any).default,
+  taxonomy: (taxonomy as any).default,
+  tags: (tags as any).default,
   coverImage: (coverImage as any).default,
   date: (date as any).default,
   draft: (draft as any).default,
   example: (example as any).default,
   excerpt: (excerpt as any).default,
   featured: (featured as any).default,
-  id: (id as any).default,
-  modDatetime: (modDatetime as any).default,
-  pubDatetime: (pubDatetime as any).default,
   slug: (slug as any).default,
-  tags: (tags as any).default,
-  taxonomy: (taxonomy as any).default,
-  title: (title as any).default,
   type: (type as any).default,
 };
 
