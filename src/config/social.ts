@@ -45,19 +45,19 @@ export const SOCIALS: SocialObjects = [
   // Active social platforms
   {
     name: "Facebook",
-    href: "https://github.com/satnaing/astro-paper", // TODO: Update with actual Facebook page
+    href: "https://www.facebook.com/gesundheit.in.tuebingen/", // TODO: Update with actual Facebook page
     linkTitle: `${SITE_TITLE} auf Facebook`,
     active: true,
   },
   {
     name: "Instagram",
-    href: "https://github.com/satnaing/astro-paper", // TODO: Update with actual Instagram profile
+    href: "https://www.instagram.com/gesundheitintuebingen", // TODO: Update with actual Instagram profile
     linkTitle: `${SITE_TITLE} auf Instagram`,
     active: true,
   },
   {
     name: "LinkedIn",
-    href: "https://github.com/satnaing/astro-paper", // TODO: Update with actual LinkedIn profile
+    href: "https://de.linkedin.com/in/kai-renner-0a6b1a17a", // TODO: Update with actual LinkedIn profile
     linkTitle: `${SITE_TITLE} auf LinkedIn`,
     active: true,
   },
@@ -69,12 +69,6 @@ export const SOCIALS: SocialObjects = [
     active: true,
   },
   // Inactive social platforms - consider removing unused ones
-  {
-    name: "Github",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE_TITLE} auf Github`,
-    active: false,
-  },
   {
     name: "Twitter",
     href: "https://github.com/satnaing/astro-paper",
