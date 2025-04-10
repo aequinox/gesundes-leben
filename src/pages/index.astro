@@ -1,9 +1,9 @@
 ---
 /**
- * Homepage Component
+ * Homepage Component (2025 Edition)
  *
  * The main landing page for the Gesundes Leben blog.
- * Features a hero section, blog filter, and link to all posts.
+ * Features a modern hero section, dynamic blog filter, and enhanced content presentation.
  */
 
 import Layout from "@/layouts/Layout.astro";
@@ -16,6 +16,7 @@ import Card from "@/components/sections/Card.astro";
 import LinkButton from "@/components/elements/LinkButton.astro";
 import HeroSection from "@/components/sections/HeroSection.astro";
 import { postService } from "@/services/content/PostService";
+import { Icon } from "astro-icon/components";
 
 // Fetch and process posts using the PostService
 const posts = await postService.getAllPosts();
@@ -28,37 +29,87 @@ const recentPosts = await postService.getRecentPosts(sortedPosts);
 
 <Layout>
   <Header />
-  <main id="main-content">
-    <HeroSection />
+  <main id="main-content" class="relative overflow-hidden">
+    {/* Background decorative elements */}
+    <div
+      class="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-skin-accent/5 blur-3xl"
+    >
+    </div>
+    <div
+      class="absolute top-1/3 -left-32 h-96 w-96 rounded-full bg-skin-accent/5 blur-3xl"
+    >
+    </div>
+
+    {/* Hero Section with enhanced styling */}
+    <div class="relative z-10">
+      <HeroSection />
+    </div>
 
     <Hr />
 
-    <BlogFilter />
+    {/* Blog Filter Section */}
+    <div class="relative z-10 backdrop-blur-sm">
+      <BlogFilter />
+    </div>
 
+    {/* Featured Articles Section */}
     {
       featuredPosts.length > 0 && (
-        <section id="featured">
-          <h2>Ausgewählte Artikel</h2>
-          <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
-            {featuredPosts.map(post => (
-              <Card post={post} loading="lazy" />
+        <section
+          id="featured"
+          class="relative z-10"
+          data-aos="fade-up"
+          data-aos-duration="800"
+        >
+          <div class="flex items-center gap-3">
+            <Icon name="tabler:star" class="h-7 w-7 text-skin-accent" />
+            <h2 class="text-3xl font-bold tracking-tight">
+              Ausgewählte Artikel
+            </h2>
+          </div>
+
+          <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
+            {featuredPosts.map((post, index) => (
+              <div
+                data-aos="fade-up"
+                data-aos-delay={index * 100}
+                class="transform transition-all duration-300 hover:translate-y-[-4px]"
+              >
+                <Card post={post} loading="lazy" />
+              </div>
             ))}
           </div>
         </section>
       )
     }
 
+    {/* Recent Articles Section */}
     {
       recentPosts.length > 0 && (
         <>
           <Hr />
-          <section id="recent-posts">
-            <h2>Neueste Artikel</h2>
-            <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <section
+            id="recent-posts"
+            class="relative z-10"
+            data-aos="fade-up"
+            data-aos-duration="800"
+          >
+            <div class="flex items-center gap-3">
+              <Icon name="tabler:clock" class="h-7 w-7 text-skin-accent" />
+              <h2 class="text-3xl font-bold tracking-tight">Neueste Artikel</h2>
+            </div>
+
+            <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {recentPosts.map(
                 (post, index) =>
                   index < SITE.postPerIndex && (
-                    <Card post={post} loading="lazy" />
+                    <div
+                      data-aos="fade-up"
+                      data-aos-delay={index * 100}
+                      class="transform transition-all duration-300 hover:translate-y-[-4px]"
+                    >
+                      <Card post={post} loading="lazy" />
+                    </div>
                   )
               )}
             </div>
@@ -69,14 +120,26 @@ const recentPosts = await postService.getRecentPosts(sortedPosts);
 
     <Hr />
 
-    <div class="all-posts-btn-wrapper">
-      <LinkButton href="/posts/">
-        Alle Artikel
-        <svg xmlns="http://www.w3.org/2000/svg"
-          ><path
-            d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"
-          ></path>
-        </svg>
+    {/* All Posts Button */}
+    <div
+      class="all-posts-btn-wrapper"
+      data-aos="fade-up"
+      data-aos-duration="600"
+    >
+      <LinkButton
+        href="/posts/"
+        className="group relative overflow-hidden rounded-lg bg-skin-accent px-6 py-3 font-medium text-skin-inverted shadow-md transition-all duration-300 hover:shadow-lg"
+      >
+        <span class="relative z-10 flex items-center gap-2">
+          Alle Artikel
+          <Icon
+            name="tabler:arrow-right"
+            class="h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-1"
+          />
+        </span>
+        <span
+          class="absolute inset-0 -z-10 bg-gradient-to-r from-skin-accent to-skin-accent/80 opacity-100 transition-opacity duration-300 group-hover:opacity-80"
+        ></span>
       </LinkButton>
     </div>
   </main>
@@ -88,15 +151,34 @@ const recentPosts = await postService.getRecentPosts(sortedPosts);
     #featured,
     #filtered,
     #recent-posts {
-      @apply pb-6 pt-12;
+      @apply pb-8 pt-16;
     }
-    #featured h2,
-    #filtered h2,
-    #recent-posts h2 {
-      @apply text-2xl font-semibold tracking-wide;
+    
+    /* Section transitions and animations */
+    section {
+      @apply transition-all duration-300;
     }
+    
+    /* Button wrapper styling */
     .all-posts-btn-wrapper {
-      @apply my-8 text-center;
+      @apply my-12 text-center;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      #featured,
+      #filtered,
+      #recent-posts {
+        @apply pb-6 pt-12;
+      }
+    }
+    
+    /* Reduced motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+      .transform,
+      [data-aos] {
+        @apply transform-none transition-none;
+      }
     }
   </style>
 </Layout>

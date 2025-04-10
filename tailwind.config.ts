@@ -105,7 +105,7 @@ const config: Config = {
       maxWidth: {
         // 'content': '64rem', // max-w-5xl	max-width: 64rem; /* 1024px */
         // 'content': '72rem', // max-w-6xl	max-width: 72rem; /* 1152px */
-        content: "200ch", // max-w-7xl	max-width: 80rem; /* 1280px */
+        content: "150ch", // max-w-7xl	max-width: 80rem; /* 1280px */
       },
       transitionTimingFunction: {
         "in-expo": "cubic-bezier(0.95, 0.05, 0.795, 0.035)",

@@ -1,100 +1,137 @@
 ---
 /**
- * HeroSection Component
+ * HeroSection Component (2025 Edition)
  *
- * A reusable hero section for the homepage that displays:
- * - Main heading
- * - RSS feed link
- * - Welcome message
- * - Introduction text
- * - Social links (if enabled)
+ * A modern, visually engaging hero section for the homepage that displays:
+ * - Main heading with enhanced typography
+ * - RSS feed link with improved styling
+ * - Welcome message with visual emphasis
+ * - Introduction text with improved readability
+ * - Social links with enhanced visual presentation
  *
  * @component
  */
 
 import { SOCIALS } from "@/config";
 import Socials from "@/components/socials/Socials.astro";
+import { Icon } from "astro-icon/components";
 
 // Count active social links for conditional rendering
 const socialCount = SOCIALS.filter(social => social.active).length;
 ---
 
-<section id="hero">
-  <h1>Gesundes Leben</h1>
-  <a
-    target="_blank"
-    href="/rss.xml"
-    class="rss-link"
-    aria-label="rss feed"
-    title="RSS Feed"
+<section id="hero" class="relative overflow-hidden">
+  <!-- Decorative background elements -->
+  <div
+    class="absolute -right-16 -top-16 h-32 w-32 rounded-full bg-skin-accent/10 blur-2xl"
   >
-    <svg xmlns="http://www.w3.org/2000/svg" class="rss-icon"
-      ><path
-        d="M19 20.001C19 11.729 12.271 5 4 5v2c7.168 0 13 5.832 13 13.001h2z"
-      ></path><path
-        d="M12 20.001h2C14 14.486 9.514 10 4 10v2c4.411 0 8 3.589 8 8.001z"
-      ></path><circle cx="6" cy="18" r="2"></circle>
-    </svg>
-    <span class="sr-only">RSS Feed</span>
-  </a>
+  </div>
+  <div
+    class="absolute -left-24 top-1/2 h-48 w-48 rounded-full bg-skin-accent/5 blur-3xl"
+  >
+  </div>
 
-  <h2 class="text-3xl leading-8">Willkommen auf unserem Blog!</h2>
+  <div class="relative z-10 mx-auto max-w-content">
+    <!-- Main heading with enhanced styling -->
+    <div class="mb-8 flex items-center justify-between">
+      <h1
+        class="bg-gradient-to-r from-skin-accent to-skin-accent/80 bg-clip-text text-4xl font-black tracking-tight text-transparent sm:text-6xl"
+        data-aos="fade-right"
+        data-aos-duration="800"
+      >
+        Gesundes Leben
+      </h1>
 
-  <p class="leading-7">
-    Auf diesem Blog stellen dir Sandra & Kai Artikel über Gesundheitsthemen zur
-    Verfügung und laden dich ein auf eine Reise zu mehr Gesundheit, die Spaß
-    machen soll. <span class="hash">sogehtgesund</span>
-  </p>
+      <a
+        target="_blank"
+        href="/rss.xml"
+        class="rss-link group flex items-center gap-2 rounded-full bg-skin-card p-2 shadow-sm transition-all duration-300 hover:bg-skin-accent/20 hover:shadow-md"
+        aria-label="RSS Feed"
+        title="RSS Feed"
+        data-aos="fade-left"
+      >
+        <Icon
+          name="tabler:rss"
+          class="h-6 w-6 fill-skin-accent transition-transform duration-300 group-hover:scale-110"
+        />
+        <span class="sr-only">RSS Feed</span>
+      </a>
+    </div>
 
-  <p>
-    Wir betreiben den Blog als Privatpersonen, teilen aber unser Insider-Wissen,
-    das wir uns in unserer langjährigen Arbeit als Therapeuten angeeignet haben.
-    Das möchten wir auf einfache und verständliche Weise tun, denn wir finden,
-    dass medizinische Zusammenhänge häufig zu kompliziert und für Laien schwer
-    nachvollziehbar vermittelt werden. Deshalb verlinken wir medizinische
-    Begriffe, wenn sie nicht vermeidbar sind, auf unser Glossar, wo du eine
-    verständliche Erklärung findest.
-  </p>
-  <p>
-    Unser Ziel ist <strong>Empowerment für deine Gesundheit</strong>. Das
-    bedeutet, wir möchten dich darin unterstützen, für deine Gesundheit aktiv zu
-    werden und dir dafür unser Wissen und unsere Erfahrung kostenfrei zur
-    Verfügung stellen. <span class="hash">weildueswertbist</span>
-  </p>
+    <!-- Welcome message with enhanced styling -->
+    <h2
+      class="mb-6 text-4xl font-bold leading-tight tracking-tight sm:text-5xl"
+      data-aos="fade-up"
+      data-aos-delay="100"
+    >
+      Willkommen auf unserem Blog!
+    </h2>
 
-  {
-    // only display if at least one social link is enabled
-    socialCount > 0 && (
-      <div class="social-wrapper">
-        <div class="social-links">
-          <Socials />
+    <!-- Introduction text with improved typography and spacing -->
+    <div
+      class="prose-container max-w-7xl space-y-6"
+      data-aos="fade-up"
+      data-aos-delay="200"
+    >
+      <p class="text-lg leading-relaxed">
+        Auf diesem Blog stellen dir Sandra & Kai Artikel über Gesundheitsthemen
+        zur Verfügung und laden dich ein auf eine Reise zu mehr Gesundheit, die
+        Spaß machen soll. <span
+          class="hash inline-block transform transition-all duration-300 hover:scale-105"
+          >sogehtgesund</span
+        >
+      </p>
+
+      <p class="text-lg leading-relaxed">
+        Wir betreiben den Blog als Privatpersonen, teilen aber unser
+        Insider-Wissen, das wir uns in unserer langjährigen Arbeit als
+        Therapeuten angeeignet haben. Das möchten wir auf einfache und
+        verständliche Weise tun, denn wir finden, dass medizinische
+        Zusammenhänge häufig zu kompliziert und für Laien schwer nachvollziehbar
+        vermittelt werden. Deshalb verlinken wir medizinische Begriffe, wenn sie
+        nicht vermeidbar sind, auf unser Glossar, wo du eine verständliche
+        Erklärung findest.
+      </p>
+
+      <p class="text-lg leading-relaxed">
+        Unser Ziel ist <strong class="font-bold text-skin-accent"
+          >Empowerment für deine Gesundheit</strong
+        >. Das bedeutet, wir möchten dich darin unterstützen, für deine
+        Gesundheit aktiv zu werden und dir dafür unser Wissen und unsere
+        Erfahrung kostenfrei zur Verfügung stellen. <span
+          class="hash inline-block transform transition-all duration-300 hover:scale-105"
+          >weildueswertbist</span
+        >
+      </p>
+    </div>
+
+    <!-- Social links with enhanced styling -->
+    {
+      socialCount > 0 && (
+        <div class="social-wrapper" data-aos="fade-up" data-aos-delay="300">
+          <div class="social-links">
+            <Socials />
+          </div>
         </div>
-      </div>
-    )
-  }
+      )
+    }
+  </div>
 </section>
 
 <style>
   /* Hero section styles */
   #hero {
-    @apply pb-6;
-    h1 {
-      @apply my-4 inline-block text-3xl font-bold sm:my-8 sm:text-5xl;
-    }
-    .rss-link {
-      @apply mb-6;
-    }
-    .rss-icon {
-      @apply mb-2 h-6 w-6 scale-110 fill-skin-accent sm:mb-3 sm:scale-125;
-    }
-    p {
-      @apply my-2;
-    }
+    @apply pb-12 pt-6;
+  }
+
+  /* Prose container for better typography */
+  .prose-container p {
+    @apply my-4 text-skin-base/90;
   }
 
   /* Social links wrapper */
   .social-wrapper {
-    @apply mt-4 flex flex-col sm:flex-row sm:items-center;
+    @apply mt-8 flex flex-col rounded-lg bg-skin-card/30 p-4 backdrop-blur-sm sm:flex-row sm:items-center;
   }
 
   /* Social links container */
@@ -104,6 +141,28 @@ const socialCount = SOCIALS.filter(social => social.active).length;
 
   /* Hash tag styling */
   .hash {
-    @apply font-medium text-skin-accent;
+    @apply cursor-pointer font-medium text-skin-accent;
+    &::before {
+      content: "#";
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    #hero {
+      @apply pb-8 pt-4;
+    }
+
+    .prose-container p {
+      @apply text-base;
+    }
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .transform,
+    [data-aos] {
+      @apply transform-none transition-none;
+    }
   }
 </style>
