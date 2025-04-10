@@ -1,13 +1,19 @@
 ---
+/**
+ * Tags Page Component - 2025 Modern Design
+ *
+ * Displays all available tags in a visually appealing grid layout
+ * with modern design elements and interactive features.
+ */
+
 import { getCollection } from "astro:content";
 
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
-import Tag from "@/components/elements/Tag.astro";
 import Footer from "@/components/sections/Footer.astro";
 import Header from "@/components/sections/Header.astro";
+import Hr from "@/components/elements/Hr.astro";
 import { SITE } from "@/config";
 import Layout from "@/layouts/Layout.astro";
-import Main from "@/layouts/Main.astro";
 import { tagService } from "@/services/content/TagService";
 
 const lang = getLangFromUrl(Astro.url);
@@ -16,14 +22,155 @@ const t = useTranslations(lang);
 const posts = await getCollection("blog");
 
 let tags = tagService.extractUniqueTags(posts);
+
+// Group tags into categories for visual organization
+// This is just for display purposes - we're creating a grid layout
+const chunkedTags = [];
+const chunkSize = 3; // Number of tags per row on large screens
+
+for (let i = 0; i < tags.length; i += chunkSize) {
+  chunkedTags.push(tags.slice(i, i + chunkSize));
+}
 ---
 
 <Layout title={`Tags | ${SITE.title}`}>
   <Header activeNav="tags" />
-  <Main pageTitle={t("nav.tags")} pageDesc={t("post.allTags")}>
-    <ul>
-      {tags.map(({ tag, tagName }) => <Tag {tag} {tagName} size="lg" />)}
-    </ul>
-  </Main>
+
+  <main id="main-content">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1>{t("nav.tags")}</h1>
+        <p class="subtitle">{t("post.allTags")}</p>
+      </div>
+    </section>
+
+    <Hr />
+
+    <!-- Tags Grid Section -->
+    <section class="tags-section">
+      <div class="tags-container">
+        <p class="tags-intro">
+          Entdecke unsere Themen nach Tags geordnet. Klicke auf einen Tag, um
+          alle zugehörigen Artikel zu sehen.
+        </p>
+
+        <div class="tags-grid">
+          {
+            tags.map(({ tag, tagName }) => (
+              <div class="tag-card">
+                <a
+                  href={`/tags/${tag}/`}
+                  transition:name={tag}
+                  class="tag-link"
+                >
+                  <div class="tag-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      class="tag-svg"
+                    >
+                      <path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" />
+                    </svg>
+                  </div>
+                  <div class="tag-content">
+                    <h2 class="tag-name" data-pagefind-filter={t("tag.name")}>
+                      {tagName}
+                    </h2>
+                  </div>
+                </a>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+  </main>
+
   <Footer />
 </Layout>
+
+<style>
+  /* Hero section styles */
+  .hero-section {
+    @apply relative flex min-h-[250px] w-full items-center justify-center overflow-hidden rounded-lg bg-gradient-to-r from-purple-500 to-blue-600 p-8 text-center text-white;
+  }
+
+  .hero-content {
+    @apply relative z-10 max-w-3xl;
+  }
+
+  .hero-section::before {
+    content: "";
+    @apply absolute inset-0 bg-black/40;
+  }
+
+  .hero-section h1 {
+    @apply mb-4 text-4xl font-bold md:text-5xl;
+  }
+
+  .subtitle {
+    @apply text-xl font-light md:text-2xl;
+  }
+
+  /* Tags section styles */
+  .tags-section {
+    @apply py-12;
+  }
+
+  .tags-container {
+    @apply mx-auto max-w-content px-4;
+  }
+
+  .tags-intro {
+    @apply mb-10 text-center text-lg italic text-skin-base opacity-80;
+  }
+
+  .tags-grid {
+    @apply grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4;
+  }
+
+  /* Tag card styles */
+  .tag-card {
+    @apply overflow-hidden rounded-xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl dark:bg-gray-800;
+  }
+
+  .tag-link {
+    @apply flex flex-col items-center p-6 text-center no-underline;
+  }
+
+  .tag-icon {
+    @apply mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-skin-accent/10 p-4 transition-all duration-300;
+  }
+
+  .tag-svg {
+    @apply h-8 w-8 fill-skin-accent transition-all duration-300;
+  }
+
+  .tag-content {
+    @apply w-full;
+  }
+
+  .tag-name {
+    @apply text-xl font-semibold text-skin-base transition-all duration-300;
+  }
+
+  /* Hover effects */
+  .tag-card:hover .tag-icon {
+    @apply bg-skin-accent;
+  }
+
+  .tag-card:hover .tag-svg {
+    @apply fill-white;
+  }
+
+  .tag-card:hover .tag-name {
+    @apply text-skin-accent;
+  }
+
+  /* Main content styles */
+  #main-content {
+    @apply mx-auto w-full max-w-content;
+  }
+</style>
