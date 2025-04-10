@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### BlogFilter Component Enhancement
+- **Feature Enhancement**
+  - Implemented double filtering functionality in BlogFilter.astro:
+    - Added ability to filter posts by both group (pro, question-time, contra) AND category simultaneously
+    - Modified filtering logic to show only posts that match both selected group and category
+    - Added reset functionality when "All" category is clicked to show all posts regardless of group
+    - Implemented no-group-selected state to show all groups filtered by category only
+    - Added toggle functionality for group selection (clicking selected group deselects it)
+    - Enhanced state tracking with TypeScript type safety
+    - Improved user experience with intuitive filtering behavior
+    - Maintained existing animations and transitions
+
 ### Hero Section Component Refactoring
 - **Code Refactoring & UI Enhancement**
   - Created reusable PageHero component for consistent hero sections across pages:
