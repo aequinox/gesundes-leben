@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### About Page Fixes
+- **UI Enhancement & Bug Fix**
+  - Fixed alignment of "Mehr erfahren" buttons on the About page:
+    - Added fixed height to text content containers to ensure consistent button positioning
+    - Changed button container positioning to use `mt-auto` for bottom alignment
+    - Fixed SVG arrow rendering issue in light theme by adding `fill-transparent` to prevent black triangle artifacts
+    - Improved overall visual consistency of call-to-action buttons
+
 ### Impressum Page Implementation
 - **New Feature**
   - Added modern styled Impressum (legal information) page:

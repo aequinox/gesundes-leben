@@ -182,10 +182,10 @@ const pageDescription =
       <section id="professional" class="content-section">
         <h2>Professionelles</h2>
         <div class="founders-grid">
-          <div class="grid-card">
+          <div class="grid-card professional-card">
             <div class="card-content">
               <h3>HEILPRAKTIKERIN, SYSTEMISCHE THERAPEUTIN</h3>
-              <div class="text-content">
+              <div class="text-content mb-6">
                 <p class="founder-description">
                   Ursprünglich im Business als Marketing
                   Kommunikations-Managerin erfolgreich wollte Sandra näher ans
@@ -195,34 +195,34 @@ const pageDescription =
                   Systemische Therapeutin(SG), Mediatorin und Trauma Therapeutin
                   (PITT).
                 </p>
-                <div class="button-container">
-                  <a href="#" class="more-link">
-                    <span>Mehr erfahren</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="ml-2 h-5 w-5"
-                    >
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                      <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                  </a>
-                </div>
+              </div>
+              <div class="button-container">
+                <a href="#" class="more-link">
+                  <span>Mehr erfahren</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="ml-2 h-5 w-5"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </a>
               </div>
             </div>
           </div>
 
-          <div class="grid-card">
+          <div class="grid-card professional-card">
             <div class="card-content">
               <h3>HEILPRAKTIKER, HOMÖOPATH, BIOLOGE</h3>
-              <div class="text-content">
+              <div class="text-content mb-6">
                 <p class="founder-description">
                   Ursprünglich Biologe, dann einige Jahre lang Astrologe, hat
                   Kai seine Berufung im Umgang mit seinen Patienten gefunden.
@@ -230,26 +230,26 @@ const pageDescription =
                   klassische Homöopathie, Akupunktur, Orthomolekulare Medizin
                   (Mikronährstoffe) und Labor.
                 </p>
-                <div class="button-container">
-                  <a href="#" class="more-link">
-                    <span>Mehr erfahren</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="ml-2 h-5 w-5"
-                    >
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                      <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                  </a>
-                </div>
+              </div>
+              <div class="button-container">
+                <a href="#" class="more-link">
+                  <span>Mehr erfahren</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="ml-2 h-5 w-5"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </a>
               </div>
             </div>
           </div>
@@ -311,7 +311,7 @@ const pageDescription =
   }
 
   .text-content {
-    @apply space-y-4 text-lg;
+    @apply space-y-4 text-lg flex flex-col;
   }
 
   .text-content p {
@@ -321,6 +321,19 @@ const pageDescription =
   /* Founders grid styles */
   .founders-grid {
     @apply grid grid-cols-1 md:grid-cols-2 gap-8;
+  }
+
+  /* Professional card styles */
+  .professional-card {
+    @apply flex flex-col;
+  }
+
+  .professional-card .card-content {
+    @apply flex flex-col h-full;
+  }
+
+  .professional-card .text-content {
+    @apply flex-grow;
   }
 
   .founder-header {
@@ -348,7 +361,7 @@ const pageDescription =
   }
 
   .button-container {
-    @apply mt-6 flex justify-start;
+    @apply mt-auto flex justify-start;
   }
 
   .more-link {
@@ -366,7 +379,7 @@ const pageDescription =
   }
 
   .more-link svg {
-    @apply ml-2 transition-transform;
+    @apply ml-2 transition-transform fill-transparent;
   }
 
   .more-link:hover svg {
