@@ -11,10 +11,10 @@ import Header from "@/components/sections/Header.astro";
 import Footer from "@/components/sections/Footer.astro";
 import Hr from "@/components/elements/Hr.astro";
 import { SITE } from "@/config";
-import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+// import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 
-const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
+// const lang = getLangFromUrl(Astro.url);
+// const t = useTranslations(lang);
 
 const pageTitle = "Impressum";
 const pageDescription = "Rechtliche Informationen und Kontaktdaten";
@@ -37,7 +37,7 @@ const pageDescription = "Rechtliche Informationen und Kontaktdaten";
     <!-- Content Section -->
     <section class="content-section">
       <div class="content-container">
-        <div class="impressum-card">
+        <div class="imprint-card">
           <h2>Angaben gemäß § 5 TMG</h2>
           <div class="contact-info">
             <div class="info-group">
@@ -61,14 +61,14 @@ const pageDescription = "Rechtliche Informationen und Kontaktdaten";
           </div>
         </div>
 
-        <div class="impressum-card">
+        <div class="imprint-card">
           <h2>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
           <p>Sandra Pfeiffer & Kai Renner</p>
           <p>Am Lustnauer Tor 6</p>
           <p>72074 Tübingen</p>
         </div>
 
-        <div class="impressum-card">
+        <div class="imprint-card">
           <h2>Streitschlichtung</h2>
           <p>
             Die Europäische Kommission stellt eine Plattform zur
@@ -86,7 +86,7 @@ const pageDescription = "Rechtliche Informationen und Kontaktdaten";
           </p>
         </div>
 
-        <div class="impressum-card">
+        <div class="imprint-card">
           <h2>Haftung für Inhalte</h2>
           <p>
             Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte
@@ -106,7 +106,7 @@ const pageDescription = "Rechtliche Informationen und Kontaktdaten";
           </p>
         </div>
 
-        <div class="impressum-card">
+        <div class="imprint-card">
           <h2>Haftung für Links</h2>
           <p>
             Unser Angebot enthält Links zu externen Websites Dritter, auf deren
@@ -126,7 +126,7 @@ const pageDescription = "Rechtliche Informationen und Kontaktdaten";
           </p>
         </div>
 
-        <div class="impressum-card">
+        <div class="imprint-card">
           <h2>Urheberrecht</h2>
           <p>
             Die durch die Seitenbetreiber erstellten Inhalte und Werke auf
@@ -147,7 +147,7 @@ const pageDescription = "Rechtliche Informationen und Kontaktdaten";
           </p>
         </div>
 
-        <div class="impressum-card">
+        <div class="imprint-card">
           <h2>Datenschutz</h2>
           <p>
             Die Nutzung unserer Webseite ist in der Regel ohne Angabe
@@ -212,23 +212,23 @@ const pageDescription = "Rechtliche Informationen und Kontaktdaten";
   }
 
   /* Impressum card styles */
-  .impressum-card {
+  .imprint-card {
     @apply bg-white p-8 rounded-xl shadow-lg dark:bg-gray-800 transition-all duration-300;
   }
 
-  .impressum-card h2 {
+  .imprint-card h2 {
     @apply text-2xl font-bold mb-6 text-skin-base border-l-4 border-skin-accent pl-4;
   }
 
-  .impressum-card h3 {
+  .imprint-card h3 {
     @apply text-xl font-semibold mb-2 text-skin-accent;
   }
 
-  .impressum-card p {
+  .imprint-card p {
     @apply mb-4 leading-relaxed text-skin-base;
   }
 
-  .impressum-card a {
+  .imprint-card a {
     @apply text-skin-accent underline decoration-skin-accent underline-offset-2 transition-colors hover:decoration-wavy;
   }
 
