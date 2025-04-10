@@ -9,12 +9,19 @@ All notable changes to this project will be documented in this file.
   - Implemented double filtering functionality in BlogFilter.astro:
     - Added ability to filter posts by both group (pro, question-time, contra) AND category simultaneously
     - Modified filtering logic to show only posts that match both selected group and category
-    - Added reset functionality when "All" category is clicked to show all posts regardless of group
+    - Added reset functionality when "Alle" category is clicked to show all posts regardless of group
     - Implemented no-group-selected state to show all groups filtered by category only
     - Added toggle functionality for group selection (clicking selected group deselects it)
     - Enhanced state tracking with TypeScript type safety
     - Improved user experience with intuitive filtering behavior
     - Maintained existing animations and transitions
+  - Added user-friendly filter explanation accordion to homepage:
+    - Created collapsible accordion component with toggle functionality
+    - Added comprehensive German explanation of filtering features
+    - Implemented accessible design with proper ARIA attributes
+    - Added smooth animations for opening/closing
+    - Styled to match the site's design language
+    - Enhanced user guidance with tips for effective filtering
 
 ### Hero Section Component Refactoring
 - **Code Refactoring & UI Enhancement**

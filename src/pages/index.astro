@@ -47,6 +47,99 @@ const recentPosts = await postService.getRecentPosts(sortedPosts);
 
     <Hr />
 
+    {/* Filter Explanation Accordion */}
+    <div
+      class="filter-accordion mx-auto max-w-3xl mt-4 mb-8 rounded-lg border border-skin-accent/20 bg-skin-fill/60 shadow-sm backdrop-blur-md overflow-hidden"
+    >
+      <button
+        id="accordion-button"
+        class="accordion-button w-full flex items-center justify-between px-6 py-4 text-left font-medium text-skin-base hover:bg-skin-accent/10 transition-all duration-300"
+        aria-expanded="false"
+        aria-controls="accordion-content"
+      >
+        <span class="flex items-center gap-2">
+          <Icon name="tabler:info-circle" class="h-5 w-5 text-skin-accent" />
+          <span>Wie funktionieren die Filter?</span>
+        </span>
+        <Icon
+          name="tabler:chevron-down"
+          id="accordion-icon"
+          class="h-5 w-5 text-skin-accent transform transition-transform duration-300"
+        />
+      </button>
+
+      <div
+        id="accordion-content"
+        class="accordion-content hidden px-6 pb-6 pt-0 text-skin-base"
+        aria-hidden="true"
+      >
+        <div
+          class="prose prose-lg max-w-none prose-headings:text-skin-accent prose-a:text-skin-accent"
+        >
+          <h3>So funktionieren unsere Filterfunktionen</h3>
+
+          <h4>Grundlegende Filterung</h4>
+          <ul>
+            <li>
+              <strong>Gruppenfilter</strong>: Oben siehst du drei Gruppen (Pro,
+              Fragezeiten, Kontra). Klicke auf eine Gruppe, um nur Beiträge
+              dieser Gruppe anzuzeigen.
+            </li>
+            <li>
+              <strong>Kategoriefilter</strong>: Unter den Gruppen findest du
+              Kategoriebuttons. Klicke auf eine Kategorie, um Beiträge zu diesem
+              Thema zu filtern.
+            </li>
+          </ul>
+
+          <h4>Doppelte Filterung</h4>
+          <p>
+            Du kannst jetzt <strong
+              >gleichzeitig nach Gruppe und Kategorie filtern</strong
+            >! Wenn du zum Beispiel "Pro" als Gruppe und "Immunsystem" als
+            Kategorie auswählst, werden nur Beiträge angezeigt, die SOWOHL zur
+            Gruppe "Pro" gehören ALS AUCH das Thema "Immunsystem" behandeln.
+          </p>
+
+          <h4>Alle Filter zurücksetzen</h4>
+          <p>
+            Klicke auf den Button "Alle" bei den Kategorien, um sämtliche Filter
+            zurückzusetzen und wieder alle Beiträge anzuzeigen.
+          </p>
+
+          <h4>Nur nach Kategorie filtern</h4>
+          <p>
+            Wenn du nur nach einer bestimmten Kategorie filtern möchtest, ohne
+            eine Gruppe auszuwählen, kannst du das jetzt auch! Wähle einfach
+            eine Kategorie aus, ohne vorher eine Gruppe anzuklicken.
+          </p>
+
+          <h4>Gruppenauswahl umschalten</h4>
+          <p>
+            Wenn du eine bereits ausgewählte Gruppe nochmals anklickst, wird die
+            Auswahl aufgehoben. So kannst du schnell zwischen Gruppenfilterung
+            und keiner Gruppenfilterung wechseln.
+          </p>
+
+          <h4>Tipps zur Nutzung</h4>
+          <ol>
+            <li>
+              Beginne mit einer breiten Auswahl (z.B. nur eine Gruppe) und
+              verfeinere dann mit Kategorien.
+            </li>
+            <li>Nutze "Alle", wenn du wieder von vorne beginnen möchtest.</li>
+            <li>
+              Wenn du alle Beiträge zu einem bestimmten Thema sehen willst,
+              unabhängig von der Gruppe, wähle einfach nur die gewünschte
+              Kategorie aus.
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <Hr />
+
     {/* Blog Filter Section */}
     <div class="relative z-10 backdrop-blur-sm">
       <BlogFilter />
@@ -164,6 +257,22 @@ const recentPosts = await postService.getRecentPosts(sortedPosts);
       @apply my-12 text-center;
     }
     
+    /* Accordion styling */
+    .filter-accordion {
+      @apply transition-all duration-300;
+    }
+    
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease-in-out, padding 0.3s ease;
+    }
+    
+    .accordion-content.open {
+      max-height: 2000px; /* Large enough to contain content */
+      @apply pt-4;
+    }
+    
     /* Responsive adjustments */
     @media (max-width: 768px) {
       #featured,
@@ -179,6 +288,36 @@ const recentPosts = await postService.getRecentPosts(sortedPosts);
       [data-aos] {
         @apply transform-none transition-none;
       }
+      
+      .accordion-content {
+        transition: none;
+      }
     }
   </style>
+
+  <script>
+    // Accordion functionality
+    document.addEventListener("astro:page-load", () => {
+      const accordionButton = document.getElementById("accordion-button");
+      const accordionContent = document.getElementById("accordion-content");
+      const accordionIcon = document.getElementById("accordion-icon");
+
+      if (accordionButton && accordionContent && accordionIcon) {
+        accordionButton.addEventListener("click", () => {
+          // Toggle aria-expanded
+          const expanded =
+            accordionButton.getAttribute("aria-expanded") === "true";
+          accordionButton.setAttribute("aria-expanded", (!expanded).toString());
+          accordionContent.setAttribute("aria-hidden", expanded.toString());
+
+          // Toggle content visibility
+          accordionContent.classList.toggle("hidden");
+          accordionContent.classList.toggle("open");
+
+          // Rotate icon
+          accordionIcon.style.transform = expanded ? "" : "rotate(180deg)";
+        });
+      }
+    });
+  </script>
 </Layout>
