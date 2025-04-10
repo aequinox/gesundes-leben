@@ -12,10 +12,15 @@ All notable changes to this project will be documented in this file.
     - Made component use gradient as fallback when no image is provided
     - Implemented sensible defaults for all optional properties
     - Added TypeScript interfaces for proper type safety
-    - Replaced duplicate hero sections in imprint.astro, about.astro, and our-vision.astro
+    - Replaced duplicate hero sections in imprint.astro, about.astro, our-vision.astro, and posts layout
     - Improved maintainability with centralized styling
     - Enhanced flexibility with configurable min-height
     - Ensured consistent visual appearance across all pages
+  - Updated Posts.astro layout to use the PageHero component:
+    - Added PageHero component before the Main component
+    - Moved title and description from Main component to PageHero
+    - Added horizontal rule for visual separation
+    - Maintained existing functionality while improving visual consistency
 
 ### About Page Fixes
 - **UI Enhancement & Bug Fix**

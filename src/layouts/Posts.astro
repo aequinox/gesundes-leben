@@ -6,6 +6,8 @@ import Footer from "@/components/sections/Footer.astro";
 import Header from "@/components/sections/Header.astro";
 import Pagination from "@/components/sections/Pagination.astro";
 import Card from "@/components/sections/Card.astro";
+import PageHero from "@/components/sections/PageHero.astro";
+import Hr from "@/components/elements/Hr.astro";
 import { SITE } from "@/config";
 
 export interface Props {
@@ -32,12 +34,20 @@ const pageTitle = propPageTitle || propTitle || "Alle Artikel";
 
 <Layout title={title}>
   <Header activeNav="posts" />
-  <Main
-    pageTitle={pageTitle}
-    pageDesc={pageTitle.startsWith("Kategorie:")
+
+  <PageHero
+    title={pageTitle}
+    subtitle={pageTitle.startsWith("Kategorie:")
       ? `Artikel in der Kategorie ${pageTitle.replace("Kategorie: ", "")}`
       : "Alle Artikel in unserem Blog"}
-  >
+    minHeight="250px"
+    fromColor="purple-500"
+    toColor="blue-600"
+  />
+
+  <Hr />
+
+  <Main pageTitle="" pageDesc="">
     <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       {paginatedPosts.map(post => <Card post={post} />)}
     </div>
