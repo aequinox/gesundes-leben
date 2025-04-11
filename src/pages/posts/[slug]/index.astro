@@ -13,11 +13,15 @@ export interface Props {
 }
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog", ({ data }: any) => !data.draft);
+  // Get all posts including drafts for generating static paths
+  const allPosts = await getCollection("blog");
+  
+  // Get non-draft posts for pagination
+  const nonDraftPosts = allPosts.filter(post => !post.data.draft);
 
   // Process each post to add reading time
   const postsWithRT = await Promise.all(
-    posts.map(async post => {
+    allPosts.map(async post => {
       if (!post.data.readingTime) {
         post.data.readingTime = PostUtils.calculateReadingTime(post.body);
       }
@@ -31,7 +35,7 @@ export async function getStaticPaths() {
   }));
 
   const pagePaths = paginationService
-    .calculatePageNumbers(posts.length)
+    .calculatePageNumbers(nonDraftPosts.length)
     .map(pageNum => ({
       params: { slug: String(pageNum) },
     }));
