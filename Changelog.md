@@ -8,8 +8,9 @@ All notable changes to this project will be documented in this file.
 - **UI Enhancement**
   - Updated the mobile menu hamburger icon to use Tabler SVG icons:
     - Replaced CSS-based hamburger icon with Tabler SVG icons for better visual consistency
-    - Added dynamic icon switching between menu (≡) and close (×) icons when toggling the mobile menu
-    - Enhanced mobile toggle button with proper color and sizing for the SVG icon
+    - Implemented dynamic icon switching between menu (≡) and close (×) icons when toggling the mobile menu
+    - Used CSS-based transitions for smooth icon switching with opacity animations
+    - Enhanced mobile toggle button with proper color and sizing for the SVG icons
     - Improved accessibility with proper ARIA attributes and keyboard navigation
     - Added smooth transitions for icon changes
     - Maintained existing mobile menu functionality while improving visual appeal
