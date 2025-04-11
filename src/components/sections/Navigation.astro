@@ -1,151 +1,76 @@
 ---
 /**
- * Navigation Component
+ * Modern Navigation Component
  *
- * A modern, responsive navigation component that provides site-wide navigation with
- * enhanced accessibility, mobile support, and performance optimizations.
+ * A sleek, minimal, high-performance navigation with advanced visual effects
+ * and optimized interaction patterns.
  *
- * Features:
- * - Responsive design with mobile-first approach
- * - Enhanced accessibility with ARIA labels and keyboard navigation
- * - Smooth animations with reduced motion support
- * - Optimized performance with proper event handling
- * - Theme toggle and search functionality
- * - Print and high contrast mode optimizations
- *
- * @component
- * @example
- * ```astro
- * <Navigation activeNav="posts" />
- * ```
+ * @version 2.0.0
  */
 
-import LinkButton from "@/components/elements/LinkButton.astro";
-import ThemeToggle from "@/components/elements/ThemeToggle.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import type { NavigationLink } from "@/data/navigation";
 import { LOGO_IMAGE, SITE } from "@/config";
-import MenuIcon from "@/components/elements/Icon.astro";
+import ThemeToggle from "@/components/elements/ThemeToggle.astro";
 
-// Type-safe component props
 interface Props {
-  /** Currently active navigation item */
   activeNav?: NavigationLink;
 }
 
-// Type definitions for navigation items
-interface NavLink {
-  /** URL for the link */
-  href: string;
-  /** Navigation key for active state */
-  key: NavigationLink;
-  /** Display label */
-  label: string;
-}
-
-interface ActionButton extends NavLink {
-  /** Icon name from the icon set */
-  icon: "archive" | "search";
-  /** Whether to show text on mobile */
-  showTextOnMobile: boolean;
-}
-
 const { activeNav }: Props = Astro.props;
-
-// Internationalization setup
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-// Pre-compute translated strings for performance
-const i18nStrings = {
-  mainNav: t("nav.mainNavigation"),
-  home: t("nav.home"),
-  toggleMenu: t("nav.toggleMenu"),
-  openMenu: t("nav.openMenu"),
-  closeMenu: t("nav.closeMenu"),
-} as const;
-
-// Define main navigation links
-const NAV_LINKS: NavLink[] = [
+// Core navigation links
+const NAV_ITEMS = [
   { href: "/posts/", key: "posts", label: t("nav.posts") },
   { href: "/glossary/", key: "glossary", label: t("nav.glossary") },
-  // { href: "/categories/", key: "categories", label: t("nav.categories") },
   { href: "/tags/", key: "tags", label: t("nav.tags") },
-  // { href: "/references/", key: "references", label: t("nav.references") },
   { href: "/our-vision/", key: "our-vision", label: t("nav.ourVision") },
   { href: "/about/", key: "about", label: t("nav.about") },
 ];
 
-// Define action buttons with type safety
-const ACTION_BUTTONS: ActionButton[] = [
-  SITE.showArchives && {
-    href: "/archives/",
-    key: "archives",
-    label: t("nav.archives"),
-    icon: "archive",
-    showTextOnMobile: false,
-  },
-  SITE.showSearch && {
-    href: "/search/",
-    key: "search",
+// Action items with proper type safety
+type IconName = "search" | "archive" | "moon" | "sun" | "menu" | "x";
+
+interface ActionItem {
+  id: string;
+  label: string;
+  icon: IconName;
+  href: string;
+}
+
+// Create action items array
+const actionItems: ActionItem[] = [];
+
+// Add search action if enabled
+if (SITE.showSearch) {
+  actionItems.push({
+    id: "search-toggle",
     label: t("nav.search"),
     icon: "search",
-    showTextOnMobile: false,
-  },
-].filter((button): button is ActionButton => Boolean(button));
+    href: "/search/",
+  });
+}
 
-// Utility function to combine Tailwind classes
-const tw = (...classes: string[]) => classes.filter(Boolean).join(" ");
+// Add archives action if enabled
+if (SITE.showArchives) {
+  actionItems.push({
+    id: "archives",
+    label: t("nav.archives"),
+    icon: "archive",
+    href: "/archives/",
+  });
+}
 
-// Component-specific class compositions
-const navClasses = tw(
-  "nav-container h-16",
-  "bg-skin-fill/90 backdrop-blur-lg",
-  "transition-all duration-200 ease-in-out"
-);
-
-const menuButtonClasses = tw(
-  "flex h-16 items-center p-2 md:hidden",
-  "hover:text-skin-accent focus:text-skin-accent",
-  "transition-all duration-200"
-);
-
-const menuItemsClasses = tw(
-  "fixed right-4 top-16 hidden",
-  "rounded-lg border border-skin-line bg-skin-fill/95",
-  "shadow-lg backdrop-blur-md",
-  "transform-gpu transition-transform duration-200",
-  "md:static md:flex md:transform-none",
-  "md:border-none md:bg-transparent md:shadow-none md:backdrop-blur-none"
-);
-
-const menuListClasses = tw(
-  "grid w-44 grid-cols-2 grid-rows-4 gap-2 p-4",
-  "md:flex md:w-auto md:grid-cols-none md:grid-rows-none",
-  "md:items-center md:gap-x-6 md:gap-y-0 md:p-0"
-);
-
-const linkClasses = tw(
-  "w-full px-4 py-3 text-center font-medium",
-  "transition-all duration-200",
-  "hover:text-skin-accent focus:text-skin-accent",
-  "md:my-0 md:w-auto md:px-3 md:py-2 md:rounded-md"
-);
-
-const activeClasses = tw(
-  "text-skin-accent font-semibold",
-  "bg-skin-accent/10 md:rounded-md"
-);
+// Use the properly typed array
+const ACTIONS = actionItems;
 ---
 
-<nav class={navClasses} role="navigation" aria-label={i18nStrings.mainNav}>
-  <div class="mx-auto flex h-16 w-full items-center justify-between px-4">
-    {/* Logo/Home Link */}
-    <a
-      href="/"
-      class="flex h-16 items-center transition-opacity hover:opacity-80"
-      aria-label={i18nStrings.home}
-    >
+<nav class="nav" aria-label={t("nav.mainNavigation")}>
+  <div class="nav-container">
+    <!-- Logo -->
+    <a href="/" class="nav-logo" aria-label={t("nav.home")}>
       {
         LOGO_IMAGE.enable ? (
           <img
@@ -154,410 +79,749 @@ const activeClasses = tw(
             width={LOGO_IMAGE.width}
             height={LOGO_IMAGE.height}
             loading="eager"
-            class="h-auto max-h-10 w-auto"
           />
         ) : (
-          <span class="text-lg font-bold">{SITE.title}</span>
+          <span>{SITE.title}</span>
         )
       }
     </a>
 
-    <div class="flex items-center gap-2">
-      {/* Mobile Menu Button */}
-      <button
-        id="hamburger-menu"
-        class={menuButtonClasses}
-        aria-label={i18nStrings.toggleMenu}
-        aria-expanded="false"
-        aria-controls="menu-items"
-        data-labels={JSON.stringify({
-          open: i18nStrings.openMenu,
-          close: i18nStrings.closeMenu,
-        })}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="menu-icon h-6 w-6"
-          aria-hidden="true"
-        >
-          <line x1="7" y1="12" x2="21" y2="12" class="line"></line>
-          <line x1="3" y1="6" x2="21" y2="6" class="line"></line>
-          <line x1="12" y1="18" x2="21" y2="18" class="line"></line>
-          <line x1="18" y1="6" x2="6" y2="18" class="close"></line>
-          <line x1="6" y1="6" x2="18" y2="18" class="close"></line>
-        </svg>
-      </button>
+    <!-- Primary Navigation (Desktop) -->
+    <div class="nav-links-wrapper">
+      <ul class="nav-links">
+        {
+          NAV_ITEMS.map(({ href, key, label }) => (
+            <li>
+              <a
+                href={href}
+                class:list={["nav-link", { active: activeNav === key }]}
+                aria-current={activeNav === key ? "page" : undefined}
+              >
+                {label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
 
-      {/* Navigation Menu */}
-      <div id="menu-items" class={menuItemsClasses} role="menu">
-        <ul class={menuListClasses}>
-          {/* Main Navigation Links */}
-          {
-            NAV_LINKS.map(({ href, key, label }) => (
-              <li class="col-span-2 flex items-center justify-center">
-                <a
-                  href={href}
-                  class:list={[linkClasses, activeNav === key && activeClasses]}
-                  aria-current={activeNav === key ? "page" : undefined}
-                  role="menuitem"
-                >
-                  {label}
-                </a>
-              </li>
-            ))
-          }
-
-          {/* Action Buttons and Theme Toggle */}
-          <li
-            class="col-span-2 flex items-center justify-end gap-x-2 md:col-span-1"
+    <!-- Actions -->
+    <div class="nav-actions">
+      {
+        ACTIONS.map(({ id, label, icon, href }) => (
+          <a
+            id={id}
+            href={href}
+            class:list={["nav-action", { active: activeNav === id }]}
+            aria-label={label}
+            title={label}
           >
-            {
-              ACTION_BUTTONS.map(
-                ({ href, key, label, icon, showTextOnMobile }) => (
-                  <LinkButton
-                    href={href}
-                    className={`action-button ${activeNav === key ? "active" : ""}`}
-                    ariaLabel={label}
-                    title={label}
-                  >
-                    <MenuIcon name={icon} active={activeNav === key} />
-                    <span class={showTextOnMobile ? "sm:sr-only" : "sr-only"}>
-                      {label}
-                    </span>
-                  </LinkButton>
-                )
-              )
-            }
-            {SITE.lightAndDarkMode && <ThemeToggle lang={lang} />}
-          </li>
-        </ul>
-      </div>
+            <svg-icon name={icon} />
+            <span class="sr-only">{label}</span>
+          </a>
+        ))
+      }
+
+      {SITE.lightAndDarkMode && <ThemeToggle lang={lang} />}
+
+      <!-- Mobile Menu Toggle -->
+      <button
+        id="mobile-toggle"
+        class="mobile-toggle"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label={t("nav.toggleMenu")}
+      >
+        <svg-icon name="menu"></svg-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="mobile-menu" aria-hidden="true">
+    <div class="mobile-menu-container">
+      <ul class="mobile-nav-links">
+        {
+          NAV_ITEMS.map(({ href, key, label }) => (
+            <li>
+              <a
+                href={href}
+                class:list={["mobile-nav-link", { active: activeNav === key }]}
+                aria-current={activeNav === key ? "page" : undefined}
+              >
+                {label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
     </div>
   </div>
 </nav>
 
 <style>
-  /* Menu icon animations */
-  .menu-icon .line {
-    @apply transition-opacity duration-200 ease-in-out;
+  /* CSS Variables for easy theming and adjustments */
+  .nav {
+    --nav-height: 2.5rem;
+    --nav-padding-x: clamp(1rem, 5vw, 2rem);
+    --nav-bg: hsla(var(--color-bg-base), 0.75);
+    --nav-border: hsla(var(--color-border), 0.1);
+    --nav-shadow: 0 4px 20px -4px hsla(var(--color-card-shadow), 0.15);
+    --nav-blur: 20px;
+    --nav-transition: 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    --nav-text: var(--color-text);
+    --nav-accent: var(--color-accent);
+    --nav-accent-bg: hsla(var(--color-accent-base), 0.08);
+    --nav-accent-bg-hover: hsla(var(--color-accent-base), 0.12);
+    --nav-item-radius: 0.5rem;
+    --nav-item-padding: 0.5rem 0.75rem;
+    --nav-item-gap: clamp(0.75rem, 2vw, 1.5rem);
+    --nav-font-weight: 500;
+    --nav-font-weight-active: 600;
+    --nav-z-index: 1000;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--nav-height);
+    z-index: var(--nav-z-index);
+    transform: translateY(0);
+    transition:
+      transform var(--nav-transition),
+      background-color var(--nav-transition),
+      box-shadow var(--nav-transition);
+    will-change: transform, background-color, box-shadow;
   }
 
-  .menu-icon .close {
-    @apply opacity-0 transition-opacity duration-200 ease-in-out;
+  /* Navigation states */
+  .nav::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--nav-bg);
+    backdrop-filter: blur(var(--nav-blur));
+    -webkit-backdrop-filter: blur(var(--nav-blur));
+    border-bottom: 1px solid var(--nav-border);
+    opacity: 0;
+    transition: opacity var(--nav-transition);
+    z-index: -1;
   }
 
-  #hamburger-menu[aria-expanded="true"] .line {
-    @apply opacity-0;
+  .nav.scrolled::before {
+    opacity: 1;
   }
 
-  #hamburger-menu[aria-expanded="true"] .close {
-    @apply opacity-100;
+  .nav.scrolled {
+    box-shadow: var(--nav-shadow);
   }
 
-  /* Action button styles */
-  :global(.action-button) {
-    @apply flex items-center justify-center rounded-full p-2;
-    @apply transition-all duration-200 ease-in-out;
-    @apply hover:bg-skin-accent/10 hover:text-skin-accent focus:text-skin-accent;
+  .nav.hidden {
+    transform: translateY(-100%);
   }
 
-  :global(.action-button.active) {
-    @apply bg-skin-accent/10 text-skin-accent;
-  }
-
-  :global(.action-button svg) {
-    @apply h-5 w-5;
-  }
-
-  /* Navigation container styles */
+  /* Container */
   .nav-container {
-    @apply px-4 py-3;
-    @apply transition-all duration-200 ease-in-out;
-    @apply bg-gradient-to-b from-skin-fill/95 to-skin-fill/90;
-    @apply backdrop-blur-md;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--nav-padding-x);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
   }
 
-  /* .nav-container.scrolled {
-    @apply px-4 py-1;
-    box-shadow:
-      0 4px 6px -1px rgba(0, 0, 0, 0.07),
-      0 2px 4px -1px rgba(0, 0, 0, 0.05);
-  } */
-
-  /* Focus styles */
-  a:focus-visible,
-  button:focus-visible {
-    @apply outline-none ring-2 ring-skin-accent ring-offset-2;
+  /* Logo */
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--nav-text);
+    font-weight: 700;
+    font-size: 1.25rem;
+    transition: opacity 200ms ease;
+    flex-shrink: 0;
+    height: 100%;
   }
 
-  /* Reduced motion preferences */
+  .nav-logo:hover {
+    opacity: 0.85;
+  }
+
+  .nav-logo img {
+    height: auto;
+    max-height: 2rem;
+    width: auto;
+  }
+
+  /* Navigation Links */
+  .nav-links-wrapper {
+    display: none;
+    height: 100%;
+  }
+
+  .nav-links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: var(--nav-item-gap);
+    height: 100%;
+    align-items: center;
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--nav-item-padding);
+    color: var(--nav-text);
+    font-weight: var(--nav-font-weight);
+    text-decoration: none;
+    border-radius: var(--nav-item-radius);
+    transition: all 200ms ease;
+    position: relative;
+  }
+
+  .nav-link:hover {
+    color: var(--nav-accent);
+    background-color: var(--nav-accent-bg);
+  }
+
+  .nav-link.active {
+    color: var(--nav-accent);
+    font-weight: var(--nav-font-weight-active);
+  }
+
+  .nav-link.active::after {
+    content: "";
+    position: absolute;
+    bottom: -0.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1.5rem;
+    height: 0.25rem;
+    background-color: var(--nav-accent);
+    border-radius: 1rem;
+  }
+
+  /* Actions */
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 100%;
+  }
+
+  .nav-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    color: var(--nav-text);
+    border-radius: 50%;
+    transition: all 200ms ease;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    position: relative;
+  }
+
+  .nav-action:hover {
+    color: var(--nav-accent);
+    background-color: var(--nav-accent-bg);
+  }
+
+  .nav-action.active {
+    color: var(--nav-accent);
+    background-color: var(--nav-accent-bg-hover);
+  }
+
+  .nav-action svg-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Mobile Toggle - Using Tabler Icons */
+  .mobile-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    background-color: var(--nav-accent-bg);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 2;
+    margin-left: 0.25rem;
+    color: var(--nav-accent);
+  }
+
+  .mobile-toggle:hover {
+    background-color: var(--nav-accent-bg-hover);
+    transform: scale(1.05);
+  }
+
+  .mobile-toggle:active {
+    transform: scale(0.95);
+  }
+
+  .mobile-toggle svg-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  /* Mobile Menu */
+  .mobile-menu {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    height: calc(100vh - var(--nav-height));
+    background: var(--nav-bg);
+    backdrop-filter: blur(var(--nav-blur));
+    -webkit-backdrop-filter: blur(var(--nav-blur));
+    z-index: calc(var(--nav-z-index) - 1);
+    transform: translateY(-100%);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      transform 400ms cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 400ms cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0s linear 400ms;
+    overflow-y: auto;
+  }
+
+  .mobile-menu.open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    transition:
+      transform 500ms cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 500ms cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0s linear 0s;
+  }
+
+  .mobile-menu-container {
+    padding: 1.5rem var(--nav-padding-x);
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .mobile-nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .mobile-nav-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: var(--nav-text);
+    font-weight: var(--nav-font-weight);
+    text-decoration: none;
+    border-radius: var(--nav-item-radius);
+    transition: all 200ms ease;
+    font-size: 1.125rem;
+  }
+
+  .mobile-nav-link:hover {
+    color: var(--nav-accent);
+    background-color: var(--nav-accent-bg);
+  }
+
+  .mobile-nav-link.active {
+    color: var(--nav-accent);
+    background-color: var(--nav-accent-bg-hover);
+    font-weight: var(--nav-font-weight-active);
+  }
+
+  /* Responsive Styles */
+  @media (min-width: 768px) {
+    .nav-links-wrapper {
+      display: flex;
+    }
+
+    .mobile-toggle {
+      display: none;
+    }
+  }
+
+  /* Dark Mode Optimizations */
+  :global(.dark) .nav {
+    --nav-bg: hsla(var(--color-bg-base), 0.8);
+    --nav-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.25);
+  }
+
+  /* Reduced Motion */
   @media (prefers-reduced-motion: reduce) {
-    .nav-container,
-    .menu-icon .line,
-    .menu-icon .close,
-    :global(.action-button),
-    .transition-all {
-      @apply transform-none transition-none;
+    .nav,
+    .nav::before,
+    .nav-link,
+    .nav-action,
+    .mobile-toggle,
+    .mobile-menu,
+    .mobile-nav-link {
+      transition: none;
     }
   }
 
-  /* Print optimization */
-  @media print {
-    nav {
-      @apply hidden;
-    }
-  }
-
-  /* High contrast mode support */
+  /* High Contrast Mode */
   @media (forced-colors: active) {
-    .nav-container {
-      @apply border-b-2 border-[ButtonText];
+    .nav::before {
+      border-bottom: 2px solid ButtonText;
     }
   }
 
-  /* Dark mode optimizations */
-  :global(.dark) .nav-container {
-    @apply bg-gradient-to-b from-skin-fill/95 to-skin-fill/90;
-  }
-
-  :global(.dark) .nav-container.scrolled {
-    box-shadow:
-      0 4px 6px -1px rgba(0, 0, 0, 0.2),
-      0 2px 4px -1px rgba(0, 0, 0, 0.15);
-  }
-
-  /* Mobile menu animations */
-  @keyframes slideIn {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-
-  @keyframes slideOut {
-    from {
-      transform: translateX(0);
-      opacity: 1;
-    }
-    to {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-  }
-
-  .menu-enter {
-    animation: slideIn 0.2s ease-out;
-  }
-
-  .menu-exit {
-    animation: slideOut 0.2s ease-in;
+  /* Screen Reader Only */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
   }
 </style>
 
 <script>
-  import { themeService } from "@/services/ui/ThemeService";
-
   /**
-   * Enhanced navigation functionality with improved performance and accessibility
+   * Modern Navigation Controller
    *
-   * Features:
-   * - Smooth mobile menu animations
-   * - Performance optimized with RAF
-   * - Enhanced keyboard navigation
-   * - Proper cleanup on page transitions
-   * - Theme persistence during navigation
+   * A high-performance, optimized navigation controller with smart scroll detection
+   * and smooth animations.
+   *
+   * @author Cline
+   * @version 2.0.0
    */
   class NavigationController {
-    private menuBtn: HTMLElement | null;
-    private menuItems: HTMLElement | null;
-    private nav: HTMLElement | null;
-    private scrollTimeout: number | null;
-    private labels: { open: string; close: string };
-    private navLinks: HTMLAnchorElement[] | null;
-    private linkClickHandlers: Map<HTMLAnchorElement, () => void>;
+    // DOM Elements
+    private nav: HTMLElement | null = null;
+    private mobileToggle: HTMLElement | null = null;
+    private mobileMenu: HTMLElement | null = null;
 
+    // State
+    private lastScrollY = 0;
+    private scrollDirection: "up" | "down" = "up";
+    private scrollThreshold = 60;
+    private scrollTolerance = 10;
+    private isScrolling = false;
+    private scrollTimer: number | null = null;
+    private resizeObserver: ResizeObserver | null = null;
+
+    // Page offset to account for the navigation height
+    private pageOffset = 0;
+
+    /**
+     * Initialize the navigation controller
+     */
     constructor() {
-      this.menuBtn = document.getElementById("hamburger-menu");
-      this.menuItems = document.getElementById("menu-items");
-      this.nav = document.querySelector(".nav-container");
-      this.scrollTimeout = null;
-      this.labels = this.getMenuLabels();
-      this.navLinks = Array.from(document.querySelectorAll("nav a"));
-      this.linkClickHandlers = new Map();
+      // Initialize after DOM is fully loaded
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => this.init());
+      } else {
+        this.init();
+      }
+    }
 
-      if (!this.menuBtn || !this.menuItems || !this.nav) {
+    /**
+     * Initialize the controller
+     */
+    private init(): void {
+      // Get DOM elements
+      this.nav = document.querySelector(".nav");
+      this.mobileToggle = document.getElementById("mobile-toggle");
+      this.mobileMenu = document.getElementById("mobile-menu");
+
+      // Exit if required elements are not found
+      if (!this.nav || !this.mobileToggle || !this.mobileMenu) {
         console.warn("Navigation elements not found");
         return;
       }
 
-      this.init();
-    }
+      // Set initial page offset
+      this.updatePageOffset();
 
-    private getMenuLabels(): { open: string; close: string } {
-      return this.menuBtn?.dataset.labels
-        ? JSON.parse(this.menuBtn.dataset.labels)
-        : {
-            open: "Open Menu",
-            close: "Close Menu",
-          };
-    }
-
-    private init(): void {
+      // Set up event listeners
       this.setupEventListeners();
-      this.setupKeyboardNav();
+
+      // Initial scroll check
+      this.handleScroll();
     }
 
-    private toggleMenu = (): void => {
-      if (!this.menuBtn || !this.menuItems) return;
+    /**
+     * Set up all event listeners
+     */
+    private setupEventListeners(): void {
+      // Mobile menu toggle
+      this.mobileToggle?.addEventListener("click", this.toggleMobileMenu);
 
-      const isExpanded = this.menuBtn.getAttribute("aria-expanded") === "true";
+      // Optimized scroll handling with throttling
+      window.addEventListener("scroll", this.handleScrollEvent, {
+        passive: true,
+      });
+
+      // Handle resize events
+      this.resizeObserver = new ResizeObserver(this.handleResize);
+      if (this.nav) {
+        this.resizeObserver.observe(this.nav);
+      }
+
+      // Close mobile menu on click outside
+      document.addEventListener("click", this.handleOutsideClick);
+
+      // Close mobile menu on escape key
+      document.addEventListener("keydown", this.handleKeyDown);
+
+      // Handle mobile menu links
+      const mobileLinks = this.mobileMenu?.querySelectorAll("a");
+      mobileLinks?.forEach(link => {
+        link.addEventListener("click", this.closeMobileMenu);
+      });
+    }
+
+    /**
+     * Toggle the mobile menu
+     */
+    private toggleMobileMenu = (): void => {
+      if (!this.mobileToggle || !this.mobileMenu) return;
+
+      const isExpanded =
+        this.mobileToggle.getAttribute("aria-expanded") === "true";
       const willExpand = !isExpanded;
 
-      this.menuBtn.setAttribute("aria-expanded", willExpand.toString());
-      this.menuBtn.setAttribute(
-        "aria-label",
-        willExpand ? this.labels.close : this.labels.open
-      );
+      // Update ARIA attributes
+      this.mobileToggle.setAttribute("aria-expanded", willExpand.toString());
+      this.mobileMenu.setAttribute("aria-hidden", (!willExpand).toString());
 
-      // Toggle with animation
-      if (willExpand) {
-        this.menuItems.classList.remove("hidden");
-        this.menuItems.classList.add("menu-enter");
-      } else {
-        this.menuItems.classList.add("menu-exit");
-        setTimeout(() => {
-          this.menuItems?.classList.add("hidden");
-          this.menuItems?.classList.remove("menu-exit");
-        }, 200);
+      // Toggle classes
+      this.mobileMenu.classList.toggle("open", willExpand);
+
+      // Toggle icon between menu and x
+      const iconElement = this.mobileToggle.querySelector("svg-icon");
+      if (iconElement) {
+        iconElement.setAttribute("name", willExpand ? "x" : "menu");
+      }
+
+      // Prevent body scroll when menu is open
+      document.body.style.overflow = willExpand ? "hidden" : "";
+    };
+
+    /**
+     * Close the mobile menu
+     */
+    private closeMobileMenu = (): void => {
+      if (!this.mobileToggle || !this.mobileMenu) return;
+
+      this.mobileToggle.setAttribute("aria-expanded", "false");
+      this.mobileMenu.setAttribute("aria-hidden", "true");
+      this.mobileMenu.classList.remove("open");
+
+      // Reset icon to menu
+      const iconElement = this.mobileToggle.querySelector("svg-icon");
+      if (iconElement) {
+        iconElement.setAttribute("name", "menu");
+      }
+
+      document.body.style.overflow = "";
+    };
+
+    /**
+     * Handle scroll events with throttling
+     */
+    private handleScrollEvent = (): void => {
+      if (!this.isScrolling) {
+        window.requestAnimationFrame(() => {
+          this.handleScroll();
+          this.isScrolling = false;
+        });
+        this.isScrolling = true;
       }
     };
 
+    /**
+     * Handle scroll position and update navigation state
+     */
     private handleScroll = (): void => {
       if (!this.nav) return;
 
-      const scrollThreshold = window.innerHeight * 0.25;
-      const isScrolled = window.scrollY > scrollThreshold;
+      const currentScrollY = window.scrollY;
 
-      this.nav.classList.toggle("scrolled", isScrolled);
+      // Determine scroll direction with tolerance to avoid flickering
+      if (Math.abs(currentScrollY - this.lastScrollY) > this.scrollTolerance) {
+        this.scrollDirection =
+          currentScrollY > this.lastScrollY ? "down" : "up";
+        this.lastScrollY = currentScrollY;
+      }
+
+      // Add scrolled class when not at the top
+      this.nav.classList.toggle("scrolled", currentScrollY > 10);
+
+      // Smart scroll detection for hiding/showing
+      if (currentScrollY <= 0) {
+        // At the top - always show
+        this.nav.classList.remove("hidden");
+      } else if (
+        this.scrollDirection === "down" &&
+        currentScrollY > this.scrollThreshold
+      ) {
+        // Scrolling down and past threshold - hide
+        this.nav.classList.add("hidden");
+
+        // Close mobile menu if open
+        if (this.mobileToggle?.getAttribute("aria-expanded") === "true") {
+          this.closeMobileMenu();
+        }
+      } else if (this.scrollDirection === "up") {
+        // Scrolling up - show
+        this.nav.classList.remove("hidden");
+      }
+
+      // Clear previous timer
+      if (this.scrollTimer) {
+        clearTimeout(this.scrollTimer);
+      }
+
+      // Set a timer to check if scrolling has stopped
+      this.scrollTimer = window.setTimeout(() => {
+        this.handleScrollStop();
+      }, 150);
     };
 
-    private setupKeyboardNav(): void {
-      // Close menu on Escape
-      document.addEventListener("keydown", (e: KeyboardEvent) => {
-        if (
-          e.key === "Escape" &&
-          this.menuBtn?.getAttribute("aria-expanded") === "true"
-        ) {
-          this.toggleMenu();
-        }
-      });
+    /**
+     * Handle when scrolling stops
+     */
+    private handleScrollStop = (): void => {
+      if (!this.nav) return;
 
-      // Focus trap within menu when open
-      const focusableElements = this.menuItems?.querySelectorAll(
-        'a[href], button, [tabindex]:not([tabindex="-1"])'
-      );
+      // If near the top, ensure nav is visible
+      if (window.scrollY < 100) {
+        this.nav.classList.remove("hidden");
+      }
+    };
 
-      if (focusableElements?.length) {
-        const firstFocusable = focusableElements[0] as HTMLElement;
-        const lastFocusable = focusableElements[
-          focusableElements.length - 1
-        ] as HTMLElement;
+    /**
+     * Handle resize events
+     */
+    private handleResize = (): void => {
+      // Update page offset
+      this.updatePageOffset();
 
-        lastFocusable.addEventListener("keydown", (e: KeyboardEvent) => {
-          if (e.key === "Tab" && !e.shiftKey) {
-            e.preventDefault();
-            firstFocusable.focus();
-          }
-        });
+      // Close mobile menu on larger screens
+      if (
+        window.innerWidth >= 768 &&
+        this.mobileToggle?.getAttribute("aria-expanded") === "true"
+      ) {
+        this.closeMobileMenu();
+      }
+    };
 
-        firstFocusable.addEventListener("keydown", (e: KeyboardEvent) => {
-          if (e.key === "Tab" && e.shiftKey) {
-            e.preventDefault();
-            lastFocusable.focus();
-          }
-        });
+    /**
+     * Handle clicks outside the mobile menu
+     */
+    private handleOutsideClick = (e: MouseEvent): void => {
+      if (
+        this.mobileToggle?.getAttribute("aria-expanded") === "true" &&
+        !this.mobileMenu?.contains(e.target as Node) &&
+        !this.mobileToggle.contains(e.target as Node)
+      ) {
+        this.closeMobileMenu();
+      }
+    };
+
+    /**
+     * Handle keyboard events
+     */
+    private handleKeyDown = (e: KeyboardEvent): void => {
+      if (
+        e.key === "Escape" &&
+        this.mobileToggle?.getAttribute("aria-expanded") === "true"
+      ) {
+        this.closeMobileMenu();
+      }
+    };
+
+    /**
+     * Update page offset based on navigation height
+     */
+    private updatePageOffset(): void {
+      if (this.nav) {
+        const navHeight = this.nav.offsetHeight;
+        document.documentElement.style.setProperty(
+          "--nav-offset",
+          `${navHeight}px`
+        );
+        this.pageOffset = navHeight;
       }
     }
 
-    private handleLinkClick = (): void => {
-      // Store current theme in session storage for persistence during navigation
-      sessionStorage.setItem(
-        "theme-transition",
-        document.documentElement.getAttribute("data-theme") || ""
-      );
-
-      // Apply theme immediately before navigation to prevent flickering
-      themeService.applyThemeImmediately();
-    };
-
-    private setupEventListeners(): void {
-      // Menu toggle
-      this.menuBtn?.addEventListener("click", this.toggleMenu);
-
-      // Optimized scroll handling
-      window.addEventListener(
-        "scroll",
-        () => {
-          if (this.scrollTimeout) {
-            cancelAnimationFrame(this.scrollTimeout);
-          }
-          this.scrollTimeout = requestAnimationFrame(this.handleScroll);
-        },
-        { passive: true }
-      );
-
-      // Close menu on click outside
-      document.addEventListener("click", (e: MouseEvent) => {
-        if (
-          this.menuBtn?.getAttribute("aria-expanded") === "true" &&
-          !this.menuItems?.contains(e.target as Node) &&
-          !this.menuBtn.contains(e.target as Node)
-        ) {
-          this.toggleMenu();
-        }
-      });
-
-      // Handle link clicks to apply theme immediately before navigation
-      if (this.navLinks) {
-        this.navLinks.forEach(link => {
-          // Create a unique handler for each link and store it for cleanup
-          const handler = this.handleLinkClick.bind(this);
-          this.linkClickHandlers.set(link, handler);
-          link.addEventListener("click", handler, { capture: true });
-
-          // Add data attribute to mark links as processed
-          link.setAttribute("data-theme-processed", "true");
-        });
-      }
-    }
-
+    /**
+     * Clean up all event listeners and observers
+     */
     public cleanup(): void {
-      this.menuBtn?.removeEventListener("click", this.toggleMenu);
+      // Remove event listeners
+      this.mobileToggle?.removeEventListener("click", this.toggleMobileMenu);
+      window.removeEventListener("scroll", this.handleScrollEvent);
+      document.removeEventListener("click", this.handleOutsideClick);
+      document.removeEventListener("keydown", this.handleKeyDown);
 
-      // Clean up link click handlers
-      if (this.linkClickHandlers.size > 0) {
-        this.linkClickHandlers.forEach((handler, link) => {
-          link.removeEventListener("click", handler, { capture: true });
-        });
-        this.linkClickHandlers.clear();
+      // Disconnect resize observer
+      if (this.resizeObserver) {
+        this.resizeObserver.disconnect();
+        this.resizeObserver = null;
       }
 
-      if (this.scrollTimeout) {
-        cancelAnimationFrame(this.scrollTimeout);
+      // Clear timers
+      if (this.scrollTimer) {
+        clearTimeout(this.scrollTimer);
+        this.scrollTimer = null;
       }
+
+      // Reset body overflow
+      document.body.style.overflow = "";
     }
+  }
+
+  // Create SVG icon component using Tabler Icons
+  class SvgIcon extends HTMLElement {
+    static icons = {
+      // Tabler Icons - https://tabler-icons.io/
+      search: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>`,
+      archive: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 4m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" /><path d="M10 12l4 0" /></svg>`,
+      moon: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-moon" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" /></svg>`,
+      sun: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-sun" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" /></svg>`,
+      menu: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-menu-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 6l16 0" /><path d="M4 12l16 0" /><path d="M4 18l16 0" /></svg>`,
+      x: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>`,
+    };
+
+    connectedCallback() {
+      const name = this.getAttribute("name") || "";
+      const svg = SvgIcon.icons[name as keyof typeof SvgIcon.icons] || "";
+      this.innerHTML = svg;
+    }
+  }
+
+  // Define custom element
+  if (!customElements.get("svg-icon")) {
+    customElements.define("svg-icon", SvgIcon);
   }
 
   // Initialize controller
@@ -565,26 +829,32 @@ const activeClasses = tw(
 
   // Handle Astro page transitions
   document.addEventListener("astro:page-load", () => {
-    controller?.cleanup();
+    if (controller) {
+      controller.cleanup();
+    }
     controller = new NavigationController();
   });
 
-  // Apply theme at each stage of the view transition
-  document.addEventListener("astro:before-preparation", () => {
-    themeService.applyThemeImmediately();
-  });
-
-  document.addEventListener("astro:after-preparation", () => {
-    themeService.applyThemeImmediately();
-  });
-
   document.addEventListener("astro:before-swap", () => {
-    controller?.cleanup();
-    controller = null;
-    themeService.applyThemeImmediately();
-  });
-
-  document.addEventListener("astro:after-swap", () => {
-    themeService.reflectPreference();
+    if (controller) {
+      controller.cleanup();
+      controller = null;
+    }
   });
 </script>
+
+<!-- Add padding to the main content to prevent it from being hidden under the fixed navigation -->
+<style is:global>
+  :root {
+    --nav-offset: 3.5rem;
+  }
+
+  body {
+    padding-top: var(--nav-offset);
+  }
+
+  main {
+    position: relative;
+    z-index: 1;
+  }
+</style>

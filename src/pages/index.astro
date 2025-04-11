@@ -221,7 +221,7 @@ import { Icon } from "astro-icon/components";
     >
       <LinkButton
         href="/posts/"
-        className="group relative overflow-hidden rounded-lg bg-skin-accent px-6 py-3 font-medium text-skin-inverted shadow-md transition-all duration-300 hover:shadow-lg"
+        className="group relative overflow-hidden rounded-lg bg-skin-accent px-6 py-3 font-medium text-skin-inverted shadow-md transition-all duration-300 hover:bg-skin-accent hover:text-skin-inverted hover:shadow-lg"
       >
         <span class="relative z-10 flex items-center gap-2">
           Alle Artikel
@@ -230,9 +230,6 @@ import { Icon } from "astro-icon/components";
             class="h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-1"
           />
         </span>
-        <span
-          class="absolute inset-0 -z-10 bg-gradient-to-r from-skin-accent to-skin-accent/80 opacity-100 transition-opacity duration-300 group-hover:opacity-80"
-        ></span>
       </LinkButton>
     </div>
   </main>
