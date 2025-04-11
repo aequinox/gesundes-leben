@@ -6,8 +6,6 @@
  * following SOLID principles.
  */
 
-import path from "path";
-import { parse, stringify } from "yaml";
 import { contentFileService } from "@/services/content/ContentFileService";
 import { frontmatterService, type BlogFrontmatter } from "@/services/content/FrontmatterService";
 import { handleAsync } from "@/core/errors/handleAsync";

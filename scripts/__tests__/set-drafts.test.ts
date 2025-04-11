@@ -19,6 +19,7 @@ vi.mock('@/core/errors/handleAsync', () => ({
 }));
 
 vi.mock('path', () => ({
+  /* tslint:disable-next-line:no-unused-variable */
   relative: vi.fn((from, to) => 'relative/path/file.md'),
   join: vi.fn((...args) => args.join('/')),
 }));

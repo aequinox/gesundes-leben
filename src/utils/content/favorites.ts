@@ -1,5 +1,5 @@
 import { getCollection, getEntry } from "astro:content";
-import type { Favorite } from "./types";
+import type { Favorite, FavoriteCategory } from "./types";
 
 /**
  * Custom error class for favorite-related operations
@@ -13,11 +13,6 @@ class FavoriteError extends Error {
     this.name = "FavoriteError";
   }
 }
-
-/**
- * Valid category types for favorites
- */
-type FavoriteCategory = "Basis" | "Premium" | "Profi";
 
 /**
  * Sort options for favorites
@@ -50,9 +45,9 @@ export class FavoriteUtils {
 
   /**
    * Clears the favorites cache
-   * @private
+   * This method should be called when favorites data might have changed
    */
-  private static clearCache(): void {
+  public static clearCache(): void {
     FavoriteUtils.favoritesCache = null;
   }
 
@@ -74,12 +69,25 @@ export class FavoriteUtils {
    */
   public static sortByCategory(favorites: ReadonlyArray<Favorite>): Favorite[] {
     return [...favorites].sort((a, b) => {
-      const priorityA = a.data.category
-        ? FavoriteUtils.CATEGORY_PRIORITY[a.data.category]
-        : 0;
-      const priorityB = b.data.category
-        ? FavoriteUtils.CATEGORY_PRIORITY[b.data.category]
-        : 0;
+      // Get the priority for category A
+      let priorityA = 0;
+      if (
+        a.data.category &&
+        ["Basis", "Premium", "Profi"].includes(a.data.category)
+      ) {
+        priorityA =
+          FavoriteUtils.CATEGORY_PRIORITY[a.data.category as FavoriteCategory];
+      }
+
+      // Get the priority for category B
+      let priorityB = 0;
+      if (
+        b.data.category &&
+        ["Basis", "Premium", "Profi"].includes(b.data.category)
+      ) {
+        priorityB =
+          FavoriteUtils.CATEGORY_PRIORITY[b.data.category as FavoriteCategory];
+      }
       return priorityB - priorityA;
     });
   }
@@ -101,6 +109,11 @@ export class FavoriteUtils {
     try {
       if (useCache && FavoriteUtils.favoritesCache) {
         const cached = FavoriteUtils.favoritesCache;
+        if (!Array.isArray(cached)) {
+          throw new FavoriteError(
+            "Failed to fetch favorites. The favorites cache is not an array."
+          );
+        }
         return sortBy === "category"
           ? FavoriteUtils.sortByCategory(cached)
           : FavoriteUtils.sortByName(cached);
@@ -202,8 +215,17 @@ export class FavoriteUtils {
       };
 
       favorites.forEach(favorite => {
-        const category = favorite.data.category || "Uncategorized";
-        grouped[category].push(favorite);
+        // Default to "Uncategorized" if no category is provided
+        const categoryValue = favorite.data.category || "Uncategorized";
+
+        // Validate that the category is one of the expected values
+        if (
+          ["Basis", "Premium", "Profi", "Uncategorized"].includes(categoryValue)
+        ) {
+          // Use type assertion to tell TypeScript this is a valid key
+          const category = categoryValue as FavoriteCategory | "Uncategorized";
+          grouped[category].push(favorite);
+        }
       });
 
       return grouped;
@@ -252,7 +274,9 @@ export class FavoriteUtils {
         return (
           name.toLowerCase().includes(searchTerm) ||
           manufacturer.toLowerCase().includes(searchTerm) ||
-          descriptions.some(desc => desc.toLowerCase().includes(searchTerm))
+          descriptions.some((desc: string) =>
+            desc.toLowerCase().includes(searchTerm)
+          )
         );
       });
     } catch (error) {
