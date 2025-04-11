@@ -9,22 +9,22 @@
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/sections/Header.astro";
 import Footer from "@/components/sections/Footer.astro";
-import { SITE } from "@/config";
+// import { SITE } from "@/config";
 import Hr from "@/components/elements/Hr.astro";
 import BlogFilter from "@/components/filter/BlogFilter.astro";
-import Card from "@/components/sections/Card.astro";
+// import Card from "@/components/sections/Card.astro";
 import LinkButton from "@/components/elements/LinkButton.astro";
 import HeroSection from "@/components/sections/HeroSection.astro";
-import { postService } from "@/services/content/PostService";
+// import { postService } from "@/services/content/PostService";
 import { Icon } from "astro-icon/components";
 
 // Fetch and process posts using the PostService
-const posts = await postService.getAllPosts();
-const sortedPosts = await postService.getSortedPosts(posts);
+// const posts = await postService.getAllPosts();
+// const sortedPosts = await postService.getSortedPosts(posts);
 
 // Get featured and recent posts using the PostService
-const featuredPosts = await postService.getFeaturedPosts(sortedPosts);
-const recentPosts = await postService.getRecentPosts(sortedPosts);
+// const featuredPosts = await postService.getFeaturedPosts(sortedPosts);
+// const recentPosts = await postService.getRecentPosts(sortedPosts);
 ---
 
 <Layout>
