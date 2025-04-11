@@ -1,5 +1,18 @@
+import fs from 'fs';
+import path from 'path';
 import { ConversionError } from './errors';
 import logger from './logger'; // Import the logger for consistent logging
+
+// Extend NodeJS Global interface for imageDimensions
+declare global {
+  // eslint-disable-next-line no-var
+  var imageDimensions: Map<string, { width?: number; height?: number }>;
+}
+
+// Ensure global map exists
+if (!global.imageDimensions) {
+  global.imageDimensions = new Map<string, { width?: number; height?: number }>();
+}
 
 /**
  * Extracts the filename from a URL.
@@ -65,7 +78,96 @@ export function getBaseFilenameIfResized(filename: string): string | null {
  * @param src - The original image source URL or path string.
  * @returns The normalized image path string. Returns the original src if filename extraction fails.
  */
-export function getNormalizedImagePath(src: string): string {
+/**
+ * Checks if a file exists with a different extension.
+ * Useful for finding the correct file when the extension in the reference is wrong.
+ * 
+ * @param basePath - The base directory path where to look for the file
+ * @param filename - The filename with potentially incorrect extension
+ * @param possibleExtensions - Array of possible extensions to check (without the dot)
+ * @returns The filename with the correct extension if found, or the original filename if not
+ */
+export function findCorrectFileExtension(
+  basePath: string, 
+  filename: string, 
+  possibleExtensions: string[] = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']
+): string {
+  if (!filename) {
+    return filename;
+  }
+
+  try {
+    // Check if the file already exists with its current extension
+    const fullPath = path.join(basePath, filename);
+    if (fs.existsSync(fullPath)) {
+      return filename; // File exists with current extension
+    }
+
+    // Extract the base name without extension
+    const lastDotIndex = filename.lastIndexOf('.');
+    if (lastDotIndex === -1) {
+      return filename; // No extension found
+    }
+
+    const baseName = filename.substring(0, lastDotIndex);
+    const currentExt = filename.substring(lastDotIndex + 1).toLowerCase();
+
+    // Don't check the current extension again
+    const extensionsToCheck = possibleExtensions.filter(ext => ext.toLowerCase() !== currentExt);
+
+    // Try each possible extension
+    for (const ext of extensionsToCheck) {
+      const alternativeFilename = `${baseName}.${ext}`;
+      const alternativePath = path.join(basePath, alternativeFilename);
+      
+      if (fs.existsSync(alternativePath)) {
+        logger.info(`Found correct file extension: ${filename} -> ${alternativeFilename}`);
+        return alternativeFilename;
+      }
+    }
+
+    // If no alternative found, return the original
+    return filename;
+  } catch (error: unknown) {
+    logger.error(`Error checking file extensions for: ${filename}`, error);
+    return filename; // Return original on error
+  }
+}
+
+/**
+ * Gets the dimensions of an image file.
+ * 
+ * @param imagePath - The full path to the image file
+ * @returns An object with width and height properties, or undefined if dimensions couldn't be determined
+ */
+export function getImageDimensions(imagePath: string): { width?: number; height?: number } | undefined {
+  try {
+    // Check if the file exists
+    if (!fs.existsSync(imagePath)) {
+      logger.warn(`Image file not found: ${imagePath}`);
+      return undefined;
+    }
+
+    // For now, we'll use a simple approach to get dimensions from global map if available
+    // In a real implementation, you might use a library like 'image-size' to get actual dimensions
+    const filename = path.basename(imagePath);
+    
+    // Check if we have dimensions in the global map
+    if (global.imageDimensions?.has(filename)) {
+      return global.imageDimensions.get(filename);
+    }
+    
+    // If we don't have dimensions, return undefined
+    // In a real implementation, you would calculate dimensions here
+    logger.info(`No dimensions found for image: ${filename}`);
+    return undefined;
+  } catch (error) {
+    logger.error(`Error getting image dimensions for: ${imagePath}`, error);
+    return undefined;
+  }
+}
+
+export function getNormalizedImagePath(src: string, basePath: string = ''): string {
   if (!src) {
     return ''; // Return empty if src is empty
   }
@@ -78,17 +180,17 @@ export function getNormalizedImagePath(src: string): string {
     }
 
     const baseFilename = getBaseFilenameIfResized(filename);
+    let normalizedFilename = baseFilename || filename;
 
-    // If it's a resized version, replace the original filename with the base filename in the src path
-    if (baseFilename) {
-      // Be careful with replacement: ensure only the filename part is replaced
-      const parts = src.split('/');
-      parts[parts.length - 1] = baseFilename; // Replace last part (filename)
-      return parts.join('/');
+    // If basePath is provided, check for correct file extension
+    if (basePath) {
+      normalizedFilename = findCorrectFileExtension(basePath, normalizedFilename);
     }
 
-    // If it's not a resized version, return the original src
-    return src;
+    // Replace the original filename with the normalized one in the src path
+    const parts = src.split('/');
+    parts[parts.length - 1] = normalizedFilename; // Replace last part (filename)
+    return parts.join('/');
   } catch (error: unknown) {
       // Log error during normalization process and return original src as fallback
       logger.error(`Error normalizing image path for src: ${src}`, error);

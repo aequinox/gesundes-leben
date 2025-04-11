@@ -284,13 +284,18 @@ function processFrontmatter(file: MarkdownFile): boolean {
 
 /**
  * Normalizes image references in markdown content.
- * Handles resized image filenames and ensures 'images/' prefix.
+ * Handles resized image filenames, ensures 'images/' prefix, validates file extensions,
+ * and preserves alignment markers in captions.
  * @param file - The markdown file object.
  * @returns True if the content was modified, false otherwise.
  */
 function normalizeImageReferences(file: MarkdownFile): boolean {
     const { filePath } = file;
     let modified = false;
+    
+    // Get the post directory path for file existence checks
+    const postDir = path.dirname(filePath);
+    const imagesDir = path.join(postDir, 'images');
 
     // Regex to find markdown images: ![alt](src "title") or ![alt](src)
     // It captures alt, src, and optional title. Excludes http(s):// links.
@@ -298,17 +303,129 @@ function normalizeImageReferences(file: MarkdownFile): boolean {
 
     file.content = file.content.replace(imageRegex, (match, alt: string, src: string, title?: string) => {
         const filename = src.split('/').pop() ?? '';
+        
+        // First normalize the base filename (handle resized images)
         const baseFilename = shared.getBaseFilenameIfResized(filename);
-        const normalizedFilename = baseFilename || filename;
+        let normalizedFilename = baseFilename || filename;
+        
+        // Then check for correct file extension
+        normalizedFilename = shared.findCorrectFileExtension(imagesDir, normalizedFilename);
+        
         const normalizedSrc = `images/${normalizedFilename}`;
 
+        let wasModified = false;
+        
         if (baseFilename) {
             logger.info(`Normalized image reference filename in ${filePath}: ${filename} -> ${baseFilename}`);
-            modified = true;
+            wasModified = true;
         }
+        
+        if (normalizedFilename !== (baseFilename || filename)) {
+            logger.info(`Corrected image extension in ${filePath}: ${baseFilename || filename} -> ${normalizedFilename}`);
+            wasModified = true;
+        }
+        
         if (!src.startsWith('images/')) {
-             logger.info(`Added 'images/' prefix to image reference in ${filePath}: ${src} -> ${normalizedSrc}`);
-             modified = true;
+            logger.info(`Added 'images/' prefix to image reference in ${filePath}: ${src} -> ${normalizedSrc}`);
+            wasModified = true;
+        }
+
+        // Ensure title has an alignment marker if it doesn't already have one
+        if (title) {
+            // Check if title already has an alignment marker
+            if (!title.match(/^[<>_]/)) {
+                // Determine alignment based on aspect ratio
+                let alignmentMarker = '_'; // Default: center
+                
+                // Get image dimensions if available
+                const imagesDir = path.join(postDir, 'images');
+                const imagePath = path.join(imagesDir, normalizedFilename);
+                
+                try {
+                    // Try to get image dimensions using shared utility if available
+                    const dimensions = shared.getImageDimensions?.(imagePath);
+                    
+                    if (dimensions?.width && dimensions?.height) {
+                        const aspectRatio = dimensions.width / dimensions.height;
+                        
+                        // Use static alternating pattern for square-ish images
+                        // This is a simplified approach since we can't maintain state between calls
+                        if (aspectRatio >= 0.8 && aspectRatio <= 1.2) { // Square-ish
+                            // Use hash of filename to determine left/right consistently
+                            const hash = normalizedFilename.split('').reduce((a, b) => {
+                                a = ((a << 5) - a) + b.charCodeAt(0);
+                                return a & a;
+                            }, 0);
+                            alignmentMarker = (hash % 2 === 0) ? '<' : '>'; // Left or right based on hash
+                        } else if (aspectRatio > 1.5) { // Wide
+                            alignmentMarker = '_'; // Center
+                        } else { // Tall or other ratios
+                            // Also alternate for these
+                            const hash = normalizedFilename.split('').reduce((a, b) => {
+                                a = ((a << 5) - a) + b.charCodeAt(0);
+                                return a & a;
+                            }, 0);
+                            alignmentMarker = (hash % 2 === 0) ? '<' : '>'; // Left or right based on hash
+                        }
+                    }
+                } catch (error) {
+                    // If dimensions can't be determined, use center alignment
+                    logger.warn(`Could not determine image dimensions for ${imagePath}, using center alignment`);
+                }
+                
+                // Add the determined alignment marker
+                title = alignmentMarker + title;
+                wasModified = true;
+                logger.info(`Added ${alignmentMarker === '<' ? 'left' : alignmentMarker === '>' ? 'right' : 'center'} alignment marker to image caption in ${filePath}`);
+            }
+        } else {
+            // If no title exists, preserve original caption if available or use a generic one
+            const originalCaption = filename.replace(/\.[^/.]+$/, '').replace(/-/g, ' ').replace(/_/g, ' ');
+            
+            // Determine alignment as above
+            let alignmentMarker = '_'; // Default: center
+            
+            // Get image dimensions if available
+            const imagesDir = path.join(postDir, 'images');
+            const imagePath = path.join(imagesDir, normalizedFilename);
+            
+            try {
+                // Try to get image dimensions
+                const dimensions = shared.getImageDimensions?.(imagePath);
+                
+                if (dimensions?.width && dimensions?.height) {
+                    const aspectRatio = dimensions.width / dimensions.height;
+                    
+                    if (aspectRatio >= 0.8 && aspectRatio <= 1.2) { // Square-ish
+                        // Use hash of filename to determine left/right consistently
+                        const hash = normalizedFilename.split('').reduce((a, b) => {
+                            a = ((a << 5) - a) + b.charCodeAt(0);
+                            return a & a;
+                        }, 0);
+                        alignmentMarker = (hash % 2 === 0) ? '<' : '>'; // Left or right based on hash
+                    } else if (aspectRatio > 1.5) { // Wide
+                        alignmentMarker = '_'; // Center
+                    } else { // Tall or other ratios
+                        // Also alternate for these
+                        const hash = normalizedFilename.split('').reduce((a, b) => {
+                            a = ((a << 5) - a) + b.charCodeAt(0);
+                            return a & a;
+                        }, 0);
+                        alignmentMarker = (hash % 2 === 0) ? '<' : '>'; // Left or right based on hash
+                    }
+                }
+            } catch (error) {
+                // If dimensions can't be determined, use center alignment
+                logger.warn(`Could not determine image dimensions for ${imagePath}, using center alignment`);
+            }
+            
+            title = alignmentMarker + (originalCaption || 'Image');
+            wasModified = true;
+            logger.info(`Added caption with ${alignmentMarker === '<' ? 'left' : alignmentMarker === '>' ? 'right' : 'center'} alignment marker to image in ${filePath}`);
+        }
+
+        if (wasModified) {
+            modified = true;
         }
 
         return createImageReference(alt || '', normalizedSrc, title); // Ensure alt is string

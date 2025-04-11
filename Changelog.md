@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### WordPress to Markdown Exporter Image Handling Improvements
+- **Bug Fix & Enhancement**
+  - Fixed image file extension handling in WordPress to Markdown exporter:
+    - Added file extension validation to check if images exist with different extensions
+    - Implemented `findCorrectFileExtension()` function to automatically find the correct file extension
+    - Enhanced image path normalization to handle extension mismatches
+    - Fixed issue with incorrect file extensions in image references (e.g., .png vs .jpg)
+  - Improved image alignment and caption handling:
+    - Implemented intelligent image alignment based on aspect ratio:
+      - Square-ish images (aspect ratio 0.8-1.2) alternate between left and right alignment
+      - Wide images (aspect ratio > 1.5) are centered
+      - Other images alternate between left and right
+    - Added proper figcaption handling for Kadence image blocks
+    - Ensured all images have proper alignment markers (`<`, `>`, or `_`) in captions
+    - Added hash-based consistent alignment for images when dimensions aren't available
+    - Preserved original captions from WordPress figcaption elements
+  - Enhanced code architecture following SOLID principles:
+    - Added `getImageDimensions` function to retrieve image dimensions from files
+    - Applied Single Responsibility Principle with focused image handling functions
+    - Improved error handling and logging for image processing
+    - Added better validation for image paths and extensions
+    - Enhanced type safety with TypeScript interfaces
+
 ### BlogFilter Component Enhancement
 - **Feature Enhancement**
   - Implemented double filtering functionality in BlogFilter.astro:

@@ -1,5 +1,6 @@
 import TurndownService from 'turndown';
 import * as turndownPluginGfm from 'turndown-plugin-gfm';
+import path from 'path';
 import { ConversionError } from './errors';
 import * as shared from './shared';
 import logger from './logger'; // Import logger for consistency
@@ -125,22 +126,89 @@ export function initTurndownService(): TurndownService {
       const alt = img.getAttribute('alt') ?? '';
       const filename = src.split('/').pop() ?? ''; // Get filename safely
       
-      // Normalize image path (use base filename)
-      const normalizedSrc = shared.getNormalizedImagePath(src);
+      // Get the figcaption text if available
+      const figcaption = element.querySelector('figcaption');
+      let caption = '';
+      if (figcaption && figcaption.textContent) {
+        caption = figcaption.textContent.trim();
+      }
+      
+      // Determine alignment based on aspect ratio
+      let alignmentMarker = '_'; // Default: center
+      
+      // Try to get image dimensions if available
+      try {
+        // If we have the image file, try to get its dimensions
+        if (img.width && img.height) {
+          // Use actual image dimensions from the DOM element
+          const aspectRatio = img.width / img.height;
+          
+          if (aspectRatio >= 0.8 && aspectRatio <= 1.2) { // Square-ish
+            // Alternate between left and right for square-ish images
+            alignmentMarker = alternateRight ? '>' : '<';
+            alternateRight = !alternateRight;
+          } else if (aspectRatio > 1.5) { // Wide
+            // Center wide images
+            alignmentMarker = '_';
+          } else { // Tall or other ratios
+            // Also alternate for these
+            alignmentMarker = alternateRight ? '>' : '<';
+            alternateRight = !alternateRight;
+          }
+          
+          // Store dimensions in global map for post-processing
+          if (filename) {
+            global.imageDimensions.set(filename, { 
+              width: img.width, 
+              height: img.height 
+            });
+          }
+        } else {
+          // Fallback to global map if DOM dimensions not available
+          const dimensions = global.imageDimensions?.get(filename);
+          if (dimensions?.width && dimensions?.height) {
+            const aspectRatio = dimensions.width / dimensions.height;
+            if (aspectRatio >= 0.8 && aspectRatio <= 1.2) { // Square-ish
+              alignmentMarker = alternateRight ? '>' : '<';
+              alternateRight = !alternateRight;
+            } else if (aspectRatio > 1.5) { // Wide
+              alignmentMarker = '_';
+            } else { // Tall or other ratios
+              alignmentMarker = alternateRight ? '>' : '<';
+              alternateRight = !alternateRight;
+            }
+          } else {
+            // If no dimensions available, alternate
+            alignmentMarker = alternateRight ? '>' : '<';
+            alternateRight = !alternateRight;
+          }
+        }
+      } catch (error) {
+        // If error occurs, use alternating alignment
+        logger.warn(`Error determining image alignment for ${filename}, using alternating alignment: ${error instanceof Error ? error.message : String(error)}`);
+        alignmentMarker = alternateRight ? '>' : '<';
+        alternateRight = !alternateRight;
+      }
+      
+      // Add alignment marker to caption
+      if (caption) {
+        caption = alignmentMarker + caption;
+      } else {
+        caption = alignmentMarker + 'Image';
+      }
+      
+      // Get the post directory path for file existence checks
+      const postDir = element.ownerDocument?.documentURI ? 
+        path.dirname(element.ownerDocument.documentURI) : '';
+      
+      // Normalize image path with extension validation if post directory is available
+      const normalizedSrc = shared.getNormalizedImagePath(src, postDir ? path.join(postDir, 'images') : '');
+      
       // Ensure path is relative to 'images/' directory for final markdown
       const finalSrc = normalizedSrc.replace(/^.*\/([^/]+)$/, 'images/$1');
-
-      // Return Markdown image format with the correct filename format
-      // For Kadence blocks, we need to ensure we use the correct image size version
-      // The user example shows we need to use the format: mikroplastik_4-1-1024x984.png
-      // instead of just mikroplastik_4-1.png
       
-      // Extract the base name without extension
-      const baseName = filename.replace(/\.[^/.]+$/, '');
-      // Add the size suffix if not already present
-      const sizedFilename = baseName.includes('-1024x') ? filename : `${baseName}-1024x984.png`;
-      
-      return `![${alt}](images/${sizedFilename})`;
+      // Return Markdown image format with caption in title attribute
+      return `![${alt}](${finalSrc} "${caption}")`;
     },
   });
 
@@ -174,29 +242,71 @@ export function initTurndownService(): TurndownService {
 
       let alignmentMarker = '_'; // Default: center
 
-      // Determine alignment based on aspect ratio from global map
-      const dimensions = global.imageDimensions?.get(filename);
-      if (dimensions?.width && dimensions?.height) {
-          const aspectRatio = dimensions.width / dimensions.height;
+      // Try to get image dimensions if available
+      try {
+        // If we have the image file, try to get its dimensions
+        if (img.width && img.height) {
+          // Use actual image dimensions from the DOM element
+          const aspectRatio = img.width / img.height;
+          
           if (aspectRatio >= 0.8 && aspectRatio <= 1.2) { // Square-ish
-              alignmentMarker = alternateRight ? '>' : '<';
-              alternateRight = !alternateRight;
+            // Alternate between left and right for square-ish images
+            alignmentMarker = alternateRight ? '>' : '<';
+            alternateRight = !alternateRight;
           } else if (aspectRatio > 1.5) { // Wide
-              alignmentMarker = '_';
+            // Center wide images
+            alignmentMarker = '_';
           } else { // Tall or other ratios
+            // Also alternate for these
+            alignmentMarker = alternateRight ? '>' : '<';
+            alternateRight = !alternateRight;
+          }
+          
+      // Store dimensions in global map for post-processing
+      if (filename) {
+        global.imageDimensions.set(filename, { 
+          width: img.width, 
+          height: img.height 
+        });
+      }
+          
+        } else {
+          // Fallback to global map if DOM dimensions not available
+          const dimensions = global.imageDimensions?.get(filename);
+          if (dimensions?.width && dimensions?.height) {
+            const aspectRatio = dimensions.width / dimensions.height;
+            if (aspectRatio >= 0.8 && aspectRatio <= 1.2) { // Square-ish
               alignmentMarker = alternateRight ? '>' : '<';
               alternateRight = !alternateRight;
+            } else if (aspectRatio > 1.5) { // Wide
+              alignmentMarker = '_';
+            } else { // Tall or other ratios
+              alignmentMarker = alternateRight ? '>' : '<';
+              alternateRight = !alternateRight;
+            }
+          } else {
+            // If no dimensions available, alternate
+            alignmentMarker = alternateRight ? '>' : '<';
+            alternateRight = !alternateRight;
           }
-      } else { // Dimensions unknown or invalid
-          alignmentMarker = alternateRight ? '>' : '<';
-          alternateRight = !alternateRight;
+        }
+      } catch (error) {
+        // If error occurs, use alternating alignment
+        logger.warn(`Error determining image alignment for ${filename}, using alternating alignment: ${error instanceof Error ? error.message : String(error)}`);
+        alignmentMarker = alternateRight ? '>' : '<';
+        alternateRight = !alternateRight;
       }
 
       // Prepend alignment marker to caption
       caption = alignmentMarker + caption;
 
-      // Normalize image path (use base filename)
-      const normalizedSrc = shared.getNormalizedImagePath(src);
+      // Get the post directory path for file existence checks
+      const postDir = element.ownerDocument?.documentURI ? 
+        path.dirname(element.ownerDocument.documentURI) : '';
+      
+      // Normalize image path with extension validation if post directory is available
+      const normalizedSrc = shared.getNormalizedImagePath(src, postDir ? path.join(postDir, 'images') : '');
+      
       // Ensure path is relative to 'images/' directory for final markdown
       const finalSrc = normalizedSrc.replace(/^.*\/([^/]+)$/, 'images/$1');
 
@@ -272,30 +382,79 @@ export function initTurndownService(): TurndownService {
 
       let alignmentMarker = '_'; // Default: center
 
-      // Determine alignment based on aspect ratio
-      const dimensions = global.imageDimensions?.get(filename);
-       if (dimensions?.width && dimensions?.height) {
-          const aspectRatio = dimensions.width / dimensions.height;
+      // Try to get image dimensions if available
+      try {
+        // If we have the image file, try to get its dimensions
+        if (img.width && img.height) {
+          // Use actual image dimensions from the DOM element
+          const aspectRatio = img.width / img.height;
+          
           if (aspectRatio >= 0.8 && aspectRatio <= 1.2) { // Square-ish
-              alignmentMarker = alternateRight ? '>' : '<';
-              alternateRight = !alternateRight;
+            // Alternate between left and right for square-ish images
+            alignmentMarker = alternateRight ? '>' : '<';
+            alternateRight = !alternateRight;
           } else if (aspectRatio > 1.5) { // Wide
-              alignmentMarker = '_';
+            // Center wide images
+            alignmentMarker = '_';
           } else { // Tall or other ratios
+            // Also alternate for these
+            alignmentMarker = alternateRight ? '>' : '<';
+            alternateRight = !alternateRight;
+          }
+          
+          // Store dimensions in global map for post-processing
+          if (filename) {
+            global.imageDimensions.set(filename, { 
+              width: img.width, 
+              height: img.height 
+            });
+          }
+          
+        } else {
+          // Fallback to global map if DOM dimensions not available
+          const dimensions = global.imageDimensions?.get(filename);
+          if (dimensions?.width && dimensions?.height) {
+            const aspectRatio = dimensions.width / dimensions.height;
+            if (aspectRatio >= 0.8 && aspectRatio <= 1.2) { // Square-ish
               alignmentMarker = alternateRight ? '>' : '<';
               alternateRight = !alternateRight;
+            } else if (aspectRatio > 1.5) { // Wide
+              alignmentMarker = '_';
+            } else { // Tall or other ratios
+              alignmentMarker = alternateRight ? '>' : '<';
+              alternateRight = !alternateRight;
+            }
+          } else {
+            // If no dimensions available, alternate
+            alignmentMarker = alternateRight ? '>' : '<';
+            alternateRight = !alternateRight;
           }
-      } else { // Dimensions unknown or invalid
-          alignmentMarker = alternateRight ? '>' : '<';
-          alternateRight = !alternateRight;
+        }
+      } catch (error) {
+        // If error occurs, use alternating alignment
+        logger.warn(`Error determining image alignment for ${filename}, using alternating alignment: ${error instanceof Error ? error.message : String(error)}`);
+        alignmentMarker = alternateRight ? '>' : '<';
+        alternateRight = !alternateRight;
       }
 
       // Clean existing marker and prepend new one to title
-      title = title.replace(/^[<>_]/, ''); // Remove existing marker if present
-      title = alignmentMarker + (title || 'Image'); // Add marker, use 'Image' if title was empty
+      // Make sure we have a title to work with
+      title = title || 'Image';
+      
+      // Remove existing alignment marker if present
+      title = title.replace(/^[<>_]/, '');
+      
+      // Add the alignment marker to the beginning of the title
+      title = alignmentMarker + title;
 
-      // Normalize image path and make relative
-      const normalizedSrc = shared.getNormalizedImagePath(src);
+      // Get the post directory path for file existence checks
+      const postDir = img.ownerDocument?.documentURI ? 
+        path.dirname(img.ownerDocument.documentURI) : '';
+      
+      // Normalize image path with extension validation if post directory is available
+      const normalizedSrc = shared.getNormalizedImagePath(src, postDir ? path.join(postDir, 'images') : '');
+      
+      // Ensure path is relative to 'images/' directory for final markdown
       const finalSrc = normalizedSrc.replace(/^.*\/([^/]+)$/, 'images/$1');
 
       return `![${alt}](${finalSrc} "${title}")`;
