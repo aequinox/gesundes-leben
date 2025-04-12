@@ -1,9 +1,11 @@
 ---
 /**
- * Card Component
+ * Card Component (2025 Modern Design)
  *
  * A versatile card component for displaying blog posts with support for
  * hero images, categories, metadata, and view transitions.
+ * Updated with 2025 design trends including glass morphism, enhanced micro-interactions,
+ * and improved visual hierarchy.
  *
  * @component
  * @example
@@ -37,6 +39,7 @@ interface GroupConfig {
   type: GroupType;
   icon: string;
   label: string;
+  gradient: string;
 }
 
 const { post, withHeroImage = true, loading = "eager" }: Props = Astro.props;
@@ -48,48 +51,74 @@ const {
 // Generate the post URL using the centralized slug service
 const href = `/posts/${slugService.getPostSlug(post)}/`;
 
-// Map group types to their configurations
+// Map group types to their configurations with enhanced styling
 const groupConfigs: Record<string, GroupConfig> = {
   fragezeiten: {
     type: "question-time",
     icon: "tabler:question-mark",
     label: "Question Time",
+    gradient: "from-purple-500/80 to-indigo-600/80",
   },
   kontra: {
     type: "contra",
     icon: "tabler:thumb-down",
     label: "Contra",
+    gradient: "from-rose-500/80 to-red-600/80",
   },
   pro: {
     type: "pro",
     icon: "tabler:thumb-up",
     label: "Pro",
+    gradient: "from-emerald-500/80 to-green-600/80",
   },
 } as const;
 
 // Get group config with type safety
 const groupConfig = groupConfigs[groupProp || "fragezeiten"];
 
-// Memoize common class names
+// Memoize common class names with 2025 modern styling
 const cardClasses = [
   "article-card",
   "flex flex-col justify-between",
-  "overflow-hidden rounded-sm",
-  "bg-skin-card/10 hover:bg-skin-card/30",
-  "hover:shadow-lg",
-  "transition-all duration-300",
+  "overflow-hidden rounded-xl", // More pronounced rounding
+  "backdrop-blur-sm bg-skin-card/5", // Glass morphism base
+  "border border-skin-accent/10", // Subtle border
+  "hover:bg-skin-card/15", // Subtle background change on hover
+  "hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)]", // Modern shadow on hover
+  "hover:border-skin-accent/20", // Border highlight on hover
+  "transition-all duration-500", // Slower, more elegant transition
+  "will-change-transform", // Performance optimization
 ].join(" ");
 
 const titleClasses = [
-  "text-lg font-medium",
-  "transition-colors duration-300",
+  "text-xl font-medium", // Larger text
+  "transition-all duration-300",
   "hover:text-skin-accent",
+  "tracking-tight", // Tighter letter spacing for modern look
+  "leading-snug", // Improved line height
 ].join(" ");
 
 const readMoreClasses = [
   "mr-2 mt-4",
   "text-sm font-bold uppercase",
   "group-hover:text-skin-accent",
+  "tracking-wider", // Wider tracking for buttons is modern
+  "relative overflow-hidden", // For shine effect
+].join(" ");
+
+// Category pill modern styling
+const categoryClasses = [
+  "mb-1 mr-2", // More spacing
+  "inline-flex items-center",
+  "text-xs font-medium", // Smaller text
+  "text-skin-accent",
+  "px-2 py-0.5", // Padding for pill effect
+  "rounded-full", // Pill shape
+  "bg-skin-accent/10", // Subtle background
+  "backdrop-blur-sm", // Glass effect
+  "border border-skin-accent/20", // Subtle border
+  "transition-all duration-300",
+  "hover:bg-skin-accent/20", // Interactive hover
 ].join(" ");
 ---
 
@@ -99,92 +128,124 @@ const readMoreClasses = [
   data-group={groupConfig.type}
   aria-labelledby={`post-title-${slugService.getPostSlug(post)}`}
 >
-  <header class="w-full group-hover:opacity-80">
-    {
-      withHeroImage && heroImage && (
-        <div class="group relative cursor-pointer overflow-hidden">
-          <a href={href} aria-label={`Read more about ${title}`}>
-            <Picture
-              src={heroImage.src}
-              format="avif"
-              widths={[400, 800]}
-              sizes="(max-width: 800px) 400px, (max-width: 1200px) 800px"
-              alt={title}
-              loading={loading}
-              class="aspect-video w-full object-cover transition-all duration-300 ease-in-out group-hover:scale-105 group-hover:grayscale-[25%]"
-              transition:name={slugService.slugifyStr(title + "-heroImage")}
-            />
+  <div class="card-content relative flex flex-col h-full">
+    {/* Hero Image Section with Enhanced Visual Treatment */}
+    <header class="w-full">
+      {
+        withHeroImage && heroImage && (
+          <div class="group relative cursor-pointer overflow-hidden">
+            {/* Modern image container with enhanced hover effects */}
+            <a
+              href={href}
+              aria-label={`Read more about ${title}`}
+              class="block relative"
+            >
+              <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10 opacity-40 transition-opacity duration-500 group-hover:opacity-60" />
+              <Picture
+                src={heroImage.src}
+                format="avif"
+                widths={[400, 800]}
+                sizes="(max-width: 800px) 400px, (max-width: 1200px) 800px"
+                alt={title}
+                loading={loading}
+                class="aspect-video w-full object-cover transition-all duration-700 ease-out group-hover:scale-105 group-hover:grayscale-[15%]"
+                transition:name={slugService.slugifyStr(title + "-heroImage")}
+              />
+            </a>
+
+            {/* Enhanced Group indicator badge */}
+            <div
+              class={`absolute bottom-3 right-3 z-20 rounded-full bg-gradient-to-r ${groupConfig.gradient} px-3 py-2 text-white shadow-lg backdrop-blur-sm transition-all duration-500 ease-out group-hover:scale-105 group-hover:translate-y-[-2px]`}
+              aria-label={groupConfig.label}
+            >
+              <Icon
+                name={groupConfig.icon}
+                class="h-5 w-5"
+                aria-hidden="true"
+              />
+            </div>
+          </div>
+        )
+      }
+
+      {/* Content Section with Enhanced Typography and Spacing */}
+      <div class="p-5 flex-grow">
+        <div class="space-y-3">
+          {/* Modern Category Pills */}
+          {
+            categories && categories.length > 0 && (
+              <div class="flex flex-wrap gap-1">
+                {categories.map((category: string) => (
+                  <div
+                    transition:name={slugService.slugifyStr(title + category)}
+                    class={categoryClasses}
+                  >
+                    {category}
+                  </div>
+                ))}
+              </div>
+            )
+          }
+
+          {/* Enhanced Title with Modern Typography */}
+          <a
+            href={href}
+            aria-label={`Read more about ${title}`}
+            class="group block"
+          >
+            <h2
+              id={`post-title-${slugService.getPostSlug(post)}`}
+              class={titleClasses}
+              transition:name={slugService.slugifyStr(title)}
+            >
+              <span
+                class="bg-left-bottom bg-gradient-to-r from-skin-accent to-skin-accent/70 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-500 ease-out"
+              >
+                {title}
+              </span>
+            </h2>
           </a>
 
-          {/* Group indicator badge */}
-          <div
-            class="absolute bottom-2 right-2 rounded-full bg-skin-accent/70 px-2 py-[0.5rem] text-skin-fill transition-all duration-300 ease-in-out group-hover:scale-105 group-hover:bg-skin-accent"
-            aria-label={groupConfig.label}
-          >
-            <Icon name={groupConfig.icon} class="h-6 w-6" aria-hidden="true" />
+          {/* Article Metadata with Improved Spacing */}
+          <div class="py-1">
+            <ArticleMeta post={post} />
           </div>
+
+          {/* Description with Enhanced Typography */}
+          {
+            description && (
+              <div class="line-clamp-3 text-skin-base/80 text-sm leading-relaxed">
+                {description}
+              </div>
+            )
+          }
         </div>
-      )
-    }
-
-    <div class="p-4">
-      <div class="mb-4">
-        {
-          categories && categories.length > 0 && (
-            <div class="mb-2 flex flex-wrap text-xs uppercase">
-              {categories.map((category: string) => (
-                <div
-                  transition:name={slugService.slugifyStr(title + category)}
-                  class="mb-1 mr-[0.125rem] inline-flex items-center text-sm font-medium text-skin-accent after:[&:not(:last-child)]:ml-[0.125rem] after:[&:not(:last-child)]:content-['|']"
-                >
-                  {category}
-                </div>
-              ))}
-            </div>
-          )
-        }
-
-        <a href={href} aria-label={`Read more about ${title}`}>
-          <h2
-            id={`post-title-${slugService.getPostSlug(post)}`}
-            class={titleClasses}
-            transition:name={slugService.slugifyStr(title)}
-          >
-            {title}
-          </h2>
-        </a>
-
-        <ArticleMeta post={post} />
-
-        {
-          description && (
-            <div class="line-clamp-3 text-skin-base/80">{description}</div>
-          )
-        }
       </div>
-    </div>
-  </header>
+    </header>
 
-  <div class="group mt-auto pb-4 pl-4">
-    <a
-      href={href}
-      class={readMoreClasses}
-      aria-label={`Read more about ${title}`}
-    >
-      <span class="inline-flex items-center gap-2">
-        Weiterlesen
-        <Icon
-          name="tabler:arrow-right"
-          class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
-          aria-hidden="true"
-        />
-      </span>
-    </a>
+    {/* Modern Read More Link with Animation Effects */}
+    <div class="mt-auto p-5 pt-0">
+      <a
+        href={href}
+        class={readMoreClasses}
+        aria-label={`Read more about ${title}`}
+      >
+        <span class="inline-flex items-center gap-2 relative">
+          <span class="shine"></span>
+          Weiterlesen
+          <Icon
+            name="tabler:arrow-right"
+            class="h-5 w-5 transition-all duration-500 ease-out group-hover:translate-x-2"
+            aria-hidden="true"
+          />
+        </span>
+      </a>
+    </div>
   </div>
 </article>
 
 <style>
-  /* Animation keyframes */
+  /* Enhanced Animation Keyframes */
   @keyframes hide {
     from {
       opacity: 1;
@@ -192,14 +253,14 @@ const readMoreClasses = [
     }
     to {
       opacity: 0;
-      transform: scale(0);
+      transform: scale(0.95);
     }
   }
 
   @keyframes show {
     from {
       opacity: 0;
-      transform: scale(0);
+      transform: scale(0.95);
     }
     to {
       opacity: 1;
@@ -207,59 +268,112 @@ const readMoreClasses = [
     }
   }
 
-  /* Animation classes */
+  /* Shine effect animation */
+  @keyframes shine {
+    from {
+      transform: translateX(-100%) rotate(45deg);
+    }
+    to {
+      transform: translateX(100%) rotate(45deg);
+    }
+  }
+
+  .shine {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transform: translateX(-100%) rotate(45deg);
+    animation: shine 3s infinite;
+    pointer-events: none;
+  }
+
+  /* Modern Card Styling */
+  .article-card {
+    position: relative;
+    isolation: isolate;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  /* Animation classes with improved timing */
   .hide {
     display: none;
-    animation: hide 100ms ease-in-out;
+    animation: hide 200ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .show {
     display: block;
-    animation: show 400ms ease-in-out;
+    animation: show 500ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Focus styles */
+  /* Enhanced Focus styles */
   article:focus-within {
     @apply ring-2 ring-skin-accent ring-offset-2 ring-offset-skin-fill;
+    box-shadow:
+      0 0 0 2px var(--color-accent),
+      0 0 0 4px rgba(255, 255, 255, 0.2);
   }
 
-  /* Link focus styles */
+  /* Enhanced Link focus styles */
   a:focus-visible {
     @apply outline-none ring-2 ring-skin-accent ring-offset-2 ring-offset-skin-fill;
+    box-shadow:
+      0 0 0 2px var(--color-accent),
+      0 0 0 4px rgba(255, 255, 255, 0.2);
   }
 
-  /* Reduced motion */
+  /* Reduced motion - maintaining accessibility */
   @media (prefers-reduced-motion: reduce) {
     .transition-all,
     .transition-colors,
     .transition-transform,
-    .group-hover\:translate-x-1,
-    .group-hover\:scale-105 {
+    .group-hover\:translate-x-2,
+    .group-hover\:scale-105,
+    .group-hover\:translate-y-\[-2px\] {
       @apply transform-none transition-none;
     }
 
     .hide,
-    .show {
+    .show,
+    .shine {
       animation: none;
     }
   }
 
-  /* Print styles */
+  /* Print styles - maintaining functionality */
   @media print {
     article {
-      @apply break-inside-avoid shadow-none;
+      @apply break-inside-avoid shadow-none border-none;
     }
 
-    .group-hover\:translate-x-1,
-    .group-hover\:scale-105 {
+    .group-hover\:translate-x-2,
+    .group-hover\:scale-105,
+    .group-hover\:translate-y-\[-2px\] {
       @apply transform-none;
+    }
+
+    .shine {
+      display: none;
     }
   }
 
-  /* High contrast mode */
+  /* High contrast mode - maintaining accessibility */
   @media (forced-colors: active) {
     article {
       @apply border border-[CanvasText];
+    }
+
+    .bg-gradient-to-r,
+    .bg-gradient-to-t {
+      background: Canvas;
     }
   }
 </style>
