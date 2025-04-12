@@ -125,6 +125,16 @@ interface UITranslations {
   "group.questionTime.title": string;
   "group.questionTime.slogan": string;
 
+  // Filter
+  "filter.content": string;
+  "filter.postsAvailable": string;
+  "filter.posts": string;
+  "filter.categories": string;
+  "filter.reset": string;
+  "filter.noResults": string;
+  "filter.noResultsHelp": string;
+  "filter.clearFilters": string;
+
   // Date and Time
   "datetime.at": string;
   "readingTime.minutes": string;
@@ -259,6 +269,17 @@ export const ui: Record<
     "group.questionTime.slogan":
       "About knowledge, science, and reading recommendations",
 
+    // Filter
+    "filter.content": "Filter Content",
+    "filter.postsAvailable": "posts available",
+    "filter.posts": "posts",
+    "filter.categories": "Categories",
+    "filter.reset": "Reset",
+    "filter.noResults": "No matching posts found",
+    "filter.noResultsHelp":
+      "Try adjusting your filter criteria or selecting different categories",
+    "filter.clearFilters": "Clear All Filters",
+
     // Date and Time
     "datetime.at": "at",
     "readingTime.minutes": "minutes read",
@@ -388,6 +409,17 @@ export const ui: Record<
     "group.questionTime.title": "Frage-Zeiten",
     "group.questionTime.slogan":
       "Über Wissenswertes, Wissenschaftliches und Lesenswertes",
+
+    // Filter
+    "filter.content": "Inhalte filtern",
+    "filter.postsAvailable": "Beiträge verfügbar",
+    "filter.posts": "Beiträge",
+    "filter.categories": "Kategorien",
+    "filter.reset": "Zurücksetzen",
+    "filter.noResults": "Keine passenden Beiträge gefunden",
+    "filter.noResultsHelp":
+      "Versuche, deine Filterkriterien anzupassen oder andere Kategorien auszuwählen",
+    "filter.clearFilters": "Alle Filter zurücksetzen",
 
     // Date and Time
     "datetime.at": "um",
