@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Card Component Height Standardization
+- **UI Enhancement**
+  - Modified Card.astro component to ensure consistent height across all cards:
+    - Implemented flexbox layout to create equal-height cards
+    - Pushed "Weiterlesen" button to the bottom of each card
+    - Enhanced content area to take up available space with flex-grow
+    - Improved vertical spacing and alignment
+    - Maintained all existing animations and visual effects
+    - Ensured proper accessibility with semantic HTML structure
+    - Preserved responsive behavior across all screen sizes
+    - Enhanced user experience with consistent visual presentation
+    - Improved grid layout appearance with uniform card heights
+
 ### Card Component Ultra-Modern Redesign
 - **UI Enhancement**
   - Completely redesigned Card.astro component with 2025 ultra-modern design principles:
