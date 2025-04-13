@@ -1,5 +1,7 @@
 ---
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
+import { getCollection } from "astro:content";
+import { slugService } from "@/services/format/SlugService";
 
 interface Props {
   class?: string;
@@ -21,6 +23,24 @@ const currentUrlPath = Astro.url.pathname.replace(/\/+$/, "");
 
 // Split path into segments and remove empty entries
 const pathSegments = currentUrlPath.split("/").filter(Boolean);
+
+// Get all blog posts for title lookup
+const allPosts = await getCollection("blog");
+
+/**
+ * Finds a blog post by its slug
+ * @param slug The post slug to search for
+ * @returns The post title if found, or null if not found
+ */
+function findPostTitleBySlug(slug: string): string | null {
+  // Find the post with a matching slug
+  const post = allPosts.find(post => {
+    const postSlug = slugService.getPostSlug(post);
+    return postSlug === slug;
+  });
+
+  return post ? post.data.title : null;
+}
 
 /**
  * Formats a breadcrumb label based on the segment and its context
@@ -66,6 +86,15 @@ function formatBreadcrumbLabel(segment: string, index: number): string {
     const pageIndicator =
       Number(pageNum) === 1 ? "" : ` (${t("nav.page")} ${pageNum})`;
     return `${decodeURIComponent(tag)}${pageIndicator}`;
+  }
+
+  // Handle blog post slugs - check if this is a post slug
+  if (pathSegments[index - 1] === "posts" && isNaN(Number(segment))) {
+    // Try to find the post title by slug
+    const postTitle = findPostTitleBySlug(segment);
+    if (postTitle) {
+      return postTitle;
+    }
   }
 
   // Default case: decode URI component for readable labels
@@ -123,7 +152,7 @@ const breadcrumbItems = buildBreadcrumbItems();
           <li>
             {item.isCurrentPage ? (
               <span class="current-page" aria-current="page">
-                <span class="capitalize">{item.label}</span>
+                {item.label}
               </span>
             ) : (
               <Fragment>
