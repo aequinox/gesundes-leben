@@ -35,6 +35,13 @@ function formatBreadcrumbLabel(segment: string, index: number): string {
     references: "nav.references",
     search: "nav.search",
     archives: "nav.archives",
+    "our-vision": "nav.ourVision",
+    about: "nav.about",
+    imprint: "footer.imprint",
+    pro: "group.pro.title",
+    kontra: "group.contra.title",
+    fragezeiten: "group.questionTime.title",
+    books: "book.recommendation",
   };
 
   // Translate common segments
@@ -103,55 +110,192 @@ function buildBreadcrumbItems(): BreadcrumbItem[] {
 const breadcrumbItems = buildBreadcrumbItems();
 ---
 
-<nav class:list={["breadcrumb", className]} aria-label="breadcrumb">
-  <ul>
-    {
-      breadcrumbItems.map(item => (
-        <li>
-          {item.isCurrentPage ? (
-            <span class="capitalize" aria-current="page">
-              {item.label}
-            </span>
-          ) : (
-            <Fragment>
-              <a href={item.href} class="capitalize">
-                {item.label}
-              </a>
-              <span aria-hidden="true">&raquo;</span>
-            </Fragment>
-          )}
-        </li>
-      ))
-    }
-  </ul>
+<nav
+  class:list={["breadcrumb", className]}
+  aria-label="breadcrumb"
+  data-aos="fade-in"
+  data-aos-duration="800"
+>
+  <div class="breadcrumb-container">
+    <ul>
+      {
+        breadcrumbItems.map((item, index) => (
+          <li>
+            {item.isCurrentPage ? (
+              <span class="current-page" aria-current="page">
+                <span class="capitalize">{item.label}</span>
+              </span>
+            ) : (
+              <Fragment>
+                <a href={item.href} class="breadcrumb-link capitalize">
+                  <span>{item.label}</span>
+                </a>
+                {index < breadcrumbItems.length - 1 && (
+                  <span class="separator" aria-hidden="true">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="separator-icon"
+                    >
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </span>
+                )}
+              </Fragment>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
 </nav>
 
 <style lang="postcss">
   .breadcrumb {
-    @apply mx-auto mb-8 mt-8 w-full max-w-content;
+    @apply mx-auto w-full max-w-content;
+  }
+  
+  .breadcrumb-container {
+    @apply rounded-xl px-4 py-2;
+    background: rgba(var(--color-card-rgb), 0.5);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(var(--color-card-rgb), 0.2);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
+  }
+  
+  ul {
+    @apply flex flex-wrap items-center gap-1;
+  }
+  
+  li {
+    @apply inline-flex items-center;
+  }
+  
+  .breadcrumb-link {
+    @apply capitalize font-medium relative px-2 py-1 rounded-md transition-all duration-300;
     
-    ul {
-      @apply flex flex-wrap items-center gap-1;
-      
-      li {
-        @apply inline;
-        
-        a {
-          @apply capitalize opacity-70 transition-opacity duration-200;
-          
-          &:hover {
-            @apply opacity-100;
-          }
-        }
-        
-        span {
-          @apply opacity-70;
-          
-          &[aria-current="page"] {
-            @apply opacity-100;
-          }
-        }
-      }
+    &:hover {
+      @apply bg-skin-card;
+      transform: translateY(-1px);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+    
+    span {
+      @apply relative z-10;
+      background-image: linear-gradient(transparent 70%, rgba(var(--color-accent-rgb), 0.2) 0%);
+      background-size: 0 100%;
+      background-repeat: no-repeat;
+      transition: background-size 0.3s;
+    }
+    
+    &:hover span {
+      background-size: 100% 100%;
+    }
+  }
+  
+  .current-page {
+    @apply px-3 py-1 rounded-full font-medium inline-block;
+    background: linear-gradient(135deg, 
+      rgba(var(--color-accent-rgb), 0.15) 0%, 
+      rgba(var(--color-accent-rgb), 0.3) 100%
+    );
+    border: 1px solid rgba(var(--color-accent-rgb), 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .separator {
+    @apply mx-1 opacity-60;
+  }
+  
+  .separator-icon {
+    @apply h-4 w-4;
+  }
+  
+  /* Dark mode adjustments */
+  :global(html[data-theme="dark"]) .breadcrumb-container {
+    background: rgba(var(--color-card-rgb), 0.3);
+    border: 1px solid rgba(var(--color-card-rgb), 0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  :global(html[data-theme="dark"]) .current-page {
+    background: linear-gradient(135deg, 
+      rgba(var(--color-accent-rgb), 0.1) 0%, 
+      rgba(var(--color-accent-rgb), 0.2) 100%
+    );
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .breadcrumb-container {
+      @apply px-3 py-1.5;
+    }
+    
+    .breadcrumb-link {
+      @apply px-1.5 py-0.5;
+    }
+    
+    .current-page {
+      @apply px-2 py-0.5;
+    }
+  }
+  
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .breadcrumb-container,
+    .breadcrumb-link,
+    .breadcrumb-link span {
+      transition: none;
+    }
+    
+    .breadcrumb-link:hover {
+      transform: none;
+    }
+  }
+  
+  /* High contrast mode */
+  @media (forced-colors: active) {
+    .breadcrumb-container {
+      border: 1px solid CanvasText;
+      background: Canvas;
+      backdrop-filter: none;
+    }
+    
+    .current-page {
+      border: 1px solid CanvasText;
+      background: Canvas;
     }
   }
 </style>
+
+<script>
+  // Add intersection observer for scroll animations
+  document.addEventListener("astro:page-load", () => {
+    const breadcrumb = document.querySelector(".breadcrumb");
+
+    if (breadcrumb && "IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1 }
+      );
+
+      observer.observe(breadcrumb);
+    }
+  });
+</script>

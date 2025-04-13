@@ -4,6 +4,7 @@ import { ClientRouter } from "astro:transitions";
 import SizeIndicator from "@/components/SizeIndicator.astro";
 import { SITE, LOCALE } from "@/config";
 import Seo from "@/components/seo/Seo.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
 
 const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
 
@@ -169,7 +170,8 @@ const structuredData = {
     data-pagefind-body
     class="mx-auto min-h-screen w-full max-w-content scroll-smooth bg-skin-fill px-4 font-sans antialiased"
   >
+    <Breadcrumbs />
     <slot />
-    <SizeIndicator />
+    {import.meta.env.DEV && <SizeIndicator />}
   </body>
 </html>

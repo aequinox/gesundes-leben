@@ -38,34 +38,35 @@ const currentYear = new Date().getFullYear();
 const containerClasses = ["w-full", noMarginTop ? "" : "mt-auto"]
   .filter(Boolean)
   .join(" ");
-
-const footerClasses = [
-  "footer-wrapper",
-  "flex flex-col items-center justify-between py-6",
-  "sm:flex-row-reverse sm:py-4",
-].join(" ");
-
-const copyrightClasses = [
-  "copyright-wrapper",
-  "my-2 flex flex-col items-center whitespace-nowrap",
-  "sm:flex-row",
-].join(" ");
 ---
 
-<footer class={containerClasses}>
-  <Hr noPadding />
-  <div class={footerClasses}>
-    <Socials centered />
-    <div class="footer-links">
-      <a href="/imprint" class="footer-link">{t("footer.imprint")}</a>
-    </div>
-    <div class={copyrightClasses}>
-      <span>
-        {t("footer.copyright")} &#169; {currentYear}
-        {SITE.author && ` ${authorDisplayName}`}
-      </span>
-      <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
-      <span>{t("footer.rights")}</span>
+<footer class={containerClasses} data-aos="fade-up" data-aos-duration="800">
+  <Hr variant="gradient" noPadding />
+
+  <div class="footer-container">
+    <div class="footer-content">
+      <div class="footer-section brand-section">
+        <div class="copyright-wrapper">
+          <span class="copyright-text">
+            {t("footer.copyright")} &#169; {currentYear}
+            {SITE.author && ` ${authorDisplayName}`}
+          </span>
+          <span class="rights-text">{t("footer.rights")}</span>
+        </div>
+      </div>
+
+      <div class="footer-section links-section">
+        <div class="footer-links">
+          <a href="/imprint" class="footer-link">
+            <span class="link-text">{t("footer.imprint")}</span>
+            <span class="link-hover-effect"></span>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-section social-section">
+        <Socials centered />
+      </div>
     </div>
   </div>
 </footer>
@@ -73,41 +74,127 @@ const copyrightClasses = [
 <style>
   /* Base styles */
   footer {
-    @apply transition-colors duration-300;
+    @apply relative transition-all duration-300;
+    margin-top: 4rem;
   }
 
-  /* Focus styles */
-  footer:focus-within {
-    @apply ring-2 ring-skin-accent ring-offset-2;
+  .footer-container {
+    @apply relative overflow-hidden rounded-t-2xl px-6 py-8;
+    background: linear-gradient(
+      to bottom,
+      rgba(var(--color-card-rgb), 0.5),
+      rgba(var(--color-card-rgb), 0.8)
+    );
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(var(--color-accent-rgb), 0.1);
+    box-shadow: 0 -10px 30px -15px rgba(0, 0, 0, 0.1);
   }
 
-  /* Link styles */
-  .link-button {
-    @apply my-1 p-2 transition-transform duration-200 hover:rotate-6;
+  .footer-content {
+    @apply mx-auto grid max-w-content gap-8;
+    grid-template-columns: 1fr;
   }
 
-  .link-button :global(svg) {
-    @apply scale-125;
+  /* Footer sections */
+  .footer-section {
+    @apply flex flex-col items-center justify-center;
+    transition: transform 0.3s ease;
   }
 
-  /* Footer links styles */
+  .footer-section:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Brand section */
+  .brand-section {
+    @apply text-center;
+  }
+
+  .copyright-wrapper {
+    @apply flex flex-col items-center gap-1;
+  }
+
+  .copyright-text,
+  .rights-text {
+    @apply text-sm opacity-80;
+  }
+
+  /* Links section */
+  .links-section {
+    @apply my-4;
+  }
+
   .footer-links {
-    @apply my-2 flex items-center justify-center;
+    @apply flex flex-wrap justify-center gap-6;
   }
 
   .footer-link {
-    @apply text-skin-base hover:text-skin-accent transition-colors duration-200 px-3 py-1 rounded-md hover:bg-skin-card;
+    @apply relative inline-block px-4 py-2 font-medium text-skin-base transition-all duration-300;
+  }
+
+  .link-text {
+    @apply relative z-10;
+  }
+
+  .link-hover-effect {
+    @apply absolute bottom-0 left-0 h-[2px] w-0 rounded-full bg-skin-accent transition-all duration-300;
+  }
+
+  .footer-link:hover {
+    @apply text-skin-accent;
+  }
+
+  .footer-link:hover .link-hover-effect {
+    @apply w-full;
+  }
+
+  .footer-link:focus-visible {
+    @apply outline-none ring-2 ring-skin-accent ring-offset-2;
+  }
+
+  /* Social section */
+  .social-section {
+    @apply mt-2;
+  }
+
+  /* Responsive layout */
+  @media (min-width: 768px) {
+    .footer-content {
+      grid-template-columns: 1fr 1fr 1fr;
+      @apply items-center;
+    }
+
+    .copyright-wrapper {
+      @apply items-start;
+    }
+
+    .social-section {
+      @apply mt-0;
+    }
+  }
+
+  /* Dark mode adjustments */
+  :global(html[data-theme="dark"]) .footer-container {
+    background: linear-gradient(
+      to bottom,
+      rgba(var(--color-card-rgb), 0.3),
+      rgba(var(--color-card-rgb), 0.5)
+    );
+    border-top: 1px solid rgba(var(--color-accent-rgb), 0.05);
+    box-shadow: 0 -10px 30px -15px rgba(0, 0, 0, 0.2);
   }
 
   /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
     footer,
-    .link-button {
+    .footer-section,
+    .footer-link,
+    .link-hover-effect {
       @apply transition-none;
     }
 
-    .link-button:hover {
-      @apply rotate-0;
+    .footer-section:hover {
+      transform: none;
     }
   }
 
@@ -118,26 +205,30 @@ const copyrightClasses = [
     }
   }
 
-  /* Dark mode adjustments */
-  :global(.dark) footer {
-    @apply bg-skin-fill/5;
-  }
-
   /* High contrast mode */
   @media (forced-colors: active) {
-    footer {
+    .footer-container {
       @apply border-t border-[CanvasText];
+      background: Canvas;
+      backdrop-filter: none;
+    }
+
+    .link-hover-effect {
+      @apply bg-[Highlight];
     }
   }
 </style>
 
 <script>
   /**
-   * Enhances footer links with keyboard navigation
+   * Enhances footer links with keyboard navigation and animations
    */
   function setupFooter() {
-    const links = document.querySelectorAll<HTMLElement>(".link-button");
+    const footerLinks = document.querySelectorAll<HTMLElement>(".footer-link");
+    const footerSections =
+      document.querySelectorAll<HTMLElement>(".footer-section");
 
+    // Handle keyboard navigation
     const handleKeydown = (event: Event) => {
       const e = event as KeyboardEvent;
       if (e.key === "Enter" || e.key === " ") {
@@ -146,13 +237,34 @@ const copyrightClasses = [
       }
     };
 
-    links.forEach(link => {
+    footerLinks.forEach(link => {
       link.addEventListener("keydown", handleKeydown);
     });
 
+    // Add staggered animation to footer sections
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        entries => {
+          entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+              setTimeout(() => {
+                entry.target.classList.add("animate-in");
+              }, index * 100);
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1 }
+      );
+
+      footerSections.forEach(section => {
+        observer.observe(section);
+      });
+    }
+
     // Cleanup function to prevent memory leaks
     return () => {
-      links.forEach(link => {
+      footerLinks.forEach(link => {
         link.removeEventListener("keydown", handleKeydown);
       });
     };
@@ -163,12 +275,12 @@ const copyrightClasses = [
 
   // Re-initialize after Astro page transitions
   document.addEventListener("astro:after-swap", () => {
-    cleanup();
+    if (cleanup) cleanup();
     cleanup = setupFooter();
   });
 
   // Cleanup on page unload
   document.addEventListener("astro:before-swap", () => {
-    cleanup();
+    if (cleanup) cleanup();
   });
 </script>
