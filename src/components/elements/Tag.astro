@@ -1,45 +1,160 @@
 ---
-import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { getLangFromUrl, useTranslations } from "../../i18n/utils";
+import { Icon } from "astro-icon/components";
 
 export interface Props {
+  /** Tag identifier */
   tag: string;
+  /** Display name for the tag */
   tagName: string;
-  size?: "sm" | "lg";
+  /** Size variant */
+  size?: "xs" | "sm" | "md" | "lg";
+  /** Visual style variant */
+  variant?: "default" | "pill" | "outline" | "minimal";
+  /** Whether to show the tag icon */
+  showIcon?: boolean;
+  /** Custom icon name (from astro-icon) */
+  icon?: string;
+  /** Additional CSS classes */
+  class?: string;
 }
 
-const { tag, tagName, size = "sm" } = Astro.props;
+const {
+  tag,
+  tagName,
+  size = "sm",
+  variant = "default",
+  showIcon = true,
+  icon = "tabler:hash",
+  class: className = "",
+} = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+
+const sizeClasses = {
+  xs: "tag-xs",
+  sm: "tag-sm",
+  md: "tag-md",
+  lg: "tag-lg",
+};
+
+const variantClasses = {
+  default: "tag-default",
+  pill: "tag-pill",
+  outline: "tag-outline",
+  minimal: "tag-minimal",
+};
 ---
 
-<li
-  class={`inline-block ${
-    size === "sm" ? "my-1 underline-offset-4" : "my-3 mx-1 underline-offset-8"
-  }`}
->
+<li class:list={["tag-item", className]}>
   <a
     href={`/tags/${tag}/`}
     transition:name={tag}
-    class={`${size === "sm" ? "text-sm" : "text-lg"} pr-2 group`}
+    class:list={["tag", sizeClasses[size], variantClasses[variant]]}
+    data-tag={tag}
   >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      class={`${size === "sm" ? " scale-75" : "scale-110"}`}
-    >
-      <path
-        d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z"
-      ></path>
-    </svg>
-    &nbsp;<span data-pagefind-filter={t("tag.name")}>{tagName}</span>
+    {
+      showIcon && (
+        <span class="tag-icon">
+          <Icon name={icon} />
+        </span>
+      )
+    }
+    <span class="tag-text" data-pagefind-filter={t("tag.name")}>{tagName}</span>
   </a>
 </li>
 
-<style lang="postcss">
-  a {
-    @apply relative underline decoration-dashed hover:-top-0.5 hover:text-skin-accent focus-visible:p-1;
+<style>
+  .tag-item {
+    @apply inline-block;
   }
-  a svg {
-    @apply -mr-3 h-6 w-6 scale-95 text-skin-base opacity-80 group-hover:fill-skin-accent;
+
+  .tag {
+    @apply relative inline-flex items-center gap-1 overflow-hidden transition-all duration-300;
+  }
+
+  /* Size variants */
+  .tag-xs {
+    @apply my-0.5 px-2 py-0.5 text-xs;
+  }
+
+  .tag-sm {
+    @apply my-1 px-3 py-1 text-sm;
+  }
+
+  .tag-md {
+    @apply my-1.5 px-4 py-1.5 text-base;
+  }
+
+  .tag-lg {
+    @apply my-2 px-5 py-2 text-lg;
+  }
+
+  /* Style variants */
+  .tag-default {
+    @apply rounded-md bg-skin-card text-skin-base shadow-sm hover:bg-skin-card-muted hover:text-skin-accent;
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.05),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+
+  .tag-pill {
+    @apply rounded-full bg-skin-accent/10 text-skin-accent shadow-sm hover:bg-skin-accent/20;
+  }
+
+  .tag-outline {
+    @apply rounded-md border border-skin-accent/30 text-skin-base hover:border-skin-accent hover:bg-skin-accent/5 hover:text-skin-accent;
+  }
+
+  .tag-minimal {
+    @apply text-skin-base underline decoration-dashed decoration-skin-accent/30 underline-offset-4 hover:text-skin-accent hover:decoration-skin-accent;
+  }
+
+  /* Icon styling */
+  .tag-icon {
+    @apply flex items-center justify-center;
+  }
+
+  .tag-icon svg {
+    @apply size-4 text-skin-accent/70 transition-transform duration-300;
+  }
+
+  .tag:hover .tag-icon svg {
+    @apply text-skin-accent;
+  }
+
+  .tag-default .tag-icon svg,
+  .tag-pill .tag-icon svg {
+    @apply -ml-1;
+  }
+
+  /* Text styling */
+  .tag-text {
+    @apply relative z-10;
+  }
+
+  /* Hover effects */
+  .tag-default:hover,
+  .tag-pill:hover,
+  .tag-outline:hover {
+    transform: translateY(-1px);
+  }
+
+  .tag-default:active,
+  .tag-pill:active,
+  .tag-outline:active {
+    transform: translateY(0);
+  }
+
+  /* Dark mode adjustments */
+  :global(html[data-theme="dark"]) .tag-default {
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.1),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+
+  :global(html[data-theme="dark"]) .tag-pill {
+    @apply bg-skin-accent/15;
   }
 </style>

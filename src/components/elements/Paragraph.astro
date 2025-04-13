@@ -1,11 +1,103 @@
 ---
+export interface Props {
+  /** Visual style variant */
+  variant?: "default" | "lead" | "subtle" | "accent";
+  /** Animation effect */
+  animation?: "none" | "fade" | "slide" | "zoom";
+  /** Text alignment */
+  align?: "left" | "center" | "right" | "justify";
+  /** Whether to enable hyphenation */
+  hyphenate?: boolean;
+  /** Whether to add drop cap effect */
+  dropCap?: boolean;
+  /** Additional CSS classes */
+  class?: string;
+}
 
+const {
+  variant = "default",
+  animation = "none",
+  align = "left",
+  hyphenate = false,
+  dropCap = false,
+  class: className = "",
+} = Astro.props;
+
+const variantClasses = {
+  default: "p-default",
+  lead: "p-lead",
+  subtle: "p-subtle",
+  accent: "p-accent",
+};
+
+const alignClasses = {
+  left: "text-left",
+  center: "text-center",
+  right: "text-right",
+  justify: "text-justify",
+};
+
+const animationMap = {
+  none: "",
+  fade: "fade-up",
+  slide: "fade-right",
+  zoom: "zoom-in",
+};
+
+const animationClass =
+  animation !== "none" ? `data-aos="${animationMap[animation]}"` : "";
+const hyphenateClass = hyphenate ? "hyphens-auto" : "";
+const dropCapClass = dropCap ? "has-drop-cap" : "";
 ---
 
-<p class="hyphens-auto text-justify xl:text-lg">
+<p
+  class:list={[
+    variantClasses[variant],
+    alignClasses[align],
+    hyphenateClass,
+    dropCapClass,
+    className,
+  ]}
+  {...animation !== "none" && { "data-aos": animationMap[animation] }}
+>
   <slot />
 </p>
 
-<!-- <p class="xl:text-lg" data-aos="fade-zoom-in">
-  <slot />
-</p> -->
+<style>
+  p {
+    @apply mb-6 max-w-content leading-relaxed text-skin-base;
+  }
+
+  /* Variant styles */
+  .p-default {
+    @apply text-base xl:text-lg;
+  }
+
+  .p-lead {
+    @apply text-lg font-medium xl:text-xl;
+  }
+
+  .p-subtle {
+    @apply text-base text-skin-base/70 xl:text-lg;
+  }
+
+  .p-accent {
+    @apply border-l-4 border-skin-accent pl-4 text-base xl:text-lg;
+  }
+
+  /* Drop cap effect */
+  .has-drop-cap:first-letter {
+    @apply float-left mr-3 text-5xl font-bold text-skin-accent;
+    line-height: 0.68;
+    margin-top: 0.05em;
+  }
+
+  /* Dark mode adjustments */
+  :global(html[data-theme="dark"]) .p-subtle {
+    @apply text-skin-base/60;
+  }
+
+  :global(html[data-theme="dark"]) .has-drop-cap:first-letter {
+    @apply text-skin-accent/90;
+  }
+</style>

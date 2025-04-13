@@ -7,7 +7,7 @@ heroImage:
   src: ./images/die_koerperlichkeit_der_depression.png
   alt: test1
 pubDatetime: 2024-08-12T19:45:39Z
-modDatetime: 2025-04-08T16:53:47Z
+modDatetime: 2025-04-13T12:57:16Z
 draft: false
 featured: false
 group: fragezeiten
@@ -37,11 +37,87 @@ import DepressionImage from "./images/die_koerperlichkeit_der_depression.png";
 import { Image } from "astro:assets";
 import Button from "@/components/elements/Button.astro";
 
+import Blockquote from "@/components/elements/Blockquote.astro";
+import Hr from "@/components/elements/Hr.astro";
+import Icon from "@/components/elements/Icon.astro";
+import ImageComponent from "@/components/elements/Image.astro";
+import LinkButton from "@/components/elements/LinkButton.astro";
+import Paragraph from "@/components/elements/Paragraph.astro";
+import Tag from "@/components/elements/Tag.astro";
+
 ## Inhaltsverzeichnis
 
 ## Welche körperlichen Ursachen einer Depression zugrunde liegen können
 
 … **und was die Wissenschaft dazu sagt.**
+
+## Button Component
+
+Buttons now come in different variants, sizes, and states including loading state and icon support.
+
+### Button Variants
+
+<div class="flex flex-wrap gap-2 mb-6">
+  <Button type="button" variant="default" icon="tabler:home">
+    Default
+  </Button>
+  <Button type="button" variant="accented" icon="tabler:star">
+    Accented
+  </Button>
+  <Button type="button" variant="muted" icon="tabler:eye">
+    Muted
+  </Button>
+  <Button variant="link" icon="tabler:link">
+    Link
+  </Button>
+</div>
+
+### Button Sizes
+
+<div class="flex flex-wrap items-center gap-2 mb-6">
+  <Button type="button" variant="default" size="sm">
+    Small
+  </Button>
+  <Button type="button" variant="default" size="md">
+    Medium
+  </Button>
+  <Button type="button" variant="default" size="lg">
+    Large
+  </Button>
+</div>
+
+### Button States
+
+<div class="flex flex-wrap gap-2 mb-6">
+  <Button type="button" variant="accented" loading={true}>
+    Loading
+  </Button>
+  <Button type="button" variant="default" fullWidth={true}>
+    Full Width
+  </Button>
+</div>
+
+## Blockquote Component
+
+Blockquotes have been redesigned with glass-morphism effects and improved typography.
+
+<Blockquote>
+  Design is not just what it looks like and feels like. Design is how it works.
+  Good design is actually a lot harder to notice than poor design, in part
+  because good designs fit our needs so well that the design is invisible. Steve
+  Jobs
+</Blockquote>
+
+## Hr Component
+
+Horizontal rules now come in different styles including default, gradient, dots, and wave.
+
+<div class="space-y-8">
+  <Hr variant="default" />
+  <Hr variant="gradient" />
+  <Hr variant="dots" />
+  <Hr variant="wave" />
+</div>
 
 ### Ein schwieriger Trend
 

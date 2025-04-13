@@ -1,0 +1,367 @@
+---
+import { Icon } from "astro-icon/components";
+import Button from "./Button.astro";
+
+export interface Props {
+  /** Modal title */
+  title?: string;
+  /** Modal description */
+  description?: string;
+  /** Modal ID for targeting */
+  id: string;
+  /** Whether the modal has a close button */
+  closable?: boolean;
+  /** Size variant */
+  size?: "sm" | "md" | "lg" | "xl" | "full";
+  /** Position variant */
+  position?: "center" | "top" | "bottom" | "right" | "left";
+  /** Whether to show a backdrop */
+  backdrop?: boolean;
+  /** Whether clicking the backdrop closes the modal */
+  backdropClickClose?: boolean;
+  /** Whether to show a footer with action buttons */
+  showFooter?: boolean;
+  /** Primary action button text */
+  primaryActionText?: string;
+  /** Secondary action button text */
+  secondaryActionText?: string;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  title,
+  description,
+  id,
+  closable = true,
+  size = "md",
+  position = "center",
+  backdrop = true,
+  backdropClickClose = true,
+  showFooter = false,
+  primaryActionText = "Confirm",
+  secondaryActionText = "Cancel",
+  class: className = "",
+} = Astro.props;
+
+const sizeClasses = {
+  sm: "modal-sm",
+  md: "modal-md",
+  lg: "modal-lg",
+  xl: "modal-xl",
+  full: "modal-full",
+};
+
+const positionClasses = {
+  center: "modal-center",
+  top: "modal-top",
+  bottom: "modal-bottom",
+  right: "modal-right",
+  left: "modal-left",
+};
+---
+
+<div
+  id={id}
+  class:list={[
+    "modal",
+    backdrop && "modal-with-backdrop",
+    sizeClasses[size],
+    positionClasses[position],
+    className,
+  ]}
+  aria-labelledby={`${id}-title`}
+  aria-describedby={description ? `${id}-description` : undefined}
+  aria-hidden="true"
+  role="dialog"
+  data-backdrop-close={backdropClickClose}
+>
+  {backdrop && <div class="modal-backdrop" />}
+
+  <div class="modal-container">
+    <div class="modal-content">
+      {
+        (title || closable) && (
+          <div class="modal-header">
+            {title && (
+              <h3 id={`${id}-title`} class="modal-title">
+                {title}
+              </h3>
+            )}
+            {closable && (
+              <button
+                type="button"
+                class="modal-close"
+                aria-label="Close modal"
+                data-modal-close
+              >
+                <Icon name="tabler:x" />
+              </button>
+            )}
+          </div>
+        )
+      }
+
+      <div class="modal-body">
+        {
+          description && (
+            <p id={`${id}-description`} class="modal-description">
+              {description}
+            </p>
+          )
+        }
+        <slot />
+      </div>
+
+      {
+        showFooter && (
+          <div class="modal-footer">
+            <Button
+              variant="muted"
+              text={secondaryActionText}
+              data-modal-close
+            />
+            <Button
+              variant="accented"
+              text={primaryActionText}
+              data-modal-confirm
+            />
+          </div>
+        )
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Base modal styles */
+  .modal {
+    @apply fixed inset-0 z-50 hidden overflow-y-auto;
+  }
+
+  .modal[aria-hidden="false"] {
+    @apply block;
+  }
+
+  .modal-backdrop {
+    @apply fixed inset-0 bg-black/50 backdrop-blur-sm;
+  }
+
+  .modal-container {
+    @apply flex min-h-full items-center justify-center p-4 text-center sm:p-0;
+  }
+
+  .modal-content {
+    @apply relative w-full overflow-hidden rounded-lg bg-skin-card text-left shadow-xl transition-all sm:my-8;
+  }
+
+  /* Header styles */
+  .modal-header {
+    @apply flex items-center justify-between border-b border-skin-line p-4 sm:p-6;
+  }
+
+  .modal-title {
+    @apply text-lg font-semibold text-skin-base;
+  }
+
+  .modal-close {
+    @apply rounded-full p-1 text-skin-base transition-colors hover:bg-skin-card-muted hover:text-skin-accent;
+  }
+
+  .modal-close svg {
+    @apply size-5;
+  }
+
+  /* Body styles */
+  .modal-body {
+    @apply p-4 sm:p-6;
+  }
+
+  .modal-description {
+    @apply mb-4 text-sm text-skin-base/80;
+  }
+
+  /* Footer styles */
+  .modal-footer {
+    @apply flex items-center justify-end gap-3 border-t border-skin-line bg-skin-card/50 p-4 sm:px-6;
+  }
+
+  /* Size variants */
+  .modal-sm .modal-content {
+    @apply max-w-sm;
+  }
+
+  .modal-md .modal-content {
+    @apply max-w-md;
+  }
+
+  .modal-lg .modal-content {
+    @apply max-w-lg;
+  }
+
+  .modal-xl .modal-content {
+    @apply max-w-xl;
+  }
+
+  .modal-full .modal-content {
+    @apply max-w-4xl;
+  }
+
+  /* Position variants */
+  .modal-center .modal-container {
+    @apply items-center;
+  }
+
+  .modal-top .modal-container {
+    @apply items-start;
+  }
+
+  .modal-bottom .modal-container {
+    @apply items-end;
+  }
+
+  .modal-right .modal-content,
+  .modal-left .modal-content {
+    @apply h-screen max-w-md rounded-none;
+  }
+
+  .modal-right .modal-container {
+    @apply items-center justify-end;
+  }
+
+  .modal-left .modal-container {
+    @apply items-center justify-start;
+  }
+
+  /* Animation classes */
+  .modal-enter {
+    @apply opacity-0;
+  }
+
+  .modal-enter-active {
+    @apply opacity-100 transition-opacity duration-300;
+  }
+
+  .modal-exit {
+    @apply opacity-100;
+  }
+
+  .modal-exit-active {
+    @apply opacity-0 transition-opacity duration-200;
+  }
+
+  /* Dark mode adjustments */
+  :global(html[data-theme="dark"]) .modal-backdrop {
+    @apply bg-black/70;
+  }
+
+  :global(html[data-theme="dark"]) .modal-footer {
+    @apply bg-skin-card-muted/20;
+  }
+</style>
+
+<script>
+  // Modal functionality
+  document.addEventListener("DOMContentLoaded", () => {
+    // Open modal function
+    function openModal(modalId: string) {
+      const modal = document.getElementById(modalId);
+      if (modal instanceof HTMLElement) {
+        modal.setAttribute("aria-hidden", "false");
+
+        // Add animation classes
+        modal.classList.add("modal-enter");
+        setTimeout(() => {
+          modal.classList.add("modal-enter-active");
+          modal.classList.remove("modal-enter");
+        }, 10);
+
+        // Prevent body scrolling
+        document.body.style.overflow = "hidden";
+
+        // Focus first focusable element
+        setTimeout(() => {
+          const focusableElements = modal.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          );
+          if (focusableElements.length > 0) {
+            (focusableElements[0] as HTMLElement).focus();
+          }
+        }, 100);
+      }
+    }
+
+    // Close modal function
+    function closeModal(modalId: string) {
+      const modal = document.getElementById(modalId);
+      if (modal instanceof HTMLElement) {
+        // Add exit animation classes
+        modal.classList.add("modal-exit");
+        modal.classList.add("modal-exit-active");
+
+        // Remove classes and hide after animation
+        setTimeout(() => {
+          modal.classList.remove("modal-exit");
+          modal.classList.remove("modal-exit-active");
+          modal.classList.remove("modal-enter-active");
+          modal.setAttribute("aria-hidden", "true");
+          document.body.style.overflow = "";
+        }, 200);
+      }
+    }
+
+    // Setup modal triggers
+    document.querySelectorAll("[data-modal-target]").forEach(trigger => {
+      trigger.addEventListener("click", () => {
+        if (trigger instanceof HTMLElement) {
+          const modalId = trigger.dataset.modalTarget;
+          if (modalId) {
+            openModal(modalId);
+          }
+        }
+      });
+    });
+
+    // Setup close buttons
+    document.querySelectorAll("[data-modal-close]").forEach(closeBtn => {
+      closeBtn.addEventListener("click", () => {
+        const modal = closeBtn.closest(".modal");
+        if (modal instanceof HTMLElement && modal.id) {
+          closeModal(modal.id);
+        }
+      });
+    });
+
+    // Setup backdrop click to close
+    document.querySelectorAll(".modal-backdrop").forEach(backdrop => {
+      backdrop.addEventListener("click", e => {
+        if (e.target === backdrop) {
+          const modal = backdrop.closest(".modal");
+          if (
+            modal instanceof HTMLElement &&
+            modal.id &&
+            modal.dataset.backdropClose === "true"
+          ) {
+            closeModal(modal.id);
+          }
+        }
+      });
+    });
+
+    // Setup ESC key to close modals
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") {
+        const openModal = document.querySelector('.modal[aria-hidden="false"]');
+        if (openModal instanceof HTMLElement && openModal.id) {
+          closeModal(openModal.id);
+        }
+      }
+    });
+
+    // Expose API to window for external use
+    (window as any).modalApi = {
+      open: openModal,
+      close: closeModal,
+    };
+  });
+</script>

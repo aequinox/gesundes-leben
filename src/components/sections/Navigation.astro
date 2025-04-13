@@ -122,7 +122,11 @@ const ACTIONS = actionItems;
         ))
       }
 
-      {SITE.lightAndDarkMode && <ThemeToggle lang={lang} />}
+      {
+        SITE.lightAndDarkMode && (
+          <ThemeToggle lang={lang} size="md" variant="icon" />
+        )
+      }
 
       <!-- Mobile Menu Toggle -->
       <button
@@ -194,7 +198,7 @@ const ACTIONS = actionItems;
 <style>
   /* CSS Variables for easy theming and adjustments */
   .nav {
-    --nav-height: 3.5rem;
+    --nav-height: 5rem;
     --nav-padding-x: clamp(1rem, 5vw, 2rem);
     --nav-bg: hsla(var(--color-bg-base), 0.75);
     --nav-border: hsla(var(--color-border), 0.1);

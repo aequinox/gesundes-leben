@@ -4,23 +4,148 @@ import { useTranslations } from "@/i18n/utils";
 import type { ui } from "@/i18n/ui";
 
 interface Props {
+  /** Language key */
   lang: keyof typeof ui;
+  /** Visual style variant */
+  variant?: "icon" | "switch" | "minimal";
+  /** Size of the toggle */
+  size?: "sm" | "md" | "lg";
+  /** Additional CSS classes */
+  class?: string;
 }
 
-const { lang }: Props = Astro.props;
+const {
+  lang,
+  variant = "icon",
+  size = "md",
+  class: className = "",
+}: Props = Astro.props;
+
 const t = useTranslations(lang);
+
+const sizeClasses = {
+  sm: "theme-toggle-sm",
+  md: "theme-toggle-md",
+  lg: "theme-toggle-lg",
+};
 ---
 
 <button
   id="theme-btn"
-  class="rounded-full fill-skin-base p-2 transition-all duration-200 hover:bg-skin-accent/10 hover:text-skin-accent"
+  class:list={[
+    "theme-toggle",
+    `theme-toggle-${variant}`,
+    sizeClasses[size],
+    className,
+  ]}
   title={t("nav.themeToggle")}
-  aria-label="auto"
+  aria-label={t("nav.themeToggle")}
   aria-live="polite"
 >
-  <Icon name="moon" id="moon-svg" />
-  <Icon name="sun" id="sun-svg" />
+  {
+    variant === "switch" ? (
+      <div class="theme-toggle-track">
+        <div class="theme-toggle-thumb" />
+        <div class="theme-toggle-icons">
+          <span class="theme-toggle-icon theme-toggle-sun">
+            <Icon name="sun" size="xs" />
+          </span>
+          <span class="theme-toggle-icon theme-toggle-moon">
+            <Icon name="moon" size="xs" />
+          </span>
+        </div>
+      </div>
+    ) : (
+      <>
+        <Icon name="moon" id="moon-svg" size={size} />
+        <Icon name="sun" id="sun-svg" size={size} />
+      </>
+    )
+  }
 </button>
+
+<style>
+  #sun-svg,
+  html[data-theme="dark"] #moon-svg {
+    display: none;
+  }
+
+  #moon-svg,
+  html[data-theme="dark"] #sun-svg {
+    display: block;
+  }
+
+  /* Base styles */
+  .theme-toggle {
+    @apply relative transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-skin-accent focus-visible:ring-offset-2;
+  }
+
+  /* Icon variant */
+  .theme-toggle-icon {
+    @apply flex items-center justify-center rounded-full p-2 text-skin-base;
+  }
+
+  .theme-toggle-icon:hover {
+    @apply bg-skin-accent/10 text-skin-accent;
+  }
+
+  /* Switch variant */
+  .theme-toggle-switch {
+    @apply inline-flex items-center justify-center overflow-hidden rounded-full;
+  }
+
+  .theme-toggle-track {
+    @apply relative flex h-6 w-12 items-center rounded-full bg-skin-card p-1 shadow-inner transition-colors duration-300;
+  }
+
+  .theme-toggle-thumb {
+    @apply absolute left-1 size-4 rounded-full bg-skin-accent shadow-md transition-transform duration-300 ease-out-expo;
+  }
+
+  :global(html[data-theme="dark"]) .theme-toggle-thumb {
+    transform: translateX(24px);
+  }
+
+  .theme-toggle-icons {
+    @apply flex w-full justify-between;
+  }
+
+  .theme-toggle-sun {
+    @apply text-amber-500/70;
+  }
+
+  .theme-toggle-moon {
+    @apply text-indigo-400/70;
+  }
+
+  /* Minimal variant */
+  .theme-toggle-minimal {
+    @apply rounded-md bg-transparent p-1 text-skin-base hover:bg-skin-card;
+  }
+
+  /* Size variants */
+  .theme-toggle-sm {
+    @apply scale-75;
+  }
+
+  .theme-toggle-md {
+    @apply scale-100;
+  }
+
+  .theme-toggle-lg {
+    @apply scale-125;
+  }
+
+  /* Animation effects */
+  .theme-toggle:active .theme-toggle-thumb {
+    @apply scale-90;
+  }
+
+  /* Dark mode adjustments */
+  :global(html[data-theme="dark"]) .theme-toggle-track {
+    @apply bg-skin-card-muted;
+  }
+</style>
 
 <script>
   import { themeService } from "@/services/ui/ThemeService";

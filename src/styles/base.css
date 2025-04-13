@@ -25,8 +25,8 @@
   /* Apply transitions to all theme-related properties */
   html[data-theme] {
     /* Critical properties that should transition smoothly */
-    transition-property: background-color, color, border-color,
-      text-decoration-color, fill, stroke;
+    transition-property:
+      background-color, color, border-color, text-decoration-color, fill, stroke;
     transition-timing-function: var(--theme-transition-timing);
     transition-duration: var(--theme-transition-duration, 0.2s);
   }
@@ -108,14 +108,7 @@
     /* okLCH(75% 0.2 100) oklch(89.5% 0.139 90.9); */
     --color-question-time: 75% 0.2 100;
   }
-  #sun-svg,
-  html[data-theme="dark"] #moon-svg {
-    display: none;
-  }
-  #moon-svg,
-  html[data-theme="dark"] #sun-svg {
-    display: block;
-  }
+
   body {
     @apply flex min-h-[100svh] flex-col bg-skin-fill font-sans text-skin-base selection:bg-skin-accent selection:bg-opacity-70 selection:text-skin-inverted;
   }
@@ -183,6 +176,10 @@
   }
   .prose h2#table-of-contents + p {
     @apply hidden;
+  }
+  /* Fix paragraph margins in btn-text */
+  .prose .btn-text p {
+    @apply m-0 inline p-0 leading-none !important;
   }
 
   .hash {

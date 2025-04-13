@@ -1,0 +1,270 @@
+---
+import { Icon } from "astro-icon/components";
+
+export interface Props {
+  /** Badge text content */
+  text?: string;
+  /** Visual style variant */
+  variant?:
+    | "default"
+    | "primary"
+    | "success"
+    | "warning"
+    | "error"
+    | "info"
+    | "neutral";
+  /** Size variant */
+  size?: "xs" | "sm" | "md" | "lg";
+  /** Shape variant */
+  shape?: "square" | "rounded" | "pill";
+  /** Optional icon name (from astro-icon) */
+  icon?: string;
+  /** Whether the badge is outlined */
+  outlined?: boolean;
+  /** Whether to show a dot indicator */
+  dot?: boolean;
+  /** Whether the badge is interactive */
+  interactive?: boolean;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  text,
+  variant = "default",
+  size = "sm",
+  shape = "rounded",
+  icon,
+  outlined = false,
+  dot = false,
+  interactive = false,
+  class: className = "",
+} = Astro.props;
+
+const variantClasses = {
+  default: "badge-default",
+  primary: "badge-primary",
+  success: "badge-success",
+  warning: "badge-warning",
+  error: "badge-error",
+  info: "badge-info",
+  neutral: "badge-neutral",
+};
+
+const sizeClasses = {
+  xs: "badge-xs",
+  sm: "badge-sm",
+  md: "badge-md",
+  lg: "badge-lg",
+};
+
+const shapeClasses = {
+  square: "badge-square",
+  rounded: "badge-rounded",
+  pill: "badge-pill",
+};
+
+const outlinedClass = outlined ? "badge-outlined" : "";
+const dotClass = dot ? "badge-dot" : "";
+const interactiveClass = interactive ? "badge-interactive" : "";
+---
+
+<span
+  class:list={[
+    "badge",
+    variantClasses[variant],
+    sizeClasses[size],
+    shapeClasses[shape],
+    outlinedClass,
+    dotClass,
+    interactiveClass,
+    className,
+  ]}
+>
+  {dot && <span class="badge-indicator" />}
+  {icon && <Icon name={icon} class="badge-icon" />}
+  {text && <span class="badge-text">{text}</span>}
+  <slot />
+</span>
+
+<style>
+  .badge {
+    @apply inline-flex items-center justify-center font-medium;
+  }
+
+  /* Size variants */
+  .badge-xs {
+    @apply px-1.5 py-0.5 text-xs;
+  }
+
+  .badge-sm {
+    @apply px-2 py-1 text-xs;
+  }
+
+  .badge-md {
+    @apply px-2.5 py-1 text-sm;
+  }
+
+  .badge-lg {
+    @apply px-3 py-1.5 text-sm;
+  }
+
+  /* Shape variants */
+  .badge-square {
+    @apply rounded-none;
+  }
+
+  .badge-rounded {
+    @apply rounded-md;
+  }
+
+  .badge-pill {
+    @apply rounded-full;
+  }
+
+  /* Style variants */
+  .badge-default {
+    @apply bg-skin-card text-skin-base;
+  }
+
+  .badge-primary {
+    @apply bg-skin-accent text-skin-inverted;
+  }
+
+  .badge-success {
+    @apply bg-emerald-500 text-white;
+  }
+
+  .badge-warning {
+    @apply bg-amber-500 text-white;
+  }
+
+  .badge-error {
+    @apply bg-red-500 text-white;
+  }
+
+  .badge-info {
+    @apply bg-blue-500 text-white;
+  }
+
+  .badge-neutral {
+    @apply bg-gray-500 text-white;
+  }
+
+  /* Outlined variants */
+  .badge-outlined {
+    @apply bg-transparent;
+  }
+
+  .badge-outlined.badge-default {
+    @apply border border-skin-line text-skin-base;
+  }
+
+  .badge-outlined.badge-primary {
+    @apply border border-skin-accent text-skin-accent;
+  }
+
+  .badge-outlined.badge-success {
+    @apply border border-emerald-500 text-emerald-600;
+  }
+
+  .badge-outlined.badge-warning {
+    @apply border border-amber-500 text-amber-600;
+  }
+
+  .badge-outlined.badge-error {
+    @apply border border-red-500 text-red-600;
+  }
+
+  .badge-outlined.badge-info {
+    @apply border border-blue-500 text-blue-600;
+  }
+
+  .badge-outlined.badge-neutral {
+    @apply border border-gray-500 text-gray-600;
+  }
+
+  /* Dot indicator */
+  .badge-dot {
+    @apply relative pl-5;
+  }
+
+  .badge-indicator {
+    @apply absolute left-1.5 size-2 rounded-full;
+  }
+
+  .badge-default .badge-indicator {
+    @apply bg-skin-accent;
+  }
+
+  .badge-primary .badge-indicator {
+    @apply bg-white;
+  }
+
+  .badge-success .badge-indicator {
+    @apply bg-white;
+  }
+
+  .badge-warning .badge-indicator {
+    @apply bg-white;
+  }
+
+  .badge-error .badge-indicator {
+    @apply bg-white;
+  }
+
+  .badge-info .badge-indicator {
+    @apply bg-white;
+  }
+
+  .badge-neutral .badge-indicator {
+    @apply bg-white;
+  }
+
+  /* Icon styling */
+  .badge-icon {
+    @apply size-3.5 flex-shrink-0;
+  }
+
+  .badge:has(.badge-icon):has(.badge-text) .badge-icon {
+    @apply mr-1;
+  }
+
+  /* Interactive state */
+  .badge-interactive {
+    @apply cursor-pointer transition-all duration-200;
+  }
+
+  .badge-interactive:hover {
+    @apply opacity-80;
+  }
+
+  .badge-interactive:active {
+    @apply opacity-70;
+  }
+
+  /* Dark mode adjustments */
+  :global(html[data-theme="dark"]) .badge-outlined.badge-default {
+    @apply border-skin-line text-skin-base;
+  }
+
+  :global(html[data-theme="dark"]) .badge-outlined.badge-success {
+    @apply text-emerald-400;
+  }
+
+  :global(html[data-theme="dark"]) .badge-outlined.badge-warning {
+    @apply text-amber-400;
+  }
+
+  :global(html[data-theme="dark"]) .badge-outlined.badge-error {
+    @apply text-red-400;
+  }
+
+  :global(html[data-theme="dark"]) .badge-outlined.badge-info {
+    @apply text-blue-400;
+  }
+
+  :global(html[data-theme="dark"]) .badge-outlined.badge-neutral {
+    @apply text-gray-400;
+  }
+</style>

@@ -1,0 +1,294 @@
+---
+import { Icon } from "astro-icon/components";
+
+export interface AccordionItem {
+  /** Item title */
+  title: string;
+  /** Item content */
+  content?: string;
+  /** Whether the item is initially open */
+  open?: boolean;
+  /** Custom icon name (from astro-icon) */
+  icon?: string;
+}
+
+export interface Props {
+  /** Array of accordion items */
+  items: AccordionItem[];
+  /** Whether to allow multiple items to be open simultaneously */
+  allowMultiple?: boolean;
+  /** Visual style variant */
+  variant?: "default" | "bordered" | "separated" | "minimal";
+  /** Size variant */
+  size?: "sm" | "md" | "lg";
+  /** Icon for collapsed state */
+  collapseIcon?: string;
+  /** Icon for expanded state */
+  expandIcon?: string;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  items,
+  allowMultiple = false,
+  variant = "default",
+  size = "md",
+  collapseIcon = "tabler:chevron-down",
+  expandIcon = "tabler:chevron-up",
+  class: className = "",
+} = Astro.props;
+
+const variantClasses = {
+  default: "accordion-default",
+  bordered: "accordion-bordered",
+  separated: "accordion-separated",
+  minimal: "accordion-minimal",
+};
+
+const sizeClasses = {
+  sm: "accordion-sm",
+  md: "accordion-md",
+  lg: "accordion-lg",
+};
+
+const uniqueId = `accordion-${Math.random().toString(36).substring(2, 9)}`;
+---
+
+<div
+  class:list={[
+    "accordion",
+    variantClasses[variant],
+    sizeClasses[size],
+    className,
+  ]}
+  id={uniqueId}
+  data-allow-multiple={allowMultiple}
+>
+  {
+    items.map((item, index) => (
+      <div
+        class:list={["accordion-item", item.open && "accordion-item-open"]}
+        data-index={index}
+      >
+        <h3>
+          <button
+            class="accordion-trigger"
+            aria-expanded={item.open ? "true" : "false"}
+            aria-controls={`${uniqueId}-panel-${index}`}
+          >
+            {item.icon && (
+              <span class="accordion-item-icon">
+                <Icon name={item.icon} />
+              </span>
+            )}
+            <span class="accordion-item-title">{item.title}</span>
+            <span class="accordion-icon">
+              <Icon name={collapseIcon} class="accordion-icon-collapse" />
+              <Icon name={expandIcon} class="accordion-icon-expand" />
+            </span>
+          </button>
+        </h3>
+        <div
+          id={`${uniqueId}-panel-${index}`}
+          class="accordion-panel"
+          aria-hidden={item.open ? "false" : "true"}
+          hidden={!item.open}
+        >
+          <div class="accordion-content">
+            {item.content && <p>{item.content}</p>}
+            <slot name={`item-${index}`} />
+          </div>
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .accordion {
+    @apply w-full;
+  }
+
+  /* Item styling */
+  .accordion-item {
+    @apply overflow-hidden;
+  }
+
+  .accordion-trigger {
+    @apply flex w-full cursor-pointer items-center justify-between text-left font-medium text-skin-base transition-all duration-200;
+  }
+
+  .accordion-panel {
+    @apply overflow-hidden transition-all duration-300 ease-out-expo;
+    max-height: 0;
+  }
+
+  .accordion-item-open .accordion-panel {
+    @apply block;
+    max-height: 1000px; /* Arbitrary large value */
+  }
+
+  .accordion-content {
+    @apply text-skin-base;
+  }
+
+  /* Icon styling */
+  .accordion-icon {
+    @apply ml-auto flex-shrink-0;
+  }
+
+  .accordion-icon-expand {
+    @apply hidden;
+  }
+
+  .accordion-item-open .accordion-icon-collapse {
+    @apply hidden;
+  }
+
+  .accordion-item-open .accordion-icon-expand {
+    @apply block;
+  }
+
+  .accordion-item-icon {
+    @apply mr-3;
+  }
+
+  .accordion-item-icon svg {
+    @apply size-5 text-skin-accent;
+  }
+
+  /* Size variants */
+  .accordion-sm .accordion-trigger {
+    @apply px-3 py-2 text-sm;
+  }
+
+  .accordion-sm .accordion-content {
+    @apply px-3 pb-3 pt-0 text-sm;
+  }
+
+  .accordion-md .accordion-trigger {
+    @apply px-4 py-3 text-base;
+  }
+
+  .accordion-md .accordion-content {
+    @apply px-4 pb-4 pt-0;
+  }
+
+  .accordion-lg .accordion-trigger {
+    @apply px-5 py-4 text-lg;
+  }
+
+  .accordion-lg .accordion-content {
+    @apply px-5 pb-5 pt-0;
+  }
+
+  /* Style variants */
+  .accordion-default .accordion-item {
+    @apply border-b border-skin-line;
+  }
+
+  .accordion-default .accordion-item:first-child {
+    @apply border-t;
+  }
+
+  .accordion-bordered {
+    @apply rounded-lg border border-skin-line;
+  }
+
+  .accordion-bordered .accordion-item {
+    @apply border-b border-skin-line;
+  }
+
+  .accordion-bordered .accordion-item:last-child {
+    @apply border-b-0;
+  }
+
+  .accordion-separated .accordion-item {
+    @apply mb-2 rounded-lg border border-skin-line bg-skin-card shadow-sm;
+  }
+
+  .accordion-minimal .accordion-trigger {
+    @apply border-b border-skin-line/50;
+  }
+
+  /* Hover and active states */
+  .accordion-trigger:hover {
+    @apply bg-skin-card/50 text-skin-accent;
+  }
+
+  .accordion-item-open .accordion-trigger {
+    @apply text-skin-accent;
+  }
+
+  /* Dark mode adjustments */
+  :global(html[data-theme="dark"]) .accordion-trigger:hover {
+    @apply bg-skin-card-muted/30;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const accordions = document.querySelectorAll(".accordion");
+
+    accordions.forEach(accordion => {
+      if (!(accordion instanceof HTMLElement)) return;
+
+      const allowMultiple = accordion.dataset.allowMultiple === "true";
+      const triggers = accordion.querySelectorAll(".accordion-trigger");
+
+      triggers.forEach(trigger => {
+        trigger.addEventListener("click", () => {
+          if (!(trigger instanceof HTMLElement)) return;
+
+          const item = trigger.closest(".accordion-item");
+          if (!item) return;
+
+          const isOpen = item.classList.contains("accordion-item-open");
+          const panel = trigger.nextElementSibling?.nextElementSibling;
+
+          if (!allowMultiple) {
+            // Close all other items
+            accordion.querySelectorAll(".accordion-item").forEach(otherItem => {
+              if (otherItem !== item) {
+                otherItem.classList.remove("accordion-item-open");
+
+                const otherTrigger =
+                  otherItem.querySelector(".accordion-trigger");
+                const otherPanel = otherItem.querySelector(".accordion-panel");
+
+                if (otherTrigger instanceof HTMLElement) {
+                  otherTrigger.setAttribute("aria-expanded", "false");
+                }
+
+                if (otherPanel instanceof HTMLElement) {
+                  otherPanel.setAttribute("aria-hidden", "true");
+                  otherPanel.hidden = true;
+                }
+              }
+            });
+          }
+
+          // Toggle current item
+          if (isOpen) {
+            item.classList.remove("accordion-item-open");
+            trigger.setAttribute("aria-expanded", "false");
+
+            if (panel instanceof HTMLElement) {
+              panel.setAttribute("aria-hidden", "true");
+              panel.hidden = true;
+            }
+          } else {
+            item.classList.add("accordion-item-open");
+            trigger.setAttribute("aria-expanded", "true");
+
+            if (panel instanceof HTMLElement) {
+              panel.setAttribute("aria-hidden", "false");
+              panel.hidden = false;
+            }
+          }
+        });
+      });
+    });
+  });
+</script>

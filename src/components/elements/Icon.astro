@@ -2,19 +2,84 @@
 import { Icon as AstroIcon } from "astro-icon/components";
 
 export interface Props {
-  name: "archive" | "search" | "moon" | "sun";
+  /** Icon name */
+  name:
+    | "archive"
+    | "search"
+    | "moon"
+    | "sun"
+    | "home"
+    | "settings"
+    | "user"
+    | "calendar"
+    | "notification"
+    | "bookmark"
+    | "heart"
+    | "share"
+    | "menu"
+    | "close"
+    | "check"
+    | "info"
+    | "warning"
+    | "error"
+    | "success";
+  /** Optional ID for the icon */
   id?: string;
+  /** Whether the icon is in active state */
   active?: boolean;
+  /** Size of the icon */
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  /** Additional CSS classes */
+  class?: string;
+  /** Whether to apply a subtle animation */
+  animated?: boolean;
 }
 
-const { name, id, active = false } = Astro.props;
+const {
+  name,
+  id,
+  active = false,
+  size = "md",
+  class: className = "",
+  animated = false,
+} = Astro.props;
 
 const iconMap = {
+  // Navigation icons
   archive: "tabler:archive",
   search: "tabler:search",
   moon: "tabler:moon",
   sun: "tabler:sun",
+  home: "tabler:home",
+  settings: "tabler:settings",
+  user: "tabler:user",
+  calendar: "tabler:calendar",
+  menu: "tabler:menu",
+  close: "tabler:x",
+
+  // Action icons
+  notification: "tabler:bell",
+  bookmark: "tabler:bookmark",
+  heart: "tabler:heart",
+  share: "tabler:share",
+
+  // Status icons
+  check: "tabler:check",
+  info: "tabler:info-circle",
+  warning: "tabler:alert-triangle",
+  error: "tabler:alert-circle",
+  success: "tabler:circle-check",
 } as const;
+
+const sizeMap = {
+  xs: "size-4",
+  sm: "size-5",
+  md: "size-6",
+  lg: "size-8",
+  xl: "size-10",
+};
+
+const animationClass = animated ? "icon-animated" : "";
 ---
 
 <AstroIcon
@@ -22,10 +87,47 @@ const iconMap = {
   id={id}
   class:list={[
     "icon",
-    active && "!stroke-skin-accent",
+    sizeMap[size],
+    active && "icon-active",
+    animationClass,
     id?.includes("moon") && "dark:hidden",
     id?.includes("sun") && "hidden dark:block",
+    className,
   ]}
-  width="24"
-  height="24"
+  aria-hidden="true"
 />
+
+<style>
+  .icon {
+    @apply inline-block stroke-2 text-skin-base transition-all duration-300;
+  }
+
+  .icon-active {
+    @apply text-skin-accent;
+  }
+
+  .icon-animated {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .icon-animated:hover {
+    transform: scale(1.1);
+  }
+
+  /* Status icon specific styles */
+  :global([name="tabler:info-circle"]) {
+    @apply text-blue-500;
+  }
+
+  :global([name="tabler:alert-triangle"]) {
+    @apply text-amber-500;
+  }
+
+  :global([name="tabler:alert-circle"]) {
+    @apply text-red-500;
+  }
+
+  :global([name="tabler:circle-check"]) {
+    @apply text-emerald-500;
+  }
+</style>

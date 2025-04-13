@@ -14,6 +14,12 @@ export interface Props extends HTMLAttributes<"a"> {
   class?: string;
   /** HTML button type */
   type?: "button" | "submit" | "reset";
+  /** Size of the button */
+  size?: "sm" | "md" | "lg";
+  /** Whether to use full width */
+  fullWidth?: boolean;
+  /** Whether to show loading state */
+  loading?: boolean;
 }
 
 const {
@@ -23,6 +29,9 @@ const {
   class: className = "",
   type,
   target,
+  size = "md",
+  fullWidth = false,
+  loading = false,
   ...rest
 }: Props = Astro.props;
 
@@ -32,7 +41,13 @@ const variants: Record<CallToActionVariant, string> = {
   default: "btn-default",
   accented: "btn-accented",
   muted: "btn-muted",
-  link: "cursor-pointer hover:text-skin-base",
+  link: "btn-link",
+};
+
+const sizes = {
+  sm: "btn-sm",
+  md: "btn-md",
+  lg: "btn-lg",
 };
 ---
 
@@ -40,47 +55,246 @@ const variants: Record<CallToActionVariant, string> = {
   type === "button" || type === "submit" || type === "reset" ? (
     <button
       type={type}
-      class:list={["not-prose btn", variants[variant], className]}
+      class:list={[
+        "btn",
+        variants[variant],
+        sizes[size],
+        fullWidth && "btn-full",
+        loading && "btn-loading",
+        className,
+      ]}
+      disabled={loading}
       {...rest}
     >
-      <div class="flex items-center justify-center">
-        {icon && <Icon name={icon} class="mr-1.5 h-5 w-5" />}
-        <Fragment set:html={content} />
-      </div>
+      <span class="btn-content">
+        {loading && (
+          <svg
+            class="btn-spinner"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+              fill="none"
+            />
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+        )}
+        {icon && !loading && <Icon name={icon} class="btn-icon" />}
+        <span class="btn-text">
+          <Fragment
+            class="not-prose m-0 inline p-0 leading-none"
+            set:html={content}
+          />
+        </span>
+      </span>
     </button>
   ) : (
     <a
-      class:list={["not-prose", variants[variant], className]}
+      class:list={[
+        "btn",
+        variants[variant],
+        sizes[size],
+        fullWidth && "btn-full",
+        className,
+      ]}
       {...(target ? { target, rel: "noopener noreferrer" } : {})}
       {...rest}
     >
-      <div class="flex items-center justify-center">
-        {icon && <Icon name={icon} class="mr-1.5 h-5 w-5" />}
-        <Fragment set:html={content} />
-      </div>
+      <span class="btn-content">
+        {icon && <Icon name={icon} class="btn-icon" />}
+        <span class="btn-text">
+          <Fragment set:html={content} />
+        </span>
+      </span>
     </a>
   )
 }
 
 <style>
-  a,
   .btn {
-    @apply mb-2 me-2 flex items-center px-4 py-2 text-center text-sm font-medium text-skin-base;
-    p {
-      @apply text-base;
+    @apply relative inline-flex items-center justify-center overflow-hidden rounded-xl border border-transparent text-center font-medium transition-all duration-300 ease-out-expo focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-skin-accent focus-visible:ring-offset-2;
+    transform: translateZ(0);
+
+    &::before {
+      content: "";
+      @apply absolute inset-0 z-0 opacity-0 transition-opacity duration-300;
+      background: radial-gradient(
+        800px circle at var(--mouse-x, 0) var(--mouse-y, 0),
+        rgba(255, 255, 255, 0.06),
+        transparent 40%
+      );
+    }
+    &:hover::before {
+      @apply opacity-100;
     }
   }
 
-  .btn {
-    @apply rounded-lg bg-gradient-to-b shadow-sm focus:outline-none focus:ring-4 focus:ring-skin-accent;
+  .btn-content {
+    @apply relative z-10 flex items-center justify-center gap-2;
   }
+
+  .btn-icon {
+    @apply size-5 flex-shrink-0 text-skin-base;
+  }
+
+  .btn-text p {
+    @apply m-0 inline p-0 leading-none !important;
+    prose-p: leading-none;
+  }
+
+  /* Size variants */
+  .btn-sm {
+    @apply min-h-8 px-3 py-1.5 text-xs;
+  }
+
+  .btn-md {
+    @apply min-h-10 px-4 py-2 text-sm;
+  }
+
+  .btn-lg {
+    @apply min-h-12 px-6 py-3 text-base;
+  }
+
+  /* Full width */
+  .btn-full {
+    @apply w-full;
+  }
+
+  /* Loading state */
+  .btn-loading {
+    @apply cursor-not-allowed;
+  }
+
+  .btn-spinner {
+    @apply size-5 animate-spin;
+  }
+
+  /* Style variants */
   .btn-default {
-    @apply from-skin-inverted/80 via-skin-inverted/90 to-skin-inverted text-skin-inverted shadow-skin-inverted/50 hover:bg-skin-inverted hover:bg-skin-inverted/90 focus:ring-skin-inverted;
+    @apply bg-skin-base text-skin-inverted shadow-lg;
+    box-shadow:
+      0 2px 4px 0 rgba(0, 0, 0, 0.05),
+      0 1px 2px 0 rgba(0, 0, 0, 0.1),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+
+    &:hover {
+      @apply bg-skin-base/90;
+      transform: translateY(-1px);
+      box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    &:active {
+      @apply bg-skin-inverted;
+      transform: translateY(0);
+      box-shadow:
+        0 1px 2px 0 rgba(0, 0, 0, 0.05),
+        inset 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+    }
   }
+
   .btn-accented {
-    @apply from-skin-accent/80 via-skin-accent/90 to-skin-accent text-skin-inverted shadow-skin-accent/50 hover:bg-skin-accent hover:bg-skin-accent/90 focus:ring-skin-accent dark:text-skin-base;
+    @apply bg-skin-accent text-skin-base shadow-lg;
+    box-shadow:
+      0 2px 4px 0 rgba(0, 0, 0, 0.05),
+      0 1px 2px 0 rgba(0, 0, 0, 0.1),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+
+    &:hover {
+      @apply bg-skin-accent/90;
+      transform: translateY(-1px);
+      box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    &:active {
+      @apply bg-skin-accent;
+      transform: translateY(0);
+      box-shadow:
+        0 1px 2px 0 rgba(0, 0, 0, 0.05),
+        inset 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+    }
   }
+
   .btn-muted {
-    @apply from-skin-muted/80 via-skin-muted/90 to-skin-muted text-skin-base shadow-skin-muted/50 hover:bg-skin-muted hover:bg-skin-muted/90 focus:ring-skin-muted;
+    @apply bg-skin-card text-skin-base shadow-md;
+    box-shadow:
+      0 2px 4px 0 rgba(0, 0, 0, 0.03),
+      0 1px 2px 0 rgba(0, 0, 0, 0.05),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
+
+    &:hover {
+      @apply bg-skin-card-muted;
+      transform: translateY(-1px);
+      box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 2px 4px -1px rgba(0, 0, 0, 0.03),
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    &:active {
+      @apply bg-skin-card;
+      transform: translateY(0);
+      box-shadow:
+        0 1px 2px 0 rgba(0, 0, 0, 0.03),
+        inset 0 1px 1px 0 rgba(0, 0, 0, 0.05);
+    }
+  }
+
+  .btn-link {
+    @apply bg-transparent p-0 text-skin-base shadow-none hover:text-skin-accent;
+  }
+
+  /* Dark mode adjustments */
+  :global(html[data-theme="dark"]) .btn-default,
+  :global(html[data-theme="dark"]) .btn-accented,
+  :global(html[data-theme="dark"]) .btn-muted {
+    box-shadow:
+      0 2px 4px 0 rgba(0, 0, 0, 0.2),
+      0 1px 2px 0 rgba(0, 0, 0, 0.15),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  :global(html[data-theme="dark"]) .btn-default:hover,
+  :global(html[data-theme="dark"]) .btn-accented:hover,
+  :global(html[data-theme="dark"]) .btn-muted:hover {
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.25),
+      0 2px 4px -1px rgba(0, 0, 0, 0.15),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
   }
 </style>
+
+<script>
+  // Add interactive light effect on hover
+  document.addEventListener("DOMContentLoaded", () => {
+    const buttons = document.querySelectorAll(".btn");
+
+    buttons.forEach(button => {
+      button.addEventListener("mousemove", function (e) {
+        if (e instanceof MouseEvent && button instanceof HTMLElement) {
+          const rect = button.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+
+          button.style.setProperty("--mouse-x", `${x}px`);
+          button.style.setProperty("--mouse-y", `${y}px`);
+        }
+      });
+    });
+  });
+</script>

@@ -1,11 +1,25 @@
 ---
-export interface Props {
+import type { HTMLAttributes } from "astro/types";
+
+export interface Props extends HTMLAttributes<"a"> {
+  /** Link destination URL */
   href: string;
+  /** Additional CSS classes */
   className?: string;
+  /** Accessible label */
   ariaLabel?: string;
+  /** Tooltip text */
   title?: string;
+  /** Whether the link is disabled */
   disabled?: boolean;
-  role?: string;
+  /** Whether to open in new tab */
+  newTab?: boolean;
+  /** Visual style variant */
+  variant?: "default" | "subtle" | "text" | "icon";
+  /** Whether to show underline effect */
+  underline?: boolean;
+  /** Whether to show hover effect */
+  noHover?: boolean;
 }
 
 const {
@@ -14,26 +28,99 @@ const {
   ariaLabel,
   title,
   disabled = false,
+  role,
+  newTab = false,
+  variant = "default",
+  underline = true,
+  noHover = false,
 } = Astro.props;
+
+const variantClasses = {
+  default: "link-default",
+  subtle: "link-subtle",
+  text: "link-text",
+  icon: "link-icon",
+};
+
+const hoverClass = noHover ? "" : "link-hover";
+const underlineClass = underline ? "link-underline" : "";
 ---
 
 {
   disabled ? (
     <span
-      class:list={["group inline-block", className]}
+      class:list={["link link-disabled", variantClasses[variant], className]}
       title={title}
       aria-disabled={disabled}
+      role={role}
     >
       <slot />
     </span>
   ) : (
     <a
-      {href}
-      class:list={["group inline-block hover:text-skin-accent", className]}
+      href={href}
+      class:list={[
+        "link",
+        variantClasses[variant],
+        hoverClass,
+        underlineClass,
+        className,
+      ]}
       aria-label={ariaLabel}
       title={title}
+      role={role}
+      target={newTab ? "_blank" : undefined}
+      rel={newTab ? "noopener noreferrer" : undefined}
     >
-      <slot />
+      <span class="link-content">
+        <slot />
+      </span>
     </a>
   )
 }
+
+<style>
+  .link {
+    @apply relative inline-flex items-center justify-center transition-all duration-300 ease-out-expo focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-skin-accent focus-visible:ring-offset-2;
+  }
+
+  .link-content {
+    @apply relative z-10 inline-flex items-center;
+  }
+
+  /* Variant styles */
+  .link-default {
+    @apply text-skin-base;
+  }
+
+  .link-subtle {
+    @apply text-skin-base/70;
+  }
+
+  .link-text {
+    @apply text-skin-accent;
+  }
+
+  .link-icon {
+    @apply p-1 text-skin-base;
+  }
+
+  /* Hover effect */
+  .link-hover:hover {
+    @apply text-skin-accent;
+  }
+
+  .link-icon.link-hover:hover {
+    @apply bg-skin-accent/10 rounded-full;
+  }
+
+  /* Underline effect */
+  .link-underline {
+    @apply after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-skin-accent after:transition-transform after:duration-300 after:ease-out-expo hover:after:origin-bottom-left hover:after:scale-x-100;
+  }
+
+  /* Disabled state */
+  .link-disabled {
+    @apply cursor-not-allowed opacity-60;
+  }
+</style>

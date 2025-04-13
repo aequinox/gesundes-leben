@@ -1,0 +1,258 @@
+---
+import { Icon } from "astro-icon/components";
+
+export interface Props {
+  /** Alert title */
+  title?: string;
+  /** Alert message */
+  message?: string;
+  /** Visual style variant */
+  variant?: "info" | "success" | "warning" | "error" | "neutral";
+  /** Visual appearance */
+  appearance?: "filled" | "outlined" | "subtle";
+  /** Whether the alert is dismissible */
+  dismissible?: boolean;
+  /** Whether to show an icon */
+  showIcon?: boolean;
+  /** Custom icon name (from astro-icon) */
+  icon?: string;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  title,
+  message,
+  variant = "info",
+  appearance = "subtle",
+  dismissible = false,
+  showIcon = true,
+  icon,
+  class: className = "",
+} = Astro.props;
+
+// Default icons based on variant
+const defaultIcons = {
+  info: "tabler:info-circle",
+  success: "tabler:circle-check",
+  warning: "tabler:alert-triangle",
+  error: "tabler:alert-circle",
+  neutral: "tabler:message-circle",
+};
+
+const iconToUse = icon || defaultIcons[variant];
+
+// CSS classes based on props
+const variantClasses = {
+  info: "alert-info",
+  success: "alert-success",
+  warning: "alert-warning",
+  error: "alert-error",
+  neutral: "alert-neutral",
+};
+
+const appearanceClasses = {
+  filled: "alert-filled",
+  outlined: "alert-outlined",
+  subtle: "alert-subtle",
+};
+---
+
+<div
+  class:list={[
+    "alert",
+    variantClasses[variant],
+    appearanceClasses[appearance],
+    className,
+  ]}
+  role="alert"
+>
+  {
+    showIcon && (
+      <div class="alert-icon">
+        <Icon name={iconToUse} />
+      </div>
+    )
+  }
+
+  <div class="alert-content">
+    {title && <h4 class="alert-title">{title}</h4>}
+    {message && <div class="alert-message">{message}</div>}
+    <slot />
+  </div>
+
+  {
+    dismissible && (
+      <button class="alert-close" aria-label="Close alert">
+        <Icon name="tabler:x" />
+      </button>
+    )
+  }
+</div>
+
+<style>
+  .alert {
+    @apply relative flex w-full overflow-hidden rounded-lg p-4 shadow-sm;
+  }
+
+  /* Icon styling */
+  .alert-icon {
+    @apply mr-3 flex-shrink-0;
+  }
+
+  .alert-icon svg {
+    @apply size-5;
+  }
+
+  /* Content styling */
+  .alert-content {
+    @apply flex-1;
+  }
+
+  .alert-title {
+    @apply mb-1 text-sm font-semibold;
+  }
+
+  .alert-message {
+    @apply text-sm;
+  }
+
+  /* Close button */
+  .alert-close {
+    @apply ml-auto flex-shrink-0 cursor-pointer rounded-full p-1 opacity-70 transition-opacity hover:opacity-100;
+  }
+
+  .alert-close svg {
+    @apply size-4;
+  }
+
+  /* Variant styling - Info */
+  .alert-info.alert-filled {
+    @apply bg-blue-500 text-white;
+  }
+
+  .alert-info.alert-outlined {
+    @apply border border-blue-500 bg-transparent text-blue-700;
+  }
+
+  .alert-info.alert-subtle {
+    @apply bg-blue-50 text-blue-800;
+  }
+
+  /* Variant styling - Success */
+  .alert-success.alert-filled {
+    @apply bg-emerald-500 text-white;
+  }
+
+  .alert-success.alert-outlined {
+    @apply border border-emerald-500 bg-transparent text-emerald-700;
+  }
+
+  .alert-success.alert-subtle {
+    @apply bg-emerald-50 text-emerald-800;
+  }
+
+  /* Variant styling - Warning */
+  .alert-warning.alert-filled {
+    @apply bg-amber-500 text-white;
+  }
+
+  .alert-warning.alert-outlined {
+    @apply border border-amber-500 bg-transparent text-amber-700;
+  }
+
+  .alert-warning.alert-subtle {
+    @apply bg-amber-50 text-amber-800;
+  }
+
+  /* Variant styling - Error */
+  .alert-error.alert-filled {
+    @apply bg-red-500 text-white;
+  }
+
+  .alert-error.alert-outlined {
+    @apply border border-red-500 bg-transparent text-red-700;
+  }
+
+  .alert-error.alert-subtle {
+    @apply bg-red-50 text-red-800;
+  }
+
+  /* Variant styling - Neutral */
+  .alert-neutral.alert-filled {
+    @apply bg-gray-500 text-white;
+  }
+
+  .alert-neutral.alert-outlined {
+    @apply border border-gray-500 bg-transparent text-gray-700;
+  }
+
+  .alert-neutral.alert-subtle {
+    @apply bg-gray-50 text-gray-800;
+  }
+
+  /* Dark mode adjustments */
+  :global(html[data-theme="dark"]) .alert-info.alert-subtle {
+    @apply bg-blue-900/30 text-blue-300;
+  }
+
+  :global(html[data-theme="dark"]) .alert-success.alert-subtle {
+    @apply bg-emerald-900/30 text-emerald-300;
+  }
+
+  :global(html[data-theme="dark"]) .alert-warning.alert-subtle {
+    @apply bg-amber-900/30 text-amber-300;
+  }
+
+  :global(html[data-theme="dark"]) .alert-error.alert-subtle {
+    @apply bg-red-900/30 text-red-300;
+  }
+
+  :global(html[data-theme="dark"]) .alert-neutral.alert-subtle {
+    @apply bg-gray-800/50 text-gray-300;
+  }
+
+  :global(html[data-theme="dark"]) .alert-info.alert-outlined {
+    @apply border-blue-700 text-blue-400;
+  }
+
+  :global(html[data-theme="dark"]) .alert-success.alert-outlined {
+    @apply border-emerald-700 text-emerald-400;
+  }
+
+  :global(html[data-theme="dark"]) .alert-warning.alert-outlined {
+    @apply border-amber-700 text-amber-400;
+  }
+
+  :global(html[data-theme="dark"]) .alert-error.alert-outlined {
+    @apply border-red-700 text-red-400;
+  }
+
+  :global(html[data-theme="dark"]) .alert-neutral.alert-outlined {
+    @apply border-gray-700 text-gray-400;
+  }
+</style>
+
+<script>
+  // Handle dismissible alerts
+  document.addEventListener("DOMContentLoaded", () => {
+    const closeButtons = document.querySelectorAll(".alert-close");
+
+    closeButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        const alert = button.closest(".alert");
+        if (alert instanceof HTMLElement) {
+          // Add fade-out animation
+          alert.style.opacity = "0";
+          alert.style.transform = "scale(0.95)";
+          alert.style.transition = "opacity 0.2s ease, transform 0.2s ease";
+
+          // Remove after animation completes
+          setTimeout(() => {
+            alert.remove();
+          }, 200);
+        }
+      });
+    });
+  });
+</script>
