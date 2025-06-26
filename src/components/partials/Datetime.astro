@@ -1,0 +1,58 @@
+---
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { formatDate } from "@/utils/date";
+import { Icon } from "astro-icon/components";
+
+export interface Props {
+  datetime: string | Date;
+  size?: "sm" | "lg";
+  className?: string;
+  iconName?: string;
+  isModified?: boolean;
+}
+
+const {
+  datetime,
+  size = "sm",
+  className = "",
+  iconName = "tabler:calendar",
+  isModified = false,
+}: Props = Astro.props;
+
+const formattedDate = formatDate(datetime);
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Determine the appropriate aria label based on whether it's a modified date
+const ariaLabel = isModified
+  ? `${t("post.lastUpdated")} ${formattedDate}`
+  : `${t("datetime.at")} ${formattedDate}`;
+---
+
+<div
+  class:list={[
+    "datetime-container group flex items-center gap-2 opacity-80 transition-all duration-300 hover:opacity-100",
+    size === "sm" ? "text-sm" : "text-base",
+    className,
+  ]}
+  aria-label={ariaLabel}
+>
+  <Icon
+    name={iconName}
+    class:list={[
+      "datetime-icon group-hover:fill--accent inline-block fill-foreground transition-transform duration-300 group-hover:scale-110",
+      size === "sm" ? "h-5 w-5" : "h-6 w-6",
+      isModified ? "text-accent" : "",
+    ]}
+    aria-hidden="true"
+  />
+  <time
+    datetime={new Date(datetime).toISOString()}
+    class:list={[
+      "datetime-text italic transition-colors duration-300 group-hover:text-accent",
+      isModified ? "text-accent" : "",
+    ]}
+  >
+    {formattedDate}
+  </time>
+</div>

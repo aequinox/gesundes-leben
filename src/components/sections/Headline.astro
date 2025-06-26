@@ -1,0 +1,239 @@
+---
+/**
+ * Headline Component
+ *
+ * A versatile component for displaying section headlines with optional
+ * subtitle and tagline. Supports customizable styling and accessibility features.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <Headline
+ *   title="Main Title"
+ *   subtitle="Optional subtitle"
+ *   tagline="Optional tagline"
+ *   classes={{
+ *     container: "max-w-3xl",
+ *     title: "text-3xl",
+ *     subtitle: "text-xl"
+ *   }}
+ * />
+ * ```
+ */
+
+interface Props {
+  /** Main title text */
+  title?: string | Promise<string>;
+  /** Secondary subtitle text */
+  subtitle?: string | Promise<string>;
+  /** Small text above the title */
+  tagline?: string | Promise<string>;
+  /** CSS classes for styling different parts */
+  classes?: {
+    /** Classes for the container element */
+    container?: string;
+    /** Classes for the title element */
+    title?: string;
+    /** Classes for the subtitle element */
+    subtitle?: string;
+  };
+}
+
+const {
+  title = await Astro.slots.render("title"),
+  subtitle = await Astro.slots.render("subtitle"),
+  tagline = await Astro.slots.render("tagline"),
+  classes = {},
+}: Props = Astro.props;
+
+// Memoize common class names
+const containerClasses = [
+  "not-prose mb-8 text-center",
+  "md:mx-auto md:mb-12",
+  classes.container || "max-w-3xl",
+]
+  .filter(Boolean)
+  .join(" ");
+
+const titleClasses = [
+  "font-heading text-heading",
+  "text-2xl font-semibold",
+  "leading-tighter tracking-tighter",
+  "text-base",
+  classes.title || "text-3xl md:text-4xl",
+]
+  .filter(Boolean)
+  .join(" ");
+
+const subtitleClasses = ["mt-4", classes.subtitle || "text-skin-muted text-xl"]
+  .filter(Boolean)
+  .join(" ");
+
+const taglineClasses = [
+  "text-base font-semibold",
+  "uppercase tracking-wider",
+  "text-skin-muted",
+].join(" ");
+
+// Generate unique IDs for accessibility
+const headlineId = `headline-${Math.random().toString(36).substring(2, 9)}`;
+const subtitleId = subtitle
+  ? `subtitle-${Math.random().toString(36).substring(2, 9)}`
+  : undefined;
+---
+
+{
+  (title || subtitle || tagline) && (
+    <div class={containerClasses} role="region" aria-labelledby={headlineId}>
+      {tagline && <p class={taglineClasses} set:html={tagline} />}
+
+      {title && <h2 id={headlineId} class={titleClasses} set:html={title} />}
+
+      {subtitle && (
+        <p
+          id={subtitleId}
+          class={subtitleClasses}
+          set:html={subtitle}
+          aria-labelledby={`${headlineId} ${subtitleId}`}
+        />
+      )}
+    </div>
+  )
+}
+
+<style>
+  @reference "@/styles/global.css";
+
+  /* Headline base styling with token-based design */
+  div {
+    @apply relative mx-auto max-w-content text-center;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    transition: all var(--theme-transition-duration)
+      var(--theme-transition-timing);
+  }
+
+  /* Decorative background elements */
+  div::before,
+  div::after {
+    content: "";
+    @apply absolute -z-10 rounded-xl opacity-10 blur-3xl;
+    background: radial-gradient(
+      circle,
+      oklch(var(--color-accent) / 0.2),
+      transparent 70%
+    );
+    transform: translateZ(-10px);
+  }
+
+  div::before {
+    @apply -top-8 -left-16 h-32 w-32;
+  }
+
+  div::after {
+    @apply -right-16 bottom-0 h-32 w-32;
+  }
+
+  /* Tagline styling */
+  p[data-type="tagline"] {
+    @apply text-base font-semibold tracking-wider uppercase;
+    color: oklch(var(--color-text-base) / 0.7);
+    transform: translateZ(5px);
+    transition: color var(--theme-transition-duration)
+      var(--theme-transition-timing);
+  }
+
+  /* Title styling */
+  h2 {
+    @apply text-2xl leading-tight font-semibold tracking-tight;
+    color: oklch(var(--color-text-base));
+    background: linear-gradient(
+      to right,
+      oklch(var(--color-accent)),
+      oklch(var(--color-accent) / 0.7)
+    );
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition:
+      color var(--theme-transition-duration) var(--theme-transition-timing),
+      background var(--theme-transition-duration) var(--theme-transition-timing);
+    transform: translateZ(10px);
+  }
+
+  /* Subtitle styling */
+  p[data-type="subtitle"] {
+    @apply mt-4 text-xl;
+    color: oklch(var(--color-text-base) / 0.8);
+    transition: color var(--theme-transition-duration)
+      var(--theme-transition-timing);
+    transform: translateZ(5px);
+  }
+
+  /* Focus styles */
+  div:focus-within {
+    @apply ring-2 ring-accent ring-offset-2;
+    box-shadow:
+      0 0 0 2px oklch(var(--color-accent)),
+      0 0 20px 5px oklch(var(--color-accent) / 0.15);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    div::before,
+    div::after {
+      @apply opacity-5;
+    }
+
+    h2 {
+      @apply text-2xl;
+    }
+
+    p {
+      @apply text-base;
+    }
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    div,
+    div::before,
+    div::after,
+    p[data-type="tagline"],
+    h2,
+    p[data-type="subtitle"] {
+      @apply transform-none transition-none;
+      opacity: 1 !important;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    div {
+      @apply break-inside-avoid bg-transparent shadow-none;
+    }
+
+    div::before,
+    div::after {
+      @apply hidden;
+    }
+
+    h2 {
+      @apply text-black;
+      background: none;
+      -webkit-text-fill-color: initial;
+    }
+  }
+
+  /* High contrast mode */
+  @media (forced-colors: active) {
+    div {
+      @apply border border-[CanvasText];
+    }
+
+    h2 {
+      @apply text-[Heading];
+      background: none;
+      -webkit-text-fill-color: initial;
+    }
+  }
+</style>

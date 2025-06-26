@@ -1,0 +1,262 @@
+---
+import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
+import Hr from "@/components/elements/Hr.astro";
+import LinkButton from "@/components/elements/LinkButton.astro";
+import Card from "@/components/sections/Card.astro";
+import Footer from "@/components/sections/Footer.astro";
+import Header from "@/components/sections/Header.astro";
+import Socials from "@/components/socials/Socials.astro";
+import { SITE } from "@/config";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import { SOCIALS } from "@/socials";
+import { processAllPosts } from "@/utils/posts";
+import { Icon } from "astro-icon/components";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Process all posts in a single operation to avoid duplicate processing
+const sortedPosts = await processAllPosts({
+  includeDrafts: false,
+  sortDirection: "desc",
+});
+
+// Split posts into featured and non-featured
+const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
+const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
+
+// Precompute post counts for performance
+const featuredPostCount = featuredPosts.length;
+const recentPostCount = Math.min(recentPosts.length, SITE.postPerIndex);
+
+// Count active social links for conditional rendering
+const socialCount = SOCIALS.filter(social => social.active).length;
+---
+
+<Layout>
+  <Header />
+
+  <main id="main-content" class="relative overflow-hidden" data-layout="index">
+    {
+      /* Background decorative elements with reduced opacity for better performance */
+    }
+
+    {/* Hero Section with enhanced styling and accessibility */}
+    <div class="relative z-10">
+      <section
+        id="hero"
+        class="relative min-h-100 overflow-hidden bg-gradient-to-br from-card/5 to-card-muted/5 pt-4 pb-8 md:pt-6 md:pb-12"
+      >
+        <!-- Decorative background elements -->
+        <div
+          class="bg-radial-gradient absolute -top-16 -right-16 -z-10 h-64 w-64 rounded-full opacity-20 blur-3xl"
+          aria-hidden="true"
+        >
+        </div>
+        <div
+          class="bg-radial-gradient absolute top-1/2 -left-24 -z-10 h-96 w-96 -translate-y-1/2 rounded-full opacity-20 blur-3xl"
+          aria-hidden="true"
+        >
+        </div>
+        <div class="relative z-10 mx-auto max-w-content">
+          <!-- Main heading -->
+          <div class="mb-8 flex items-center justify-between">
+            <h1
+              class="bg-gradient-to-r from-accent to-accent/70 bg-clip-text text-4xl font-black tracking-tight text-transparent transition-all duration-300 sm:text-6xl"
+              data-aos="fade-right"
+              data-aos-duration="600"
+            >
+              Gesundes Leben
+            </h1>
+
+            <a
+              target="_blank"
+              href="/rss.xml"
+              class="relative mr-4 inline-flex items-center gap-2 rounded-full p-2 shadow-[var(--shadow-elevation-low)] transition-all duration-300 hover:scale-105 hover:shadow-[var(--shadow-elevation-medium)]"
+              aria-label="RSS Feed"
+              title="RSS Feed"
+              data-aos="fade-left"
+              data-aos-duration="600"
+            >
+              <Icon
+                name="tabler:rss"
+                class="h-6 w-6 fill-accent transition-transform duration-300 hover:scale-110 hover:rotate-360"
+                aria-hidden="true"
+              />
+              <span class="sr-only">RSS Feed</span>
+            </a>
+          </div>
+
+          <!-- Welcome message -->
+          <h2
+            class="mb-6 text-4xl leading-tight font-bold tracking-tight sm:text-5xl"
+            data-aos="fade-up"
+            data-aos-delay="50"
+            data-aos-duration="600"
+          >
+            Willkommen auf unserem Blog!
+          </h2>
+
+          <!-- Introduction text -->
+          <div
+            class="max-w-7xl space-y-6 md:text-pretty"
+            data-aos="fade-up"
+            data-aos-delay="100"
+            data-aos-duration="600"
+          >
+            <p class="my-4 text-base leading-relaxed md:text-lg">
+              Auf diesem Blog stellen dir Sandra & Kai Artikel über
+              Gesundheitsthemen zur Verfügung und laden dich ein auf eine Reise
+              zu mehr Gesundheit, die Spaß machen soll.
+              <span class="hashtag">sogehtgesund</span>
+            </p>
+
+            <p class="my-4 text-base leading-relaxed md:text-lg">
+              Wir betreiben den Blog als Privatpersonen, teilen aber unser
+              Insider-Wissen, das wir uns in unserer langjährigen Arbeit als
+              Therapeuten angeeignet haben. Das möchten wir auf einfache und
+              verständliche Weise tun, denn wir finden, dass medizinische
+              Zusammenhänge häufig zu kompliziert und für Laien schwer
+              nachvollziehbar vermittelt werden. Deshalb verlinken wir
+              medizinische Begriffe, wenn sie nicht vermeidbar sind, auf unser <a
+                href="/glossary/"
+                class="font-medium text-accent hover:underline">Glossar</a
+              >, wo du eine verständliche Erklärung findest.
+            </p>
+
+            <p class="my-4 text-base leading-relaxed md:text-lg">
+              Unser Ziel ist <strong class="font-bold text-accent"
+                >Empowerment für deine Gesundheit</strong
+              >. Das bedeutet, wir möchten dich darin unterstützen, für deine
+              Gesundheit aktiv zu werden und dir dafür unser Wissen und unsere
+              Erfahrung kostenfrei zur Verfügung stellen.
+              <span class="hashtag">weildueswertbist</span>
+            </p>
+          </div>
+
+          <!-- Social links -->
+          {
+            socialCount > 0 && (
+              <div
+                class="shadow-elevation-low mt-8 flex flex-col rounded-xl border border-accent/10 bg-gradient-to-b from-card/30 to-card-muted/30 p-4 backdrop-blur-sm sm:flex-row sm:items-center"
+                data-aos="fade-up"
+                data-aos-delay="150"
+                data-aos-duration="600"
+              >
+                <div class="social-links">
+                  <Socials />
+                </div>
+              </div>
+            )
+          }
+        </div>
+      </section>
+    </div>
+
+    <Hr variant="dots" />
+
+    {/* Featured Articles Section - Optimized animations and rendering */}
+    {
+      featuredPostCount > 0 && (
+        <section
+          id="featured"
+          class="will-change-opacity relative z-10 pt-16 pb-8 transition-all duration-300 will-change-transform"
+          data-aos="fade-up"
+          data-aos-duration="600"
+          style="content-visibility: auto; contain-intrinsic-size: 1px 1000px;"
+        >
+          <div class="flex items-center gap-3">
+            <Icon
+              name="tabler:star"
+              class="h-7 w-7 text-accent"
+              aria-hidden="true"
+            />
+            <h2 class="text-3xl font-bold tracking-tight">
+              Ausgewählte Artikel
+            </h2>
+          </div>
+
+          <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {featuredPosts.map((post, index) => (
+              <div
+                data-aos="fade-up"
+                data-aos-delay={Math.min(index * 50, 500)}
+                class="transform transition-all duration-300 hover:translate-y-[-4px]"
+              >
+                <Card
+                  post={post}
+                  loading={index < 2 ? "eager" : "lazy"}
+                  withHeroImage={true}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {/* Recent Articles Section - Optimized animations and rendering */}
+    {
+      recentPostCount > 0 && (
+        <Fragment>
+          <Hr variant="dots" />
+          <section
+            id="recent-posts"
+            class="will-change-opacity relative z-10 pt-16 pb-8 transition-all duration-300 will-change-transform"
+            data-aos="fade-up"
+            data-aos-duration="600"
+            style="content-visibility: auto; contain-intrinsic-size: 1px 1000px;"
+          >
+            <div class="flex items-center gap-3">
+              <Icon
+                name="tabler:clock"
+                class="h-7 w-7 text-accent"
+                aria-hidden="true"
+              />
+              <h2 class="text-3xl font-bold tracking-tight">Neueste Artikel</h2>
+            </div>
+
+            <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {recentPosts.slice(0, SITE.postPerIndex).map((post, index) => (
+                <div
+                  data-aos="fade-up"
+                  data-aos-delay={Math.min(index * 50, 300)}
+                  class="transform transition-all duration-300 hover:translate-y-[-4px]"
+                >
+                  <Card
+                    post={post}
+                    loading={index < 3 ? "eager" : "lazy"}
+                    withHeroImage={true}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        </Fragment>
+      )
+    }
+
+    {/* All Posts Button */}
+    <div class="my-12 text-center" data-aos="fade-up" data-aos-duration="400">
+      <LinkButton href="/posts/">
+        {t("post.allPosts")}
+        <IconArrowRight class="inline-block" />
+      </LinkButton>
+    </div>
+  </main>
+  <!-- </Main> -->
+  <Footer />
+</Layout>
+
+<!-- Styles have been converted to Tailwind classes and applied directly to HTML elements -->
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const indexLayout = (document.querySelector("#main-content") as HTMLElement)
+      ?.dataset?.layout;
+    if (indexLayout) {
+      sessionStorage.setItem("backUrl", "/");
+    }
+  });
+</script>

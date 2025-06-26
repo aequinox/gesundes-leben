@@ -1,0 +1,32 @@
+---
+import PostDetails from "@/layouts/PostDetails.astro";
+import { processAllPosts } from "@/utils/posts";
+import { getPostSlug } from "@/utils/slugs";
+import { type CollectionEntry } from "astro:content";
+
+export interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+export async function getStaticPaths() {
+  // Process all posts in a single operation to avoid duplicate processing
+  const posts = await processAllPosts({
+    includeDrafts: false,
+    sortDirection: "desc",
+  });
+
+  const postResult = posts.map(post => ({
+    params: { slug: getPostSlug(post) },
+    props: { post },
+  }));
+
+  return postResult;
+}
+
+const { post } = Astro.props;
+
+// Use the unified post processing function
+const sortedPosts = await processAllPosts();
+---
+
+<PostDetails post={post} posts={sortedPosts} />

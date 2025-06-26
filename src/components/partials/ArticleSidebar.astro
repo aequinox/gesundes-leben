@@ -1,0 +1,85 @@
+---
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<!-- Table of Contents Sidebar -->
+<aside
+  data-pagefind-ignore="all"
+  class="sticky top-24 hidden h-auto self-start rounded-md 2xl:col-span-4 2xl:block"
+  aria-label="Table of contents"
+  style="position: sticky; height: calc(100vh - 120px);"
+>
+  <!-- Mobile Progress Bar -->
+  <div
+    id="progress-mobile"
+    class="fixed top-0 left-0 h-2 w-full bg-gradient-to-r from-accent/30 to-accent md:hidden"
+    role="progressbar"
+    aria-label="Reading progress mobile"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-valuenow="0"
+  >
+  </div>
+
+  <!-- Desktop Progress Bar -->
+  <div id="pin" class="hidden md:block">
+    <div class="mx-4 overflow-hidden">
+      <div
+        id="progress-aside"
+        class="h-px w-full bg-gradient-to-r from-accent/50 to-accent"
+        role="progressbar"
+        aria-label="Reading progress sidebar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+      >
+      </div>
+    </div>
+
+    <!-- TOC Navigation -->
+    <nav
+      id="toc"
+      class="scrollbar mx-4 h-full overflow-y-auto rounded-md bg-gradient-to-b from-card/10 to-card px-4 py-6 shadow-md"
+      aria-label="Table of contents"
+      style="height: calc(100vh - 160px); max-height: calc(100vh - 160px);"
+    >
+      <h2 class="mb-4 text-base font-medium text-foreground" id="toc-heading">
+        {t("toc.title")}
+      </h2>
+      <ul
+        class="space-y-2 text-sm text-pretty transition duration-300 ease-in-out [&>li]:flex [&>li]:items-center [&>li]:text-sm [&>li]:leading-4 [&>li]:text-foreground/80 [&>li]:transition-all [&>li]:duration-300 [&>li]:ease-[cubic-bezier(0.4,0,0.2,1)] [&>li.selected]:text-accent [&>li.selected]:opacity-100 [&>li.selected>svg]:mr-2 [&>li.selected>svg]:h-4 [&>li.selected>svg]:w-4 [&>li.selected>svg]:transition-all [&>li.selected>svg]:duration-400 [&>li.selected>svg]:ease-[cubic-bezier(0.4,0,0.2,1)] [&>li>a]:block [&>li>a]:py-1 [&>li>a]:transition-colors [&>li>a]:duration-200 [&>li>a]:ease-in-out [&>li>a]:hover:text-accent [&>li>svg]:h-0 [&>li>svg]:w-0"
+        role="list"
+        aria-labelledby="toc-heading"
+      >
+      </ul>
+    </nav>
+  </div>
+</aside>
+
+<script>
+  import {
+    BackToTopButton,
+    ScrollProgress,
+  } from "@/utils/ui/TableOfContentsEngine";
+
+  document.addEventListener("astro:page-load", () => {
+    const scrollProgress = new ScrollProgress();
+    window.addEventListener("scroll", () => scrollProgress.update(), {
+      passive: true,
+    });
+
+    new BackToTopButton();
+  });
+</script>
+
+<style>
+  @reference "@/styles/global.css";
+
+  .scrollbar {
+    scrollbar-width: none;
+   
+  }
+</style>

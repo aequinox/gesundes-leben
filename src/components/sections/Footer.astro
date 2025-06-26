@@ -1,0 +1,77 @@
+---
+import Hr from "@/components/elements/Hr.astro";
+import { SITE } from "@/config";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { getAuthorDisplayName } from "@/utils/authors";
+import Socials from "../socials/Socials.astro";
+
+// Internationalization setup
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Get the author display name using the enhanced service
+const authorDisplayName = await getAuthorDisplayName(SITE.author);
+
+const currentYear = new Date().getFullYear();
+
+// Component-specific class compositions
+const containerClasses =
+  "relative w-full transition-all duration-300 ease-out-expo";
+---
+
+<footer
+  class={containerClasses}
+  role="contentinfo"
+  aria-label={t("footer.siteFooter") || "Site footer"}
+>
+  <Hr variant="gradient" noPadding />
+
+  <div
+    class="relative overflow-hidden border-t border-border bg-background/80 shadow-sm backdrop-blur-md"
+  >
+    <div class="mx-auto max-w-6xl px-4 py-8">
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-3 md:items-center">
+        {/* Copyright Information */}
+        <div class="flex flex-col items-center text-center md:items-start">
+          <div class="flex flex-col items-center gap-1 md:items-start">
+            <span class="text-sm text-foreground/80">
+              {t("footer.copyright")} &#169; {currentYear}
+              {SITE.author && ` ${authorDisplayName}`}
+            </span>
+            <span class="text-sm text-foreground/80">{t("footer.rights")}</span>
+          </div>
+        </div>
+
+        {/* Footer Links */}
+        <div class="flex flex-col items-center justify-center">
+          <div class="flex flex-wrap justify-center gap-6">
+            <a
+              href="/imprint"
+              class="group relative inline-block px-4 py-2 text-foreground transition-colors duration-200 hover:text-accent"
+              aria-label={t("footer.imprint") || "Imprint"}
+            >
+              <span class="relative z-10">{t("footer.imprint")}</span>
+              <span
+                class="absolute bottom-0 left-0 h-[2px] w-0 rounded-full bg-accent transition-all duration-300 group-hover:w-full"
+              ></span>
+            </a>
+          </div>
+        </div>
+
+        {/* Social Links */}
+        <div class="flex flex-col items-center justify-center md:items-end">
+          <Socials centered />
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+<style>
+  /* Reduced motion preferences - Disable non-essential animations */
+  @media (prefers-reduced-motion: reduce) {
+    footer a span,
+    footer div {
+      @apply transform-none transition-none;
+    }
+  }
+</style>

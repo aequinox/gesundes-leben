@@ -1,0 +1,59 @@
+---
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { getAuthorEntry } from "@/utils/authors";
+import { Icon } from "astro-icon/components";
+
+interface Props {
+  /** The author reference (string ID or reference object) */
+  author: string | { collection: "authors"; id: string };
+  /** Size variant for the component */
+  size?: "sm" | "lg";
+  /** Additional CSS classes */
+  classes?: string;
+}
+
+const { author, size = "sm", classes = "" }: Props = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Get author entry from service
+const authorEntry = await getAuthorEntry(author);
+
+// Precompute classes for better performance
+const containerClasses = [
+  "author-container group flex items-center gap-2 opacity-80 transition-all duration-300  hover:opacity-100",
+  classes.trim(),
+];
+
+const iconClasses = [
+  "author-icon inline-block fill-foreground transition-transform duration-300 group-hover:scale-110 group-hover:fill--accent",
+  size === "sm" ? "h-5 w-5" : "h-6 w-6",
+];
+
+const textClasses = [
+  "author-text italic transition-colors duration-300 group-hover:text-accent",
+  size === "sm" ? "text-sm" : "text-base",
+];
+---
+
+{
+  authorEntry && (
+    <div
+      class:list={containerClasses}
+      aria-label={`${t("author.from")} ${authorEntry.data.name}`}
+    >
+      <Icon name="tabler:user" class:list={iconClasses} aria-hidden="true" />
+      <a
+        href={`/author/${authorEntry.id.replace(/\.(md|mdx)$/, "")}`}
+        class:list={[
+          "author-link rounded-sm hover:underline focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:outline-none",
+          ...textClasses,
+        ]}
+        data-pagefind-filter={t("author.name")}
+      >
+        {authorEntry.data.name}
+      </a>
+    </div>
+  )
+}

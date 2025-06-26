@@ -1,0 +1,61 @@
+---
+import type { ui } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import Icon from "./Icon.astro";
+
+interface Props {
+  /** Language key */
+  lang: keyof typeof ui;
+  /** Visual style variant */
+  variant?: "icon" | "switch" | "minimal";
+  /** Size of the toggle */
+  size?: "sm" | "md" | "lg";
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  lang,
+  variant = "icon",
+  size = "md",
+  class: className = "",
+}: Props = Astro.props;
+
+const t = useTranslations(lang);
+
+---
+
+<button
+  id="theme-btn"
+  class:list={[
+    variant === "icon" ? "rounded-full p-2 hover:bg-accent/10 hover:text-accent" : 
+    variant === "switch" ? "inline-flex overflow-hidden rounded-full" :
+    "rounded-md p-1 hover:bg-card",
+    size === "sm" ? "scale-75" : size === "lg" ? "scale-125" : "scale-100",
+    className,
+  ]}
+  title={t("nav.themeToggle")}
+  aria-label={t("nav.themeToggle")}
+  aria-live="polite"
+>
+  {
+    variant === "switch" ? (
+      <div class="relative h-6 w-12 rounded-full bg-card p-1 shadow-inner transition-colors duration-300">
+        <div class="absolute left-1 size-4 rounded-full bg-accent shadow-md transition-transform duration-300 ease-[cubic-bezier(0.19,1,0.22,1)] dark:translate-x-6" />
+        <div class="flex justify-between">
+          <span class="rounded-full p-2 text-amber-500/70">
+            <Icon name="sun" size="xs" />
+          </span>
+          <span class="rounded-full p-2 text-indigo-400/70">
+            <Icon name="moon" size="xs" />
+          </span>
+        </div>
+      </div>
+    ) : (
+      <>
+        <Icon name="moon" id="moon-svg" size={size} />
+        <Icon name="sun" id="sun-svg" size={size} />
+      </>
+    )
+  }
+</button>

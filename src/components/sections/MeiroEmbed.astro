@@ -1,0 +1,110 @@
+---
+/**
+ * MeiroEmbed Component
+ *
+ * A reusable component for embedding Meiro iframes with automatic resizing.
+ * Handles script loading, iframe initialization, and proper resizing.
+ *
+ * @component
+ * @example
+ * <MeiroEmbed id="9286730" />
+ */
+
+export interface Props {
+  /** Required Meiro iframe ID */
+  id: string;
+  /** Optional width of iframe (default: "100%") */
+  width?: string;
+  /** Optional height calculation method (default: "grow") */
+  heightMethod?: string;
+  /** Optional check origin setting (default: false) */
+  checkOrigin?: boolean;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  id,
+  width = "100%",
+  heightMethod = "grow",
+  checkOrigin = false,
+  class: className = "",
+}: Props = Astro.props;
+
+// Generate unique element IDs to avoid conflicts when multiple instances are used
+const iframeId = `meiro_${id}`;
+const baseUrl = "https://go.meiro.cc";
+const resizerScriptUrl =
+  "https://meiro-prod.fra1.digitaloceanspaces.com/iframeResizer.min.js";
+---
+
+{/* Iframe container with optional custom classes */}
+{
+  import.meta.env.PROD && (
+    <div class:list={["my-6 w-full overflow-hidden rounded-md", className]}>
+      {/* The iframe with data attribute instead of src for deferred loading */}
+      <iframe
+        id={iframeId}
+        class="min-h-[300px] w-full"
+        data-meiro-src={`${baseUrl}/${id}`}
+        width={width}
+        title="Meiro Embedded Content"
+        allowfullscreen="true"
+        allowtransparency="true"
+        fetchpriority="auto"
+        loading="lazy"
+        seamless="true"
+      />
+    </div>
+  )
+}
+
+<!-- Client-side script for loading and initializing the iframe -->
+<script is:inline define:vars={{ iframeId, resizerScriptUrl, heightMethod, checkOrigin }}>
+  import { logger } from "@/utils/logger";
+
+  // Use IIFE to avoid polluting global scope
+  (function () {
+    // Check if script is already loaded to prevent duplicate loading
+    if (!document.querySelector(`script[src="${resizerScriptUrl}"]`)) {
+      const script = document.createElement("script");
+      script.src = resizerScriptUrl;
+      script.async = true;
+
+      // Set up onload handler before appending to ensure it catches the load event
+      script.onload = initializeIframe;
+      document.head.appendChild(script);
+    } else {
+      // If script is already loaded, initialize immediately
+      initializeIframe();
+    }
+
+    function initializeIframe() {
+      const iframe = document.getElementById(iframeId);
+      if (iframe) {
+        // Set the src from data attribute
+        iframe.src = iframe.getAttribute("data-meiro-src");
+        iframe.removeAttribute("data-meiro-src");
+
+        // Initialize iFrameResize when iframe loads
+        iframe.onload = () => {
+          // Access iFrameResize from window to avoid ESLint errors
+          const iFrameResizeFunc = window.iFrameResize;
+
+          if (typeof iFrameResizeFunc === "function") {
+            iFrameResizeFunc(
+              {
+                checkOrigin: checkOrigin,
+                heightCalculationMethod: heightMethod,
+              },
+              `#${iframeId}`
+            );
+          } else {
+            logger.warn("iFrameResize function not available");
+          }
+        };
+        iframe.getElementById("__nuxt").style.visibility = "invisible";
+      }
+    }
+  })();
+</script>

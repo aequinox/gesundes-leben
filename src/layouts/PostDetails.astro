@@ -1,0 +1,98 @@
+---
+import ArticleContent from "@/components/partials/ArticleContent.astro";
+import ArticleFooter from "@/components/partials/ArticleFooter.astro";
+import ArticleHeader from "@/components/partials/ArticleHeader.astro";
+import ArticleProgressBar from "@/components/partials/ArticleProgressBar.astro";
+import ArticleSidebar from "@/components/partials/ArticleSidebar.astro";
+import Footer from "@/components/sections/Footer.astro";
+import Header from "@/components/sections/Header.astro";
+import { SITE } from "@/config";
+import Layout from "@/layouts/Layout.astro";
+import { getAuthorEntry } from "@/utils/authors";
+import { getPostSlug } from "@/utils/slugs";
+import type { Post } from "@/utils/types";
+
+interface PostProps {
+  post: Post;
+}
+
+interface LayoutProps {
+  title: string;
+  author: string;
+  heroImage: Post["data"]["heroImage"];
+  description: string;
+  keywords?: string[];
+  tags?: string[];
+  categories?: string[];
+  pubDatetime: Date;
+  modDatetime?: Date;
+  canonicalURL?: string;
+  ogImage: string;
+  scrollSmooth: boolean;
+}
+
+const { post } = Astro.props as PostProps;
+
+const {
+  data: {
+    title,
+    author,
+    heroImage,
+    description,
+    ogImage,
+    canonicalURL,
+    pubDatetime,
+    modDatetime,
+    keywords,
+    categories,
+    tags,
+    // references,
+  },
+} = post;
+
+const authorEntry = await getAuthorEntry(author);
+
+const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
+const ogUrl = new URL(
+  ogImageUrl ?? `/posts/${getPostSlug(post)}.png`,
+  Astro.url.origin
+).href;
+
+const layoutProps: LayoutProps = {
+  title: `${title} | ${SITE.title}`,
+  author: authorEntry?.data.name || SITE.author,
+  heroImage,
+  description,
+  keywords,
+  tags,
+  categories,
+  pubDatetime,
+  modDatetime,
+  canonicalURL,
+  ogImage: ogUrl,
+  scrollSmooth: true,
+};
+---
+
+<Layout {...layoutProps}>
+  <ArticleProgressBar />
+
+  <Header />
+  <!-- Main Content Grid -->
+  <div class="relative mx-auto mt-8 grid max-w-content grid-cols-12 gap-8">
+    <!-- Main Content Area -->
+    <main
+      id="main-content"
+      class="col-span-12 mx-auto w-full max-w-none px-4 pb-12 2xl:col-span-8"
+    >
+      <ArticleHeader post={post as Post} />
+      <ArticleContent post={post as Post} />
+      <ArticleFooter post={post as Post} />
+    </main>
+
+    <!-- Table of Contents Sidebar -->
+    <ArticleSidebar />
+  </div>
+
+  <Footer />
+</Layout>

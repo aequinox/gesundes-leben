@@ -1,0 +1,47 @@
+---
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { Icon } from "astro-icon/components";
+
+interface Props {
+  /** Reading time in minutes */
+  readingTime?: number;
+  /** Size variant for the component */
+  size?: "sm" | "lg";
+  /** Additional CSS classes */
+  classes?: string;
+}
+
+const { readingTime, size = "sm", classes = "" }: Props = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Precompute classes for better performance
+const containerClasses = [
+  "reading-time-container group flex items-center gap-2 opacity-80 transition-all duration-300  hover:opacity-100",
+  classes.trim(),
+];
+
+const iconClasses = [
+  "reading-time-icon inline-block fill-foreground transition-transform duration-300 group-hover:scale-110 group-hover:fill--accent",
+  size === "sm" ? "h-5 w-5" : "h-6 w-6",
+];
+
+const textClasses = [
+  "reading-time-text italic transition-colors duration-300 group-hover:text-accent",
+  size === "sm" ? "text-sm" : "text-base",
+];
+---
+
+{
+  readingTime && (
+    <div
+      class:list={containerClasses}
+      aria-label={`${readingTime} ${t("readingTime.minutes")} ${lang === "en" ? "reading time" : "Lesezeit"}`}
+    >
+      <Icon name="tabler:clock" class:list={iconClasses} aria-hidden="true" />
+      <span class:list={textClasses}>
+        {readingTime}&nbsp;{t("readingTime.minutes")}
+      </span>
+    </div>
+  )
+}

@@ -1,0 +1,224 @@
+---
+import Badge from "@/components/elements/Badge.astro";
+import type { UITranslations } from "@/i18n/ui";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { getPostSlug } from "@/utils/slugs";
+import { getCollection } from "astro:content";
+
+interface Props {
+  class?: string;
+}
+
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+  isCurrentPage: boolean;
+}
+
+const { class: className }: Props = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Remove trailing slash and get clean path
+const currentUrlPath = Astro.url.pathname.replace(/\/+$/, "");
+
+// Split path into segments and remove empty entries
+const pathSegments = currentUrlPath.split("/").filter(Boolean);
+
+// Get all blog posts for title lookup
+const allPosts = await getCollection("blog");
+
+/**
+ * Finds a blog post by its slug
+ * @param slug The post slug to search for
+ * @returns The post title if found, or null if not found
+ */
+const findPostTitleBySlug = (slug: string): string | null => {
+  // Find the post with a matching slug
+  const post = allPosts.find(post => {
+    const postSlug = getPostSlug(post);
+    return postSlug === slug;
+  });
+
+  return post ? post.data.title : null;
+};
+
+/**
+ * Formats a breadcrumb label based on the segment and its context
+ */
+const formatBreadcrumbLabel = (segment: string, index: number): string => {
+  // Handle common navigation segments that need translation
+  const commonSegments: Record<string, keyof UITranslations> = {
+    categories: "nav.categories",
+    tags: "nav.tags",
+    posts: "nav.posts",
+    glossary: "nav.glossary",
+    references: "nav.references",
+    search: "nav.search",
+    archives: "nav.archives",
+    "our-vision": "nav.ourVision",
+    about: "nav.about",
+    imprint: "footer.imprint",
+    pro: "group.pro.title",
+    kontra: "group.contra.title",
+    fragezeiten: "group.questionTime.title",
+    books: "book.recommendation",
+  };
+
+  // Translate common segments
+  if (segment in commonSegments) {
+    return t(commonSegments[segment]);
+  }
+
+  // Handle posts pagination
+  if (segment === "posts" && pathSegments[index + 1]) {
+    const pageNum = pathSegments[index + 1];
+    return `${t("nav.posts")} (${t("nav.page")} ${pageNum || 1})`;
+  }
+
+  // Handle tags pagination
+  if (
+    segment === "tags" &&
+    pathSegments[index + 1] &&
+    pathSegments[index + 2]
+  ) {
+    const tag = pathSegments[index + 1];
+    const pageNum = pathSegments[index + 2];
+    const pageIndicator =
+      Number(pageNum) === 1 ? "" : ` (${t("nav.page")} ${pageNum})`;
+    return `${decodeURIComponent(tag)}${pageIndicator}`;
+  }
+
+  // Handle blog post slugs - check if this is a post slug
+  if (pathSegments[index - 1] === "posts" && isNaN(Number(segment))) {
+    // Try to find the post title by slug
+    const postTitle = findPostTitleBySlug(segment);
+    if (postTitle) {
+      return postTitle;
+    }
+  }
+
+  // Default case: decode URI component for readable labels
+  return decodeURIComponent(segment);
+};
+
+/**
+ * Builds the breadcrumb items array with proper formatting and links
+ */
+const buildBreadcrumbItems = (): BreadcrumbItem[] => {
+  const items: BreadcrumbItem[] = [
+    {
+      label: t("nav.home"),
+      href: "/",
+      isCurrentPage: pathSegments.length === 0,
+    },
+  ];
+
+  let currentPath = "";
+
+  pathSegments.forEach((segment, index) => {
+    // Skip pagination numbers for posts and tags
+    if (
+      (pathSegments[index - 1] === "posts" && !isNaN(Number(segment))) ||
+      (pathSegments[index - 2] === "tags" && !isNaN(Number(segment)))
+    ) {
+      return;
+    }
+
+    currentPath += `/${segment}`;
+
+    items.push({
+      label: formatBreadcrumbLabel(segment, index),
+      href: index === pathSegments.length - 1 ? undefined : currentPath,
+      isCurrentPage: index === pathSegments.length - 1,
+    });
+  });
+
+  return items;
+};
+const capitalize = (word: string): string => {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+};
+const breadcrumbItems = buildBreadcrumbItems();
+---
+
+<nav
+  class:list={["mx-auto mt-4 w-full max-w-6xl", className]}
+  aria-label="breadcrumb"
+  data-aos="fade-in"
+  data-aos-duration="800"
+>
+  <!-- <div class="border border-card/20 bg-card/50 px-4 py-2 shadow-sm backdrop-blur-sm transition-all duration-500 ease-in-out"> -->
+  <div
+    class="py-2 backdrop-blur-sm transition-all duration-500 ease-in-out"
+  >
+    <ul class="flex flex-wrap items-center gap-1">
+      {
+        breadcrumbItems.map((item, index) => (
+          <li class="inline-flex items-center">
+            {item.isCurrentPage ? (
+              <Badge
+                class="inline-block rounded-full bg-card px-3 py-1 font-medium shadow-sm backdrop-blur-sm"
+                aria-current="page"
+                shape="rounded"
+                size="md"
+                variant="primary"
+              >
+                {capitalize(item.label)}
+              </Badge>
+            ) : (
+              <Fragment>
+                <a
+                  href={item.href}
+                  class="relative z-10 rounded-md px-2 py-1 font-medium capitalize transition-all duration-500 ease-in-out hover:-translate-y-[1px] hover:bg-card active:translate-y-0"
+                >
+                  <span>{item.label}</span>
+                </a>
+                {index < breadcrumbItems.length - 1 && (
+                  <span class="mx-1 opacity-60" aria-hidden="true">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="h-4 w-4"
+                    >
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </span>
+                )}
+              </Fragment>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</nav>
+
+<script>
+  // Add intersection observer for scroll animations
+  document.addEventListener("astro:page-load", () => {
+    const breadcrumb = document.querySelector(".breadcrumb");
+
+    if (breadcrumb && "IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1 }
+      );
+
+      observer.observe(breadcrumb);
+    }
+  });
+</script>

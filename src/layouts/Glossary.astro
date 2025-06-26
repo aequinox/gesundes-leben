@@ -1,0 +1,82 @@
+---
+/**
+ * Glossary Layout Component - 2025 Modern Design
+ *
+ * Displays glossary entries in a visually appealing grid layout
+ * with modern design elements and interactive features.
+ */
+
+import Hr from "@/components/elements/Hr.astro";
+
+// import Footer from "@/components/sections/Footer.astro";
+// import GlossaryCard from "@/components/sections/GlossaryCard.astro";
+// import Header from "@/components/sections/Header.astro";
+// import PageHero from "@/components/sections/PageHero.astro";
+// import Pagination from "@/components/sections/Pagination.astro";
+import Footer from "@/components/sections/Footer.astro";
+import GlossaryCard from "@/components/sections/GlossaryCard.astro";
+import Header from "@/components/sections/Header.astro";
+import PageHero from "@/components/sections/PageHero.astro";
+import Pagination from "@/components/sections/Pagination.astro";
+import { SITE } from "@/config";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import type { CollectionEntry } from "astro:content";
+import Layout from "./Layout.astro";
+
+export interface Props {
+  title?: string;
+  currentPage: number;
+  totalPages: number;
+  paginatedPosts: CollectionEntry<"glossary">[];
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const {
+  title: propTitle,
+  currentPage,
+  totalPages,
+  paginatedPosts,
+} = Astro.props;
+const title = propTitle
+  ? `${propTitle} | ${SITE.title}`
+  : `t("glossary.title") | ${SITE.title}`;
+const pageTitle = propTitle ? propTitle : t("glossary.all");
+---
+
+<Layout title={title}>
+  <Header activeNav="glossary" />
+
+  <main id="main-content" class="mx-auto w-full max-w-content">
+    <!-- Hero Section -->
+    <PageHero title={pageTitle} subtitle={t("glossary.description")} />
+
+    <Hr />
+
+    <!-- Glossary Grid Section -->
+    <section class="py-12">
+      <div class="mx-auto max-w-content">
+        <p class="mb-10 text-center text-lg text-foreground italic opacity-80">
+          Entdecke unser Glossar mit wichtigen Begriffen und Definitionen.
+          Klicke auf einen Eintrag, um mehr zu erfahren.
+        </p>
+
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {paginatedPosts.map(post => <GlossaryCard {post} />)}
+        </div>
+      </div>
+    </section>
+
+    <Pagination
+      currentPage={currentPage}
+      totalPages={totalPages}
+      prevUrl={currentPage > 1
+        ? `/glossary${currentPage - 1 !== 1 ? "/" + (currentPage - 1) : ""}/`
+        : ""}
+      nextUrl={currentPage < totalPages ? `/glossary/${currentPage + 1}/` : ""}
+    />
+  </main>
+
+  <Footer noMarginTop={totalPages > 1} />
+</Layout>

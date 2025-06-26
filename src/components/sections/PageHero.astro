@@ -1,0 +1,170 @@
+---
+/**
+ * PageHero Component
+ *
+ * A reusable hero section for content pages that displays:
+ * - Main heading with animated underline decoration
+ * - Subtitle
+ * - Optional background image (16:9 ratio)
+ * - Configurable gradient colors using Tailwind classes
+ * - Floating particles for visual depth
+ * - 3D perspective effects
+ *
+ * @component
+ * @example
+ * <PageHero
+ *   title="About Us"
+ *   subtitle="Our story"
+ *   fromColor="purple-500"
+ *   toColor="blue-600"
+ * />
+ */
+
+interface Props {
+  title: string;
+  subtitle: string;
+  minHeight?: string; // Optional min-height, defaults to 300px
+  image?: ImageMetadata | string; // Optional background image
+  fromColor?: string; // Optional gradient start color (Tailwind class)
+  toColor?: string; // Optional gradient end color (Tailwind class)
+}
+
+const {
+  title,
+  subtitle,
+  minHeight = "200px",
+  image,
+  fromColor = "accent",
+  toColor = "dark:background white",
+}: Props = Astro.props;
+
+// Determine if we're using an image or gradient background
+const hasImage = !!image;
+const gradientStyle = `bg-gradient-to-tr from-${fromColor} via-${fromColor} via-50% to-${toColor}`;
+const backgroundStyle = hasImage ? "" : gradientStyle;
+---
+
+<section
+  class={`relative flex w-full items-center justify-center overflow-hidden rounded-lg text-center text-white mt-4 ${backgroundStyle} hero-perspective`}
+  style={`min-height: ${minHeight};`}
+>
+  {
+    hasImage && (
+      <div class="absolute inset-0 h-full w-full overflow-hidden">
+        <img
+          src={image instanceof Object ? image.src : image}
+          alt=""
+          class="aspect-[16/9] h-full w-full object-cover"
+        />
+      </div>
+    )
+  }
+
+  <!-- Dark overlay -->
+  <div class="bg--transparent absolute inset-0"></div>
+
+  <!-- Floating particles for depth -->
+  <div class="hero-perspective absolute inset-0 z-0">
+    <div
+      class="animate-float absolute top-[10%] left-[15%] h-16 w-16 rounded-full bg-white/20 backdrop-blur-lg"
+      style="animation-delay: 0s; animation-duration: 15s;"
+    >
+    </div>
+    <div
+      class="animate-float absolute right-[10%] bottom-[20%] h-24 w-24 rounded-full bg-white/20 backdrop-blur-md"
+      style="animation-delay: -5s; animation-duration: 25s;"
+    >
+    </div>
+    <div
+      class="animate-float absolute top-[40%] right-[25%] h-12 w-12 rounded-full bg-white/20 backdrop-blur-md"
+      style="animation-delay: -10s; animation-duration: 20s;"
+    >
+    </div>
+    <div
+      class="animate-float absolute bottom-[30%] left-[20%] h-20 w-20 rounded-full bg-white/20 backdrop-blur-md"
+      style="animation-delay: -15s; animation-duration: 18s;"
+    >
+    </div>
+    <div
+      class="animate-float absolute top-[20%] right-[40%] h-8 w-8 rounded-full bg-white/20 backdrop-blur-md"
+      style="animation-delay: -7s; animation-duration: 22s;"
+    >
+    </div>
+  </div>
+
+  <div class="relative z-10 max-w-3xl translate-z-20 transform">
+    <h1 class="relative mb-4 inline-block">
+      <span
+        class="hero-text-shadow text-3xl font-bold tracking-tight text-white md:text-4xl xl:text-5xl"
+        >{title}</span
+      >
+      <div
+        class="animate-expand absolute -bottom-2 left-0 h-1 w-full rounded-full bg-white/70"
+      >
+      </div>
+    </h1>
+    <p
+      class="hero-text-shadow text-lg font-light md:text-xl lg:text-2xl xl:text-3xl"
+    >
+      {subtitle}
+    </p>
+  </div>
+</section>
+
+<style>
+  /* Custom styles that can't be directly represented in Tailwind */
+  .hero-perspective {
+    perspective: 1000px;
+    transform-style: preserve-3d;
+  }
+
+  .translate-z-20 {
+    transform: translateZ(20px);
+  }
+
+  .hero-text-shadow {
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  @keyframes expand {
+    0% {
+      width: 30%;
+      opacity: 0.6;
+    }
+    100% {
+      width: 100%;
+      opacity: 0.9;
+    }
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateZ(0) translate(0, 0);
+      opacity: 0.3;
+    }
+    50% {
+      transform: translateZ(50px) translate(15px, -15px);
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateZ(0) translate(0, 0);
+      opacity: 0.3;
+    }
+  }
+
+  .animate-expand {
+    animation: expand 3s infinite alternate ease-in-out;
+  }
+
+  .animate-float {
+    animation: float 20s infinite ease-in-out;
+  }
+
+  /* Accessibility - reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-float,
+    .animate-expand {
+      animation: none;
+    }
+  }
+</style>

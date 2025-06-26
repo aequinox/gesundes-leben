@@ -1,0 +1,80 @@
+---
+import Hr from "@/components/elements/Hr.astro";
+import ArchiveYearGroup from "@/components/sections/ArchiveYearGroup.astro";
+import Footer from "@/components/sections/Footer.astro";
+import Header from "@/components/sections/Header.astro";
+import PageHero from "@/components/sections/PageHero.astro";
+import { SITE } from "@/config";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import { logger } from "@/utils/logger";
+import { getAllPosts, groupByCondition } from "@/utils/posts";
+
+// Redirect to 404 page if `showArchives` config is false
+if (!SITE.showArchives) {
+  return Astro.redirect("/404");
+}
+
+// Get current language and translation function
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Get all non-draft posts
+const posts = await getAllPosts();
+
+// Group posts by year
+const postsByYear = groupByCondition(
+  posts,
+  post => post.data.pubDatetime.getFullYear(),
+  {
+    onError: (post, error) => {
+      logger.error(`Error grouping post ${post.id} by year: ${error}`);
+      return "Unknown Year";
+    },
+  }
+);
+---
+
+<Layout title={`${t("nav.archives")} | ${SITE.title}`}>
+  <Header />
+  <PageHero title={t("nav.archives")} subtitle={t("archive.description")} />
+
+  <Hr />
+
+  <main id="main-content" class="mx-auto w-full max-w-content">
+    <div class="archives-container">
+      {
+        Object.entries(postsByYear)
+          .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
+          .map(([year, yearGroup]) => (
+            <ArchiveYearGroup year={year} yearGroup={yearGroup} />
+          ))
+      }
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  .archives-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    width: 100%;
+    overflow: hidden; /* Prevent any potential overflow issues */
+  }
+
+  /* Clear any floats that might cause overlapping */
+  .archives-container::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  /* Accessibility improvements */
+  @media (prefers-reduced-motion: reduce) {
+    .archives-container {
+      transition: none !important;
+    }
+  }
+</style>

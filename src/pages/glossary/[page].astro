@@ -1,0 +1,40 @@
+---
+import Glossary from "@/layouts/Glossary.astro";
+import { calculatePageNumbers, generatePagination } from "@/utils/pagination";
+import { getCollection } from "astro:content";
+
+export async function getStaticPaths() {
+  const glossaryEntries = await getCollection("glossary");
+  const sortedEntries = [...glossaryEntries].sort((a, b) =>
+    a.data.title.localeCompare(b.data.title)
+  );
+
+  // Use the same postsPerPage value as in index.astro
+  const totalPages = calculatePageNumbers(
+    sortedEntries.length,
+    12 // Same value as in index.astro
+  );
+
+  return totalPages.map(page => ({
+    params: { page: page.toString() },
+  }));
+}
+
+const { page } = Astro.params;
+
+// Get all glossary entries
+const glossaryEntries = await getCollection("glossary");
+const sortedGlossaryEntries = [...glossaryEntries].sort((a, b) =>
+  a.data.title.localeCompare(b.data.title)
+);
+
+// Get pagination for the current page
+const pagination = generatePagination({
+  posts: sortedGlossaryEntries,
+  page,
+  isIndex: false,
+  postsPerPage: 12, // Display 12 glossary entries per page
+});
+---
+
+<Glossary {...pagination} title="Glossar" />

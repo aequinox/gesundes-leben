@@ -1,0 +1,57 @@
+---
+import Button from "@/components/elements/Button.astro";
+import Hr from "@/components/elements/Hr.astro";
+import Tag from "@/components/elements/Tag.astro";
+import RelatedPosts from "@/components/partials/RelatedPosts.astro";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { slugify } from "@/utils/slugs";
+import type { Post } from "@/utils/types";
+import ShareLinks from "../ShareLinks.astro";
+
+interface Props {
+  post: Post;
+}
+
+const { post }: Props = Astro.props;
+const {
+  data: { tags = [] },
+} = post;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<Fragment>
+  {/* References */}
+  <!-- {references && references.length > 0 && <References references={references} />} -->
+
+  <Hr variant="dots" />
+
+  {/* Related Posts */}
+  <RelatedPosts post={post} maxPosts={3} />
+
+  {/* Tags */}
+  <ul class="my-8 flex flex-wrap gap-2" role="list" aria-label="Tags">
+    {tags.map((tag: string) => <Tag tag={slugify(tag)} tagName={tag} />)}
+  </ul>
+
+  {/* Navigation and Share Links */}
+  <div
+    class="flex flex-col-reverse items-center justify-between gap-6 sm:flex-row-reverse sm:items-end sm:gap-4"
+  >
+    <Button
+      id="back-to-top"
+      href="#top"
+      variant="ghost"
+      size="sm"
+      icon="tabler:chevron-up"
+      iconPosition="start"
+      ariaLabel={t("nav.backToTop")}
+      class="whitespace-nowrap"
+    >
+      {t("nav.backToTop")}
+    </Button>
+
+    <ShareLinks />
+  </div>
+</Fragment>

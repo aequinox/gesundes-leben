@@ -1,0 +1,77 @@
+{
+  /**
+   * Extend the base Astro strict TypeScript configuration
+   *
+   * @see https://docs.astro.build/en/reference/configuration/#tsconfig
+   */
+  "extends": "astro/tsconfigs/strict",
+  /**
+   * Specify the files to include in the TypeScript project
+   *
+   * @see https://www.typescriptlang.org/tsconfig#include
+   */
+  "include": [".astro/types.d.ts", "**/*"],
+  /**
+   * Exclude the 'dist' directory from the TypeScript project
+   *
+   * @see https://www.typescriptlang.org/tsconfig#exclude
+   */
+  "exclude": ["dist", "public/pagefind"],
+  /**
+   * Configure TypeScript compiler options
+   *
+   * @see https://www.typescriptlang.org/tsconfig#compilerOptions
+   */
+  "compilerOptions": {
+    /**
+     * Set the base directory for module resolution
+     *
+     * @see https://www.typescriptlang.org/tsconfig#baseUrl
+     */
+    "baseUrl": ".",
+    /**
+     * Specify JSX syntax with Astro JSX support
+     *
+     * @see https://docs.astro.build/en/guides/typescript/#jsx-configuration
+     */
+    "jsx": "react-jsx",
+    /**
+     * Specify the import source for JSX with Astro JSX support
+     *
+     * @see https://docs.astro.build/en/guides/typescript/#jsx-configuration
+     */
+    "jsxImportSource": "react",
+    /**
+     * Target the latest ECMAScript version for output
+     *
+     * @see https://www.typescriptlang.org/tsconfig#target
+     */
+    "target": "ESNext",
+    /**
+     * Enable all strict type-checking options
+     *
+     * @see https://www.typescriptlang.org/tsconfig#strict
+     */
+    "strict": true,
+    /**
+     * Configure module path aliases for cleaner imports
+     *
+     * @see https://www.typescriptlang.org/tsconfig#paths
+     */
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    /**
+     * Allow JavaScript files to be included in the TypeScript project
+     *
+     * @see https://www.typescriptlang.org/tsconfig#allowJs
+     */
+    "allowJs": true,
+    /**
+     * Specify the module resolution strategy
+     *
+     * @see https://www.typescriptlang.org/tsconfig#moduleResolution
+     */
+    "moduleResolution": "bundler"
+  }
+}

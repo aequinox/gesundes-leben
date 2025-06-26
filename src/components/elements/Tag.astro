@@ -1,0 +1,132 @@
+---
+import Badge, {
+  type BadgeShape,
+  type BadgeVariant,
+} from "@/components/elements/Badge.astro";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+export interface Props {
+  /** Tag identifier */
+  tag: string;
+  /** Display name for the tag */
+  tagName: string;
+  /** Size variant */
+  size?: "xs" | "sm" | "md" | "lg";
+  /** Visual style variant */
+  variant?: "default" | "pill" | "outline" | "minimal";
+  /** Whether to show the tag icon */
+  showIcon?: boolean;
+  /** Custom icon name (from astro-icon) */
+  icon?: string;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  tag,
+  tagName,
+  size = "sm",
+  variant = "default",
+  showIcon = true,
+  icon = "tabler:hash",
+  class: className = "",
+} = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+interface BadgeProps {
+  variant: BadgeVariant;
+  shape: BadgeShape;
+  outlined: boolean;
+}
+
+const getBadgeProps = (): BadgeProps => {
+  switch (variant) {
+    case "pill":
+      return { variant: "default", shape: "pill", outlined: false };
+    case "outline":
+      return { variant: "primary", shape: "rounded", outlined: true };
+    case "minimal":
+      return { variant: "default", shape: "rounded", outlined: true };
+    case "default":
+    default:
+      return { variant: "primary", shape: "rounded", outlined: true };
+  }
+};
+
+const { variant: badgeVariant, shape, outlined } = getBadgeProps();
+---
+
+<li class:list={["tag-item", className]}>
+  <a
+    href={`/tags/${tag}/`}
+    transition:name={`tag-link-${tag}`}
+    class:list={["tag-link", variant === "minimal" ? "tag-link-minimal" : ""]}
+    data-tag={tag}
+    data-variant={variant}
+  >
+    <Badge
+      text={tagName}
+      variant={badgeVariant}
+      size={size}
+      shape={shape}
+      icon={showIcon ? icon : undefined}
+      outlined={outlined}
+      interactive={true}
+      class="tag-badge"
+    >
+      <span class="sr-only" data-pagefind-filter={t("tag.name")}>{tagName}</span
+      >
+    </Badge>
+  </a>
+</li>
+
+<style>
+  @reference "@/styles/global.css";
+
+  .tag-item {
+    @apply inline-block;
+  }
+
+  .tag-link {
+    @apply relative inline-flex transition-all duration-300;
+  }
+
+  /* Hover effects */
+  .tag-link:hover {
+    transform: translateY(-1px);
+  }
+
+  .tag-link:active {
+    transform: translateY(0);
+  }
+
+  /* Badge customizations */
+  :global(.tag-badge) {
+    @apply w-full;
+  }
+
+  /* Variant-specific styles that need to override Badge styles */
+  :global(.tag-badge.badge-pill) {
+    @apply bg-accent/10 text-accent hover:bg-accent/20;
+  }
+
+  :global(.tag-badge.badge-outlined.badge-default) {
+    @apply border-accent/30 hover:border-accent hover:bg-accent/5 hover:text-accent;
+  }
+
+  /* Minimal variant special styling */
+  .tag-link-minimal {
+    @apply no-underline;
+  }
+
+  .tag-link-minimal :global(.tag-badge) {
+    @apply border-0 bg-transparent underline decoration-accent/30 decoration-dashed underline-offset-4 hover:text-accent hover:decoration-accent;
+  }
+
+  /* Dark mode adjustments */
+  :global(html[data-theme="dark"]) :global(.tag-badge.badge-pill) {
+    @apply bg-accent/15;
+  }
+</style>

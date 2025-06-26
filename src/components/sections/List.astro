@@ -1,0 +1,512 @@
+---
+/**
+ * List component for displaying single or multiple lists with customizable styling
+ * and optimized two-column layout
+ *
+ * @example Single List
+ * ```astro
+ * <List
+ *   title="Features"
+ *   subtitle="Main features include:"
+ *   items={[
+ *     {
+ *       content: "Primary feature",
+ *       subitems: [
+ *         { content: "Sub-feature 1" },
+ *         { content: "Sub-feature 2" }
+ *       ]
+ *     },
+ *     { content: "Secondary feature" }
+ *   ]}
+ * />
+ * ```
+ *
+ * @example Two Column Layout
+ * ```astro
+ * <List
+ *   lists={[
+ *     {
+ *       title: "Left Column",
+ *       subtitle: "First list",
+ *       items: [
+ *         { content: "Item 1" },
+ *         { content: "Item 2" }
+ *       ],
+ *       columns: 1
+ *     },
+ *     {
+ *       title: "Right Column",
+ *       subtitle: "Second list",
+ *       items: [
+ *         { content: "Item A" },
+ *         { content: "Item B" }
+ *       ],
+ *       columns: 1
+ *     }
+ *   ]}
+ * />
+ * ```
+ */
+
+interface Item {
+  intro?: string;
+  content: string;
+  subitems?: Item[];
+}
+
+interface ListConfiguration {
+  title?: string;
+  subtitle?: string;
+  items: Item[];
+  titleClasses?: string;
+  columns?: number;
+}
+
+interface Props {
+  title?: string;
+  subtitle?: string;
+  items?: Item[];
+  titleClasses?: string;
+  columns?: number;
+  lists?: ListConfiguration[];
+}
+
+const {
+  title,
+  subtitle,
+  items,
+  titleClasses = "",
+  columns,
+  lists,
+}: Props = Astro.props;
+
+// Helper function to split items into balanced columns
+function splitIntoColumns(items: Item[]): {
+  leftCol: Item[];
+  rightCol: Item[];
+} {
+  const midpoint = Math.ceil(items.length / 2);
+  return {
+    leftCol: items.slice(0, midpoint),
+    rightCol: items.slice(midpoint),
+  };
+}
+
+// Prepare lists for rendering
+const listsToRender: ListConfiguration[] = [];
+
+if (lists && lists.length > 0) {
+  listsToRender.push(...lists);
+} else if (items && items.length > 0) {
+  listsToRender.push({
+    title,
+    subtitle,
+    items,
+    titleClasses,
+    columns,
+  });
+}
+
+// Generate unique IDs and prepare lists
+const preparedLists = listsToRender.map(list => {
+  const sectionId = `list-section-${Math.random().toString(36).substring(2, 9)}`;
+  const titleId = list.title ? `${sectionId}-title` : undefined;
+  const { leftCol, rightCol } = splitIntoColumns(list.items);
+
+  const titleBaseClasses = [
+    "text-2xl font-medium text-accent mb-4",
+    "border-b border-accent/20 pb-2",
+    list.titleClasses || "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return {
+    ...list,
+    sectionId,
+    titleId,
+    titleBaseClasses,
+    leftCol,
+    rightCol,
+  };
+});
+
+// Determine container layout
+const containerClass =
+  lists && lists.length > 0
+    ? "grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+    : "";
+---
+
+{
+  containerClass ? (
+    <div class={containerClass}>
+      {preparedLists.map(list => (
+        <section
+          class="relative mx-auto mt-8 mb-4 box-border w-full overflow-hidden rounded-lg bg-gradient-to-b from-card via-card/50 to-transparent p-4 text-lg hyphens-auto shadow-sm backdrop-blur-sm md:p-6"
+          aria-labelledby={list.titleId}
+          data-aos="fade-up"
+        >
+          {list.title && (
+            <div class={list.titleBaseClasses} id={list.titleId}>
+              {list.title}
+              {list.subtitle && (
+                <p class="subtitle not-prose mt-1 mb-2 text-base font-normal text-foreground/80">
+                  {list.subtitle}
+                </p>
+              )}
+            </div>
+          )}
+
+          <div class="mx-auto prose w-full max-w-content px-0">
+            <div class="grid grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-2 md:gap-x-6 md:gap-y-0">
+              {/* Left Column */}
+              <ul
+                class="custom-list mb-2 list-none px-0 pl-0 md:mb-6"
+                role="list"
+              >
+                {list.leftCol.map((item, index) => (
+                  <li
+                    data-index={index}
+                    class="animate-fadeIn relative mb-2 list-item translate-y-[10px] py-1 pl-8 opacity-0 transition-all duration-300 ease-in-out md:mb-3"
+                    style={`animation-delay: calc(${index} * 100ms);`}
+                  >
+                    <div class="item-wrapper before:absolute before:top-[0.6em] before:left-0 before:h-2 before:w-2 before:rounded-full before:bg-accent before:content-['']">
+                      {item.intro && (
+                        <strong class="font-semibold">
+                          {item.intro}:&nbsp;
+                        </strong>
+                      )}
+                      <span class="item-content">{item.content}</span>
+                    </div>
+                    {item.subitems && (
+                      <ul class="subitem-list mt-2 list-none px-0 pl-0">
+                        {item.subitems.map((subitem, subIndex) => (
+                          <li
+                            data-subindex={subIndex}
+                            class="subitem animate-fadeInSubitem mb-1 pl-6 text-[0.95em] opacity-0 before:absolute before:top-[0.65em] before:left-0 before:h-1.5 before:w-1.5 before:rotate-45 before:bg-blue-500 before:content-[''] md:mb-2"
+                          >
+                            {subitem.intro && (
+                              <strong class="font-semibold">
+                                {subitem.intro}:&nbsp;
+                              </strong>
+                            )}
+                            <span class="item-content">{subitem.content}</span>
+                            {subitem.subitems && (
+                              <ul class="sub-subitem-list mt-1 list-none pl-0">
+                                {subitem.subitems.map(
+                                  (subSubitem, subSubIndex) => (
+                                    <li
+                                      data-subsubindex={subSubIndex}
+                                      class="sub-subitem animate-fadeInSubitem mb-1 pl-5 text-[0.9em] text-foreground/90 opacity-0 delay-100 before:absolute before:top-[0.65em] before:left-0 before:h-1 before:w-1 before:rounded-full before:bg-green-400 before:content-['']"
+                                    >
+                                      {subSubitem.intro && (
+                                        <strong class="font-semibold">
+                                          {subSubitem.intro}:&nbsp;
+                                        </strong>
+                                      )}
+                                      <span class="item-content">
+                                        {subSubitem.content}
+                                      </span>
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+
+              {/* Right Column */}
+              <ul
+                class="custom-list mb-2 list-none px-0 pl-0 md:mb-6"
+                role="list"
+              >
+                {list.rightCol.map((item, index) => (
+                  <li
+                    data-index={index + list.leftCol.length}
+                    class="animate-fadeIn relative mb-2 list-item translate-y-[10px] py-1 pl-8 opacity-0 transition-all duration-300 ease-in-out md:mb-3"
+                    style={`animation-delay: calc(${index + list.leftCol.length} * 100ms);`}
+                  >
+                    <div class="item-wrapper before:absolute before:top-[0.6em] before:left-0 before:h-2 before:w-2 before:rounded-full before:bg-accent before:content-['']">
+                      {item.intro && (
+                        <strong class="font-semibold">
+                          {item.intro}:&nbsp;
+                        </strong>
+                      )}
+                      <span class="item-content">{item.content}</span>
+                    </div>
+                    {item.subitems && (
+                      <ul class="subitem-list mt-2 list-none px-0 pl-0">
+                        {item.subitems.map((subitem, subIndex) => (
+                          <li
+                            data-subindex={subIndex}
+                            class="subitem animate-fadeInSubitem mb-1 pl-6 text-[0.95em] opacity-0 before:absolute before:top-[0.65em] before:left-0 before:h-1.5 before:w-1.5 before:rotate-45 before:bg-blue-500 before:content-[''] md:mb-2"
+                          >
+                            {subitem.intro && (
+                              <strong class="font-semibold">
+                                {subitem.intro}:&nbsp;
+                              </strong>
+                            )}
+                            <span class="item-content">{subitem.content}</span>
+                            {subitem.subitems && (
+                              <ul class="sub-subitem-list mt-1 list-none pl-0">
+                                {subitem.subitems.map(
+                                  (subSubitem, subSubIndex) => (
+                                    <li
+                                      data-subsubindex={subSubIndex}
+                                      class="sub-subitem animate-fadeInSubitem mb-1 pl-5 text-[0.9em] text-foreground/90 opacity-0 delay-100 before:absolute before:top-[0.65em] before:left-0 before:h-1 before:w-1 before:rounded-full before:bg-green-400 before:content-['']"
+                                    >
+                                      {subSubitem.intro && (
+                                        <strong class="font-semibold">
+                                          {subSubitem.intro}:&nbsp;
+                                        </strong>
+                                      )}
+                                      <span class="item-content">
+                                        {subSubitem.content}
+                                      </span>
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+      ))}
+    </div>
+  ) : (
+    preparedLists.length > 0 && (
+      <section
+        class="relative mx-auto mt-8 mb-4 box-border overflow-hidden rounded-lg bg-gradient-to-b from-card via-card/50 to-transparent p-4 text-lg hyphens-auto shadow-sm backdrop-blur-sm focus-within:ring-2 focus-within:ring-accent focus-within:ring-offset-2 md:p-6 dark:bg-card/5 print:break-inside-avoid print:bg-transparent print:shadow-none"
+        aria-labelledby={preparedLists[0].titleId}
+        data-aos="fade-up"
+      >
+        {preparedLists[0].title && (
+          <div
+            class={preparedLists[0].titleBaseClasses}
+            id={preparedLists[0].titleId}
+          >
+            {preparedLists[0].title}
+            {preparedLists[0].subtitle && (
+              <p class="subtitle not-prose mt-1 mb-2 text-base font-normal text-foreground/80">
+                {preparedLists[0].subtitle}
+              </p>
+            )}
+          </div>
+        )}
+
+        <div class="mx-auto prose w-full max-w-content px-0">
+          <div class="grid grid-cols-1 gap-x-4 gap-y-2 transition-all duration-300 md:grid-cols-2 md:gap-x-6 md:gap-y-0">
+            {/* Left Column */}
+            <ul
+              class="custom-list mb-2 list-none px-0 pl-0 md:mb-6"
+              role="list"
+            >
+              {preparedLists[0].leftCol.map((item, index) => (
+                <li
+                  data-index={index}
+                  class="animate-fadeIn relative mb-2 list-item translate-y-[10px] py-1 pl-8 opacity-0 transition-all duration-300 ease-in-out md:mb-3"
+                  style={`animation-delay: calc(${index} * 100ms);`}
+                >
+                  <div class="item-wrapper before:absolute before:top-[0.6em] before:left-0 before:h-2 before:w-2 before:rounded-full before:bg-accent before:content-['']">
+                    {item.intro && (
+                      <strong class="font-semibold">{item.intro}:&nbsp;</strong>
+                    )}
+                    <span class="item-content">{item.content}</span>
+                  </div>
+                  {item.subitems && (
+                    <ul class="subitem-list mt-2 list-none px-0 pl-0">
+                      {item.subitems.map((subitem, subIndex) => (
+                        <li
+                          data-subindex={subIndex}
+                          class="subitem animate-fadeInSubitem mb-1 pl-6 text-[0.95em] opacity-0 before:absolute before:top-[0.65em] before:left-0 before:h-1.5 before:w-1.5 before:rotate-45 before:bg-blue-500 before:content-[''] md:mb-2"
+                        >
+                          {subitem.intro && (
+                            <strong class="font-semibold">
+                              {subitem.intro}:&nbsp;
+                            </strong>
+                          )}
+                          <span class="item-content">{subitem.content}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              ))}
+            </ul>
+
+            {/* Right Column */}
+            <ul
+              class="custom-list mb-2 list-none px-0 pl-0 md:mb-6"
+              role="list"
+            >
+              {preparedLists[0].rightCol.map((item, index) => (
+                <li
+                  data-index={index + preparedLists[0].leftCol.length}
+                  class="animate-fadeIn relative mb-2 list-item translate-y-[10px] py-1 pl-8 opacity-0 transition-all duration-300 ease-in-out md:mb-3"
+                  style={`animation-delay: calc(${index + preparedLists[0].leftCol.length} * 100ms);`}
+                >
+                  <div class="item-wrapper before:absolute before:top-[0.6em] before:left-0 before:h-2 before:w-2 before:rounded-full before:bg-accent before:content-['']">
+                    {item.intro && (
+                      <strong class="font-semibold">{item.intro}:&nbsp;</strong>
+                    )}
+                    <span class="item-content">{item.content}</span>
+                  </div>
+                  {item.subitems && (
+                    <ul class="subitem-list mt-2 list-none px-0 pl-0">
+                      {item.subitems.map((subitem, subIndex) => (
+                        <li
+                          data-subindex={subIndex}
+                          class="subitem animate-fadeInSubitem mb-1 pl-6 text-[0.95em] opacity-0 before:absolute before:top-[0.65em] before:left-0 before:h-1.5 before:w-1.5 before:rotate-45 before:bg-blue-500 before:content-[''] md:mb-2"
+                        >
+                          {subitem.intro && (
+                            <strong class="font-semibold">
+                              {subitem.intro}:&nbsp;
+                            </strong>
+                          )}
+                          <span class="item-content">{subitem.content}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+    )
+  )
+}
+
+<style is:global>
+  @reference "@/styles/global.css";
+
+  /* Animations that can't be directly represented in Tailwind */
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInSubitem {
+    from {
+      opacity: 0;
+      transform: translateX(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Animation utility classes */
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .animate-fadeInSubitem {
+    animation: fadeInSubitem 0.4s ease-out forwards;
+  }
+
+  /* Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    section,
+    [data-aos],
+    .list-item,
+    .subitem,
+    .sub-subitem {
+      transform: none !important;
+      opacity: 1 !important;
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+
+  /* High Contrast Mode */
+  @media (forced-colors: active) {
+    section {
+      border: 1px solid CanvasText;
+    }
+
+    li::before {
+      background-color: CanvasText;
+    }
+  }
+
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .prose {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .grid > ul + ul {
+      margin-top: 0.5rem;
+    }
+  }
+</style>
+
+<script>
+  function setupListAnimation() {
+    const sections = document.querySelectorAll("[data-aos]");
+
+    if (!("IntersectionObserver" in window)) {
+      sections.forEach(section => section.classList.add("aos-animate"));
+      return () => {};
+    }
+
+    const listItems = document.querySelectorAll(".list-item");
+    listItems.forEach((item, index) => {
+      if (item instanceof HTMLElement) {
+        item.style.setProperty("--index", index.toString());
+      }
+    });
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("aos-animate");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        rootMargin: "50px",
+        threshold: 0.1,
+      }
+    );
+
+    sections.forEach(section => observer.observe(section));
+
+    return () => {
+      sections.forEach(section => observer.unobserve(section));
+      observer.disconnect();
+    };
+  }
+
+  let cleanup = setupListAnimation();
+
+  document.addEventListener("astro:after-swap", () => {
+    if (cleanup) cleanup();
+    cleanup = setupListAnimation();
+  });
+
+  document.addEventListener("astro:before-swap", () => {
+    if (cleanup) cleanup();
+  });
+</script>

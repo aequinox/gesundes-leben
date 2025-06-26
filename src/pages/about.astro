@@ -1,0 +1,312 @@
+---
+/**
+ * About Page Component
+ *
+ * Provides information about the site's founders, mission, and values.
+ * Structured with clear sections and responsive design.
+ */
+
+import Hr from "@/components/elements/Hr.astro";
+import VisionImage from "@/components/elements/VisionImage.astro";
+import Footer from "@/components/sections/Footer.astro";
+import Header from "@/components/sections/Header.astro";
+import PageHero from "@/components/sections/PageHero.astro";
+import { SITE } from "@/config";
+import Layout from "@/layouts/Layout.astro";
+
+// Import founder images
+// import imageKai from "@/assets/images/about/Kai.webp";
+// import imageSandra from "@/assets/images/about/Sandra.webp";
+import imageKai from "@/assets/images/about/Portrait-Kai-1-GIT-round-1-300x300.png";
+import imageSandra from "@/assets/images/about/Portrait-Sandra-1.1-GIT-round-1-300x300.png";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Define the page metadata
+const pageTitle = t("nav.about");
+const pageDescription =
+  "Erfahre mehr über uns, unsere Mission und unsere Werte.";
+---
+
+<Layout title={`${pageTitle} | ${SITE.title}`} description={pageDescription}>
+  <Header activeNav="about" />
+
+  <main id="main-content">
+    <PageHero title={pageTitle} subtitle="Was es über uns zu sagen gibt" />
+
+    <Hr />
+
+    <div class="about-grid mx-auto max-w-7xl space-y-16">
+      <section id="mission" class="content-section py-6">
+        <div
+          class="grid-card overflow-hidden rounded-xl shadow-elevation-medium transition-all duration-300 hover:translate-y-[-5px] hover:shadow-elevation-high bg-card"
+        >
+          <div class="card-content flex flex-col justify-center p-8">
+            <h2
+              class="mb-6 border-l-4 border-accent pl-4 text-left text-3xl font-bold"
+            >
+              Was wir wollen
+            </h2>
+            <div class="flex flex-col space-y-4 text-lg">
+              <p class="leading-relaxed">
+                Wir haben es uns zur Aufgabe gemacht, unsere Motivation und
+                Begeisterung für ein gesundes Leben weiterzugeben, und unsere
+                Erfahrungen sowie alternativ-medizinisches und
+                naturheilkundliches Wissen zu teilen.
+              </p>
+              <p class="leading-relaxed">
+                Dabei geht es nicht um zähneknirschenden Verzicht und
+                Selbstkasteiung. Im Gegenteil – wir möchten vermitteln, dass ein
+                gesundes Leben Spaß macht, und dir einen großen persönlichen
+                Gewinn bringen kann. Sei es im Lebensgefühl, Körpergefühl, der
+                Lebensqualität, durch die Linderung, Heilung oder auch die
+                Prävention von Krankheiten.
+              </p>
+              <p class="leading-relaxed">
+                Wir möchten Wissen teilen und Handlungsspielräume anbieten,
+                damit du dein eigenes Maß und deinen eigenen Weg findest. <strong
+                  >#weilduwertvollbist</strong
+                >
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="who-we-are" class="content-section py-6">
+        <div
+          class="grid-card overflow-hidden rounded-xl bg-surface-1 shadow-elevation-medium transition-all duration-300 hover:translate-y-[-5px] hover:shadow-elevation-high dark:bg-gray-800"
+        >
+          <div class="card-content flex flex-col justify-center p-8">
+            <h2
+              class="mb-6 border-l-4 border-accent pl-4 text-left text-3xl font-bold"
+            >
+              Wer wir sind
+            </h2>
+            <div class="flex flex-col space-y-4 text-lg">
+              <p class="leading-relaxed">
+                Wir sind ein Ehepaar und arbeiten im tagtäglichen Leben als
+                Heilpraktiker, bzw. Heilpraktikerin und systemische Therapeutin,
+                d.h. als Therapeuten. So begleiten wir Patienten auf Ihrem
+                individuellen Weg.
+              </p>
+              <p class="leading-relaxed">
+                Den Blog betreiben wir als Privatpersonen, mit viel Begeisterung
+                für unsere Gesundheit, und der Überzeugung, dass alles, was man
+                teilt, uns alle reicher werden lässt.
+              </p>
+              <p class="leading-relaxed">
+                Teile auch du – diesen Blog, einzelne Artikel, deine
+                Rückmeldung. Wir freuen uns darauf!
+              </p>
+              <p class="leading-relaxed">
+                Hass-Kommentare und destruktive Beiträge jedoch werden wir
+                löschen und nicht beantworten, denn wir betreiben Psychohygiene
+                und führen ein positives Leben, zu dem so eine Einstellung nicht
+                passt. Und zu unseren Lesern passt es auch nicht. <strong
+                  >#weilduwertvollbist</strong
+                >
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="who-we-are-not" class="content-section py-6">
+        <div
+          class="grid-card overflow-hidden rounded-xl bg-surface-1 shadow-elevation-medium transition-all duration-300 hover:translate-y-[-5px] hover:shadow-elevation-high dark:bg-gray-800"
+        >
+          <div class="card-content flex flex-col justify-center p-8">
+            <h2
+              class="mb-6 border-l-4 border-accent pl-4 text-left text-3xl font-bold"
+            >
+              Wer wir nicht sind
+            </h2>
+            <div class="flex flex-col space-y-4 text-lg">
+              <p class="leading-relaxed">
+                Heiler, Retter, Esoteriker, Medizin-Gegner, Übermenschen oder
+                Alleswisser. Wir haben keine Wunderwaffe gegen Krebs, keine
+                Allheilmittel und nicht auf alles eine Antwort.
+              </p>
+              <p class="leading-relaxed">
+                Wir bemühen uns nach bestem Wissen und Gewissen, das zu
+                vermitteln, was nachgewiesene Wirksamkeit aufweist,
+                wissenschaftlich bestätigt ist, sich in der Praxis bewährt hat,
+                und von dem wir nach Anwendung überzeugt sind. Und wir lernen
+                laufend dazu. <strong>#weildueswertbist</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="personal" class="content-section py-6">
+        <h2 class="mb-8 text-center text-3xl font-bold">Persönliches</h2>
+        <div class="founders-grid grid grid-cols-1 gap-8 md:grid-cols-2">
+          <div class="grid-card">
+            <div class="card-content flex flex-col justify-center p-8">
+              <div
+                class="founder-header mb-6 flex flex-col items-center gap-6 sm:flex-row"
+              >
+                <div
+                  class="founder-avatar h-40 w-40 overflow-hidden rounded-full shadow-elevation-medium"
+                >
+                  <VisionImage
+                    src={imageSandra}
+                    alt="Portrait von Sandra Pfeiffer"
+                    class="h-full w-full rounded-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                </div>
+                <div class="founder-info">
+                  <h3 class="mb-2 text-2xl font-bold">Sandra Pfeiffer</h3>
+                  <p
+                    class="founder-title text-sm font-semibold tracking-wider text-gray-600 uppercase dark:text-gray-400"
+                  >
+                    GRÜNDERIN, REDAKTEURIN UND AUTORIN
+                  </p>
+                </div>
+              </div>
+              <div class="founder-description text-base leading-relaxed">
+                <p>
+                  Loslacherin in unpassenden Momenten; Fettnäpfchen-Treterin;
+                  sehr herzlich und offen; liebt zu reisen und im Leben
+                  unterwegs zu sein; kann nicht stillsitzen und liebt Bewegung;
+                  gräbt ihre Hände in Erde, wenn sie wütend ist; trällert
+                  meistens ein Liedchen. Darüber hinaus viel Liebe für Menschen,
+                  Kreativsein und das Schreiben.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-card">
+            <div class="card-content flex flex-col justify-center p-8">
+              <div
+                class="founder-header mb-6 flex flex-col items-center gap-6 sm:flex-row"
+              >
+                <div
+                  class="founder-avatar h-40 w-40 overflow-hidden rounded-full shadow-elevation-medium"
+                >
+                  <VisionImage
+                    src={imageKai}
+                    alt="Portrait von Kai Renner"
+                    class="h-full w-full rounded-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                </div>
+                <div class="founder-info">
+                  <h3 class="mb-2 text-2xl font-bold">Kai Renner</h3>
+                  <p
+                    class="founder-title text-sm font-semibold tracking-wider text-gray-600 uppercase dark:text-gray-400"
+                  >
+                    GRÜNDER, IT-MANAGER UND AUTOR
+                  </p>
+                </div>
+              </div>
+              <div class="founder-description text-base leading-relaxed">
+                <p>
+                  Homöopath aus Leidenschaft; stoischer Stillsitzer und ewig
+                  Studierender; bringt Sandra dazu, über sich selbst zu lachen;
+                  gibt alles für andere; sehr kreativ, aber das nächste Mal
+                  schneller; Katzen und Hunde Betörer; Brandung. Darüber hinaus
+                  ein kluger Kopf mit riesigem Gedächtnis und ein großzügiger
+                  Teiler seines Wissens.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="professional" class="content-section py-6">
+        <h2 class="mb-8 text-center text-3xl font-bold">Professionelles</h2>
+        <div class="founders-grid grid grid-cols-1 gap-8 md:grid-cols-2">
+          <div class="grid-card professional-card flex flex-col">
+            <div class="card-content flex h-full flex-col p-8">
+              <h3 class="mb-6 text-2xl font-bold">
+                HEILPRAKTIKERIN, SYSTEMISCHE THERAPEUTIN
+              </h3>
+              <div class="mb-6 flex-grow text-lg">
+                <p class="founder-description text-base leading-relaxed">
+                  Ursprünglich im Business als Marketing
+                  Kommunikations-Managerin erfolgreich wollte Sandra näher ans
+                  echte Leben und an Menschen rücken. Seit 2012 arbeitet sie als
+                  Heilpraktikerin mit den Schwerpunkten manuelle Therapie und
+                  Schmerztherapie. Psychotherapeutisch arbeitet sie als
+                  Systemische Therapeutin(SG), Mediatorin und Trauma Therapeutin
+                  (PITT).
+                </p>
+              </div>
+              <div class="button-container mt-auto flex justify-start">
+                <a
+                  href="#"
+                  class="more-link flex items-center justify-center rounded-xl bg-accent px-6 py-3 font-medium text-white shadow-elevation-low transition-all hover:translate-y-[-2px] hover:bg-accent/90"
+                >
+                  <span>Mehr erfahren</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="ml-2 h-5 w-5 fill-transparent transition-transform group-hover:translate-x-[4px]"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-card professional-card flex flex-col">
+            <div class="card-content flex h-full flex-col p-8">
+              <h3 class="mb-6 text-2xl font-bold">
+                HEILPRAKTIKER, HOMÖOPATH, BIOLOGE
+              </h3>
+              <div class="mb-6 flex-grow text-lg">
+                <p class="founder-description text-base leading-relaxed">
+                  Ursprünglich Biologe, dann einige Jahre lang Astrologe, hat
+                  Kai seine Berufung im Umgang mit seinen Patienten gefunden.
+                  Seit 2012 arbeitet er als Heilpraktiker mit den Schwerpunkten
+                  klassische Homöopathie, Akupunktur, Orthomolekulare Medizin
+                  (Mikronährstoffe) und Labor.
+                </p>
+              </div>
+              <div class="button-container mt-auto flex justify-start">
+                <a
+                  href="#"
+                  class="more-link flex items-center justify-center rounded-xl bg-accent px-6 py-3 font-medium text-white shadow-elevation-low transition-all hover:translate-y-[-2px] hover:bg-accent/90"
+                >
+                  <span>Mehr erfahren</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="ml-2 h-5 w-5 fill-transparent transition-transform group-hover:translate-x-[4px]"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

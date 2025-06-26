@@ -1,0 +1,270 @@
+---
+import { Icon } from "astro-icon/components";
+import Button from "../elements/Button.astro";
+
+export interface Props {
+  title?: string;
+  description?: string;
+  id: string;
+  closable?: boolean;
+  size?: "sm" | "md" | "lg" | "xl" | "full";
+  position?: "center" | "top" | "bottom" | "right" | "left";
+  backdrop?: boolean;
+  backdropClickClose?: boolean;
+  showFooter?: boolean;
+  primaryActionText?: string;
+  secondaryActionText?: string;
+  class?: string;
+}
+
+const {
+  title,
+  description,
+  id,
+  closable = true,
+  size = "md",
+  position = "center",
+  backdrop = true,
+  backdropClickClose = true,
+  showFooter = false,
+  primaryActionText = "Confirm",
+  secondaryActionText = "Cancel",
+  class: className = "",
+}: Props = Astro.props;
+---
+
+<div
+  id={id}
+  class:list={["fixed inset-0 z-[1000] hidden overflow-y-auto", className]}
+  aria-labelledby={`${id}-title`}
+  aria-describedby={description ? `${id}-description` : undefined}
+  aria-hidden="true"
+  role="dialog"
+  data-backdrop-close={backdropClickClose}
+>
+  {
+    backdrop && (
+      <div class="fixed inset-0 bg-black/50 backdrop-blur-sm dark:bg-black/70" />
+    )
+  }
+
+  <div
+    class:list={[
+      "flex min-h-full p-4 text-center sm:p-0",
+      position === "center" && "items-center justify-center",
+      position === "top" && "items-start justify-center",
+      position === "bottom" && "items-end justify-center",
+      position === "right" && "items-center justify-end",
+      position === "left" && "items-center justify-start",
+    ]}
+  >
+    <div
+      class:list={[
+        "relative w-full overflow-hidden rounded-lg bg-card text-left shadow-xl transition-all sm:my-8",
+        size === "sm" && "max-w-sm",
+        size === "md" && "max-w-md",
+        size === "lg" && "max-w-lg",
+        size === "xl" && "max-w-xl",
+        size === "full" && "max-w-4xl",
+        (position === "right" || position === "left") &&
+          "h-screen max-w-md rounded-none",
+      ]}
+    >
+      {
+        (title || closable) && (
+          <div class="flex items-center justify-between border-b border-line p-4 sm:p-6">
+            {title && (
+              <h3
+                id={`${id}-title`}
+                class="text-lg font-semibold text-foreground"
+              >
+                {title}
+              </h3>
+            )}
+            {closable && (
+              <button
+                type="button"
+                class="rounded-full p-1 text-foreground transition-colors hover:bg-card-muted hover:text-accent focus-visible:outline-2 focus-visible:outline-accent"
+                aria-label="Close modal"
+                data-modal-close
+              >
+                <Icon name="tabler:x" class="size-5" />
+              </button>
+            )}
+          </div>
+        )
+      }
+
+      <div class="p-4 sm:p-6">
+        {
+          description && (
+            <p id={`${id}-description`} class="mb-4 text-sm text-foreground/80">
+              {description}
+            </p>
+          )
+        }
+        <slot />
+      </div>
+
+      {
+        showFooter && (
+          <div class="flex items-center justify-end gap-3 border-t border-line bg-card/50 p-4 sm:px-6 dark:bg-card-muted/20">
+            <Button
+              variant="subtle"
+              text={secondaryActionText}
+              data-modal-close
+            />
+            <Button
+              variant="accent"
+              text={primaryActionText}
+              data-modal-confirm
+            />
+          </div>
+        )
+      }
+    </div>
+  </div>
+</div>
+
+<script>
+  // Modal functionality with robust initialization
+  let isModalInitialized = false;
+
+  // Open modal function
+  const openModal = (modalId: string) => {
+    const modal = document.getElementById(modalId);
+
+    if (modal instanceof HTMLElement) {
+      modal.setAttribute("aria-hidden", "false");
+      modal.classList.remove("hidden");
+      modal.classList.add("block");
+
+      // Add animation classes
+      modal.classList.add("opacity-0");
+      setTimeout(() => {
+        modal.classList.remove("opacity-0");
+        modal.classList.add(
+          "opacity-100",
+          "transition-opacity",
+          "duration-300"
+        );
+      }, 10);
+
+      // Prevent body scrolling
+      document.body.style.overflow = "hidden";
+
+      // Focus first focusable element
+      setTimeout(() => {
+        const focusableElements = modal.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length > 0) {
+          (focusableElements[0] as HTMLElement).focus();
+        }
+      }, 100);
+    }
+  };
+
+  // Close modal function
+  const closeModal = (modalId: string) => {
+    const modal = document.getElementById(modalId);
+    if (modal instanceof HTMLElement) {
+      // Add exit animation classes
+      modal.classList.remove("opacity-100");
+      modal.classList.add("opacity-0", "transition-opacity", "duration-200");
+
+      // Remove classes and hide after animation
+      setTimeout(() => {
+        modal.classList.remove(
+          "opacity-0",
+          "transition-opacity",
+          "duration-200",
+          "duration-300",
+          "block"
+        );
+        modal.classList.add("hidden");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }, 200);
+    }
+  };
+
+  // Initialize modal system
+  const initializeModals = () => {
+    if (isModalInitialized) return;
+
+    // Use event delegation for modal triggers - works regardless of timing
+    document.addEventListener("click", e => {
+      const target = e.target as HTMLElement;
+
+      // Handle modal trigger clicks
+      const modalTrigger = target.closest("[data-modal-target]") as HTMLElement;
+      if (modalTrigger) {
+        e.preventDefault();
+        const modalId = modalTrigger.dataset.modalTarget;
+        if (modalId) {
+          openModal(modalId);
+        }
+        return;
+      }
+
+      // Handle modal close button clicks
+      const closeButton = target.closest("[data-modal-close]") as HTMLElement;
+      if (closeButton) {
+        e.preventDefault();
+        const modal = closeButton.closest('[role="dialog"]') as HTMLElement;
+        if (modal && modal.id) {
+          closeModal(modal.id);
+        }
+        return;
+      }
+
+      // Handle backdrop clicks
+      if (
+        target.classList.contains("fixed") &&
+        target.classList.contains("inset-0") &&
+        target.classList.contains("bg-black/50")
+      ) {
+        const modal = target.parentElement as HTMLElement;
+        if (modal && modal.id && modal.dataset.backdropClose === "true") {
+          closeModal(modal.id);
+        }
+      }
+    });
+
+    // Setup ESC key to close modals
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") {
+        const openModal = document.querySelector(
+          '[role="dialog"][aria-hidden="false"]'
+        ) as HTMLElement;
+        if (openModal && openModal.id) {
+          closeModal(openModal.id);
+        }
+      }
+    });
+
+    // Expose API to window for external use
+    interface ModalAPI {
+      open: (modalId: string) => void;
+      close: (modalId: string) => void;
+    }
+
+    (window as Window & { modalApi?: ModalAPI }).modalApi = {
+      open: openModal,
+      close: closeModal,
+    };
+
+    isModalInitialized = true;
+  };
+
+  // Initialize immediately if DOM is ready, otherwise wait
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeModals);
+  } else {
+    initializeModals();
+  }
+
+  // Also initialize on astro:page-load for client-side navigation
+  document.addEventListener("astro:page-load", initializeModals);
+</script>

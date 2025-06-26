@@ -1,0 +1,282 @@
+@import "tailwindcss";
+@import "./typography.css";
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+:root,
+html[data-theme="light"] {
+  --background: oklch(98% 0.01 220deg);
+  --foreground: oklch(25% 0.03 260deg);
+  --accent: oklch(62% 0.17 215deg);
+  --card: oklch(99% 0.005 225deg);
+  --cardMuted: oklch(95% 0.01 220deg);
+  --muted: oklch(75% 0.015 240deg);
+  --border: oklch(85% 0.02 225deg);
+  --line: oklch(78% 0.015 225deg);
+  --badge: oklch(58% 0.15 230deg);
+  --surface1: oklch(99% 0.004 225deg);
+  --surface2: oklch(97% 0.008 225deg);
+  --surface3: oklch(95% 0.012 225deg);
+  /* Shadow elevation system - Enhanced with depth and softness */
+  --shadow-elevation-low:
+    0 1px 3px 0 oklch(0% 0 0deg / 0.1), 0 1px 2px 0 oklch(0% 0 0deg / 0.06),
+    0 2px 5px -1px oklch(0% 0 0deg / 0.03);
+  --shadow-elevation-medium:
+    0 4px 6px -1px oklch(0% 0 0deg / 0.1),
+    0 2px 4px -1px oklch(0% 0 0deg / 0.06),
+    0 10px 15px -3px oklch(0% 0 0deg / 0.04);
+  --shadow-elevation-high:
+    0 10px 15px -3px oklch(0% 0 0deg / 0.1),
+    0 4px 6px -2px oklch(0% 0 0deg / 0.05),
+    0 20px 25px -5px oklch(0% 0 0deg / 0.03);
+
+  /* Surface shadow - Subtle and refined */
+  --shadow-surface:
+    0 1px 3px 0 oklch(0% 0 0deg / 0.08), 0 1px 2px 0 oklch(0% 0 0deg / 0.04),
+    0 2px 5px -1px oklch(0% 0 0deg / 0.02);
+
+  /* Colored shadows for pro/contra/question-time components */
+  --shadow-pro:
+    0 4px 12px -2px oklch(62% 0.2 150deg / 0.2),
+    0 8px 16px -4px oklch(62% 0.2 150deg / 0.1),
+    0 0 0 1px oklch(62% 0.2 150deg / 0.05),
+    inset 0 1px 0 0 oklch(100% 0 0deg / 0.05);
+  --shadow-contra:
+    0 4px 12px -2px oklch(62% 0.2 20deg / 0.2),
+    0 8px 16px -4px oklch(62% 0.2 20deg / 0.1),
+    0 0 0 1px oklch(62% 0.2 20deg / 0.05),
+    inset 0 1px 0 0 oklch(100% 0 0deg / 0.05);
+  --shadow-question-time:
+    0 4px 12px -2px oklch(75% 0.16 80deg / 0.2),
+    0 8px 16px -4px oklch(75% 0.16 80deg / 0.1),
+    0 0 0 1px oklch(75% 0.16 80deg / 0.05),
+    inset 0 1px 0 0 oklch(100% 0 0deg / 0.05);
+
+  /* Ambient shadows for subtle depth */
+  --shadow-ambient:
+    0 1px 2px -1px oklch(0% 0 0deg / 0.05), 0 1px 3px 0 oklch(0% 0 0deg / 0.1);
+
+  /* Inner shadows for pressed states */
+  --shadow-inner: inset 0 2px 4px 0 oklch(0% 0 0deg / 0.06);
+
+  /* Glow effects for focus/hover states */
+  --shadow-glow-accent:
+    0 0 0 3px oklch(var(--color-accent) / 0.2),
+    0 0 15px 5px oklch(var(--color-accent) / 0.1);
+
+  /* Shadow strength multiplier */
+  --shadow-strength: 1;
+
+  /* Status colors for shadows */
+  --color-success: oklch(65% 0.15 145deg);
+  --color-warning: oklch(75% 0.16 80deg);
+  --color-error: oklch(62% 0.2 20deg);
+}
+
+html[data-theme="dark"] {
+  --background: oklch(22% 0.025 260deg);
+  --foreground: oklch(95% 0.01 45deg);
+  --accent: oklch(72% 0.18 55deg);
+  --card: oklch(28% 0.03 255deg);
+  --cardMuted: oklch(32% 0.035 255deg);
+  --muted: oklch(70% 0.02 240deg);
+  --border: oklch(40% 0.04 250deg);
+  --line: oklch(48% 0.035 250deg);
+  --badge: oklch(65% 0.16 60deg);
+  --surface1: oklch(20% 0.025 245deg);
+  --surface2: oklch(22% 0.035 245deg);
+  --surface3: oklch(24% 0.045 245deg);
+  /* Enhanced shadows for dark mode - More dramatic with subtle glow */
+  --shadow-elevation-low:
+    0 1px 3px 0 oklch(0% 0 0deg / 0.3), 0 1px 2px 0 oklch(0% 0 0deg / 0.2),
+    0 2px 5px -1px oklch(0% 0 0deg / 0.15);
+  --shadow-elevation-medium:
+    0 4px 6px -1px oklch(0% 0 0deg / 0.3),
+    0 2px 4px -1px oklch(0% 0 0deg / 0.2),
+    0 10px 15px -3px oklch(0% 0 0deg / 0.15);
+  --shadow-elevation-high:
+    0 10px 15px -3px oklch(0% 0 0deg / 0.4),
+    0 4px 6px -2px oklch(0% 0 0deg / 0.25),
+    0 20px 25px -5px oklch(0% 0 0deg / 0.15);
+
+  /* Surface shadow for dark mode - Subtle ambient glow */
+  --shadow-surface:
+    0 1px 3px 0 oklch(0% 0 0deg / 0.3), 0 1px 2px 0 oklch(0% 0 0deg / 0.2),
+    0 0 10px 1px oklch(0% 0 0deg / 0.1);
+
+  /* Colored shadows for dark mode - More vibrant with subtle glow */
+  --shadow-pro:
+    0 4px 12px -1px oklch(70% 0.18 145deg / 0.3),
+    0 8px 16px -4px oklch(70% 0.18 145deg / 0.2),
+    0 0 0 1px oklch(70% 0.18 145deg / 0.1),
+    0 0 20px 5px oklch(70% 0.18 145deg / 0.1);
+  --shadow-contra:
+    0 4px 12px -1px oklch(67% 0.22 20deg / 0.3),
+    0 8px 16px -4px oklch(67% 0.22 20deg / 0.2),
+    0 0 0 1px oklch(67% 0.22 20deg / 0.1),
+    0 0 20px 5px oklch(67% 0.22 20deg / 0.1);
+  --shadow-question-time:
+    0 4px 12px -1px oklch(80% 0.18 80deg / 0.3),
+    0 8px 16px -4px oklch(80% 0.18 80deg / 0.2),
+    0 0 0 1px oklch(80% 0.18 80deg / 0.1),
+    0 0 20px 5px oklch(80% 0.18 80deg / 0.1);
+
+  /* Dark mode inner shadows - Deeper for more contrast */
+  --shadow-inner:
+    inset 0 2px 4px 0 oklch(0% 0 0deg / 0.2),
+    inset 0 1px 3px 0 oklch(0% 0 0deg / 0.1);
+
+  /* Status colors for dark mode */
+  --color-success: oklch(70% 0.18 145deg);
+  --color-warning: oklch(80% 0.18 80deg);
+  --color-error: oklch(67% 0.22 20deg);
+}
+
+#sun-svg,
+html[data-theme="dark"] #moon-svg {
+  display: none;
+}
+
+#moon-svg,
+html[data-theme="dark"] #sun-svg {
+  display: block;
+}
+
+/* Image inversion utility - Only applies in dark mode */
+.invert {
+  filter: invert(0); /* No inversion by default (light mode) */
+}
+
+html[data-theme="dark"] .invert {
+  filter: invert(1) hue-rotate(180deg); /* Apply inversion only in dark mode with color correction */
+}
+
+@theme inline {
+  /* Breakpoints */
+  --breakpoint-sm: 640px; /* Small devices (phones) */
+  --breakpoint-md: 768px; /* Medium devices (tablets) */
+  --breakpoint-lg: 1024px; /* Large devices (small desktops) */
+  --breakpoint-xl: 1280px; /* Extra Large devices (desktops) */
+  --breakpoint-2xl: 1440px; /* Extra Extra Large devices */
+  --breakpoint-3xl: 1600px; /* 3XL devices */
+  --breakpoint-4xl: 1920px; /* 4K devices */
+  --breakpoint-5xl: 2160px; /* Ultra-wide devices */
+  --breakpoint-6xl: 2560px; /* Maximum resolution */
+
+  /* Colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-card: var(--card);
+  --color-card-muted: var(--cardMuted);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-line: var(--line);
+  --color-badge: var(--badge);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-pro: oklch(62% 0.2 150deg);
+  --color-contra: oklch(62% 0.2 20deg);
+  --color-question-time: oklch(75% 0.16 80deg);
+  --color-elevation-low: var(--shadow-elevation-low);
+  --color-elevation-medium: var(--shadow-elevation-medium);
+  --color-elevation-high: var(--shadow-elevation-high);
+
+  /* Font Families */
+  --font-sans: "Montserrat Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Line Heights */
+  --leading-tight: 1.25;
+  --leading-tighter: 0.75;
+
+  /* Max Width */
+  --spacing-content: 150ch;
+
+  /* Timing Functions */
+  --ease-in-expo: cubic-bezier(0.95, 0.05, 0.795, 0.035);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-accent/75;
+    scrollbar-width: auto;
+    scrollbar-color: var(--color-accent) transparent;
+  }
+  html {
+    @apply scroll-pt-16 overflow-y-scroll scroll-smooth;
+  }
+  body {
+    @apply flex min-h-svh flex-col bg-background pt-16 font-(family-name:--font-poppins) text-foreground selection:bg-accent/75 selection:text-background;
+  }
+  a,
+  button {
+    @apply outline-offset-1 outline-accent focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-dashed;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  section,
+  footer {
+    @apply mx-auto max-w-6xl;
+  }
+
+  #article > section:nth-child(2) {
+    & > h1:nth-child(1) {
+      @apply text-center leading-8 break-words !text-accent;
+    }
+
+    & > p:nth-child(2) {
+      @apply !text-center text-base leading-relaxed tracking-wide hyphens-auto xl:text-lg;
+    }
+  }
+
+  .hashtag {
+    color: red;
+  }
+}
+
+/* #article > section:nth-child(2) > h1:nth-child(1) > p  {
+  @apply !bg-red-500 !text-center text-lg font-semibold break-words text-foreground;
+} */
+
+/* #article > section:nth-child(2) > p:nth-child(2) */
+
+/* #article > section:nth-child(2) > p:nth-child(2) */
+/* Screen reader only class for accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.hashtag {
+  @apply relative inline-block font-medium text-accent before:content-['#'];
+}
+
+/* Image component utilities */
+/* Shadow styles */
+.shadow-image-floating {
+  box-shadow: var(--shadow-elevation-high);
+}
+
+.shadow-image-glass {
+  box-shadow: var(--shadow-elevation-medium);
+}
+
+.shadow-image-polaroid {
+  box-shadow: var(--shadow-elevation-high);
+}
+
+.shadow-image-surface {
+  box-shadow: var(--shadow-surface);
+}

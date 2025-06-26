@@ -1,0 +1,152 @@
+---
+import { logger } from "@/utils/logger";
+import type { ImageMetadata } from "astro";
+
+type Props = {
+  /** Image source URL or metadata */
+  src: string | ImageMetadata;
+  /** Alt text for accessibility */
+  alt: string;
+  /** Optional loading strategy */
+  loading?: "lazy" | "eager";
+  /** Optional object fit style */
+  objectFit?: "cover" | "contain" | "fill" | "none" | "scale-down";
+  /** Optional object position */
+  objectPosition?: string;
+  /** Optional visual effect */
+  effect?: "none" | "blur" | "grayscale" | "sepia" | "duotone";
+  /** Optional border radius */
+  rounded?: boolean | "sm" | "md" | "lg" | "full";
+  /** Additional CSS classes */
+  class?: string;
+};
+
+const {
+  src: srcProp,
+  alt,
+  loading = "lazy",
+  objectFit = "cover",
+  objectPosition = "center",
+  effect = "none",
+  rounded = false,
+  class: className = "",
+}: Props = Astro.props;
+
+// For MDX files, we'll use the img tag directly with the provided src
+let src: string;
+
+if (typeof srcProp === "string") {
+  // Use the string directly
+  src = srcProp;
+} else {
+  // If it's an ImageMetadata object, try to extract the src property
+  try {
+    src = srcProp.src || "";
+  } catch (error) {
+    logger.error(`Error extracting src from ImageMetadata: ${error}`);
+    src = "";
+  }
+}
+
+// Map object fit values to CSS classes
+const objectFitClasses = {
+  cover: "object-cover",
+  contain: "object-contain",
+  fill: "object-fill",
+  none: "object-none",
+  "scale-down": "object-scale-down",
+};
+
+// Map effect values to CSS classes
+const effectClasses = {
+  none: "",
+  blur: "vision-blur",
+  grayscale: "vision-grayscale",
+  sepia: "vision-sepia",
+  duotone: "vision-duotone",
+};
+
+// Map rounded values to CSS classes
+const roundedClasses = {
+  true: "rounded",
+  sm: "rounded-sm",
+  md: "rounded-md",
+  lg: "rounded-lg",
+  full: "rounded-full",
+  false: "",
+};
+
+// Determine the final CSS classes
+const fitClass = objectFitClasses[objectFit];
+const effectClass = effectClasses[effect];
+const roundedClass =
+  typeof rounded === "boolean" || rounded === undefined
+    ? roundedClasses[String(rounded) as "true" | "false"]
+    : roundedClasses[rounded];
+---
+
+<div
+  class:list={["vision-image-container", effectClass, roundedClass, className]}
+>
+  <img
+    src={src}
+    alt={alt}
+    loading={loading}
+    class:list={["vision-image", fitClass]}
+    style={`object-position: ${objectPosition};`}
+  />
+</div>
+
+<style>
+  @reference "@/styles/global.css";
+
+  .vision-image-container {
+    @apply relative h-full w-full overflow-hidden;
+  }
+
+  .vision-image {
+    @apply h-full w-full transition-transform duration-500;
+  }
+
+  /* Effect styles */
+  .vision-blur .vision-image {
+    @apply blur-[2px] hover:blur-none;
+    transition: filter 0.3s ease;
+  }
+
+  .vision-grayscale .vision-image {
+    @apply grayscale hover:grayscale-0;
+    transition: filter 0.3s ease;
+  }
+
+  .vision-sepia .vision-image {
+    @apply sepia hover:sepia-0;
+    transition: filter 0.3s ease;
+  }
+
+  .vision-duotone .vision-image {
+    @apply relative;
+    filter: grayscale(100%) contrast(1.2);
+  }
+
+  .vision-duotone::before {
+    content: "";
+    @apply absolute inset-0 z-10 mix-blend-color;
+    background: linear-gradient(
+      45deg,
+      oklch(var(--color-accent) / 0.5),
+      oklch(var(--color-fill) / 0.5)
+    );
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+  }
+
+  .vision-duotone:hover::before {
+    opacity: 0.3;
+  }
+
+  /* Hover effects */
+  .vision-image-container:hover .vision-image {
+    @apply scale-105;
+  }
+</style>

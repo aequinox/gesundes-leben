@@ -1,0 +1,63 @@
+---
+/**
+ * Archive Year Group Component
+ *
+ * Displays a year group of posts in the archives page, organized by month.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <ArchiveYearGroup
+ *   year="2023"
+ *   yearGroup={postsFrom2023}
+ * />
+ * ```
+ */
+
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { groupByCondition } from "@/utils/posts";
+import type { Post } from "@/utils/types";
+import Badge from "../elements/Badge.astro";
+import ArchiveMonthGroup from "./ArchiveMonthGroup.astro";
+
+export interface Props {
+  /** The year to display */
+  year: string;
+  /** Array of posts from this year */
+  yearGroup: Post[];
+}
+
+const { year, yearGroup } = Astro.props;
+
+// Group posts by month
+const postsByMonth = groupByCondition(
+  yearGroup,
+  post => post.data.pubDatetime.getMonth() + 1
+);
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section
+  class="clear-both mb-8 flex w-full flex-col gap-4 border-b border-solid border-border pb-8 last:mb-0 last:border-b-0 last:pb-0 motion-reduce:transition-none"
+  aria-labelledby={`year-${year}`}
+>
+  <Badge variant="primary" shape="rounded" class="mr-2">
+    <h2 id={`year-${year}`} class="text-2xl font-bold">
+      {year} - {yearGroup.length}
+      {yearGroup.length > 1 ? t("post.posts") : t("post.post")}
+    </h2>
+  </Badge>
+
+  {
+    Object.entries(postsByMonth)
+      .sort(([monthA], [monthB]) => Number(monthB) - Number(monthA))
+      .map(([month, monthGroup]) => (
+        <ArchiveMonthGroup
+          monthIndex={Number(month) - 1}
+          monthGroup={monthGroup}
+        />
+      ))
+  }
+</section>

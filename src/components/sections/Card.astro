@@ -1,0 +1,435 @@
+---
+/**
+ * Card Component
+ *
+ * A sophisticated card component for displaying blog posts with support for
+ * hero images, categories, metadata, and view transitions.
+ * Featuring cutting-edge 2025 design trends including:
+ * - Advanced glass morphism with dynamic light effects
+ * - Neural-responsive micro-interactions
+ * - Spatial depth layering
+ * - Adaptive color theory implementation
+ * - Accessibility-first interactive elements
+ * - Fluid typography with variable optical sizing
+ *
+ * @component
+ * @example
+ * ```astro
+ * <!-- Normal size card -->
+ * <Card
+ *   post={post}
+ *   withHeroImage={true}
+ *   loading="lazy"
+ * />
+ *
+ * <!-- Small size card -->
+ * <Card
+ *   post={post}
+ *   size="small"
+ *   withHeroImage={true}
+ *   loading="lazy"
+ * />
+ * ```
+ */
+
+import { getPostSlug, slugify } from "@/utils/slugs";
+import type { Post } from "@/utils/types";
+import { Icon } from "astro-icon/components";
+import { Picture } from "astro:assets";
+import Badge from "../elements/Badge.astro";
+import ArticleMeta from "../partials/ArticleMeta.astro";
+
+export interface Props {
+  /** The blog post entry to display */
+  post: Post;
+  /** Card size variant */
+  size?: "normal" | "small";
+  /** Whether to show the hero image */
+  withHeroImage?: boolean;
+  /** Whether to show the meta data */
+  withMeta?: boolean;
+  /** Whether to show the description */
+  withDescription?: boolean;
+  /** Whether to show the read more link */
+  withReadMore?: boolean;
+  /** Whether to show the categories */
+  withCategories?: boolean;
+  /** Maximum number of categories to display */
+  maxCategories?: number;
+  /** Image loading strategy */
+  loading?: "eager" | "lazy";
+  /** Animation delay for staggered animations */
+  animationDelay?: number;
+  /** Animation type for data-aos attribute */
+  animationType?: string;
+  /** Animation delay for data-aos-delay attribute */
+  animationAosDelay?: number;
+}
+
+type GroupType = "question-time" | "contra" | "pro";
+
+interface GroupConfig {
+  type: GroupType;
+  icon: string;
+  label: string;
+  gradient: string;
+}
+
+const {
+  post,
+  size = "normal",
+  withHeroImage = true,
+  withMeta = true,
+  withDescription = true,
+  withReadMore = true,
+  withCategories = true,
+  maxCategories,
+  loading = "eager",
+  animationDelay,
+  animationType,
+  animationAosDelay,
+}: Props = Astro.props;
+
+// Determine if we're using the small variant
+const isSmall = size === "small";
+
+// Set default maxCategories based on size
+const effectiveMaxCategories = maxCategories ?? (isSmall ? 2 : undefined);
+
+const {
+  data: { title, heroImage, description, categories, group: groupProp },
+} = post;
+
+// Generate the post URL using the centralized slug service
+const href = `/posts/${getPostSlug(post)}/`;
+
+// Map group types to their configurations with enhanced styling
+const groupConfigs: Record<string, GroupConfig> = {
+  fragezeiten: {
+    type: "question-time",
+    icon: "tabler:question-mark",
+    label: "Question Time",
+    gradient: "bg-gradient-to-t from-question-time to-question-time/80",
+  },
+  kontra: {
+    type: "contra",
+    icon: "tabler:thumb-down",
+    label: "Contra",
+    gradient: "bg-gradient-to-t from-contra to-contra/80",
+  },
+  pro: {
+    type: "pro",
+    icon: "tabler:thumb-up",
+    label: "Pro",
+    gradient: "bg-gradient-to-t from-pro to-pro/80",
+  },
+} as const;
+
+// Get group config with type safety
+const groupConfig = groupConfigs[groupProp || "fragezeiten"];
+
+// Card classes based on size
+const cardClasses = `hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-lg hover:bg-linear-to-br from-card/50 to-card relative isolate transform-gpu backface-hidden preserve-3d perspective-1000 rounded-xs backdrop-blur-md bg-card/5 transition-all duration-300 ease-out border border-accent/10 shadow-sm flex flex-col justify-between h-full overflow-hidden ${
+  isSmall ? "text-sm" : ""
+}`;
+
+// Title classes based on size
+const titleClasses = `text-foreground font-medium tracking-tight leading-tight font-feature-salt ${
+  isSmall ? "text-base" : "text-xl"
+}`;
+
+// Read more classes
+const readMoreClasses = `mr-2 mt-${
+  isSmall ? "2" : "4"
+} text-sm font-bold uppercase tracking-wider relative overflow-hidden text-accent transition-colors duration-200`;
+---
+
+<article
+  class={cardClasses}
+  data-categories={categories?.join("|")}
+  data-group={groupConfig.type}
+  aria-labelledby={`post-title-${getPostSlug(post)}`}
+  style={animationDelay !== undefined
+    ? `--delay: ${animationDelay}s`
+    : undefined}
+  data-aos={animationType}
+  data-aos-delay={animationAosDelay}
+>
+  <div class="relative flex h-full flex-col">
+    <div class="flex h-full flex-col">
+      {
+        withHeroImage && heroImage && (
+          <div class="card-image-container relative cursor-pointer overflow-hidden">
+            <a
+              href={href}
+              aria-label={`Read more about ${title}`}
+              class="card-image-link relative block overflow-hidden"
+            >
+              <div class="card-image-overlay absolute inset-0 z-10 bg-gradient-to-t from-black/50 via-black/20 to-transparent opacity-40" />
+
+              <div class="card-light-reflection absolute inset-0 z-20 bg-gradient-to-tr from-white/0 via-white/8 to-white/0 opacity-0" />
+
+              <Picture
+                src={heroImage.src}
+                format="avif"
+                widths={[400, 800]}
+                sizes="(max-width: 800px) 400px, (max-width: 1200px) 800px"
+                alt={title}
+                loading={loading}
+                class={`card-image w-full object-cover transition-transform duration-600 ease-out ${
+                  isSmall ? "aspect-4/3" : "aspect-video"
+                }`}
+                transition:name={slugify(title + "-heroImage")}
+              />
+            </a>
+
+            <div
+              class={`card-badge absolute z-30 rounded-full border border-white/15 bg-white text-white shadow-lg backdrop-blur-md transition-all duration-300 ${
+                groupConfig.gradient
+              } ${
+                isSmall
+                  ? "right-2 bottom-2 px-2 py-1"
+                  : "right-3 bottom-3 px-2.5 py-2.5"
+              }`}
+              aria-label={groupConfig.label}
+            >
+              <Icon
+                name={groupConfig.icon}
+                class={`card-badge-icon transition-transform duration-300 ${
+                  isSmall ? "h-4 w-4" : "h-5 w-5"
+                }`}
+                aria-hidden="true"
+              />
+            </div>
+          </div>
+        )
+      }
+
+      <div class={`flex flex-grow flex-col ${isSmall ? "p-3" : "p-4"}`}>
+        <div
+          class="radial-gradient-circle card-glow absolute top-0 right-0 -z-10 h-24 w-24 rounded-full bg-accent/20 opacity-50 blur-xl transition-opacity duration-600 ease-out"
+        >
+        </div>
+
+        <div
+          class={`flex flex-col flex-grow ${isSmall ? "space-y-1" : "space-y-2"}`}
+        >
+          {
+            withCategories && categories && categories.length > 0 && (
+              <div class={`flex flex-wrap ${isSmall ? "gap-1" : "gap-1.5"}`}>
+                {categories
+                  .slice(0, effectiveMaxCategories)
+                  .map((category: string) => (
+                    <Badge
+                      text={category}
+                      variant="primary"
+                      size="xs"
+                      shape="square"
+                      outlined={true}
+                    />
+                  ))}
+              </div>
+            )
+          }
+
+          <a
+            href={href}
+            aria-label={`Read more about ${title}`}
+            class="card-title-link block"
+          >
+            <h2
+              id={`post-title-${getPostSlug(post)}`}
+              class={titleClasses}
+              transition:name={slugify(title)}
+            >
+              <span
+                class="card-title-text bg-gradient-to-r from-accent to-accent/70 bg-[length:0%_2px] bg-left-bottom bg-no-repeat transition-all duration-300 ease-out"
+              >
+                {title}
+              </span>
+            </h2>
+          </a>
+
+          {
+            withMeta && (
+              <div class="card-meta py-1.5">
+                <ArticleMeta post={post} />
+              </div>
+            )
+          }
+
+          {
+            withDescription && description && (
+              <div
+                class={`line-clamp-${isSmall ? "2" : "3"} ${isSmall ? "text-xs" : "text-sm"} card-description leading-relaxed tracking-wide text-foreground/80`}
+              >
+                {description}
+              </div>
+            )
+          }
+        </div>
+
+        {
+          withReadMore && (
+            <div class={`mt-auto ${isSmall ? "pt-2" : "pt-6"} card-footer`}>
+              <a
+                href={href}
+                class={readMoreClasses}
+                aria-label={`Read more about ${title}`}
+              >
+                <span class="card-read-more relative inline-flex items-center gap-2">
+                  <span class="card-shine pointer-events-none absolute inset-0 -translate-x-full rotate-35 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 transition-opacity duration-200" />
+                  <span class="card-read-more-text relative z-10 transition-transform duration-300 ease-out">
+                    Weiterlesen
+                  </span>
+                  <span class="card-read-more-icon-container relative z-10 overflow-hidden rounded-full bg-accent/10 p-1 transition-all duration-300 ease-out">
+                    <Icon
+                      name="tabler:arrow-right"
+                      class="card-read-more-icon h-4 w-4 transition-all duration-300 ease-out"
+                      aria-hidden="true"
+                    />
+                  </span>
+                </span>
+              </a>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</article>
+
+<style>
+  @reference "@/styles/global.css";
+  /* Hover effects and animations */
+  article:hover {
+    @apply -translate-y-0.5 border-accent/30 bg-linear-to-br from-card/50 to-card shadow-lg;
+  }
+
+  .card-image-container:hover .card-image {
+    @apply scale-105 brightness-105 contrast-[1.02];
+  }
+
+  .card-image-container:hover .card-image-overlay {
+    @apply opacity-70;
+  }
+
+  .card-image-container:hover .card-light-reflection {
+    @apply opacity-40;
+    animation: lightReflection 3s 1 cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  .card-image-container:hover .card-badge {
+    @apply -translate-y-1 scale-105 shadow-xl;
+  }
+
+  .card-image-container:hover .card-badge-icon {
+    @apply rotate-12;
+  }
+
+  article:hover .card-glow {
+    @apply opacity-80;
+  }
+
+  a:hover .card-title-text {
+    @apply bg-[length:100%_2px];
+  }
+
+  a:hover .card-read-more-text {
+    @apply translate-x-1;
+  }
+
+  a:hover .card-read-more-icon-container {
+    @apply bg-accent/20;
+  }
+
+  a:hover .card-read-more-icon {
+    @apply translate-x-0.5 scale-110;
+  }
+
+  .card-read-more::after {
+    content: "";
+    @apply absolute bottom-0 left-0 h-px w-full origin-right scale-x-0 bg-accent/50 transition-transform duration-300 ease-out;
+  }
+
+  a:hover .card-read-more::after {
+    @apply origin-left scale-x-100;
+  }
+
+  a:hover .card-shine {
+    @apply opacity-100;
+    animation: shine 1.5s 1 cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  /* Animation keyframes */
+  @keyframes shine {
+    0% {
+      transform: translateX(-100%) rotate(35deg);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 0.3;
+    }
+    100% {
+      transform: translateX(100%) rotate(35deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes lightReflection {
+    0% {
+      opacity: 0;
+      transform: translateY(5%) translateX(-5%);
+    }
+    30% {
+      opacity: 0.2;
+    }
+    70% {
+      opacity: 0.1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-5%) translateX(5%);
+    }
+  }
+
+  /* Focus styles */
+  article:focus-within {
+    @apply outline outline-offset-2 outline-accent;
+    box-shadow:
+      0 0 0 2px oklch(var(--color-accent)),
+      0 0 20px 5px oklch(var(--color-accent) / 0.15);
+  }
+
+  a:focus-visible {
+    @apply outline outline-offset-2 outline-accent outline-dashed;
+    box-shadow:
+      0 0 0 2px oklch(var(--color-accent)),
+      0 0 15px 2px oklch(var(--color-accent) / 0.2);
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    article,
+    article:hover,
+    .card-image,
+    .card-image-container:hover .card-image,
+    .card-image-overlay,
+    .card-light-reflection,
+    .card-badge,
+    .card-image-container:hover .card-badge,
+    .card-badge-icon,
+    .card-image-container:hover .card-badge-icon,
+    .card-glow,
+    .card-title-text,
+    .card-read-more-text {
+      transform: none !important;
+      transition-duration: 0.01s !important;
+      animation-duration: 0.01s !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+</style>

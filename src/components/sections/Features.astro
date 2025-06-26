@@ -1,0 +1,219 @@
+---
+/**
+ * Features Component
+ *
+ * A flexible component for displaying feature lists with icons, titles,
+ * and descriptions in a responsive grid layout.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <Features
+ *   title="Key Features"
+ *   items={[
+ *     {
+ *       title: "Feature 1",
+ *       description: "Description",
+ *       icon: "tabler:check"
+ *     }
+ *   ]}
+ * />
+ * ```
+ */
+
+import type { Features as Props } from "@/components/types/";
+import Headline from "./Headline.astro";
+import ItemGrid from "./ItemGrid.astro";
+
+type HeadlineClasses = Record<string, string>;
+
+const {
+  title = await Astro.slots.render("title"),
+  subtitle = await Astro.slots.render("subtitle"),
+  tagline = await Astro.slots.render("tagline"),
+  items = [],
+  columns = 2,
+  defaultIcon,
+  id,
+  classes = {},
+}: Props = Astro.props;
+
+// Type guard for string class definitions
+const isString = (value: unknown): value is string => typeof value === "string";
+
+// Process headline classes
+const headlineClasses: HeadlineClasses = isString(classes?.headline)
+  ? { container: classes.headline }
+  : typeof classes?.headline === "object" && classes?.headline !== null
+    ? (classes.headline as HeadlineClasses)
+    : {};
+
+// Process item classes
+const itemClasses: Record<string, string> = {
+  container: "",
+  title: "md:text-xl",
+  icon: "text-white bg-accent rounded-full w-10 h-10 p-2 md:w-12 md:h-12 md:p-3 mr-4",
+  ...(isString(classes?.items)
+    ? { container: classes.items }
+    : typeof classes?.items === "object" && classes?.items !== null
+      ? classes.items
+      : {}),
+};
+
+// Memoize container classes
+const containerClasses = ["max-w-5xl", classes?.container]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<section
+  id={id}
+  class={containerClasses}
+  aria-labelledby={id ? `${id}-title` : undefined}
+>
+  <Headline
+    title={title}
+    subtitle={subtitle}
+    tagline={tagline}
+    classes={headlineClasses}
+  />
+
+  <ItemGrid
+    items={items}
+    columns={columns}
+    defaultIcon={defaultIcon}
+    classes={itemClasses}
+  />
+</section>
+
+<style>
+  @reference "@/styles/global.css";
+
+  /* Features section base styling */
+  section {
+    @apply relative mx-auto max-w-5xl;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    transition: all var(--theme-transition-duration)
+      var(--theme-transition-timing);
+  }
+
+  /* Decorative background elements */
+  section::before {
+    content: "";
+    @apply absolute -z-10 rounded-xl opacity-20 blur-3xl;
+    background: radial-gradient(
+      circle at 30% 50%,
+      oklch(var(--color-accent) / 0.3),
+      transparent 70%
+    );
+    transform: translateZ(-10px);
+  }
+
+  section::after {
+    content: "";
+    @apply absolute -z-10 rounded-xl opacity-10 blur-2xl;
+    background: radial-gradient(
+      circle at 70% 50%,
+      oklch(var(--color-accent) / 0.2),
+      transparent 70%
+    );
+    transform: translateZ(-5px);
+  }
+
+  /* Focus styles */
+  section:focus-within {
+    @apply ring-2 ring-accent ring-offset-2;
+    box-shadow:
+      0 0 0 2px oklch(var(--color-accent)),
+      0 0 20px 5px oklch(var(--color-accent) / 0.15);
+  }
+
+  /* Dark mode adjustments */
+  :global(html[data-theme="dark"]) section {
+    background: linear-gradient(
+      135deg,
+      oklch(var(--color-card) / 0.05),
+      oklch(var(--color-card-muted) / 0.05)
+    );
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    section {
+      @apply px-4;
+    }
+
+    section::before,
+    section::after {
+      @apply opacity-10;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    section,
+    section::before,
+    section::after {
+      @apply transform-none transition-none;
+      opacity: 1 !important;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    section {
+      @apply break-inside-avoid bg-transparent shadow-none;
+    }
+
+    section::before,
+    section::after {
+      @apply hidden;
+    }
+  }
+
+  /* High contrast mode */
+  @media (forced-colors: active) {
+    section {
+      @apply border border-[CanvasText];
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Enhances features section with advanced scroll interactions
+   */
+  function setupFeatures() {
+    const features = document.querySelectorAll('section[id^="features-"]');
+
+    if (!("IntersectionObserver" in window)) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("aos-animate");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        rootMargin: "50px",
+        threshold: 0.1,
+      }
+    );
+
+    features.forEach(feature => {
+      feature.classList.add("opacity-0");
+      feature.setAttribute("data-aos", "fade-up");
+      observer.observe(feature);
+    });
+  }
+
+  // Initialize on page load
+  setupFeatures();
+
+  // Re-initialize after Astro page transitions
+  document.addEventListener("astro:after-swap", setupFeatures);
+</script>

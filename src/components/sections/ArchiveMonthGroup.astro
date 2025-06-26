@@ -1,0 +1,76 @@
+---
+/**
+ * Archive Month Group Component
+ *
+ * Displays a month group of posts in the archives page.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <ArchiveMonthGroup
+ *   monthIndex={0} // January (0-based index)
+ *   monthGroup={postsFromJanuary}
+ * />
+ * ```
+ */
+
+import type { TranslationKey } from "@/i18n/ui";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import type { Post } from "@/utils/types";
+import Card from "./Card.astro";
+
+export interface Props {
+  /** The month index (0-11) to display */
+  monthIndex: number;
+  /** Array of posts from this month */
+  monthGroup: Post[];
+}
+
+const { monthIndex, monthGroup } = Astro.props;
+
+// Get current language and translation function
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Map month index (0-11) to translation key
+const monthKeys: TranslationKey[] = [
+  "month.january",
+  "month.february",
+  "month.march",
+  "month.april",
+  "month.may",
+  "month.june",
+  "month.july",
+  "month.august",
+  "month.september",
+  "month.october",
+  "month.november",
+  "month.december",
+];
+
+// Get translated month name
+const monthName = t(monthKeys[monthIndex]);
+
+// Sort posts by date (newest first)
+const sortedPosts = [...monthGroup].sort(
+  (a, b) =>
+    Math.floor(new Date(b.data.pubDatetime).getTime() / 1000) -
+    Math.floor(new Date(a.data.pubDatetime).getTime() / 1000)
+);
+---
+
+<div
+  class="archive-month-group clear-both mb-6 last:mb-0 motion-reduce:transition-none"
+>
+  <div class="flex flex-col sm:flex-row">
+    <div class="mt-6 min-w-36 text-lg sm:my-6">
+      <h3 class="font-bold">
+        {monthName}
+        <sup class="text-xs">{monthGroup.length}</sup>
+      </h3>
+    </div>
+    <ul class="flex w-full flex-col gap-4">
+      {sortedPosts.map(post => <Card {post} withHeroImage={false} />)}
+    </ul>
+  </div>
+</div>

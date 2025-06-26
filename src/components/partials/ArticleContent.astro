@@ -1,0 +1,131 @@
+---
+import Blockquote from "@/components/elements/Blockquote.astro";
+import H1 from "@/components/elements/H1.astro";
+import H2 from "@/components/elements/H2.astro";
+import H3 from "@/components/elements/H3.astro";
+import H4 from "@/components/elements/H4.astro";
+import H5 from "@/components/elements/H5.astro";
+import H6 from "@/components/elements/H6.astro";
+import Image from "@/components/elements/Image.astro";
+import Paragraph from "@/components/elements/Paragraph.astro";
+import { slugify } from "@/utils/slugs";
+import { Picture } from "astro:assets";
+import { render, type CollectionEntry } from "astro:content";
+
+export interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+const {
+  data: { title, heroImage },
+} = post;
+
+const { Content } = await render(post);
+
+const heroImageTransitionName = heroImage
+  ? `hero-image-${slugify(title)}-${post.id}`
+  : undefined;
+
+const components = {
+  img: Image,
+  blockquote: Blockquote,
+  p: Paragraph,
+  h1: H1,
+  h2: H2,
+  h3: H3,
+  h4: H4,
+  h5: H5,
+  h6: H6,
+};
+---
+
+<Fragment>
+  {/* Hero Image with Parallax Effect */}
+  {
+    heroImage && (
+      <div
+        id="hero-parallax-container"
+        class="relative mx-auto mt-4 h-0 overflow-hidden pb-[66.67%] md:pb-[56.25%]"
+      >
+        <div class="absolute inset-0 h-[120%] w-full translate-y-[-10%]">
+          <Picture
+            id="hero-parallax-image"
+            class="h-full w-full object-cover will-change-transform"
+            src={heroImage.src}
+            alt={heroImage.alt}
+            decoding="async"
+            loading={"eager"}
+            widths={[400, 800, 1200, 1600]}
+            sizes="(max-width: 800px) 400px, (max-width: 1200px) 800px, (max-width: 1600px) 1200px, 1600px"
+            formats={["avif", "webp"]}
+            fallbackFormat="png"
+            transition:name={heroImageTransitionName}
+            data-pagefind-index-attrs="title,alt"
+          />
+        </div>
+      </div>
+    )
+  }
+
+  {/* Article Content */}
+  <article id="article" class="mx-auto prose mt-6 max-w-none">
+    <Content components={components} />
+  </article>
+</Fragment>
+
+<script>
+  import { TableOfContents } from "@/utils/ui/TableOfContentsEngine";
+
+  document.addEventListener("astro:page-load", () => {
+    // Add a small delay to ensure content is fully rendered
+    setTimeout(() => new TableOfContents(), 100);
+
+    // Handle parallax effect for hero image
+    const setupParallax = () => {
+      const parallaxContainer = document.getElementById(
+        "hero-parallax-container"
+      ) as HTMLElement;
+      const parallaxImage = document.getElementById(
+        "hero-parallax-image"
+      ) as HTMLElement;
+
+      if (!parallaxContainer || !parallaxImage) return;
+
+      // Check for reduced motion preference
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
+      if (prefersReducedMotion) {
+        // Disable parallax effect for users who prefer reduced motion
+        parallaxImage.style.transform = "none";
+        return;
+      }
+
+      const handleScroll = () => {
+        const scrollPosition = window.scrollY;
+        const containerRect = parallaxContainer.getBoundingClientRect();
+
+        // Only apply parallax when the container is in view
+        if (
+          containerRect.bottom > 0 &&
+          containerRect.top < window.innerHeight
+        ) {
+          // Calculate parallax offset - move at 40% of scroll speed
+          const offset = scrollPosition * 0.4;
+          parallaxImage.style.transform = `translateY(${offset}px)`;
+        }
+      };
+
+      // Initial calculation
+      handleScroll();
+
+      // Add scroll event listener with passive option for better performance
+      window.addEventListener("scroll", handleScroll, { passive: true });
+    };
+
+    // Setup parallax effect
+    setupParallax();
+  });
+</script>

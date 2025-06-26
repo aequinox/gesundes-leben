@@ -1,0 +1,60 @@
+---
+export interface Props {
+  /** Visual style variant */
+  variant?: "default" | "lead" | "subtle" | "accent";
+  /** Animation effect */
+  animation?: "none" | "fade" | "slide" | "zoom";
+  /** Text alignment */
+  align?: "left" | "center" | "right" | "justify";
+  /** Whether to enable hyphenation */
+  hyphenate?: boolean;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  variant = "default",
+  animation = "none",
+  align = "left",
+  hyphenate = true,
+  class: className = "",
+} = Astro.props;
+
+const variantClasses = {
+  default: "text-base xl:text-lg",
+  lead: "text-lg xl:text-xl font-medium",
+  subtle: "text-base xl:text-lg text-foreground/70",
+  accent: "text-base xl:text-lg border-l-4 border-accent pl-4",
+};
+
+const alignClasses = {
+  left: "text-left",
+  center: "text-center",
+  right: "text-right",
+  justify: "text-justify",
+};
+
+const animationMap = {
+  none: "",
+  fade: "fade-up",
+  slide: "fade-right",
+  zoom: "zoom-in",
+};
+
+// const animationClass =
+//   animation !== "none" ? `data-aos="${animationMap[animation]}"` : "";
+const hyphenateClass = hyphenate ? "hyphens-auto" : "";
+---
+
+<p
+  class:list={[
+    "text-base leading-relaxed tracking-wide",
+    variantClasses[variant],
+    alignClasses[align],
+    hyphenateClass,
+    className,
+  ]}
+  {...animation !== "none" && { "data-aos": animationMap[animation] }}
+>
+  <slot />
+</p>

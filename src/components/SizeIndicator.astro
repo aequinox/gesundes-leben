@@ -1,0 +1,56 @@
+---
+/**
+ * A development-only component that displays the current breakpoint size
+ * Useful for responsive design development
+ */
+
+interface Props {
+  class?: string;
+}
+
+const { class: className }: Props = Astro.props;
+---
+
+{
+  import.meta.env.DEV && (
+    <div
+      class:list={[
+        "fixed right-0 bottom-0 z-50 m-2 flex w-[30px] items-center justify-center font-mono text-xs tracking-tight text-black uppercase",
+        className,
+      ]}
+      role="status"
+      aria-label="Current viewport size indicator"
+    >
+      <span class="block rounded-full bg-gray-200 px-2 py-2.5 sm:hidden">
+        all
+      </span>
+      <span class="hidden rounded-full bg-red-200 p-2 sm:block md:hidden">
+        sm
+      </span>
+      <span class="hidden rounded-full bg-yellow-200 p-2 md:block lg:hidden">
+        md
+      </span>
+      <span class="hidden rounded-full bg-green-200 p-2 lg:block xl:hidden">
+        lg
+      </span>
+      <span class="hidden rounded-full bg-blue-200 p-2 xl:block 2xl:hidden">
+        xl
+      </span>
+      <span class="hidden rounded-full bg-pink-200 px-2 py-2.5 2xl:block 3xl:hidden">
+        2xl
+      </span>
+      <span class="hidden rounded-full bg-violet-200 px-2 py-2.5 3xl:block 4xl:hidden">
+        3xl
+      </span>
+      <span class="hidden rounded-full bg-lime-200 px-2 py-2.5 4xl:block 5xl:hidden">
+        4xl
+      </span>
+      <span class="hidden rounded-full bg-orange-200 px-2 py-2.5 5xl:block 6xl:hidden">
+        5xl
+      </span>
+      <span class="hidden rounded-full bg-purple-200 px-2 py-2.5 6xl:block">
+        6xl
+      </span>
+    </div>
+  )
+}

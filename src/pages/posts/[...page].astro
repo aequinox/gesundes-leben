@@ -1,0 +1,172 @@
+---
+import Hr from "@/components/elements/Hr.astro";
+import BlogFilter from "@/components/filter/BlogFilter.astro";
+import Footer from "@/components/sections/Footer.astro";
+import Header from "@/components/sections/Header.astro";
+import PageHero from "@/components/sections/PageHero.astro";
+import { SITE } from "@/config";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import { processAllPosts } from "@/utils/posts";
+import type { GetStaticPaths } from "astro";
+import { Icon } from "astro-icon/components";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+export const getStaticPaths = (async ({ paginate }) => {
+  // Use the unified post processing function
+  const posts = await processAllPosts({ includeDrafts: false });
+  return paginate(posts, { pageSize: SITE.postPerPage });
+}) satisfies GetStaticPaths;
+
+// Define the page metadata
+const pageTitle = t("nav.posts");
+const pageDescription =
+  "Hier findest du alle Artikel, die wir geschrieben haben.";
+---
+
+<Layout title={`${pageTitle} | ${SITE.title}`} description={pageDescription}>
+  <Header activeNav="posts" />
+
+  <main id="main-content">
+    <PageHero title={pageTitle} subtitle={pageDescription} />
+
+    <Hr />
+
+    {/* Filter Explanation Accordion */}
+    <div
+      class="filter-accordion shadow-elevation-medium mx-auto mt-4 mb-16 max-w-3xl overflow-hidden rounded-xl border border-accent/20 bg-surface-1/60 backdrop-blur-md"
+    >
+      <button
+        id="accordion-button"
+        class="accordion-button flex w-full items-center justify-between px-6 py-4 text-left font-medium text-foreground transition-all duration-300 hover:bg-accent/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+        aria-expanded="false"
+        aria-controls="accordion-content"
+      >
+        <span class="flex items-center gap-2">
+          <Icon name="tabler:info-circle" class="h-5 w-5 text-accent" />
+          <span>Wie funktionieren die Filter?</span>
+        </span>
+        <Icon
+          name="tabler:chevron-down"
+          id="accordion-icon"
+          class="h-5 w-5 transform text-accent transition-transform duration-300"
+        />
+      </button>
+
+      <div
+        id="accordion-content"
+        class="accordion-content hidden px-6 pt-0 pb-6 text-foreground"
+        aria-hidden="true"
+      >
+        <div
+          class="prose prose-lg max-w-none prose-headings:text-accent prose-a:text-accent"
+        >
+          <h3>So funktionieren unsere Filterfunktionen</h3>
+
+          <h4>Grundlegende Filterung</h4>
+          <ul>
+            <li>
+              <strong>Gruppenfilter</strong>: Unten siehst du drei Gruppen (Pro,
+              Fragezeiten, Kontra). Klicke auf eine Gruppe, um nur Beiträge
+              dieser Gruppe anzuzeigen.
+            </li>
+            <li>
+              <strong>Kategoriefilter</strong>: Unter den Gruppen findest du
+              Kategoriebuttons. Klicke auf eine Kategorie, um Beiträge zu diesem
+              Thema zu filtern.
+            </li>
+          </ul>
+
+          <h4>Doppelte Filterung</h4>
+          <p>
+            Du kannst jetzt <strong
+              >gleichzeitig nach Gruppe und Kategorie filtern</strong
+            >! Wenn du zum Beispiel "Pro" als Gruppe und "Immunsystem" als
+            Kategorie auswählst, werden nur Beiträge angezeigt, die SOWOHL zur
+            Gruppe "Pro" gehören ALS AUCH das Thema "Immunsystem" behandeln.
+          </p>
+
+          <h4>Alle Filter zurücksetzen</h4>
+          <p>
+            Klicke auf den Button "Alle" bei den Kategorien, um sämtliche Filter
+            zurückzusetzen und wieder alle Beiträge anzuzeigen.
+          </p>
+
+          <h4>Nur nach Kategorie filtern</h4>
+          <p>
+            Wenn du nur nach einer bestimmten Kategorie filtern möchtest, ohne
+            eine Gruppe auszuwählen, kannst du das jetzt auch! Wähle einfach
+            eine Kategorie aus, ohne vorher eine Gruppe anzuklicken.
+          </p>
+
+          <h4>Gruppenauswahl umschalten</h4>
+          <p>
+            Wenn du eine bereits ausgewählte Gruppe nochmals anklickst, wird die
+            Auswahl aufgehoben. So kannst du schnell zwischen Gruppenfilterung
+            und keiner Gruppenfilterung wechseln.
+          </p>
+
+          <h4>Tipps zur Nutzung</h4>
+          <ol>
+            <li>
+              Beginne mit einer breiten Auswahl (z.B. nur eine Gruppe) und
+              verfeinere dann mit Kategorien.
+            </li>
+            <li>Nutze "Alle", wenn du wieder von vorne beginnen möchtest.</li>
+            <li>
+              Wenn du alle Beiträge zu einem bestimmten Thema sehen willst,
+              unabhängig von der Gruppe, wähle einfach nur die gewünschte
+              Kategorie aus.
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative z-10 backdrop-blur-sm">
+      <BlogFilter />
+    </div>
+  </main>
+
+  <Footer />
+
+  <script>
+    // Optimized accordion functionality with performance improvements
+    document.addEventListener("astro:page-load", () => {
+      const accordionButton = document.getElementById("accordion-button");
+      const accordionContent = document.getElementById("accordion-content");
+      const accordionIcon = document.getElementById("accordion-icon");
+
+      if (accordionButton && accordionContent && accordionIcon) {
+        // Use passive event listener for better performance
+        accordionButton.addEventListener(
+          "click",
+          () => {
+            // Toggle aria-expanded
+            const expanded =
+              accordionButton.getAttribute("aria-expanded") === "true";
+            accordionButton.setAttribute(
+              "aria-expanded",
+              (!expanded).toString()
+            );
+            accordionContent.setAttribute("aria-hidden", expanded.toString());
+
+            // Toggle content visibility with optimized class handling
+            accordionContent.classList.toggle("hidden");
+
+            // Use requestAnimationFrame for smoother animation
+            requestAnimationFrame(() => {
+              accordionContent.classList.toggle("open");
+
+              // Use transform instead of direct style manipulation for better performance
+              accordionIcon.style.transform = expanded ? "" : "rotate(180deg)";
+            });
+          },
+          { passive: true }
+        );
+      }
+    });
+  </script>
+</Layout>

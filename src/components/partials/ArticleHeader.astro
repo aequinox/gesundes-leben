@@ -1,0 +1,43 @@
+---
+import ArticleMeta from "@/components/partials/ArticleMeta.astro";
+import { slugify } from "@/utils/slugs";
+import { type CollectionEntry } from "astro:content";
+
+export interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+const {
+  data: { title, categories = [] },
+} = post;
+---
+
+<Fragment>
+  {/* Categories */}
+  <div class="mb-2 flex flex-wrap text-xs uppercase">
+    {
+      categories &&
+        categories.map((category: string) => (
+          <div
+            transition:name={slugify(title + category)}
+            class="mr-[0.125rem] mb-1 inline-flex items-center text-sm font-medium text-accent after:[&:not(:last-child)]:ml-[0.125rem] after:[&:not(:last-child)]:content-['|']"
+            data-pagefind-filter="category"
+          >
+            {category}
+          </div>
+        ))
+    }
+  </div>
+
+  {/* Title */}
+  <h1
+    transition:name={slugify(title)}
+    class="mb-4 text-xl font-semibold lg:text-3xl"
+  >
+    {title}
+  </h1>
+
+  {/* Article Meta */}
+  <ArticleMeta post={post} showAuthor={true} showReadingTime={true} />
+</Fragment>

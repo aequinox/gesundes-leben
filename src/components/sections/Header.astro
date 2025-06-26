@@ -1,0 +1,151 @@
+---
+/**
+ * Header Component
+ *
+ * A modern, accessible header component that provides site-wide navigation and user
+ * interaction features. Built with performance and user experience in mind.
+ *
+ * Features:
+ * - Responsive design with mobile-first approach
+ * - Enhanced accessibility with ARIA attributes and keyboard navigation
+ * - Smooth animations with reduced motion support
+ * - Internationalization support
+ * - Print and high contrast mode optimizations
+ *
+ * @component
+ * @example
+ * ```astro
+ * <Header activeNav="posts" />
+ * ```
+ */
+
+import Navigation from "@/components/sections/Navigation.astro";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import type { NavigationLink } from "../types";
+
+// Type-safe component props
+interface Props {
+  /** Currently active navigation item for highlighting */
+  activeNav?: NavigationLink;
+}
+
+const { activeNav }: Props = Astro.props;
+
+// Internationalization setup
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Pre-compute translated strings for performance
+const i18nStrings = {
+  skipToContent: t("nav.skipToContent"),
+  mainHeader: t("nav.mainNavigation"),
+} as const;
+
+// Utility function to combine Tailwind classes
+const tw = (...classes: string[]) => classes.filter(Boolean).join(" ");
+
+// Component-specific class compositions
+const skipLinkClasses = tw(
+  "absolute -top-full left-16 z-50",
+  "bg-accent px-3 py-2 text-background",
+  "transition-transform duration-300 ease-in-out focus:translate-y-24",
+  "rounded-b-lg shadow-lg",
+  "focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
+);
+---
+
+<header class="w-full" role="banner" aria-label={i18nStrings.mainHeader}>
+  {/* Skip to content link - Accessibility feature */}
+  <a
+    id="skip-to-content"
+    href="#main-content"
+    class={skipLinkClasses}
+    aria-label={i18nStrings.skipToContent}
+  >
+    {i18nStrings.skipToContent}
+  </a>
+
+  {/* Main navigation component */}
+  <Navigation activeNav={activeNav} />
+</header>
+
+<style>
+  @reference "@/styles/global.css";
+  /* Skip link styles with improved accessibility and consistent theming */
+  #skip-to-content {
+    @apply focus:shadow-lg;
+    @apply focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:outline-none;
+    @apply bg-accent text-background;
+  }
+
+  /* Reduced motion preferences - Disable non-essential animations */
+  @media (prefers-reduced-motion: reduce) {
+    #skip-to-content {
+      @apply transform-none transition-none;
+    }
+  }
+
+  /* Print optimization - Hide header when printing */
+  @media print {
+    header {
+      @apply hidden;
+    }
+  }
+
+  /* High contrast mode support with improved visibility */
+  @media (forced-colors: active) {
+    #skip-to-content {
+      border: 2px solid ButtonText;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Skip Link Handler
+   *
+   * Simple handler for the skip-to-content link to improve accessibility
+   */
+  document.addEventListener("DOMContentLoaded", () => {
+    const skipLink = document.getElementById("skip-to-content");
+
+    if (skipLink) {
+      skipLink.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          const mainContent = document.getElementById("main-content");
+
+          if (mainContent) {
+            mainContent.focus();
+            mainContent.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        }
+      });
+    }
+  });
+
+  // Handle Astro page transitions
+  document.addEventListener("astro:after-swap", () => {
+    const skipLink = document.getElementById("skip-to-content");
+
+    if (skipLink) {
+      skipLink.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          const mainContent = document.getElementById("main-content");
+
+          if (mainContent) {
+            mainContent.focus();
+            mainContent.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        }
+      });
+    }
+  });
+</script>

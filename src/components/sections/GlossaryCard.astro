@@ -1,0 +1,116 @@
+---
+/**
+ * GlossaryCard Component - 2025 Modern Design
+ *
+ * A card component for displaying glossary entries with title, content,
+ * and navigation. Features modern design elements with interactive hover effects.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <GlossaryCard
+ *   post={glossaryEntry}
+ * />
+ * ```
+ */
+
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { slugify } from "@/utils/slugs";
+import { Icon } from "astro-icon/components";
+import { render, type CollectionEntry } from "astro:content";
+import Modal from "./Modal.astro";
+
+export interface Props {
+  /** The glossary entry to display */
+  post: CollectionEntry<"glossary">;
+  /** Whether to use secondary heading style */
+  secHeading?: boolean;
+  /** Image loading strategy */
+  loading?: "eager" | "lazy";
+}
+
+const { post }: Props = Astro.props;
+
+const {
+  data: { title },
+} = post;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const slug = slugify(title);
+// Generate a unique ID for the modal
+const modalId = `glossary-modal-${slug}`;
+
+// Get rendered content
+const { Content } = await render(post);
+
+// Memoize translated strings
+const readMoreLabel = t("glossary.readMoreLabel");
+const readMoreAriaLabel = t("glossary.readMore").replace("{title}", title);
+const excerptAriaLabel = t("glossary.excerpt");
+---
+
+<article
+  class="group overflow-hidden rounded-xl bg-card shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+  aria-labelledby={`glossary-title-${slug}`}
+>
+  <div class="flex h-full flex-col p-6">
+    <div class="mb-4 flex items-center gap-4">
+      <div
+        class="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 transition-all duration-300 group-hover:bg-accent"
+      >
+        <Icon
+          name="tabler:book"
+          class="h-6 w-6 fill-accent transition-all duration-300"
+          aria-hidden="true"
+        />
+      </div>
+      <h2
+        id={`glossary-title-${slug}`}
+        class="text-xl font-semibold text-foreground transition-all duration-300"
+        transition:name={slug}
+      >
+        {title}
+      </h2>
+    </div>
+
+    <div
+      class="mb-3 line-clamp-3 text-sm leading-relaxed text-foreground/80"
+      aria-label={excerptAriaLabel}
+    >
+      <Content />
+    </div>
+
+    <div class="mt-auto pt-4">
+      <button
+        type="button"
+        class="inline-flex cursor-pointer items-center gap-2 font-medium text-accent no-underline transition-all duration-300 hover:text-accent/80"
+        aria-label={readMoreAriaLabel}
+        data-modal-target={modalId}
+      >
+        <span>{readMoreLabel}</span>
+        <Icon
+          name="tabler:arrow-right"
+          class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
+          aria-hidden="true"
+        />
+      </button>
+    </div>
+  </div>
+</article>
+
+<!-- Modal for full glossary content -->
+<Modal
+  id={modalId}
+  title={title}
+  size="full"
+  position="center"
+  closable={true}
+  backdrop={true}
+  backdropClickClose={true}
+>
+  <div class="my-4 prose max-w-none px-0 md:px-6">
+    <Content />
+  </div>
+</Modal>

@@ -1,0 +1,385 @@
+---
+import type { ImageMetadata } from "astro";
+import { Image as AstroImage, Picture } from "astro:assets";
+
+type Props = {
+  /** Image source URL or metadata */
+  src: string | ImageMetadata;
+  /** Alt text for accessibility */
+  alt: string;
+  /** Optional caption */
+  title?: string;
+  /** Optional aspect ratio */
+  aspectRatio?: "auto" | "square" | "video" | "portrait" | "ultrawide";
+  /** Optional loading strategy */
+  loading?: "lazy" | "eager";
+  /** Optional visual style */
+  style?: "default" | "polaroid" | "bordered" | "floating" | "glass";
+  /** Optional animation effect */
+  effect?: "none" | "zoom" | "parallax" | "tilt";
+  /** Optional position */
+  position?: "left" | "right" | "center" | "full";
+  /** Optional widths for responsive images */
+  widths?: number[];
+  /** Optional image formats */
+  formats?: Array<"avif" | "webp" | "jpeg" | "jpg" | "png" | "gif">;
+  /** Optional image quality (0-100) */
+  quality?: number;
+  /** Optional sizes attribute for responsive images */
+  sizes?: string;
+  /** Optional densities for responsive images */
+  densities?: number[];
+  /** Optional width override */
+  width?: number;
+  /** Optional height override */
+  height?: number;
+  /** Optional invert flag to invert image colors */
+  invert?: boolean;
+};
+
+const {
+  src: srcProp,
+  alt,
+  title,
+  aspectRatio = "auto",
+  loading = "lazy",
+  style = "default",
+  effect = "none",
+  position = "center",
+  invert = false,
+}: Props = Astro.props;
+
+// Parse position and other controls from title if provided (legacy support)
+let finalPosition = position;
+let finalTitle = title;
+let shouldInvert = invert;
+
+if (title) {
+  // Check for invert prefix first (can be combined with position)
+  if (title.charAt(0) === "!") {
+    shouldInvert = true;
+    finalTitle = title.slice(1);
+    
+    // Check if there's a position control character after the invert
+    if (finalTitle.length > 0) {
+      const positionChar = finalTitle.charAt(0);
+      const positionMap: Record<string, string> = {
+        ">": "right",
+        "<": "left",
+        "|": "center",
+        "_": "full",
+      };
+      
+      if (positionMap[positionChar]) {
+        finalPosition = positionMap[positionChar] as typeof position;
+        finalTitle = finalTitle.slice(1);
+      }
+    }
+  } else {
+    // No invert prefix, check for position control characters
+    const controlChar = title.charAt(0);
+    const directionMap: Record<string, string> = {
+      ">": "right",
+      "<": "left",
+      "|": "center",
+      "_": "full",
+    };
+
+    if (directionMap[controlChar]) {
+      finalPosition = directionMap[controlChar] as typeof position;
+      finalTitle = title.slice(1);
+    }
+  }
+}
+
+// Determine if we're using a string URL or an ImageMetadata object
+const isStringSource = typeof srcProp === "string";
+let stringSource = "";
+
+if (isStringSource) {
+  // Use the string directly for the fallback case
+  stringSource = srcProp as string;
+}
+
+
+// Determine animation based on position
+const animationDirection =
+  finalPosition === "left"
+    ? "fade-right"
+    : finalPosition === "right"
+      ? "fade-left"
+      : "fade-up";
+
+// Determine responsive widths based on position
+const defaultWidths = {
+  left: [400, 600, 800],
+  right: [400, 600, 800],
+  center: [600, 800, 1200],
+  full: [800, 1200, 1600, 2000],
+};
+
+// Get widths from props or use defaults based on position
+const widths = Astro.props.widths || defaultWidths[finalPosition];
+
+// Default formats
+const formats = Astro.props.formats || ["webp"];
+
+// Default quality
+const quality = Astro.props.quality || 80;
+
+// Default sizes based on position
+const defaultSizes = {
+  left: "(max-width: 768px) 100vw, 40vw",
+  right: "(max-width: 768px) 100vw, 40vw",
+  center: "(max-width: 768px) 100vw, 70vw",
+  full: "100vw",
+};
+
+// Get sizes from props or use defaults based on position
+const sizes = Astro.props.sizes || defaultSizes[finalPosition];
+
+// Default densities
+const densities = Astro.props.densities || [1, 2];
+
+// Calculate dimensions based on aspect ratio if not provided
+let width = Astro.props.width;
+let height = Astro.props.height;
+
+// If we have an ImageMetadata object, we can get its dimensions
+if (!isStringSource && !width && !height) {
+  const imgMetadata = srcProp as ImageMetadata;
+  width = imgMetadata.width;
+  height = imgMetadata.height;
+  
+  // Apply aspect ratio adjustments if needed
+  if (aspectRatio !== "auto" && width && height) {
+    if (aspectRatio === "square") {
+      height = width;
+    } else if (aspectRatio === "video") {
+      height = Math.round(width * (9/16));
+    } else if (aspectRatio === "portrait") {
+      height = Math.round(width * (4/3));
+    } else if (aspectRatio === "ultrawide") {
+      height = Math.round(width * (9/21));
+    }
+  }
+}
+---
+
+<figure
+  class:list={[
+    // Container: relative mx-auto my-6 max-w-screen-lg
+    "relative mx-auto my-6 max-w-screen-lg",
+    // Position
+    finalPosition === "left"
+      ? "float-left mr-8 md:max-w-[50%] lg:max-w-[40%]"
+      : finalPosition === "right"
+      ? "float-right ml-8 md:max-w-[50%] lg:max-w-[40%]"
+      : finalPosition === "center"
+      ? "mx-auto block md:max-w-[70%]"
+      : finalPosition === "full"
+      ? "mx-auto block w-full"
+      : "",
+    // Effect
+    effect === "zoom"
+      ? "overflow-hidden group"
+      : effect === "parallax"
+      ? "overflow-hidden"
+      : effect === "tilt"
+      ? ""
+      : "",
+  ]}
+  data-aos={animationDirection}
+  data-effect={effect}
+>
+  <div
+    class:list={[
+      // Wrapper: relative overflow-hidden
+      "relative overflow-hidden",
+      // Style
+      style === "polaroid"
+        ? "rounded-sm bg-white p-2 shadow-image-polaroid dark:bg-card"
+        : style === "bordered"
+        ? "rounded-none border-4 border-accent/30 p-1"
+        : style === "floating"
+        ? "rounded-lg shadow-image-floating"
+        : style === "glass"
+        ? "rounded-xl bg-white/5 backdrop-blur border border-white/10 dark:bg-black/20 dark:border-white/5 shadow-image-glass"
+        : "overflow-hidden rounded-none border-0 shadow-none",
+      // Aspect ratio
+      aspectRatio === "square"
+        ? "aspect-square"
+        : aspectRatio === "video"
+        ? "aspect-video"
+        : aspectRatio === "portrait"
+        ? "aspect-[3/4]"
+        : aspectRatio === "ultrawide"
+        ? "aspect-[21/9]"
+        : "",
+      // Effect
+      effect === "zoom" ? "group" : "",
+      effect === "tilt" ? "transition-transform duration-300 will-change-transform" : "",
+    ]}
+    style={
+      style === "polaroid"
+        ? "transform: rotate(var(--rotation, 0deg)); --rotation: calc(2deg - 4deg * Math.random());"
+        : undefined
+    }
+  >
+    {
+      isStringSource ? (
+        stringSource.startsWith('http') ? (
+          // For remote images, use the AstroImage component with remote optimization
+          <AstroImage
+            src={stringSource}
+            alt={alt}
+            width={width || 800}
+            height={height || 600}
+            loading={loading}
+            densities={densities}
+            sizes={sizes}
+            class:list={[
+              // Base image: h-full w-full object-cover transition-all duration-500
+              "h-full w-full object-cover transition-all duration-500",
+              // Zoom effect
+              effect === "zoom" ? "transition-transform duration-500 group-hover:scale-105" : "",
+              // Tilt effect
+              effect === "tilt" ? "" : "",
+              // Invert effect
+              shouldInvert ? "invert" : "",
+            ]}
+          />
+        ) : (
+          // For local string paths that can't be optimized, fallback to img
+          <img
+            src={stringSource}
+            alt={alt}
+            loading={loading}
+            width={width}
+            height={height}
+            class:list={[
+              // Base image: h-full w-full object-cover transition-all duration-500
+              "h-full w-full object-cover transition-all duration-500",
+              // Zoom effect
+              effect === "zoom" ? "transition-transform duration-500 group-hover:scale-105" : "",
+              // Tilt effect
+              effect === "tilt" ? "" : "",
+              // Invert effect
+              shouldInvert ? "invert" : "",
+            ]}
+          />
+        )
+      ) : (
+        // For ImageMetadata objects, use Picture for art direction or Image for simple cases
+        formats.length > 1 ? (
+          <Picture
+            src={srcProp as ImageMetadata}
+            alt={alt}
+            widths={widths}
+            formats={formats}
+            sizes={sizes}
+            quality={quality}
+            loading={loading}
+            class:list={[
+              "h-full w-full object-cover transition-all duration-500",
+              effect === "zoom" ? "transition-transform duration-500 group-hover:scale-105" : "",
+              effect === "tilt" ? "" : "",
+              shouldInvert ? "invert" : "",
+            ]}
+          />
+        ) : (
+          <AstroImage
+            src={srcProp as ImageMetadata}
+            alt={alt}
+            width={width}
+            height={height}
+            densities={densities}
+            sizes={sizes}
+            quality={quality}
+            loading={loading}
+            class:list={[
+              "h-full w-full object-cover transition-all duration-500",
+              effect === "zoom" ? "transition-transform duration-500 group-hover:scale-105" : "",
+              effect === "tilt" ? "" : "",
+              shouldInvert ? "invert" : "",
+            ]}
+          />
+        )
+      )
+    }
+
+    {effect === "parallax" && (
+      <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+    )}
+  </div>
+
+  {finalTitle && (
+    <figcaption
+      class:list={[
+        // Caption: relative text-center text-sm font-light tracking-wide text-foreground transition-all duration-300
+        "relative text-center text-sm font-light tracking-wide text-foreground transition-all duration-300",
+        // Before pseudo: handled via custom utility or plugin, fallback omitted
+        // Hover: text-accent
+        // Position-specific
+        finalPosition === "left"
+          ? "text-left"
+          : finalPosition === "right"
+          ? "text-right"
+          : "",
+      ]}
+    >
+      {finalTitle}
+    </figcaption>
+  )}
+</figure>
+
+<script>
+  // Handle parallax effect
+  document.addEventListener("DOMContentLoaded", () => {
+    const parallaxImages = document.querySelectorAll(".img-parallax .image");
+
+    if (parallaxImages.length > 0) {
+      window.addEventListener("scroll", () => {
+        parallaxImages.forEach(img => {
+          if (img instanceof HTMLElement) {
+            const rect = img.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+
+            if (rect.top < windowHeight && rect.bottom > 0) {
+              const scrollPosition = (rect.top - windowHeight) / 5;
+              img.style.transform = `translateY(${scrollPosition}px)`;
+            }
+          }
+        });
+      });
+    }
+
+    // Handle tilt effect
+    const tiltImages = document.querySelectorAll(".img-tilt");
+
+    tiltImages.forEach(container => {
+      container.addEventListener("mousemove", e => {
+        if (e instanceof MouseEvent && container instanceof HTMLElement) {
+          const rect = container.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+
+          const rotateX = (y - centerY) / 20;
+          const rotateY = (centerX - x) / 20;
+
+          container.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        }
+      });
+
+      container.addEventListener("mouseleave", () => {
+        if (container instanceof HTMLElement) {
+          container.style.transform =
+            "perspective(1000px) rotateX(0) rotateY(0)";
+        }
+      });
+    });
+  });
+</script>

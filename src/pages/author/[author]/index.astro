@@ -1,0 +1,46 @@
+---
+import AuthorPosts from "@/layouts/AuthorPosts.astro";
+import { getAllAuthors } from "@/utils/authors";
+import { logger } from "@/utils/logger";
+import { generatePagination } from "@/utils/pagination";
+import { getCollection } from "astro:content";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  const authors = await getAllAuthors();
+
+  // Log author IDs for debugging
+  logger.log(`Author IDs: ${authors.map(author => author.id).join(", ")}`);
+
+  // Make sure to handle file extensions in author IDs
+  return authors.map(author => {
+    // Remove file extension if present
+    const authorId = author.id.replace(/\.(md|mdx)$/, "");
+    return {
+      params: { author: authorId },
+      props: { author: authorId, authorName: author.data.name, posts },
+    };
+  });
+}
+
+const { author, authorName, posts } = Astro.props;
+
+// Since there's no direct equivalent in PostService for getPostsByAuthor,
+// we'll implement a custom solution based on the original implementation
+const postsByAuthor = posts.filter(post => {
+  const postAuthor = post.data.author;
+  let postAuthorSlug =
+    typeof postAuthor === "string" ? postAuthor : postAuthor.id;
+  postAuthorSlug = postAuthorSlug.replace(/\.(md|mdx)$/, "").toLowerCase();
+
+  return postAuthorSlug === author.toLowerCase();
+});
+
+const pagination = generatePagination({
+  posts: postsByAuthor,
+  page: 1,
+  isIndex: true,
+});
+---
+
+<AuthorPosts {...pagination} {author} {authorName} />

@@ -1,0 +1,113 @@
+---
+export interface Props {
+  /** Heading level (1-6) */
+  level: 1 | 2 | 3 | 4 | 5 | 6;
+  /** Optional ID for the heading */
+  id?: string;
+  /** Optional aria-label for accessibility */
+  ariaLabel?: string;
+  /** Optional aria-labelledby reference */
+  ariaLabelledby?: string;
+  /** Additional CSS classes */
+  class?: string;
+  /** Optional variant for styling */
+  variant?: "default" | "accent" | "subtle";
+}
+
+const {
+  level,
+  id,
+  ariaLabel,
+  ariaLabelledby,
+  class: className = "",
+  variant = "default",
+} = Astro.props;
+
+const HeadingTag = `h${level}` as keyof HTMLElementTagNameMap;
+
+// We don't need to extract accessible name from slot content anymore
+// since we're not automatically generating aria-labels
+
+const variantClasses = {
+  default: "heading-default",
+  accent: "heading-accent",
+  subtle: "heading-subtle",
+};
+---
+
+<HeadingTag
+  id={id}
+  class:list={[
+    "heading",
+    variantClasses[variant],
+    `heading-${level}`,
+    className,
+  ]}
+  {...ariaLabel ? { "aria-label": ariaLabel } : {}}
+  {...ariaLabelledby ? { "aria-labelledby": ariaLabelledby } : {}}
+>
+  <slot />
+</HeadingTag>
+
+<style>
+  /* Base styles */
+  @reference "@/styles/global.css";
+
+  .heading {
+    @apply mb-4 text-base font-semibold;
+  }
+
+  .heading-1 {
+    @apply text-3xl lg:text-4xl;
+  }
+
+  .heading-2 {
+    @apply mb-6 border-b border-accent/30 pb-2 text-2xl font-bold tracking-tight text-foreground/90 lg:text-3xl;
+  }
+
+  .heading-3 {
+    @apply text-xl lg:text-2xl;
+  }
+
+  .heading-4 {
+    @apply text-lg lg:text-xl;
+  }
+
+  .heading-5 {
+    @apply text-base lg:text-lg;
+  }
+
+  .heading-6 {
+    @apply text-base;
+  }
+
+  .heading-accent {
+    @apply text-accent;
+  }
+
+  .heading-subtle {
+    @apply text-base/70;
+  }
+</style>
+
+<script>
+  // Ensure accessibility by checking for accessible name
+  document.addEventListener("DOMContentLoaded", () => {
+    const headings = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+
+    headings.forEach(heading => {
+      // Check if heading has an accessible name
+      const hasAccessibleName =
+        heading.textContent?.trim() ||
+        heading.getAttribute("aria-label") ||
+        heading.getAttribute("aria-labelledby") ||
+        heading.querySelector("img[alt]") ||
+        heading.querySelector("svg title");
+
+      if (!hasAccessibleName) {
+        // eslint-disable-next-line no-console
+        console.warn("Heading lacks an accessible name:", heading);
+      }
+    });
+  });
+</script>

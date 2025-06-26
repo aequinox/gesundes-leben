@@ -1,0 +1,78 @@
+---
+import Hr from "@/components/elements/Hr.astro";
+import Pagination from "@/components/Pagination.astro";
+import Card from "@/components/sections/Card.astro";
+import Footer from "@/components/sections/Footer.astro";
+import Header from "@/components/sections/Header.astro";
+import PageHero from "@/components/sections/PageHero.astro";
+import { SITE } from "@/config";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import getPostsByTag, { processAllPosts } from "@/utils/posts";
+import { extractUniqueTags } from "@/utils/tags";
+import type { GetStaticPathsOptions } from "astro";
+
+export const getStaticPaths = async ({ paginate }: GetStaticPathsOptions) => {
+  // Use the unified post processing function
+  const posts = await processAllPosts();
+  const tags = extractUniqueTags(posts);
+
+  return Promise.all(
+    tags.map(async ({ tag, tagName }) => {
+      const tagPosts = await getPostsByTag(posts, tag);
+
+      return paginate(tagPosts, {
+        params: { tag },
+        props: { tagName },
+        pageSize: SITE.postPerPage,
+      });
+    })
+  ).then(results => results.flat());
+};
+
+const { page, tagName } = Astro.props;
+
+// Get current language and translation function
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<Layout title={`Tag: ${tagName} | ${SITE.title}`}>
+  <Header />
+  <PageHero title={`Tag: ${tagName}`} subtitle={t("tags.description")} />
+
+  <Hr />
+
+  <main id="main-content" class="mx-auto w-full max-w-content">
+    <!-- <h1 slot="title" transition:name={tag}>{`Tag:${tag}`}</h1> -->
+    <div
+      class="grid grid-cols-1 gap-4 space-y-4 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4"
+    >
+      {
+        page.data.map(post => (
+          <Card {post} withHeroImage={true} withMeta={false} />
+        ))
+      }
+    </div>
+  </main>
+  <Pagination {page} />
+  <Footer />
+</Layout>
+
+<!-- <Layout title={`Tag: ${tagName} | ${SITE.title}`}>
+  <Header />
+  <Main
+    pageTitle={[`Tag:`, `${tagName}`]}
+    titleTransition={tag}
+    pageDesc={`All the articles with the tag "${tagName}".`}
+  >
+    <h1 slot="title" transition:name={tag}>{`Tag:${tag}`}</h1>
+    <ul>
+      {page.data.map(post => <Card {post} withHeroImage={false} />)}
+    </ul>
+  </Main>
+
+  <Pagination {page} />
+
+  <Footer noMarginTop={page.lastPage > 1} />
+</Layout> -->

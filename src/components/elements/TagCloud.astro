@@ -1,0 +1,486 @@
+---
+/**
+ * TagCloud Component - 2025 Ultra-Modern Design
+ *
+ * A visually stunning, interactive tag cloud with:
+ * - Dynamic sizing based on tag popularity
+ * - 3D perspective and depth effects
+ * - Neural-responsive animations
+ * - Glass morphism with dynamic light effects
+ * - Accessibility features
+ */
+
+import type { TagInfo } from "@/utils/tags";
+import { Icon } from "astro-icon/components";
+
+export interface Props {
+  /** Tags to display in the cloud */
+  tags: TagInfo[];
+  /** Tag counts for sizing */
+  tagCounts: Record<string, number>;
+  /** Maximum number of tags to display (optional) */
+  maxTags?: number;
+  /** Visual style variant */
+  variant?: "default" | "glass" | "minimal" | "3d";
+  /** Animation intensity */
+  animation?: "none" | "subtle" | "medium" | "intense";
+  /** Performance mode (reduces animations for better performance) */
+  performanceMode?: boolean;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  tags,
+  tagCounts,
+  maxTags = 50,
+  variant = "default",
+  animation = "subtle",
+  performanceMode = false,
+  class: className = "",
+} = Astro.props;
+
+// Filter to max number of tags if specified
+const filteredTags = tags.slice(0, maxTags);
+
+// Find min and max counts for scaling
+const counts = Object.values(tagCounts);
+const minCount = Math.min(...counts);
+const maxCount = Math.max(...counts);
+
+// Define size ranges (in rem)
+const MIN_SIZE = 0.75;
+const MAX_SIZE = 2.5;
+
+// Calculate size for each tag
+const getTagSize = (count: number): number => {
+  // If all tags have the same count, return middle size
+  if (minCount === maxCount) return (MIN_SIZE + MAX_SIZE) / 2;
+
+  // Linear scaling between min and max sizes
+  return (
+    MIN_SIZE +
+    ((count - minCount) / (maxCount - minCount)) * (MAX_SIZE - MIN_SIZE)
+  );
+};
+
+// Calculate font weight for each tag (300-700)
+const getTagWeight = (count: number): number => {
+  if (minCount === maxCount) return 500;
+  const weightRange = 400; // from 300 to 700
+  const normalizedCount = (count - minCount) / (maxCount - minCount);
+  return 300 + Math.round(normalizedCount * weightRange);
+};
+
+// Calculate z-index for 3D effect (1-10)
+const getZIndex = (count: number): number => {
+  if (minCount === maxCount) return 5;
+  return Math.round(1 + ((count - minCount) / (maxCount - minCount)) * 9);
+};
+
+// Calculate opacity/saturation (0.6-1)
+const getOpacity = (count: number): number => {
+  if (minCount === maxCount) return 0.8;
+  return 0.6 + ((count - minCount) / (maxCount - minCount)) * 0.4;
+};
+
+// Process tags with their visual properties
+const tagItems = filteredTags.map(tag => ({
+  ...tag,
+  count: tagCounts[tag.tag] || 0,
+  size: getTagSize(tagCounts[tag.tag] || 0),
+  weight: getTagWeight(tagCounts[tag.tag] || 0),
+  zIndex: getZIndex(tagCounts[tag.tag] || 0),
+  opacity: getOpacity(tagCounts[tag.tag] || 0),
+}));
+
+// Sort by count (descending) to ensure most popular tags are rendered first
+// This helps with proper layering in the 3D space
+const sortedTags = [...tagItems].sort((a, b) => b.count - a.count);
+
+// Get variant-specific classes
+const getVariantClass = () => {
+  switch (variant) {
+    case "glass":
+      return "tag-cloud-glass";
+    case "minimal":
+      return "tag-cloud-minimal";
+    case "3d":
+      return "tag-cloud-3d";
+    default:
+      return "tag-cloud-default";
+  }
+};
+
+// Get animation-specific classes
+const getAnimationClass = () => {
+  switch (animation) {
+    case "none":
+      return "tag-cloud-anim-none";
+    case "subtle":
+      return "tag-cloud-anim-subtle";
+    case "medium":
+      return "tag-cloud-anim-medium";
+    case "intense":
+      return "tag-cloud-anim-intense";
+    default:
+      return "tag-cloud-anim-subtle";
+  }
+};
+
+const variantClass = getVariantClass();
+const animationClass = getAnimationClass();
+---
+
+<div
+  class:list={[
+    "tag-cloud-container",
+    variantClass,
+    animationClass,
+    performanceMode ? "performance-mode" : "",
+    className,
+  ]}
+  data-performance-mode={performanceMode}
+>
+  <div class="tag-cloud-inner">
+    {
+      sortedTags.map(tag => (
+        <a
+          href={`/tags/${tag.tag}/`}
+          class="tag-cloud-item"
+          data-tag={tag.tag}
+          data-count={tag.count}
+          data-z-index={tag.zIndex}
+          style={`
+          --tag-size: ${tag.size}rem;
+          --tag-weight: ${tag.weight};
+          --tag-z-index: ${tag.zIndex};
+          --tag-opacity: ${tag.opacity};
+          z-index: ${tag.zIndex};
+        `}
+        >
+          <span class="tag-cloud-text">
+            <Icon name="tabler:hash" class="tag-cloud-icon" />
+            {tag.tagName}
+            <span class="tag-cloud-count">{tag.count}</span>
+          </span>
+          <span class="tag-cloud-shine" />
+        </a>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  // Client-side interactivity for the tag cloud
+  document.addEventListener("astro:page-load", () => {
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (prefersReducedMotion) {
+      // Disable animations for users who prefer reduced motion
+      document.querySelectorAll(".tag-cloud-container").forEach(container => {
+        container.classList.add("reduced-motion");
+      });
+      return;
+    }
+
+    // Get all tag cloud containers
+    const containers = document.querySelectorAll(".tag-cloud-container");
+
+    containers.forEach(container => {
+      // Check if performance mode is enabled
+      const performanceMode =
+        container.getAttribute("data-performance-mode") === "true";
+
+      // Only apply interactive effects if not in performance mode and not using "none" animation
+      if (
+        !container.classList.contains("tag-cloud-anim-none") &&
+        !performanceMode
+      ) {
+        // Get all tag items within this container
+        const tagItems = container.querySelectorAll(".tag-cloud-item");
+
+        // Store last animation frame request
+        let animationFrame: number | null = null;
+
+        // Throttle variables
+        let lastExecution = 0;
+        const THROTTLE_DELAY = 16; // ~60fps
+
+        // Add mouse move effect for 3D parallax with throttling
+        container.addEventListener("mousemove", (e: Event) => {
+          const now = performance.now();
+
+          // Throttle the event handling
+          if (now - lastExecution < THROTTLE_DELAY) return;
+          lastExecution = now;
+
+          // Cancel any pending animation frame
+          if (animationFrame) {
+            cancelAnimationFrame(animationFrame);
+          }
+
+          // Use requestAnimationFrame for smoother rendering
+          animationFrame = requestAnimationFrame(() => {
+            const mouseEvent = e as MouseEvent;
+            const rect = container.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            // Calculate mouse position relative to center (-1 to 1)
+            const relativeX = (mouseEvent.clientX - centerX) / (rect.width / 2);
+            const relativeY =
+              (mouseEvent.clientY - centerY) / (rect.height / 2);
+
+            // Apply transform to each tag based on its z-index and mouse position
+            // Limit the number of tags we animate based on performance mode
+            const maxTags = 50; // Limit the number of tags we animate
+            const tagsArray = Array.from(tagItems).slice(0, maxTags);
+
+            tagsArray.forEach(tag => {
+              const zIndex = parseInt(tag.getAttribute("data-z-index") || "5");
+              const factor = zIndex / 10; // Higher z-index = more movement
+
+              // Apply transform - more popular tags move more
+              // Reduce movement amount for better performance
+              (tag as HTMLElement).style.transform = `
+                translate(${relativeX * factor * 10}px, ${relativeY * factor * 10}px)
+                rotate(${relativeX * factor * 1}deg)
+              `;
+            });
+          });
+        });
+
+        // Reset positions when mouse leaves
+        container.addEventListener("mouseleave", () => {
+          // Cancel any pending animation frame
+          if (animationFrame) {
+            cancelAnimationFrame(animationFrame);
+          }
+
+          // Use requestAnimationFrame for smoother rendering
+          requestAnimationFrame(() => {
+            tagItems.forEach(tag => {
+              (tag as HTMLElement).style.transform = "";
+            });
+          });
+        });
+      }
+    });
+  });
+</script>
+
+<style>
+  @reference "@/styles/global.css";
+  /* Base container styles */
+  .tag-cloud-container {
+    @apply relative mx-auto my-8 overflow-hidden rounded-xl p-8;
+    min-height: 300px;
+  }
+
+  /* Inner container for positioning */
+  .tag-cloud-inner {
+    @apply relative flex flex-wrap items-center justify-center gap-4;
+    min-height: 240px;
+  }
+
+  /* Individual tag styles */
+  .tag-cloud-item {
+    @apply relative cursor-pointer rounded-full px-4 py-2 transition-all duration-300;
+    font-size: var(--tag-size, 1rem);
+    font-weight: var(--tag-weight, 400);
+    opacity: var(--tag-opacity, 0.8);
+    transform-origin: center center;
+    will-change: transform;
+  }
+
+  /* Tag text container */
+  .tag-cloud-text {
+    @apply relative z-10 flex items-center gap-1;
+  }
+
+  /* Tag icon */
+  .tag-cloud-icon {
+    @apply size-[0.8em] flex-shrink-0 opacity-70;
+  }
+
+  /* Tag count badge */
+  .tag-cloud-count {
+    @apply ml-1 inline-flex size-[1.2em] items-center justify-center rounded-full bg-accent/10 text-[0.7em] font-semibold text-accent;
+  }
+
+  /* Shine effect overlay */
+  .tag-cloud-shine {
+    @apply absolute inset-0 z-0 opacity-0 transition-opacity duration-1000;
+    background: linear-gradient(
+      45deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      transparent 100%
+    );
+  }
+
+  /* Variant: Default */
+  .tag-cloud-default {
+    @apply bg-gradient-to-br from-card/80 to-card/30 backdrop-blur-md;
+    box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(var(--color-accent-rgb), 0.1);
+  }
+
+  .tag-cloud-default .tag-cloud-item {
+    @apply bg-accent/10 text-accent hover:bg-accent hover:text-background;
+  }
+
+  /* Variant: Glass */
+  .tag-cloud-glass {
+    @apply bg-background/30 backdrop-blur-xl;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .tag-cloud-glass .tag-cloud-item {
+    @apply bg-background/50 text-base backdrop-blur-sm hover:bg-accent hover:text-background;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Variant: Minimal */
+  .tag-cloud-minimal {
+    @apply bg-transparent;
+  }
+
+  .tag-cloud-minimal .tag-cloud-item {
+    @apply bg-transparent text-base underline decoration-accent/30 decoration-dashed underline-offset-4 hover:text-accent hover:decoration-accent;
+    border: none;
+  }
+
+  /* Variant: 3D */
+  .tag-cloud-3d {
+    @apply bg-gradient-to-br from-surface-1 to-surface-3;
+    /* @apply bg-gradient-to-br from-surface-1 to-surface-3; */
+    perspective: 1000px;
+  }
+
+  .tag-cloud-3d .tag-cloud-inner {
+    transform-style: preserve-3d;
+  }
+
+  .tag-cloud-3d .tag-cloud-item {
+    @apply bg-accent/10 text-accent hover:bg-accent hover:text-background;
+    transform: translateZ(calc(var(--tag-z-index) * 10px));
+  }
+
+  /* Animation: Subtle */
+  .tag-cloud-anim-subtle .tag-cloud-item {
+    animation: float 6s ease-in-out infinite;
+    animation-delay: calc(var(--tag-z-index) * 0.2s);
+  }
+
+  /* Animation: Medium */
+  .tag-cloud-anim-medium .tag-cloud-item {
+    animation: float 5s ease-in-out infinite alternate;
+    animation-delay: calc(var(--tag-z-index) * 0.3s);
+  }
+
+  /* Animation: Intense */
+  .tag-cloud-anim-intense .tag-cloud-item {
+    animation: pulse 4s ease-in-out infinite alternate;
+    animation-delay: calc(var(--tag-z-index) * 0.4s);
+  }
+
+  /* Performance mode - reduce animations */
+  .performance-mode .tag-cloud-item {
+    animation-duration: 10s !important; /* Slower animations */
+    animation-delay: 0s !important; /* No delays */
+    will-change: auto !important; /* Don't optimize for transforms */
+  }
+
+  /* Limit animations in performance mode */
+  .performance-mode.tag-cloud-anim-intense .tag-cloud-item {
+    animation: float 10s ease-in-out infinite !important; /* Use simpler animation */
+  }
+
+  /* Hover effects */
+  .tag-cloud-item:hover {
+    transform: translateY(-5px) scale(1.05);
+    z-index: 20 !important;
+  }
+
+  .tag-cloud-item:hover .tag-cloud-shine {
+    @apply opacity-100;
+    animation: shine 1.5s ease-in-out;
+  }
+
+  /* Reduced motion */
+  .reduced-motion .tag-cloud-item {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .reduced-motion .tag-cloud-item:hover {
+    transform: none !important;
+  }
+
+  /* Animations */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0);
+    }
+    50% {
+      transform: translateY(-10px) rotate(calc(var(--tag-z-index) * 0.5deg));
+    }
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      transform: scale(1) rotate(0);
+    }
+    50% {
+      transform: scale(1.05) rotate(calc(var(--tag-z-index) * 1deg));
+    }
+  }
+
+  @keyframes shine {
+    0% {
+      transform: translateX(-100%) rotate(20deg);
+    }
+    100% {
+      transform: translateX(100%) rotate(20deg);
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .tag-cloud-container {
+      @apply p-4;
+      min-height: 200px;
+    }
+
+    .tag-cloud-inner {
+      min-height: 160px;
+    }
+
+    .tag-cloud-item {
+      /* Slightly reduce size range on mobile */
+      font-size: calc(var(--tag-size) * 0.9);
+    }
+  }
+
+  /* Dark mode adjustments */
+  :global(html[data-theme="dark"]) .tag-cloud-default {
+    @apply from-gray-800/80 to-gray-900/30;
+  }
+
+  :global(html[data-theme="dark"]) .tag-cloud-glass {
+    @apply bg-background/20;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  :global(html[data-theme="dark"]) .tag-cloud-glass .tag-cloud-item {
+    @apply bg-background/30;
+  }
+</style>

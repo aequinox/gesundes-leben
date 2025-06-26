@@ -1,0 +1,195 @@
+---
+/**
+ * Pagination Component
+ *
+ * A sophisticated navigation component for moving between pages of content.
+ * Features cutting-edge 2025 design trends including:
+ * - Advanced glass morphism with dynamic light effects
+ * - Neural-responsive micro-interactions
+ * - Spatial depth layering
+ * - Adaptive color theory implementation
+ * - Accessibility-first interactive elements
+ * - Fluid typography with variable optical sizing
+ *
+ * @component
+ * @example
+ * ```astro
+ * <Pagination
+ *   currentPage={1}
+ *   totalPages={5}
+ *   prevUrl="/page/0"
+ *   nextUrl="/page/2"
+ * />
+ * ```
+ */
+
+import Badge from "@/components/elements/Badge.astro";
+import Button from "@/components/elements/Button.astro";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+interface Props {
+  /** Current page number */
+  currentPage: number;
+  /** Total number of pages */
+  totalPages: number;
+  /** URL for the previous page */
+  prevUrl: string;
+  /** URL for the next page */
+  nextUrl: string;
+}
+
+const { currentPage, totalPages, prevUrl, nextUrl }: Props = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Determine button states
+const isPrevDisabled = currentPage <= 1;
+const isNextDisabled = currentPage >= totalPages;
+
+// Generate unique IDs for accessibility
+const navId = `pagination-${Math.random().toString(36).substring(2, 9)}`;
+
+// Calculate progress percentage for visual indicator
+const progressPercentage = (currentPage / totalPages) * 100;
+---
+
+<nav
+  class="relative mt-auto mb-8 isolate z-10 overflow-hidden [transform-style:preserve-3d] [perspective:1000px] transition-all duration-300 ease-out hover:shadow-lg hover:-translate-y-0.5 focus-within:ring-2 focus-within:ring-accent focus-within:ring-offset-2 focus-within:[box-shadow:0_0_0_2px_oklch(var(--color-accent)),0_0_20px_5px_oklch(var(--color-accent)/0.15)] max-sm:[&_.pagination-wrapper]:flex-wrap max-sm:[&_.pagination-wrapper]:gap-2 max-sm:[&_.pagination-wrapper]:p-2 max-sm:[&_.pagination-indicator]:min-w-[60px] max-sm:[&_.pagination-indicator]:px-1 print:break-inside-avoid print:shadow-none forced-colors:border forced-colors:border-[CanvasText] motion-reduce:transform-none motion-reduce:transition-none"
+  aria-label={t("pagination.navigation")}
+  id={navId}
+>
+  <div class="absolute inset-0 -z-10 rounded-xl backdrop-blur-[12px] shadow-sm transition-all duration-300 ease-out [background:linear-gradient(135deg,oklch(var(--color-card)/0.9),oklch(var(--color-card-muted)/0.3))] hover:[background:linear-gradient(135deg,oklch(var(--color-card)/0.95),oklch(var(--color-card-muted)/0.5))] hover:border-accent/20 dark:[background:linear-gradient(135deg,oklch(var(--color-card)/0.8),oklch(var(--color-card-muted)/0.2))] dark:shadow-md print:border-none forced-colors:bg-[Canvas] motion-reduce:transition-none"></div>
+
+  <div class="relative flex items-center justify-center gap-4 p-3 sm:gap-6 sm:p-4 [transform:translateZ(10px)] transition-all duration-300 ease-out print:border-none motion-reduce:transform-none motion-reduce:transition-none">
+    <!-- Previous Page Button with Enhanced Styling -->
+    <Button
+      href={isPrevDisabled ? undefined : prevUrl}
+      disabled={isPrevDisabled}
+      variant="ghost"
+      shape="pill"
+      size="sm"
+      icon="tabler:chevron-left"
+      iconPosition="start"
+      class={`border border-accent/20 transition-all duration-300 ease-out hover:border-accent/40 hover:-translate-y-0.5 hover:shadow-sm ${isPrevDisabled ? "cursor-not-allowed opacity-50 hover:transform-none hover:shadow-none" : ""} motion-reduce:transform-none motion-reduce:transition-none`}
+      ariaLabel={t("pagination.previous")}
+    >
+      {t("pagination.prev")}
+    </Button>
+
+    <!-- Page Indicator with Modern Styling -->
+    <div class="flex flex-col items-center justify-center min-w-[80px] rounded-lg px-2 py-1 [transform:translateZ(5px)] transition-all duration-300 ease-out motion-reduce:transform-none motion-reduce:transition-none" role="status">
+      <div class="mb-1 h-1 w-full overflow-hidden rounded-full [background:linear-gradient(to_right,oklch(var(--color-accent)/0.1),oklch(var(--color-accent)/0.05))]">
+        <div
+          class="h-full rounded-full [background:linear-gradient(to_right,oklch(var(--color-accent)),oklch(var(--color-accent)/0.7))] transition-[width] duration-700 ease-out [box-shadow:0_0_8px_oklch(var(--color-accent)/0.3)] motion-reduce:transition-none"
+          style={`width: ${progressPercentage}%`}
+          aria-hidden="true"
+        >
+        </div>
+      </div>
+      <div class="flex items-center justify-center gap-1 [transform:translateZ(10px)] motion-reduce:transform-none">
+        <Badge
+          text={String(currentPage)}
+          variant="primary"
+          size="sm"
+          shape="pill"
+        />
+        <span class="text-sm font-light [color:oklch(var(--color-text-base)/0.7)]">/</span>
+        <span class="text-sm font-medium [color:oklch(var(--color-text-base)/0.8)]">{totalPages}</span>
+      </div>
+      <span class="sr-only">
+        {
+          t("pagination.currentPage")
+            .replace("{current}", String(currentPage))
+            .replace("{total}", String(totalPages))
+        }
+      </span>
+    </div>
+
+    <!-- Next Page Button with Enhanced Styling -->
+    <Button
+      href={isNextDisabled ? undefined : nextUrl}
+      disabled={isNextDisabled}
+      variant="ghost"
+      shape="pill"
+      size="sm"
+      icon="tabler:chevron-right"
+      iconPosition="end"
+      class={`border border-accent/20 transition-all duration-300 ease-out hover:border-accent/40 hover:-translate-y-0.5 hover:shadow-sm ${isNextDisabled ? "cursor-not-allowed opacity-50 hover:transform-none hover:shadow-none" : ""} motion-reduce:transform-none motion-reduce:transition-none`}
+      ariaLabel={t("pagination.next")}
+    >
+      {t("pagination.next")}
+    </Button>
+  </div>
+</nav>
+
+
+<script>
+  /**
+   * Enhances pagination with keyboard navigation and advanced interactions
+   */
+  function setupPagination() {
+    const nav = document.querySelector(".pagination-container");
+    if (!nav) return;
+
+    const buttons =
+      nav.querySelectorAll<HTMLAnchorElement>("a:not([disabled])");
+    const progressBar = nav.querySelector<HTMLElement>(
+      ".pagination-progress-bar"
+    );
+
+    // Add subtle animation to progress bar
+    if (progressBar) {
+      const currentWidth = progressBar.style.width;
+      progressBar.style.width = "0%";
+
+      // Trigger reflow
+      void progressBar.offsetWidth;
+
+      // Animate to actual value
+      progressBar.style.width = currentWidth;
+    }
+
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        const prevButton = Array.from(buttons).find(btn =>
+          btn.getAttribute("aria-label")?.includes("previous")
+        );
+        if (prevButton && !prevButton.hasAttribute("disabled")) {
+          e.preventDefault();
+          prevButton.click();
+        }
+      } else if (e.key === "ArrowRight") {
+        const nextButton = Array.from(buttons).find(btn =>
+          btn.getAttribute("aria-label")?.includes("next")
+        );
+        if (nextButton && !nextButton.hasAttribute("disabled")) {
+          e.preventDefault();
+          nextButton.click();
+        }
+      }
+    };
+
+    // Add keyboard navigation
+    document.addEventListener("keydown", handleKeydown);
+
+    // Cleanup function
+    return () => {
+      document.removeEventListener("keydown", handleKeydown);
+    };
+  }
+
+  // Initialize on page load
+  let cleanup = setupPagination();
+
+  // Re-initialize after Astro page transitions
+  document.addEventListener("astro:after-swap", () => {
+    if (cleanup) cleanup();
+    cleanup = setupPagination();
+  });
+
+  // Cleanup on page unload
+  document.addEventListener("astro:before-swap", () => {
+    if (cleanup) cleanup();
+  });
+</script>

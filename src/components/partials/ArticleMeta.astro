@@ -1,0 +1,71 @@
+---
+import { type CollectionEntry } from "astro:content";
+import Author from "./Author.astro";
+import Datetime from "./Datetime.astro";
+import ReadingTime from "./ReadingTime.astro";
+
+export interface Props {
+  post: CollectionEntry<"blog"> | CollectionEntry<"glossary">;
+  showAuthor?: boolean;
+  showReadingTime?: boolean;
+  size?: "sm" | "lg";
+}
+
+const {
+  post,
+  showAuthor = true,
+  showReadingTime = true,
+  size = "sm",
+}: Props = Astro.props;
+
+const { pubDatetime, modDatetime, author } = post.data;
+
+// Determine which date to show and if it's modified
+const isModified = modDatetime && new Date(modDatetime) > new Date(pubDatetime);
+const displayDate = isModified ? modDatetime : pubDatetime;
+const iconName = isModified ? "tabler:edit" : "tabler:calendar";
+---
+
+<div
+  id="article-meta"
+  class:list={[
+    "flex flex-wrap items-center gap-2 text-sm",
+    size === "sm" ? "text-sm" : "text-base",
+  ]}
+>
+  <Datetime
+    datetime={displayDate}
+    size={size}
+    className="article-meta-datetime"
+    iconName={iconName}
+    isModified={isModified}
+  />
+
+  {
+    showAuthor && author && (
+      <Fragment>
+        <div
+          class="relative w-0 h-4 mx-2 after:content-['|'] after:absolute after:left-0 after:text-current after:opacity-50 last:hidden last:after:hidden"
+          aria-hidden="true"
+        />
+        <Author author={author} size={size} classes="article-meta-author" />
+      </Fragment>
+    )
+  }
+
+  {
+    showReadingTime && "readingTime" in post.data && post.data.readingTime && (
+      <Fragment>
+        <div
+          class="relative w-0 h-4 mx-2 after:content-['|'] after:absolute after:left-0 after:text-current after:opacity-50 last:hidden last:after:hidden"
+          aria-hidden="true"
+        />
+        <ReadingTime
+          readingTime={post.data.readingTime}
+          size={size}
+          classes="article-meta-reading-time"
+        />
+      </Fragment>
+    )
+  }
+</div>

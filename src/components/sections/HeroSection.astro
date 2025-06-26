@@ -1,0 +1,117 @@
+---
+import Socials from "@/components/socials/Socials.astro";
+import { SOCIALS } from "@/socials";
+import { Icon } from "astro-icon/components";
+
+// Count active social links for conditional rendering
+const socialCount = SOCIALS.filter(social => social.active).length;
+---
+
+<section
+  id="hero"
+  class="relative min-h-[calc(100vh-var(--nav-height))] overflow-hidden bg-gradient-to-br from-card/5 to-card-muted/5 pt-4 pb-8 md:pt-6 md:pb-12"
+>
+  <!-- Decorative background elements -->
+  <div
+    class="bg-radial-gradient absolute -top-16 -right-16 -z-10 h-64 w-64 rounded-full opacity-20 blur-3xl"
+    aria-hidden="true"
+  >
+  </div>
+  <div
+    class="bg-radial-gradient absolute top-1/2 -left-24 -z-10 h-96 w-96 -translate-y-1/2 rounded-full opacity-20 blur-3xl"
+    aria-hidden="true"
+  >
+  </div>
+  <div class="relative z-10 mx-auto max-w-content">
+    <!-- Main heading -->
+    <div class="mb-8 flex items-center justify-between">
+      <h1
+        class="bg-gradient-to-r from-accent to-accent/70 bg-clip-text text-4xl font-black tracking-tight text-transparent transition-all duration-300 sm:text-6xl"
+        data-aos="fade-right"
+        data-aos-duration="600"
+      >
+        Gesundes Leben
+      </h1>
+
+      <a
+        target="_blank"
+        href="/rss.xml"
+        class="relative mr-4 inline-flex items-center gap-2 rounded-full p-2 shadow-[var(--shadow-elevation-low)] transition-all duration-300 hover:scale-105 hover:shadow-[var(--shadow-elevation-medium)]"
+        aria-label="RSS Feed"
+        title="RSS Feed"
+        data-aos="fade-left"
+        data-aos-duration="600"
+      >
+        <Icon
+          name="tabler:rss"
+          class="h-6 w-6 fill-accent transition-transform duration-300 hover:scale-110 hover:rotate-360"
+          aria-hidden="true"
+        />
+        <span class="sr-only">RSS Feed</span>
+      </a>
+    </div>
+
+    <!-- Welcome message -->
+    <h2
+      class="mb-6 text-4xl leading-tight font-bold tracking-tight sm:text-5xl"
+      data-aos="fade-up"
+      data-aos-delay="50"
+      data-aos-duration="600"
+    >
+      Willkommen auf unserem Blog!
+    </h2>
+
+    <!-- Introduction text -->
+    <div
+      class="max-w-7xl space-y-6"
+      data-aos="fade-up"
+      data-aos-delay="100"
+      data-aos-duration="600"
+    >
+      <p class="my-4 text-base leading-relaxed text-balance md:text-lg">
+        Auf diesem Blog stellen dir Sandra & Kai Artikel über Gesundheitsthemen
+        zur Verfügung und laden dich ein auf eine Reise zu mehr Gesundheit, die
+        Spaß machen soll.
+        <span class="hashtag">sogehtgesund</span>
+      </p>
+
+      <p class="my-4 text-base leading-relaxed text-balance md:text-lg">
+        Wir betreiben den Blog als Privatpersonen, teilen aber unser
+        Insider-Wissen, das wir uns in unserer langjährigen Arbeit als
+        Therapeuten angeeignet haben. Das möchten wir auf einfache und
+        verständliche Weise tun, denn wir finden, dass medizinische
+        Zusammenhänge häufig zu kompliziert und für Laien schwer nachvollziehbar
+        vermittelt werden. Deshalb verlinken wir medizinische Begriffe, wenn sie
+        nicht vermeidbar sind, auf unser <a
+          href="/glossary/"
+          class="font-medium text-accent hover:underline">Glossar</a
+        >, wo du eine verständliche Erklärung findest.
+      </p>
+
+      <p class="my-4 text-base leading-relaxed md:text-lg">
+        Unser Ziel ist <strong class="font-bold text-accent"
+          >Empowerment für deine Gesundheit</strong
+        >. Das bedeutet, wir möchten dich darin unterstützen, für deine
+        Gesundheit aktiv zu werden und dir dafür unser Wissen und unsere
+        Erfahrung kostenfrei zur Verfügung stellen.
+          <span class="hashtag">weildueswertbist</span>
+      </p>
+    </div>
+
+    <!-- Social links -->
+    {
+      socialCount > 0 && (
+        <div
+          class="shadow-elevation-low mt-8 flex flex-col rounded-xl border border-accent/10 bg-gradient-to-b from-card/30 to-card-muted/30 p-4 backdrop-blur-sm sm:flex-row sm:items-center"
+          data-aos="fade-up"
+          data-aos-delay="150"
+          data-aos-duration="600"
+        >
+          <div class="social-links">
+            <Socials />
+          </div>
+        </div>
+      )
+    }
+  </div>
+</section>

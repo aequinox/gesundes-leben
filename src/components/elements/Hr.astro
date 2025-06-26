@@ -1,0 +1,140 @@
+---
+export interface Props {
+  /** Remove horizontal padding */
+  noPadding?: boolean;
+  /** Hide from screen readers */
+  ariaHidden?: boolean;
+  /** Visual style variant */
+  variant?: "default" | "gradient" | "dots" | "wave";
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  noPadding = false,
+  ariaHidden = true,
+  variant = "default",
+  class: className = "",
+} = Astro.props;
+
+const variants = {
+  default: "hr-default",
+  gradient: "hr-gradient",
+  dots: "hr-dots",
+  wave: "hr-wave",
+};
+---
+
+<div
+  class={`hr-container ${noPadding ? "px-0" : "px-4"} ${className}`}
+  data-aos="fade"
+>
+  {
+    variant === "default" && (
+      <hr class={variants[variant]} aria-hidden={ariaHidden} />
+    )
+  }
+
+  {
+    variant === "gradient" && (
+      <div class={variants[variant]} aria-hidden={ariaHidden} />
+    )
+  }
+
+  {
+    variant === "dots" && (
+      <div class={variants[variant]} aria-hidden={ariaHidden}>
+        <span />
+        <span />
+        <span />
+      </div>
+    )
+  }
+
+  {
+    variant === "wave" && (
+      <div class={variants[variant]} aria-hidden={ariaHidden}>
+        <svg
+          viewBox="0 0 1200 60"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M0,0 C150,40 350,0 500,30 C650,60 750,0 900,20 C1050,40 1100,10 1200,30 L1200,60 L0,60 Z"
+            class="wave-path"
+          />
+        </svg>
+      </div>
+    )
+  }
+</div>
+
+<style>
+  /* Base styles */
+  @reference "@/styles/global.css";
+
+  .hr-container {
+    @apply relative mx-auto my-8 max-w-content;
+  }
+
+  .hr-default {
+    @apply h-px w-full border-t border-line;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .hr-gradient {
+    @apply h-px w-full rounded-full;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      oklch(var(--color-accent) / 0.3) 15%,
+      oklch(var(--color-accent) / 0.8) 50%,
+      oklch(var(--color-accent) / 0.3) 85%,
+      transparent 100%
+    );
+  }
+
+  .hr-dots {
+    @apply flex items-center justify-center py-2;
+  }
+
+  .hr-dots span {
+    @apply mx-1 inline-block size-1.5 rounded-full bg-accent opacity-80;
+  }
+
+  .hr-dots span:nth-child(2) {
+    @apply size-2 opacity-90;
+  }
+
+  .hr-wave {
+    @apply h-8 w-full overflow-hidden;
+  }
+
+  .hr-wave svg {
+    @apply h-full w-full;
+  }
+
+  .wave-path {
+    @apply fill-accent/20;
+  }
+
+  /* Dark mode adjustments */
+  :global(html[data-theme="dark"]) .hr-default {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  :global(html[data-theme="dark"]) .hr-gradient {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      oklch(var(--color-accent) / 0.2) 15%,
+      oklch(var(--color-accent) / 0.6) 50%,
+      oklch(var(--color-accent) / 0.2) 85%,
+      transparent 100%
+    );
+  }
+
+  :global(html[data-theme="dark"]) .wave-path {
+    @apply fill-accent/15;
+  }
+</style>

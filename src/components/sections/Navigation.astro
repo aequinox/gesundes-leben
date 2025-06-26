@@ -1,0 +1,544 @@
+---
+import ThemeToggle from "@/components/elements/ThemeToggle.astro";
+import type { IconName, NavigationLink } from "@/components/types";
+import { SITE } from "@/config";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+interface LogoConfig {
+  /** Whether to show the logo */
+  readonly enable: boolean;
+
+  /** Whether to use SVG format */
+  readonly svg: boolean;
+
+  /** Logo width in pixels */
+  readonly width: number;
+
+  /** Logo height in pixels */
+  readonly height: number;
+}
+
+/**
+ * Logo Configuration
+ * Settings for the site logo
+ */
+const LOGO_IMAGE: Readonly<LogoConfig> = {
+  enable: false, // Whether to show logo
+  svg: true, // Use SVG format
+  width: 216, // Logo width
+  height: 46, // Logo height
+};
+
+interface Props {
+  activeNav?: NavigationLink;
+}
+
+const { activeNav }: Props = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Core navigation links
+const NAV_ITEMS = [
+  { href: "/posts/", key: "posts", label: t("nav.posts") },
+  { href: "/glossary/", key: "glossary", label: t("nav.glossary") },
+  { href: "/tags/", key: "tags", label: t("nav.tags") },
+  { href: "/our-vision/", key: "our-vision", label: t("nav.ourVision") },
+  { href: "/about/", key: "about", label: t("nav.about") },
+];
+
+interface ActionItem {
+  id: string;
+  label: string;
+  icon: IconName;
+  href: string;
+}
+
+// Create action items array
+const actionItems: ActionItem[] = [];
+
+// Add search action if enabled
+if (SITE.showSearch) {
+  actionItems.push({
+    id: "search-toggle",
+    label: t("nav.search"),
+    icon: "search",
+    href: "/search/",
+  });
+}
+
+// Add archives action if enabled
+if (SITE.showArchives) {
+  actionItems.push({
+    id: "archives",
+    label: t("nav.archives"),
+    icon: "archive",
+    href: "/archives/",
+  });
+}
+
+// Use the properly typed array
+const ACTIONS = actionItems;
+---
+
+<nav
+  class="nav fixed inset-x-0 top-0 z-50 h-16 border-b border-border bg-background/80 shadow-sm backdrop-blur-md transition-transform duration-300 ease-out-expo"
+  aria-label={t("nav.mainNavigation")}
+>
+  <div class="mx-auto flex h-full max-w-6xl items-center justify-between px-4">
+    <!-- Logo -->
+    <a
+      href="/"
+      class="flex h-full items-center font-sans text-lg font-bold text-foreground transition-opacity hover:opacity-80"
+      aria-label={t("nav.home")}
+    >
+      {
+        LOGO_IMAGE.enable ? (
+          <img
+            src={`/assets/${LOGO_IMAGE.svg ? "logo.svg" : "logo.png"}`}
+            alt={SITE.title}
+            width={LOGO_IMAGE.width}
+            height={LOGO_IMAGE.height}
+            loading="eager"
+            class="h-auto max-h-8 w-auto"
+          />
+        ) : (
+          <span>{SITE.title}</span>
+        )
+      }
+    </a>
+
+    <!-- Primary Navigation (Desktop) -->
+    <div class="hidden md:block">
+      <ul class="flex items-center gap-6">
+        {
+          NAV_ITEMS.map(({ href, key, label }) => (
+            <li>
+              <a
+                href={href}
+                class:list={[
+                  "transition-colors duration-200 hover:text-accent",
+                  {
+                    "text-accent underline decoration-solid decoration-2 underline-offset-4":
+                      activeNav === key,
+                  },
+                ]}
+                aria-current={activeNav === key ? "page" : undefined}
+              >
+                {label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-3">
+      {
+        ACTIONS.map(({ id, label, icon, href }) => (
+          <a
+            id={id}
+            href={href}
+            class:list={[
+              "items-center justify-center rounded-full text-foreground transition-colors hover:text-accent",
+              { "bg-surface3 text-accent": activeNav === id },
+            ]}
+            aria-label={label}
+            title={label}
+          >
+            <svg-icon name={icon} class="h-4 w-4" />
+            <span class="sr-only">{label}</span>
+          </a>
+        ))
+      }
+
+      {
+        SITE.lightAndDarkMode && (
+          <ThemeToggle lang={lang} size="md" variant="icon" />
+        )
+      }
+
+      <!-- Mobile Menu Toggle -->
+      <button
+        id="mobile-toggle"
+        class="bg-surface2 hover:bg-surface3 flex h-8 w-8 items-center justify-center rounded-full text-foreground transition-all hover:text-accent md:hidden"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label={t("nav.toggleMenu")}
+      >
+        <span class="menu-icon block transition-transform duration-300">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            fill="none"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M4 6h16"></path>
+            <path d="M4 12h16"></path>
+            <path d="M4 18h16"></path>
+          </svg>
+        </span>
+        <span class="x-icon hidden transition-transform duration-300">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            fill="none"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M18 6l-12 12"></path>
+            <path d="M6 6l12 12"></path>
+          </svg>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div
+    id="mobile-menu"
+    class="fixed inset-x-0 top-16 z-40 hidden h-[calc(100vh-4rem)] bg-background/95 backdrop-blur-md"
+    aria-hidden="true"
+  >
+    <div class="mx-auto max-w-6xl p-4">
+      <ul class="flex flex-col gap-2">
+        {
+          NAV_ITEMS.map(({ href, key, label }) => (
+            <li>
+              <a
+                href={href}
+                class:list={[
+                  "hover:bg-surface2 block rounded-lg px-4 py-3 text-foreground transition-colors hover:text-accent",
+                  {
+                    "bg-surface2 text-accent underline decoration-solid decoration-2 underline-offset-4":
+                      activeNav === key,
+                  },
+                ]}
+                aria-current={activeNav === key ? "page" : undefined}
+              >
+                {label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<script>
+  import { logger } from "@/utils/logger";
+
+  /**
+   * Modern Navigation Controller
+   *
+   * A high-performance, optimized navigation controller with smart scroll detection
+   * and smooth animations.
+   *
+   * @version 3.0.0
+   */
+  class NavigationController {
+    // DOM Elements
+    private nav: HTMLElement | null = null;
+    private mobileToggle: HTMLElement | null = null;
+    private mobileMenu: HTMLElement | null = null;
+    private menuIcon: HTMLElement | null = null;
+    private xIcon: HTMLElement | null = null;
+
+    // State
+    private lastScrollY = 0;
+    private scrollDirection: "up" | "down" = "up";
+    private hideThreshold: number;
+    private scrollTolerance = 10;
+    private isScrolling = false;
+    private scrollTimer: number | null = null;
+
+    /**
+     * Initialize the navigation controller
+     */
+    constructor() {
+      // Set hide threshold to 50% of viewport height
+      this.hideThreshold = window.innerHeight * 0.5;
+
+      // Initialize after DOM is fully loaded
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => this.init());
+      } else {
+        this.init();
+      }
+    }
+
+    /**
+     * Initialize the controller
+     */
+    private init(): void {
+      // Get DOM elements
+      this.nav = document.querySelector(".nav");
+      this.mobileToggle = document.getElementById("mobile-toggle");
+      this.mobileMenu = document.getElementById("mobile-menu");
+      this.menuIcon = document.querySelector(".menu-icon");
+      this.xIcon = document.querySelector(".x-icon");
+
+      // Exit if required elements are not found
+      if (!this.nav || !this.mobileToggle || !this.mobileMenu) {
+        logger.warn("Navigation elements not found");
+        return;
+      }
+
+      // Set up event listeners
+      this.setupEventListeners();
+
+      // Initial scroll check
+      this.handleScroll();
+    }
+
+    /**
+     * Set up all event listeners
+     */
+    private setupEventListeners(): void {
+      // Mobile menu toggle
+      this.mobileToggle?.addEventListener("click", this.toggleMobileMenu);
+
+      // Optimized scroll handling with throttling
+      window.addEventListener("scroll", this.handleScrollEvent, {
+        passive: true,
+      });
+
+      // Close mobile menu on click outside
+      document.addEventListener("click", this.handleOutsideClick);
+
+      // Close mobile menu on escape key
+      document.addEventListener("keydown", this.handleKeyDown);
+
+      // Handle mobile menu links
+      const mobileLinks = this.mobileMenu?.querySelectorAll("a");
+      mobileLinks?.forEach(link => {
+        link.addEventListener("click", this.closeMobileMenu);
+      });
+
+      // Handle resize events
+      window.addEventListener("resize", this.handleResize);
+    }
+
+    /**
+     * Toggle the mobile menu
+     */
+    private toggleMobileMenu = (): void => {
+      if (
+        !this.mobileToggle ||
+        !this.mobileMenu ||
+        !this.menuIcon ||
+        !this.xIcon
+      )
+        return;
+
+      const isExpanded =
+        this.mobileToggle.getAttribute("aria-expanded") === "true";
+      const willExpand = !isExpanded;
+
+      // Update ARIA attributes
+      this.mobileToggle.setAttribute("aria-expanded", willExpand.toString());
+      this.mobileMenu.setAttribute("aria-hidden", (!willExpand).toString());
+
+      // Toggle menu visibility
+      this.mobileMenu.classList.toggle("hidden", !willExpand);
+
+      // Toggle icons
+      this.menuIcon.classList.toggle("hidden", willExpand);
+      this.xIcon.classList.toggle("hidden", !willExpand);
+
+      // Prevent body scroll when menu is open
+      document.body.style.overflow = willExpand ? "hidden" : "";
+    };
+
+    /**
+     * Close the mobile menu
+     */
+    private closeMobileMenu = (): void => {
+      if (
+        !this.mobileToggle ||
+        !this.mobileMenu ||
+        !this.menuIcon ||
+        !this.xIcon
+      )
+        return;
+
+      this.mobileToggle.setAttribute("aria-expanded", "false");
+      this.mobileMenu.setAttribute("aria-hidden", "true");
+      this.mobileMenu.classList.add("hidden");
+
+      // Toggle icons
+      this.menuIcon.classList.remove("hidden");
+      this.xIcon.classList.add("hidden");
+
+      // Reset body overflow
+      document.body.style.overflow = "";
+    };
+
+    /**
+     * Handle scroll events with improved performance
+     * Uses passive event listener and optimized throttling
+     */
+    private handleScrollEvent = (): void => {
+      // Skip if already processing a scroll event
+      if (this.isScrolling) return;
+
+      // Use requestAnimationFrame for better performance
+      this.isScrolling = true;
+      requestAnimationFrame(() => {
+        this.handleScroll();
+        // Allow next scroll event after frame is rendered
+        this.isScrolling = false;
+      });
+    };
+
+    /**
+     * Handle scroll position and update navigation state
+     * Optimized for performance with minimal DOM operations
+     */
+    private handleScroll = (): void => {
+      if (!this.nav) return;
+
+      // Don't hide nav when mobile menu is open
+      if (this.mobileToggle?.getAttribute("aria-expanded") === "true") {
+        return;
+      }
+
+      const currentScrollY = window.scrollY;
+      const scrollDelta = currentScrollY - this.lastScrollY;
+      const absDelta = Math.abs(scrollDelta);
+
+      // Only process significant scroll events to reduce workload
+      if (absDelta <= this.scrollTolerance) {
+        return;
+      }
+
+      // Determine scroll direction
+      this.scrollDirection = scrollDelta > 0 ? "down" : "up";
+
+      // Hide navbar when scrolling down past threshold
+      if (
+        this.scrollDirection === "down" &&
+        currentScrollY > this.hideThreshold
+      ) {
+        this.nav.style.transform = "translateY(-100%)";
+      }
+      // Show navbar when scrolling up
+      else if (this.scrollDirection === "up") {
+        this.nav.style.transform = "translateY(0)";
+      }
+
+      // Update last scroll position
+      this.lastScrollY = currentScrollY;
+    };
+
+    /**
+     * Handle resize events
+     */
+    private handleResize = (): void => {
+      // Update hide threshold on resize
+      this.hideThreshold = window.innerHeight * 0.5;
+
+      // Close mobile menu on larger screens
+      if (
+        window.innerWidth >= 768 &&
+        this.mobileToggle?.getAttribute("aria-expanded") === "true"
+      ) {
+        this.closeMobileMenu();
+      }
+    };
+
+    /**
+     * Handle clicks outside the mobile menu
+     */
+    private handleOutsideClick = (e: MouseEvent): void => {
+      if (
+        this.mobileToggle?.getAttribute("aria-expanded") === "true" &&
+        !this.mobileMenu?.contains(e.target as Node) &&
+        !this.mobileToggle.contains(e.target as Node)
+      ) {
+        this.closeMobileMenu();
+      }
+    };
+
+    /**
+     * Handle keyboard events
+     */
+    private handleKeyDown = (e: KeyboardEvent): void => {
+      if (
+        e.key === "Escape" &&
+        this.mobileToggle?.getAttribute("aria-expanded") === "true"
+      ) {
+        this.closeMobileMenu();
+      }
+    };
+
+    /**
+     * Clean up all event listeners
+     */
+    public cleanup(): void {
+      // Remove event listeners
+      this.mobileToggle?.removeEventListener("click", this.toggleMobileMenu);
+      window.removeEventListener("scroll", this.handleScrollEvent);
+      window.removeEventListener("resize", this.handleResize);
+      document.removeEventListener("click", this.handleOutsideClick);
+      document.removeEventListener("keydown", this.handleKeyDown);
+
+      // Clear timers
+      if (this.scrollTimer) {
+        clearTimeout(this.scrollTimer);
+        this.scrollTimer = null;
+      }
+
+      // Reset body overflow
+      document.body.style.overflow = "";
+    }
+  }
+
+  // Create SVG icon component using Tabler Icons
+  class SvgIcon extends HTMLElement {
+    static icons = {
+      // Tabler Icons - https://tabler-icons.io/
+      search: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>`,
+      archive: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 4m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" /><path d="M10 12l4 0" /></svg>`,
+      moon: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-moon" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" /></svg>`,
+      sun: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-sun" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" /></svg>`,
+      menu: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-menu-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 6l16 0" /><path d="M4 12l16 0" /><path d="M4 18l16 0" /></svg>`,
+      x: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>`,
+    };
+
+    connectedCallback() {
+      const name = this.getAttribute("name") || "";
+      const svg = SvgIcon.icons[name as keyof typeof SvgIcon.icons] || "";
+      this.innerHTML = svg;
+    }
+  }
+
+  // Define custom element
+  if (!customElements.get("svg-icon")) {
+    customElements.define("svg-icon", SvgIcon);
+  }
+
+  // Initialize controller
+  let controller: NavigationController | null = new NavigationController();
+
+  // Handle Astro page transitions
+  document.addEventListener("astro:page-load", () => {
+    if (controller) {
+      controller.cleanup();
+    }
+    controller = new NavigationController();
+  });
+
+  document.addEventListener("astro:before-swap", () => {
+    if (controller) {
+      controller.cleanup();
+      controller = null;
+    }
+  });
+</script>

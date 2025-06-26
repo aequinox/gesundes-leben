@@ -1,0 +1,12 @@
+---
+import type { Props as HProps } from "./H.astro";
+import H from "./H.astro";
+
+type Props = Omit<HProps, "level">;
+
+const props: Props = Astro.props;
+---
+
+<H level={4} {...props}>
+  <slot />
+</H>

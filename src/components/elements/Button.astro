@@ -1,0 +1,332 @@
+---
+/**
+ * Button Component
+ *
+ * A clean, accessible button component that follows the project's design system.
+ * Supports both button and link functionality with consistent styling and behavior.
+ *
+ * Features:
+ * - Unified button/link interface
+ * - Accessible by default with ARIA support
+ * - Loading states with spinner
+ * - Icon support with proper positioning
+ * - Consistent with project's OKLCH color system
+ * - Performance optimized with minimal DOM
+ *
+ * @component
+ * @example
+ * ```astro
+ * <Button>Click me</Button>
+ * <Button href="/about" variant="accent">Learn more</Button>
+ * <Button type="submit" loading={isSubmitting}>Submit</Button>
+ * ```
+ */
+
+import { Icon } from "astro-icon/components";
+import type { HTMLAttributes } from "astro/types";
+
+type ButtonVariant =
+  | "default" // Primary solid button
+  | "accent" // Accent colored button
+  | "outline" // Outlined button
+  | "ghost" // Transparent with hover effect
+  | "subtle" // Subtle background
+  | "text" // Text only
+  | "link" // Behaves like a link
+  | "icon"; // Icon-focused button
+
+  // Define all possible sizes
+type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
+
+// Define all possible shapes
+type ButtonShape = "default" | "rounded" | "pill" | "circle" | "square";
+
+export interface Props extends HTMLAttributes<"button" | "a"> {
+  /** Link destination URL (makes this a link instead of button) */
+  href?: string;
+  /** Visual style variant */
+  variant?: ButtonVariant;
+  /** Size variant */
+  size?: ButtonSize;
+  /** Shape variant */
+  shape?: ButtonShape;
+  /** Button/link text content */
+  text?: string;
+  /** Icon identifier from astro-icon */
+  icon?: string;
+  /** Icon position relative to text */
+  iconPosition?: "start" | "end";
+  /** HTML button type */
+  type?: "button" | "submit" | "reset";
+  /** Whether the button is disabled */
+  disabled?: boolean;
+  /** Whether to open link in new tab */
+  newTab?: boolean;
+  /** Whether to use full width */
+  fullWidth?: boolean;
+  /** Whether to show loading state */
+  loading?: boolean;
+  /** Additional CSS classes */
+  class?: string;
+  /** Accessible label */
+  ariaLabel?: string;
+}
+
+const {
+  href,
+  variant = "default",
+  size = "md",
+  shape = "default",
+  icon,
+  iconPosition = "start",
+  type = "button",
+  disabled = false,
+  newTab = false,
+  fullWidth = false,
+  loading = false,
+  class: className = "",
+  ariaLabel,
+  "aria-label": ariaLabelAttr,
+  ...rest
+} = Astro.props;
+
+// Use either ariaLabel prop or aria-label attribute
+const finalAriaLabel = ariaLabel || ariaLabelAttr;
+
+// Determine if this should be a link
+const isLink = !!href && !disabled;
+
+// Get content from slot
+const content = await Astro.slots.render("default");
+
+// Build classes using the project's design system
+const baseClasses = [
+  // Layout & positioning
+  "relative",
+  "inline-flex",
+  "items-center",
+  "justify-center",
+  "gap-2",
+
+  // Typography
+  "font-medium",
+  "text-center",
+  "no-underline",
+
+  // Transitions & animations
+  "transition-all",
+  "duration-300",
+  "ease-out",
+
+  // Focus styles (consistent with project)
+  "focus-visible:outline-none",
+  "focus-visible:ring-2",
+  "focus-visible:ring-accent",
+  "focus-visible:ring-offset-2",
+
+  // Hover effects
+  "hover:translate-y-[-1px]",
+  "active:translate-y-0",
+];
+
+// Variant-specific styles using project's color system
+const variantClasses = {
+  default: [
+    "bg-foreground",
+    "text-background",
+    "border",
+    "border-transparent",
+    "hover:bg-foreground/90",
+    "shadow-[var(--shadow-elevation-low)]",
+    "hover:shadow-[var(--shadow-elevation-medium)]",
+  ],
+  accent: [
+    "bg-accent",
+    "text-background",
+    "border",
+    "border-transparent",
+    "hover:bg-accent/90",
+    "shadow-[var(--shadow-elevation-low)]",
+    "hover:shadow-[var(--shadow-elevation-medium)]",
+  ],
+  outline: [
+    "bg-transparent",
+    "text-accent",
+    "border",
+    "border-accent/30",
+    "hover:border-accent",
+    "hover:bg-accent/5",
+  ],
+  ghost: [
+    "bg-transparent",
+    "text-foreground",
+    "border",
+    "border-transparent",
+    "hover:bg-card/50",
+  ],
+  subtle: [
+    "bg-card",
+    "text-foreground",
+    "border",
+    "border-transparent",
+    "hover:bg-card-muted",
+    "shadow-[var(--shadow-surface)]",
+  ],
+  text: [
+    "bg-transparent",
+    "text-accent",
+    "border-0",
+    "hover:text-accent/80",
+    "hover:underline",
+    "shadow-none",
+    "hover:shadow-none",
+  ],
+  link: [
+    "bg-transparent",
+    "text-accent",
+    "border-0",
+    "hover:text-accent/80",
+    "hover:underline",
+    "shadow-none",
+    "hover:shadow-none",
+    "p-0",
+    "min-h-auto",
+  ],
+  icon: [
+    "bg-transparent",
+    "text-foreground",
+    "border",
+    "border-transparent",
+    "hover:bg-card/50",
+    "p-2",
+    "aspect-square",
+  ],
+};
+
+// Size-specific styles
+const sizeClasses = {
+  xs: ["min-h-6", "px-2", "py-1", "text-xs", "rounded"],
+  sm: ["min-h-8", "px-3", "py-1.5", "text-sm", "rounded-md"],
+  md: ["min-h-10", "px-4", "py-2", "text-sm", "rounded-lg"],
+  lg: ["min-h-12", "px-6", "py-3", "text-base", "rounded-lg"],
+  xl: ["min-h-14", "px-8", "py-4", "text-lg", "rounded-xl"],
+};
+
+// Shape-specific styles
+const shapeClasses = {
+  default: [],
+  rounded: ["rounded-lg"],
+  pill: ["rounded-full"],
+  circle: ["rounded-full", "aspect-square", "p-0"],
+  square: ["rounded-none", "aspect-square"],
+};
+
+// Conditional classes
+const conditionalClasses = [
+  fullWidth && "w-full",
+  loading && "cursor-wait",
+  disabled && "cursor-not-allowed opacity-50 hover:translate-y-0",
+  !disabled && !loading && "cursor-pointer",
+];
+
+// Combine all classes
+const buttonClasses = [
+  ...baseClasses,
+  ...variantClasses[variant],
+  ...sizeClasses[size],
+  ...shapeClasses[shape],
+  ...conditionalClasses,
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+{
+  isLink ? (
+    <a
+      href={href}
+      class={`${buttonClasses} select-none focus-visible:[outline:2px_solid_oklch(var(--color-accent))] focus-visible:[outline-offset:2px] motion-reduce:transform-none motion-reduce:transition-none forced-colors:border forced-colors:border-[ButtonText] ${variant === 'link' ? 'inline p-0 min-h-0 hover:translate-y-0' : ''} ${disabled ? 'pointer-events-none' : ''}`}
+      aria-label={finalAriaLabel}
+      target={newTab ? "_blank" : undefined}
+      rel={newTab ? "noopener noreferrer" : undefined}
+      aria-disabled={disabled ? "true" : undefined}
+      {...rest}
+    >
+      <span class="flex items-center justify-center gap-2">
+        {loading && (
+          <svg
+            class="size-4 animate-spin"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            />
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+        )}
+        {icon && iconPosition === "start" && !loading && (
+          <Icon name={icon} class="size-4 flex-shrink-0" aria-hidden="true" />
+        )}
+        {content && <span>{content}</span>}
+        {icon && iconPosition === "end" && !loading && (
+          <Icon name={icon} class="size-4 flex-shrink-0" aria-hidden="true" />
+        )}
+      </span>
+    </a>
+  ) : (
+    <button
+      type={type}
+      class={`${buttonClasses} select-none focus-visible:[outline:2px_solid_oklch(var(--color-accent))] focus-visible:[outline-offset:2px] motion-reduce:transform-none motion-reduce:transition-none forced-colors:border forced-colors:border-[ButtonText] ${variant === 'icon' ? 'aspect-square justify-center p-2' : ''} ${variant === 'link' ? 'inline p-0 min-h-0 hover:translate-y-0' : ''} disabled:pointer-events-none`}
+      disabled={disabled || loading}
+      aria-label={finalAriaLabel}
+      aria-disabled={disabled || loading}
+      {...rest}
+    >
+      <span class="flex items-center justify-center gap-2">
+        {loading && (
+          <svg
+            class="size-4 animate-spin"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            />
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+        )}
+        {icon && iconPosition === "start" && !loading && (
+          <Icon name={icon} class="size-4 flex-shrink-0" aria-hidden="true" />
+        )}
+        {content && <span>{content}</span>}
+        {icon && iconPosition === "end" && !loading && (
+          <Icon name={icon} class="size-4 flex-shrink-0" aria-hidden="true" />
+        )}
+      </span>
+    </button>
+  )
+}

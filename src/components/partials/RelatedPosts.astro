@@ -1,0 +1,165 @@
+---
+/**
+ * RelatedPosts Component
+ *
+ * A sophisticated component for displaying related blog posts based on tags, categories, and groups.
+ * Uses a scoring algorithm to find the most relevant posts.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <RelatedPosts
+ *   post={post}
+ *   maxPosts={3}
+ * />
+ * ```
+ */
+
+import { getCollection } from "astro:content";
+// import { postService } from "@/services/content/PostService";
+import Card from "@/components/sections/Card.astro";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { getRelatedPosts, getSortedPosts } from "@/utils/posts";
+import type { Post } from "@/utils/types";
+
+interface Props {
+  /** The current blog post */
+  post: Post;
+  /** Maximum number of related posts to display */
+  maxPosts?: number;
+  /** Animation type for data-aos attribute */
+  animationType?: string;
+}
+
+const { post, maxPosts = 3, animationType = "fade-up" }: Props = Astro.props;
+
+// Get translations
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Fetch all posts
+const posts = await getCollection("blog");
+const sortedPosts = getSortedPosts(posts);
+// const allPosts = await postService.getAllPosts();
+// const sortedPosts = await postService.getSortedPosts(allPosts);
+
+// Get related posts using our algorithm
+const relatedPosts = getRelatedPosts(post, sortedPosts, maxPosts);
+
+// No related posts message from i18n
+const noRelatedPostsMessage = t("post.noRelatedPosts");
+---
+
+<section
+  class="related-posts-section"
+  aria-labelledby="related-posts-heading"
+  data-aos={animationType}
+>
+  <div class="related-posts-header">
+    <h2 id="related-posts-heading" class="related-posts-heading">
+      {t("post.relatedPosts")}
+    </h2>
+  </div>
+
+  {
+    relatedPosts.length > 0 ? (
+      <div class="related-posts-grid">
+        {relatedPosts.map((relatedPost, index) => (
+          <div
+            class="related-post-item"
+            style={`--animation-order: ${index};`}
+            data-aos="fade-up"
+            data-aos-delay={index * 100}
+          >
+            <Card
+              post={relatedPost}
+              size="small"
+              withHeroImage={true}
+              loading="lazy"
+              withMeta={false}
+              withDescription={true}
+              withReadMore={true}
+              withCategories={true}
+              maxCategories={2}
+            />
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div class="related-posts-empty">
+        <p>{noRelatedPostsMessage}</p>
+      </div>
+    )
+  }
+</section>
+
+<style>
+  @reference "@/styles/global.css";
+
+  /* Base section styling */
+  .related-posts-section {
+    @apply relative isolate mt-4 pt-4;
+  }
+
+  /* Header styling */
+  .related-posts-header {
+    @apply relative mb-4 flex flex-col;
+  }
+
+  .related-posts-heading {
+    @apply relative mb-2 items-center gap-2 text-2xl font-semibold text-accent md:text-3xl;
+  }
+
+  .related-posts-icon {
+    @apply h-6 w-6 text-[--color-accent];
+  }
+
+  /* Grid layout */
+  .related-posts-grid {
+    @apply grid grid-cols-1 gap-2;
+  }
+
+  /* Empty state */
+  .related-posts-empty {
+    @apply rounded-[--border-radius-lg] p-4 text-center italic backdrop-blur-md;
+    color: oklch(var(--color-text-base) / 0.7);
+    background-color: oklch(var(--color-card) / 0.3);
+  }
+
+  /* Animation for staggered items */
+  .related-post-item {
+    @apply m-0 opacity-0;
+    transform: translateY(20px);
+    animation: fadeInStaggered 0.5s ease-out forwards;
+    animation-delay: calc(var(--animation-order, 0) * 100ms + 200ms);
+  }
+
+  @keyframes fadeInStaggered {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (min-width: 768px) {
+    .related-posts-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .related-posts-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .related-post-item {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>

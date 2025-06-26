@@ -1,0 +1,167 @@
+---
+/**
+ * Modern Accordion Component - 2025 Design
+ *
+ * A beautiful, accessible accordion component with smooth animations
+ * and modern design patterns. Uses only Tailwind CSS classes.
+ *
+ * @example
+ * ```astro
+ * ---
+ * import Accordion from "@components/sections/Accordion.astro";
+ *
+ * const items = [
+ *   {
+ *     title: "What is Astro?",
+ *     content: "Astro is an all-in-one web framework for building fast, content-focused websites.",
+ *     open: true
+ *   },
+ *   {
+ *     title: "How does Astro work?",
+ *     content: "Astro builds your site as static HTML and loads JavaScript only when necessary."
+ *   }
+ * ];
+ * ---
+ *
+ * <Accordion items={items} />
+ * <Accordion items={items} variant="bordered" />
+ * <Accordion items={items} variant="separated" />
+ * ```
+ */
+import { Icon } from "astro-icon/components";
+
+export interface AccordionItem {
+  /** Item title */
+  title: string;
+  /** Item content */
+  content?: string;
+  /** Whether the item is initially open */
+  open?: boolean;
+  /** Custom icon name (from astro-icon) */
+  icon?: string;
+  /** Custom slot identifier (0-19) for this item */
+  slotId?: number;
+}
+
+export interface Props {
+  /** Array of accordion items */
+  items: AccordionItem[];
+  /** Whether to allow multiple items to be open simultaneously */
+  allowMultiple?: boolean;
+  /** Visual style variant */
+  variant?: "default" | "bordered" | "separated" | "minimal";
+  /** Size variant */
+  size?: "sm" | "md" | "lg";
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  items,
+  allowMultiple = false,
+  variant = "default",
+  size = "md",
+  class: className = "",
+} = Astro.props;
+
+const uniqueId = `accordion-${Math.random().toString(36).substring(2, 9)}`;
+---
+
+<div
+  class={`accordion w-full space-y-0 ${className}`}
+  id={uniqueId}
+  data-allow-multiple={allowMultiple}
+>
+  {
+    items.map((item, index) => (
+      <div
+        class={`accordion-item group relative overflow-hidden transition-all duration-300 ease-out ${item.open ? "is-open" : ""} ${variant === "default" ? "border-b border-line/60 first:border-t" : ""} ${variant === "bordered" ? "mb-4 rounded-xl border border-line/80 bg-card shadow-sm hover:border-accent/30 hover:shadow-md" : ""} ${variant === "separated" ? "mb-4 rounded-xl border border-line/80 bg-card shadow-sm hover:border-accent/30 hover:bg-card-muted/20 hover:shadow-md" : ""} ${variant === "minimal" ? "border-b border-line/40 hover:border-line/80" : ""} `}
+        data-index={index}
+      >
+        <h3 class="accordion-header">
+          <button
+            type="button"
+            class={`accordion-trigger group/trigger flex w-full items-center justify-between text-left font-medium text-foreground transition-all duration-300 ease-out hover:text-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none ${variant === "default" ? "hover:bg-card/30" : ""} ${variant === "bordered" ? "rounded-xl hover:bg-card-muted/30" : ""} ${variant === "separated" ? "rounded-xl hover:bg-card-muted/40" : ""} ${variant === "minimal" ? "hover:bg-card/20" : ""} ${size === "sm" ? "px-4 py-3 text-sm" : ""} ${size === "md" ? "px-5 py-4 text-base" : ""} ${size === "lg" ? "px-6 py-5 text-lg" : ""} ${item.open ? "font-semibold text-accent" : ""} `}
+            aria-expanded={item.open ? "true" : "false"}
+            aria-controls={`${uniqueId}-panel-${index}`}
+          >
+            <div class="flex items-center">
+              {item.icon && (
+                <span
+                  class={`accordion-item-icon mr-3 flex items-center justify-center transition-all duration-300 ${item.open ? "scale-110 text-accent" : ""}`}
+                >
+                  <Icon
+                    name={item.icon}
+                    class="size-5 text-accent transition-all duration-300 group-hover/trigger:scale-110"
+                  />
+                </span>
+              )}
+              <span class="accordion-item-title font-medium transition-all duration-300">
+                {item.title}
+              </span>
+            </div>
+            <span class="accordion-chevron ml-4 flex h-5 w-5 flex-shrink-0 items-center justify-center">
+              <svg
+                class={`h-4 w-4 transition-transform duration-300 ease-out ${item.open ? "rotate-180" : ""}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </span>
+          </button>
+        </h3>
+        <div
+          id={`${uniqueId}-panel-${index}`}
+          class="accordion-panel overflow-hidden transition-all duration-500 ease-out"
+          style={
+            item.open
+              ? "max-height: 1000px; opacity: 1;"
+              : "max-height: 0; opacity: 0;"
+          }
+          aria-hidden={item.open ? "false" : "true"}
+        >
+          <div
+            class={`accordion-content leading-relaxed text-foreground/90 transition-all duration-300 ${size === "sm" ? "px-4 pt-1 pb-4 text-sm" : ""} ${size === "md" ? "px-5 pt-2 pb-5" : ""} ${size === "lg" ? "px-6 pt-2 pb-6 text-base" : ""} `}
+          >
+            {item.content && <p class="mb-0">{item.content}</p>}
+            {item.slotId === 0 && <slot name="content-0" />}
+            {item.slotId === 1 && <slot name="content-1" />}
+            {item.slotId === 2 && <slot name="content-2" />}
+            {item.slotId === 3 && <slot name="content-3" />}
+            {item.slotId === 4 && <slot name="content-4" />}
+            {item.slotId === 5 && <slot name="content-5" />}
+            {item.slotId === 6 && <slot name="content-6" />}
+            {item.slotId === 7 && <slot name="content-7" />}
+            {item.slotId === 8 && <slot name="content-8" />}
+            {item.slotId === 9 && <slot name="content-9" />}
+            {index === 0 && <slot name="item-0" />}
+            {index === 1 && <slot name="item-1" />}
+            {index === 2 && <slot name="item-2" />}
+            {index === 3 && <slot name="item-3" />}
+            {index === 4 && <slot name="item-4" />}
+            {index === 5 && <slot name="item-5" />}
+            {index === 6 && <slot name="item-6" />}
+            {index === 7 && <slot name="item-7" />}
+            {index === 8 && <slot name="item-8" />}
+            {index === 9 && <slot name="item-9" />}
+          </div>
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<script>
+  import { autoInitAccordions } from "@/utils/ui/AccordionEngine";
+
+  // Initialize the accordion engine
+  autoInitAccordions();
+</script>

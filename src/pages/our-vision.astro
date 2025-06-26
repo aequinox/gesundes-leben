@@ -1,0 +1,325 @@
+---
+/**
+ * Our Vision Page Component
+ *
+ * Provides information about the site's vision, mission, and values.
+ * Structured with clear sections and responsive design.
+ */
+
+import Hr from "@/components/elements/Hr.astro";
+import VisionImage from "@/components/elements/VisionImage.astro";
+import Footer from "@/components/sections/Footer.astro";
+import Header from "@/components/sections/Header.astro";
+import PageHero from "@/components/sections/PageHero.astro";
+import { SITE } from "@/config";
+import Layout from "@/layouts/Layout.astro";
+
+// Import vision images
+import booksImage from "@/assets/images/our-vision/Glossar_pexels-pixabay-261909-1-1536x1097.jpg";
+import tuebingenImage from "@/assets/images/our-vision/lasma-artmane-fNUGvjwkhmM-unsplash-1-1536x1024.jpg";
+import qualityImage from "@/assets/images/our-vision/pexels-rodnae-productions-7563653-1-1536x1024.jpg";
+import jumpingPersonImage from "@/assets/images/our-vision/victor-rodriguez-pWOdBS_l9LQ-unsplash-1-1536x1020.jpg";
+// import { logger } from "@/utils/logger";
+// import { isValidEmail } from "@/utils/validation";
+
+// Define the page metadata
+const pageTitle = "Unsere Vision | " + SITE.title;
+const pageDescription =
+  "Erfahre mehr über unsere Vision und Mission für deine Gesundheit.";
+
+// export const prerender = false; // Not needed in 'server' mode
+
+// const errors = { first_name: "", email: "", message: "" };
+
+// if (Astro.request.method === "POST") {
+//   try {
+//     const data = await Astro.request.formData();
+//     const first_name = data.get("first_name");
+//     const email = data.get("email");
+//     const message = data.get("message");
+
+//     if (typeof first_name !== "string" || first_name.length < 1) {
+//       errors.first_name += "Please enter your first name. ";
+//     }
+//     if (typeof email !== "string" || !isValidEmail(email)) {
+//       errors.email += "Email is not valid. ";
+//     } 
+
+//     if (typeof message !== "string" || message.length < 20) {
+//       errors.message += "Message must be at least 20 characters. ";
+//     }
+
+//     logger.info(`Form data submitted: ${first_name}, ${email}, ${message}`);
+//     // Do something with the data
+//   } catch (error) {
+//     if (error instanceof Error) {
+//       logger.error(error.message);
+//     }
+//   }
+// }
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <Header activeNav="our-vision" />
+
+  <main id="main-content">
+    <PageHero
+      title="Unsere Vision"
+      subtitle="Empowerment für deine Gesundheit"
+    />
+
+    <Hr />
+
+    <div class="vision-grid mx-auto max-w-7xl space-y-16">
+      <section id="empowerment" class="content-section py-6">
+        <div
+          class="grid-card grid grid-cols-1 gap-8 overflow-hidden rounded-xl transition-transform duration-300 hover:translate-y-[-5px] lg:grid-cols-2 dark:bg-gray-800"
+        >
+          <div class="card-content flex flex-col justify-center p-8">
+            <h2
+              class="mb-6 border-l-4 border-accent pl-4 text-left text-3xl font-bold"
+            >
+              Empowerment
+            </h2>
+            <div class="text-content space-y-4 text-lg">
+              <p class="leading-relaxed">
+                Wir laden dich auf eine Reise ein – hin zu neuen
+                Handlungsspielräumen, um deine Gesundheit auf positive Weise zu
+                beeinflussen, und Erkrankungen vorzubeugen, Linderung oder
+                Heilung für vorhandene Belastungen anzustreben.
+              </p>
+              <p class="leading-relaxed">
+                Denn es gibt nicht nur einen Weg, sondern viele, die auf
+                unterschiedliche Weise erfolgen. Diese Vielfalt zusammen mit der
+                Verbindung von Schulmedizin und Alternativmedizin möchten wir
+                gerne mit dir teilen auf dieser "spannende Reise". <strong
+                  >#weilduwertvollbist</strong
+                >
+              </p>
+            </div>
+          </div>
+          <div class="card-image h-full min-h-[400px] w-full overflow-hidden">
+            <VisionImage
+              src={jumpingPersonImage}
+              alt="Person springt mit ausgebreiteten Armen vor einem Bergsee"
+              class="h-full min-h-[400px] w-full object-cover"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section id="sources" class="content-section py-6">
+        <div
+          class="grid-card reverse grid grid-cols-1 gap-8 overflow-hidden rounded-xl transition-transform duration-300 hover:translate-y-[-5px] lg:grid-cols-2 dark:bg-gray-800"
+        >
+          <div class="card-content flex flex-col justify-center p-8 lg:order-2">
+            <h2
+              class="mb-6 border-l-4 border-accent pl-4 text-left text-3xl font-bold"
+            >
+              Was nutzen wir als Quellen
+            </h2>
+            <div class="text-content space-y-4 text-lg">
+              <p class="leading-relaxed">
+                Was wir dir auf dem Blog vorstellen, ist weitestgehend
+                wissenschaftlich basiert, und durch Studien und Referenzen
+                untermauert.
+              </p>
+              <p class="leading-relaxed">
+                Wenn einmal keine wissenschaftlichen Studien angegeben sind,
+                basiert der Artikel auf (medizinischen) Wissensinhalten und
+                Erfahrungen, die wir uns über die Jahre als Therapeuten
+                angeeignet haben, oder die sich in unserer Praxis bewährt haben.
+              </p>
+              <p class="leading-relaxed">
+                Oder auch auf unseren persönlichen Erfahrungen, weil wir vieles
+                von dem anwenden, wovon wir schreiben, denn <strong
+                  >#sogehtgesund</strong
+                >.
+              </p>
+            </div>
+          </div>
+          <div
+            class="card-image h-full min-h-[400px] w-full overflow-hidden lg:order-1"
+          >
+            <VisionImage
+              src={booksImage}
+              alt="Stapel von Büchern und Referenzmaterialien"
+              class="h-full min-h-[400px] w-full object-cover"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section id="tuebingen" class="content-section py-6">
+        <div
+          class="grid-card grid grid-cols-1 gap-8 overflow-hidden rounded-xl transition-transform duration-300 hover:translate-y-[-5px] lg:grid-cols-2 dark:bg-gray-800"
+        >
+          <div class="card-content flex flex-col justify-center p-8">
+            <h2
+              class="mb-6 border-l-4 border-accent pl-4 text-left text-3xl font-bold"
+            >
+              Warum in Tübingen
+            </h2>
+            <div class="text-content space-y-4 text-lg">
+              <p class="leading-relaxed">
+                Natürlich steht Gesundheit in Tübingen nicht nur Tübingern zur
+                Verfügung.
+              </p>
+              <p class="leading-relaxed">
+                Jedoch sind wir Wahl-Tübinger und lieben unsere Stadt und seine
+                Einwohner, weshalb wir sie im Besonderen fördern möchten.
+              </p>
+            </div>
+          </div>
+          <div class="card-image h-full min-h-[400px] w-full overflow-hidden">
+            <VisionImage
+              src={tuebingenImage}
+              alt="Blick auf die Altstadt von Tübingen"
+              class="h-full min-h-[400px] w-full object-cover"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section id="recommendations" class="content-section py-6">
+        <div
+          class="grid-card reverse grid grid-cols-1 gap-8 overflow-hidden rounded-xl transition-transform duration-300 hover:translate-y-[-5px] lg:grid-cols-2 dark:bg-gray-800"
+        >
+          <div class="card-content flex flex-col justify-center p-8 lg:order-2">
+            <h2
+              class="mb-6 border-l-4 border-accent pl-4 text-left text-3xl font-bold"
+            >
+              Worauf beruhen unsere Empfehlungen?
+            </h2>
+            <div class="text-content space-y-4 text-lg">
+              <p class="leading-relaxed">
+                Die Produktempfehlungen, auf die wir verlinken, basieren häufig
+                auf eigenen Erfahrungen mit den Produkten. Das bedeutet, die
+                empfohlenen Produkte sind natürlich nicht die einzigen, die es
+                gibt. Aber es sind Produkte, mit denen wir gute Erfahrungen
+                gemacht haben (häufig am eigenen Leib), die wir per vorheriger
+                Recherche evaluiert haben, oder die bestimmte Bedingungen
+                erfüllen, die essenziell sind (wie z.B. ausreichende Dosierung,
+                Vermeidung von Schadstoffen, gute Qualität, gutes
+                Preis-Leistungs-Verhältnis, etc.).
+              </p>
+              <p class="leading-relaxed">
+                Die Einnahmen, die wir durch manche der Empfehlungen erzielen,
+                kommen dem Blog zugute, denn nur so können wir uns leisten, die
+                Zeit neben unserer beruflichen Tätigkeit einzubringen, die nötig
+                ist, um dir unser Therapeuten-Wissen zugänglich zu machen. <strong
+                  >#weilduwertvollbist</strong
+                >
+              </p>
+            </div>
+          </div>
+          <div
+            class="card-image h-full min-h-[400px] w-full overflow-hidden lg:order-1"
+          >
+            <VisionImage
+              src={qualityImage}
+              alt="Gute Qualität und guter Preis"
+              class="h-full min-h-[400px] w-full object-cover"
+            />
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <Hr />
+
+    <section id="contact" class="content-section">
+      <div
+        class="contact-card mx-auto max-w-4xl overflow-hidden rounded-xl dark:bg-gray-800"
+      >
+        <div
+          class="contact-header bg-gradient-to-r from-purple-500 to-blue-600 p-8 text-white"
+        >
+          <h2 class="mb-4 text-center text-3xl font-bold">Dein Feedback</h2>
+          <p class="contact-intro mx-auto max-w-3xl text-center text-lg">
+            Wenn du gute Ideen hast, wie wir unsere gemeinsame Reise noch
+            verbessern können, schreib uns. Am liebsten ist uns das Wachsen im
+            gemeinsamen Austausch, und wir freuen uns auf dein konstruktives
+            Feedback.
+          </p>
+        </div>
+        <!-- <div
+          class="contact-form p-8 dark:border dark:border-gray-700 dark:bg-gray-800"
+        >
+          <form method="POST">
+            <div class="form-grid mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div class="form-group mb-6">
+                <label
+                  for="name"
+                  class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
+                  >Name</label
+                >
+                <input
+                  type="text"
+                  id="first_name"
+                  name="first_name"
+                  placeholder="Dein Name"
+                  required
+                  class="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                />
+              </div>
+              <div class="form-group mb-6">
+                <label
+                  for="email"
+                  class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
+                  >E-Mail Adresse</label
+                >
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="Deine E-Mail"
+                  required
+                  class="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                />
+              </div>
+            </div>
+            <div class="form-group mb-6">
+              <label
+                for="message"
+                class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
+                >Deine Nachricht</label
+              >
+              <textarea
+                id="message"
+                name="message"
+                rows="5"
+                placeholder="Deine Nachricht an uns"
+                required
+                class="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+              ></textarea>
+            </div>
+            <button
+              type="submit"
+              class="flex w-full items-center justify-center rounded-xl bg-accent px-6 py-3 font-medium text-white transition-all hover:translate-y-[-2px] hover:bg-accent/90"
+            >
+              <span>Absenden</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1"
+              >
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </form>
+        </div>-->
+      </div> 
+    </section>
+  </main>
+
+  <Footer />
+</Layout>

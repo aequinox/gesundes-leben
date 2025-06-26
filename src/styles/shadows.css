@@ -1,0 +1,108 @@
+@layer utilities {
+  /* Elevation shadow system */
+  .shadow-elevation-low {
+    box-shadow: var(--shadow-elevation-low);
+  }
+
+  .shadow-elevation-medium {
+    box-shadow: var(--shadow-elevation-medium);
+  }
+
+  .shadow-elevation-high {
+    box-shadow: var(--shadow-elevation-high);
+  }
+
+  /* Surface shadow */
+  .shadow-surface {
+    box-shadow: var(--shadow-surface);
+  }
+
+  /* Interactive shadow states */
+  .shadow-hover {
+    @apply transition-shadow duration-300;
+  }
+
+  .shadow-hover:hover {
+    box-shadow: var(--shadow-elevation-medium);
+  }
+
+  /* Focus shadow */
+  .shadow-focus {
+    @apply transition-shadow duration-200;
+  }
+
+  .shadow-focus:focus-visible {
+    box-shadow:
+      0 0 0 2px oklch(var(--color-accent)),
+      var(--shadow-elevation-low);
+    outline: none;
+  }
+
+  /* Inner shadow */
+  .shadow-inner-1 {
+    box-shadow: inset 0 1px 2px 0 oklch(0% 0 0deg / 0.05);
+  }
+
+  .shadow-inner-2 {
+    box-shadow: inset 0 1px 4px 0 oklch(0% 0 0deg / 0.1);
+  }
+
+  /* Directional shadows */
+  .shadow-top {
+    box-shadow:
+      0 -1px 3px 0 oklch(0% 0 0deg / 0.1),
+      0 -1px 2px 0 oklch(0% 0 0deg / 0.06);
+  }
+
+  .shadow-right {
+    box-shadow:
+      1px 0 3px 0 oklch(0% 0 0deg / 0.1),
+      1px 0 2px 0 oklch(0% 0 0deg / 0.06);
+  }
+
+  .shadow-bottom {
+    box-shadow:
+      0 1px 3px 0 oklch(0% 0 0deg / 0.1),
+      0 1px 2px 0 oklch(0% 0 0deg / 0.06);
+  }
+
+  .shadow-left {
+    box-shadow:
+      -1px 0 3px 0 rgba(0, 0, 0, 0.1),
+      -1px 0 2px 0 rgba(0, 0, 0, 0.06);
+  }
+
+  /* Colored shadows */
+  .shadow-accent {
+    box-shadow: 0 4px 14px 0 oklch(var(--color-accent) / 0.25);
+  }
+
+  .shadow-success {
+    box-shadow: 0 4px 14px 0 oklch(var(--color-success) / 0.25);
+  }
+
+  .shadow-warning {
+    box-shadow: 0 4px 14px 0 oklch(var(--color-warning) / 0.25);
+  }
+
+  .shadow-error {
+    box-shadow: 0 4px 14px 0 oklch(var(--color-error) / 0.25);
+  }
+
+  /* Dark mode adjustments */
+  @media (prefers-color-scheme: dark) {
+    .shadow-elevation-1,
+    .shadow-elevation-2,
+    .shadow-elevation-3 {
+      --shadow-strength: calc(var(--shadow-strength) * 1.5);
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .shadow-hover,
+    .shadow-focus {
+      @apply transition-none;
+    }
+  }
+}
