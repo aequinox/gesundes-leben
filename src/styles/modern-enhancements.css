@@ -71,6 +71,13 @@
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
       }
+
+      /* Disable theme transitions for reduced motion */
+      .theme-transitioning * {
+        transition-duration: 0.01ms !important;
+        transform: none !important;
+        will-change: auto !important;
+      }
     }
   }
 
@@ -359,11 +366,35 @@
     }
   }
 
-  /* Modern dark mode transitions */
-  * {
+  /* Optimized theme transitions - Selective instead of wildcard */
+  body {
     transition-property: color, background-color, border-color, box-shadow;
-    transition-duration: var(--duration-normal);
+    transition-duration: var(--duration-fast);
     transition-timing-function: var(--easing-standard);
+  }
+
+  /* Faster transitions for theme switching */
+  [data-theme] {
+    transition: none;
+  }
+
+  [data-theme] * {
+    transition-property: color, background-color, border-color;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+  }
+
+  /* Ultra-fast transitions during theme switching */
+  .theme-transitioning * {
+    transition-duration: 100ms !important;
+    transition-timing-function: ease-out !important;
+    transform: translateZ(0); /* Force GPU acceleration */
+    will-change: color, background-color, border-color;
+  }
+
+  /* Remove will-change after transition for better performance */
+  html:not(.theme-transitioning) * {
+    will-change: auto;
   }
 
   /* High contrast mode support */

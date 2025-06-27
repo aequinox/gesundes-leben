@@ -24,8 +24,10 @@ function setPreference() {
 }
 
 function reflectPreference() {
+  // Add temporary class for faster theme switching
+  document.documentElement.classList.add('theme-transitioning');
+  
   document.firstElementChild.setAttribute("data-theme", themeValue);
-
   document.querySelector("#theme-btn")?.setAttribute("aria-label", themeValue);
 
   // Get a reference to the body element
@@ -33,17 +35,25 @@ function reflectPreference() {
 
   // Check if the body element exists before using getComputedStyle
   if (body) {
-    // Get the computed styles for the body element
-    const computedStyles = window.getComputedStyle(body);
+    // Use requestAnimationFrame for better performance
+    requestAnimationFrame(() => {
+      // Get the computed styles for the body element
+      const computedStyles = window.getComputedStyle(body);
 
-    // Get the background color property
-    const bgColor = computedStyles.backgroundColor;
+      // Get the background color property
+      const bgColor = computedStyles.backgroundColor;
 
-    // Set the background color in <meta theme-color ... />
-    document
-      .querySelector("meta[name='theme-color']")
-      ?.setAttribute("content", bgColor);
+      // Set the background color in <meta theme-color ... />
+      document
+        .querySelector("meta[name='theme-color']")
+        ?.setAttribute("content", bgColor);
+    });
   }
+
+  // Remove temporary class after transition
+  setTimeout(() => {
+    document.documentElement.classList.remove('theme-transitioning');
+  }, 200);
 }
 
 // set early so no page flashes / CSS is made aware
@@ -54,10 +64,21 @@ window.onload = () => {
     // set on load so screen readers can get the latest value on the button
     reflectPreference();
 
+    // Debounce function to prevent rapid theme switching
+    let themeToggleTimeout;
+    
     // now this script can find and listen for clicks on the control
     document.querySelector("#theme-btn")?.addEventListener("click", () => {
-      themeValue = themeValue === "light" ? "dark" : "light";
-      setPreference();
+      // Clear any existing timeout
+      if (themeToggleTimeout) {
+        clearTimeout(themeToggleTimeout);
+      }
+      
+      // Debounce the theme change
+      themeToggleTimeout = setTimeout(() => {
+        themeValue = themeValue === "light" ? "dark" : "light";
+        setPreference();
+      }, 50); // Small delay to prevent rapid switching
     });
   }
 

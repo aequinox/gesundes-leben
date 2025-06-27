@@ -1,7 +1,8 @@
 @import "tailwindcss";
 @import "./typography.css";
 /* @import "./typography-enhanced.css"; */
-@import "./modern-enhancements.css";
+/* @import "./modern-enhancements.css"; */
+
 @import "./color-system.css";
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
