@@ -1,5 +1,5 @@
 import { logger, LogLevelName, type TimestampFormat } from "../logger";
-import { describe, it, expect, mock, mock, beforeEach, afterEach } from "bun:test";
+import { describe, it, expect, mock, beforeEach, afterEach } from "bun:test";
 
 describe("Logger", () => {
   // Spy on console methods
@@ -239,9 +239,13 @@ describe("Logger", () => {
       logger.info("Test message");
 
       // Should not include timestamp
-      const callArg = consoleSpy.log.mock.calls[0][0];
-      expect(callArg).not.toMatch(/\d{2}:\d{2}:\d{2}/);
-      expect(callArg).not.toMatch(/\d{4}-\d{2}-\d{2}/);
+      expect(consoleSpy.log.mock.calls.length).toBeGreaterThan(0);
+      const calls = consoleSpy.log.mock.calls;
+      if (calls.length > 0 && calls[0].length > 0) {
+        const callArg = calls[0][0];
+        expect(callArg).not.toMatch(/\d{2}:\d{2}:\d{2}/);
+        expect(callArg).not.toMatch(/\d{4}-\d{2}-\d{2}/);
+      }
     });
   });
 

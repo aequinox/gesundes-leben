@@ -7,10 +7,11 @@ const t = useTranslations(lang);
 
 <!-- Table of Contents Sidebar -->
 <aside
+  id="toc-sidebar"
   data-pagefind-ignore="all"
-  class="sticky top-24 hidden h-auto self-start rounded-md 2xl:col-span-4 2xl:block"
+  class="fixed top-24 hidden h-auto rounded-md 2xl:col-span-4 2xl:block"
   aria-label="Table of contents"
-  style="position: sticky; height: calc(100vh - 120px);"
+  style="position: fixed; height: calc(100vh - 120px); right: max(2rem, calc((100vw - 1200px) / 2)); width: 280px; z-index: 30; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-out;"
 >
   <!-- Mobile Progress Bar -->
   <div
@@ -42,7 +43,7 @@ const t = useTranslations(lang);
     <!-- TOC Navigation -->
     <nav
       id="toc"
-      class="scrollbar mx-4 h-full overflow-y-auto rounded-md bg-gradient-to-b from-card/10 to-card px-4 py-6 shadow-md"
+      class="scrollbar mx-4 h-full overflow-y-auto rounded-md bg-gradient-to-b from-card/10 to-card px-6 py-6 shadow-md"
       aria-label="Table of contents"
       style="height: calc(100vh - 160px); max-height: calc(100vh - 160px);"
     >
@@ -65,13 +66,139 @@ const t = useTranslations(lang);
     ScrollProgress,
   } from "@/utils/ui/TableOfContentsEngine";
 
+  class FloatingTOC {
+    private sidebar: HTMLElement | null;
+    private article: HTMLElement | null;
+    private lastScrollY: number = 0;
+    private ticking: boolean = false;
+    private initialTop: number = 96; // 24 * 4 = 96px (top-24)
+    private scrollOffset: number = 0;
+
+    constructor() {
+      this.sidebar = document.getElementById("toc-sidebar");
+      this.article = document.querySelector("article");
+      this.initialize();
+    }
+
+    private initialize(): void {
+      if (!this.sidebar) return;
+
+      // Add floating class for styling
+      this.sidebar.classList.add("floating");
+
+      // Set initial position
+      this.updatePosition();
+
+      // Add scroll listener
+      window.addEventListener("scroll", () => this.handleScroll(), {
+        passive: true,
+      });
+
+      // Handle resize
+      window.addEventListener("resize", () => this.updatePosition(), {
+        passive: true,
+      });
+
+      // Hide/show based on article visibility
+      this.checkArticleVisibility();
+    }
+
+    private handleScroll(): void {
+      if (this.ticking) return;
+
+      this.ticking = true;
+      requestAnimationFrame(() => {
+        this.updateFloatingPosition();
+        this.ticking = false;
+      });
+    }
+
+    private updateFloatingPosition(): void {
+      if (!this.sidebar || !this.article) return;
+
+      const currentScrollY = window.scrollY;
+      const scrollDelta = currentScrollY - this.lastScrollY;
+
+      // Apply some smoothing to the scroll offset
+      this.scrollOffset += scrollDelta * 0.1;
+
+      // Constrain the offset to reasonable bounds
+      const maxOffset = 100;
+      this.scrollOffset = Math.max(
+        -maxOffset,
+        Math.min(maxOffset, this.scrollOffset)
+      );
+
+      // Apply the transform for smooth movement
+      this.sidebar.style.transform = `translateY(${this.scrollOffset}px)`;
+
+      // Add a subtle opacity change based on scroll speed for dynamic effect
+      const scrollSpeed = Math.abs(scrollDelta);
+      const opacity = Math.max(0.7, 1 - scrollSpeed * 0.01);
+      this.sidebar.style.opacity = opacity.toString();
+
+      this.lastScrollY = currentScrollY;
+
+      // Reset opacity after a short delay
+      setTimeout(() => {
+        if (this.sidebar) {
+          this.sidebar.style.opacity = "1";
+        }
+      }, 150);
+    }
+
+    private updatePosition(): void {
+      if (!this.sidebar) return;
+
+      // Ensure the sidebar stays within viewport bounds
+      const viewportHeight = window.innerHeight;
+      const sidebarHeight = this.sidebar.offsetHeight;
+
+      if (sidebarHeight > viewportHeight - this.initialTop) {
+        this.sidebar.style.height = `${viewportHeight - this.initialTop - 20}px`;
+      }
+    }
+
+    private checkArticleVisibility(): void {
+      if (!this.sidebar || !this.article) return;
+
+      const observer = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (this.sidebar) {
+              if (entry.isIntersecting) {
+                this.sidebar.style.opacity = "1";
+                this.sidebar.style.transform = "translateX(0)";
+              } else {
+                // Fade out when article is not visible
+                this.sidebar.style.opacity = "0.6";
+              }
+            }
+          });
+        },
+        {
+          threshold: 0.1,
+          rootMargin: "0px 0px -20% 0px",
+        }
+      );
+
+      observer.observe(this.article);
+    }
+  }
+
   document.addEventListener("astro:page-load", () => {
+    // Import and initialize the TableOfContents class
+    import("@/utils/ui/TableOfContentsEngine").then(({ TableOfContents }) => {
+      new TableOfContents();
+    });
+
     const scrollProgress = new ScrollProgress();
     window.addEventListener("scroll", () => scrollProgress.update(), {
       passive: true,
     });
 
     new BackToTopButton();
+    new FloatingTOC();
   });
 </script>
 
@@ -80,5 +207,46 @@ const t = useTranslations(lang);
 
   .scrollbar {
     scrollbar-width: none;
+  }
+
+  /* #toc-sidebar {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  } */
+
+  /* .dark #toc-sidebar {
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  } */
+
+  /* #toc-sidebar.floating {
+    transform-origin: center;
+    will-change: transform, opacity;
+  } */
+
+  /* @media (max-width: 1536px) {
+    #toc-sidebar {
+      display: none !important;
+    }
+  } */
+
+  /* Smooth entrance animation */
+  #toc-sidebar {
+    animation: slideInRight 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
   }
 </style>
