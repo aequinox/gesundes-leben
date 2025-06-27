@@ -51,15 +51,30 @@ describe('isValidEmail', () => {
       'user@example-.com',
       'user name@example.com',
       'user@exam ple.com',
-      null,
-      undefined,
-      123,
-      {},
-      [],
     ];
 
     it.each(invalidEmails)('should validate %s as invalid', (email) => {
       expect(isValidEmail(email as string)).toBe(false);
+    });
+
+    it('should validate null as invalid', () => {
+      expect(isValidEmail(null as any)).toBe(false);
+    });
+
+    it('should validate undefined as invalid', () => {
+      expect(isValidEmail(undefined as any)).toBe(false);
+    });
+
+    it('should validate number as invalid', () => {
+      expect(isValidEmail(123 as any)).toBe(false);
+    });
+
+    it('should validate object as invalid', () => {
+      expect(isValidEmail({} as any)).toBe(false);
+    });
+
+    it('should validate array as invalid', () => {
+      expect(isValidEmail([] as any)).toBe(false);
     });
   });
 

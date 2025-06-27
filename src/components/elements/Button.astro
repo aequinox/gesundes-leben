@@ -24,6 +24,14 @@
 
 import { Icon } from "astro-icon/components";
 import type { HTMLAttributes } from "astro/types";
+import LoadingSpinner from "./LoadingSpinner.astro";
+import { 
+  buttonBaseClasses, 
+  focusStyles, 
+  animationStyles, 
+  shadowStyles,
+  cn 
+} from "@/utils/ui/designSystem";
 
 type ButtonVariant =
   | "default" // Primary solid button
@@ -101,32 +109,10 @@ const content = await Astro.slots.render("default");
 
 // Build classes using the project's design system
 const baseClasses = [
-  // Layout & positioning
-  "relative",
-  "inline-flex",
-  "items-center",
-  "justify-center",
-  "gap-2",
-
-  // Typography
-  "font-medium",
-  "text-center",
-  "no-underline",
-
-  // Transitions & animations
-  "transition-all",
-  "duration-300",
-  "ease-out",
-
-  // Focus styles (consistent with project)
-  "focus-visible:outline-none",
-  "focus-visible:ring-2",
-  "focus-visible:ring-accent",
-  "focus-visible:ring-offset-2",
-
-  // Hover effects
-  "hover:translate-y-[-1px]",
-  "active:translate-y-0",
+  ...buttonBaseClasses,
+  ...animationStyles.transitions.all,
+  ...focusStyles.ring,
+  ...animationStyles.hover.lift,
 ];
 
 // Variant-specific styles using project's color system
@@ -137,8 +123,8 @@ const variantClasses = {
     "border",
     "border-transparent",
     "hover:bg-foreground/90",
-    "shadow-[var(--shadow-elevation-low)]",
-    "hover:shadow-[var(--shadow-elevation-medium)]",
+    ...shadowStyles.elevation.low,
+    ...shadowStyles.hoverTransitions.elevate,
   ],
   accent: [
     "bg-accent",
@@ -146,8 +132,8 @@ const variantClasses = {
     "border",
     "border-transparent",
     "hover:bg-accent/90",
-    "shadow-[var(--shadow-elevation-low)]",
-    "hover:shadow-[var(--shadow-elevation-medium)]",
+    ...shadowStyles.elevation.low,
+    ...shadowStyles.hoverTransitions.elevate,
   ],
   outline: [
     "bg-transparent",
@@ -170,7 +156,7 @@ const variantClasses = {
     "border",
     "border-transparent",
     "hover:bg-card-muted",
-    "shadow-[var(--shadow-surface)]",
+    ...shadowStyles.surface,
   ],
   text: [
     "bg-transparent",
@@ -224,29 +210,33 @@ const shapeClasses = {
 // Conditional classes
 const conditionalClasses = [
   fullWidth && "w-full",
-  loading && "cursor-wait",
-  disabled && "cursor-not-allowed opacity-50 hover:translate-y-0",
+  loading && animationStyles.states.loading,
+  disabled && animationStyles.states.disabled,
   !disabled && !loading && "cursor-pointer",
-];
+].flat().filter(Boolean) as string[];
 
-// Combine all classes
-const buttonClasses = [
-  ...baseClasses,
-  ...variantClasses[variant],
-  ...sizeClasses[size],
-  ...shapeClasses[shape],
-  ...conditionalClasses,
-  className,
-]
-  .filter(Boolean)
-  .join(" ");
+// Combine all classes using design system utility
+const buttonClasses = cn(
+  baseClasses,
+  variantClasses[variant],
+  sizeClasses[size],
+  shapeClasses[shape],
+  conditionalClasses,
+  animationStyles.motionSafe,
+  className
+);
 ---
 
 {
   isLink ? (
     <a
       href={href}
-      class={`${buttonClasses} select-none focus-visible:[outline:2px_solid_oklch(var(--color-accent))] focus-visible:[outline-offset:2px] motion-reduce:transform-none motion-reduce:transition-none forced-colors:border forced-colors:border-[ButtonText] ${variant === 'link' ? 'inline p-0 min-h-0 hover:translate-y-0' : ''} ${disabled ? 'pointer-events-none' : ''}`}
+      class={cn(
+        buttonClasses,
+        focusStyles.oklchOutline,
+        variant === 'link' && 'inline p-0 min-h-0 hover:translate-y-0',
+        disabled && 'pointer-events-none'
+      )}
       aria-label={finalAriaLabel}
       target={newTab ? "_blank" : undefined}
       rel={newTab ? "noopener noreferrer" : undefined}
@@ -254,29 +244,7 @@ const buttonClasses = [
       {...rest}
     >
       <span class="flex items-center justify-center gap-2">
-        {loading && (
-          <svg
-            class="size-4 animate-spin"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            />
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
-        )}
+{loading && <LoadingSpinner size="sm" />}
         {icon && iconPosition === "start" && !loading && (
           <Icon name={icon} class="size-4 flex-shrink-0" aria-hidden="true" />
         )}
@@ -289,36 +257,20 @@ const buttonClasses = [
   ) : (
     <button
       type={type}
-      class={`${buttonClasses} select-none focus-visible:[outline:2px_solid_oklch(var(--color-accent))] focus-visible:[outline-offset:2px] motion-reduce:transform-none motion-reduce:transition-none forced-colors:border forced-colors:border-[ButtonText] ${variant === 'icon' ? 'aspect-square justify-center p-2' : ''} ${variant === 'link' ? 'inline p-0 min-h-0 hover:translate-y-0' : ''} disabled:pointer-events-none`}
+      class={cn(
+        buttonClasses,
+        focusStyles.oklchOutline,
+        variant === 'icon' && 'aspect-square justify-center p-2',
+        variant === 'link' && 'inline p-0 min-h-0 hover:translate-y-0',
+        'disabled:pointer-events-none'
+      )}
       disabled={disabled || loading}
       aria-label={finalAriaLabel}
       aria-disabled={disabled || loading}
       {...rest}
     >
       <span class="flex items-center justify-center gap-2">
-        {loading && (
-          <svg
-            class="size-4 animate-spin"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            />
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
-        )}
+{loading && <LoadingSpinner size="sm" />}
         {icon && iconPosition === "start" && !loading && (
           <Icon name={icon} class="size-4 flex-shrink-0" aria-hidden="true" />
         )}

@@ -61,7 +61,7 @@ const resizerScriptUrl =
 
 <!-- Client-side script for loading and initializing the iframe -->
 <script is:inline define:vars={{ iframeId, resizerScriptUrl, heightMethod, checkOrigin }}>
-  import { logger } from "@/utils/logger";
+  // Note: cannot import in inline scripts, so we'll use console for logging
 
   // Use IIFE to avoid polluting global scope
   (function () {
@@ -100,7 +100,7 @@ const resizerScriptUrl =
               `#${iframeId}`
             );
           } else {
-            logger.warn("iFrameResize function not available");
+            console.warn("iFrameResize function not available");
           }
         };
         iframe.getElementById("__nuxt").style.visibility = "invisible";

@@ -1,4 +1,17 @@
-import { vi, describe, beforeEach, it, expect, beforeAll } from 'vitest';
+import { vi, describe, beforeEach, it, expect } from 'vitest';
+
+// Mock dependencies before imports
+vi.mock('astro:content', () => ({
+  getEntry: vi.fn(),
+  getCollection: vi.fn()
+}));
+
+vi.mock('../logger', () => ({
+  logger: {
+    error: vi.fn()
+  }
+}));
+
 import { 
   getAuthorEntry,
   getAllAuthors,
@@ -13,19 +26,6 @@ describe('authors utilities', () => {
   const mockGetCollection = vi.fn();
   const mockLoggerError = vi.fn();
 
-  beforeAll(() => {
-    vi.mock('astro:content', () => ({
-      getEntry: mockGetEntry,
-      getCollection: mockGetCollection
-    }));
-
-    vi.mock('../logger', () => ({
-      logger: {
-        error: mockLoggerError
-      }
-    }));
-  });
-
   const mockAuthor: Author = {
     id: 'test-author',
     collection: 'authors',
@@ -37,25 +37,35 @@ describe('authors utilities', () => {
     body: ''
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    
+    // Connect mocks to imported modules
+    const astroContent = await import('astro:content');
+    const logger = await import('../logger');
+    
+    vi.mocked(astroContent.getEntry).mockImplementation(mockGetEntry);
+    vi.mocked(astroContent.getCollection).mockImplementation(mockGetCollection);
+    vi.mocked(logger.logger.error).mockImplementation(mockLoggerError);
   });
 
   describe('getAuthorEntry', () => {
     it('should return author entry by string slug', async () => {
-      mockGetEntry.mockResolvedValue(mockAuthor);
+      const { getEntry } = await import('astro:content');
+      vi.mocked(getEntry).mockResolvedValue(mockAuthor);
 
       const result = await getAuthorEntry('test-author');
       expect(result).toEqual(mockAuthor);
-      expect(mockGetEntry).toHaveBeenCalledWith('authors', 'test-author');
+      expect(getEntry).toHaveBeenCalledWith('authors', 'test-author');
     });
 
     it('should return author entry by reference object', async () => {
-      mockGetEntry.mockResolvedValue(mockAuthor);
+      const { getEntry } = await import('astro:content');
+      vi.mocked(getEntry).mockResolvedValue(mockAuthor);
 
       const result = await getAuthorEntry({ collection: 'authors', id: 'test-author' });
       expect(result).toEqual(mockAuthor);
-      expect(mockGetEntry).toHaveBeenCalledWith('authors', 'test-author');
+      expect(getEntry).toHaveBeenCalledWith('authors', 'test-author');
     });
 
     it('should return null and log error when getEntry fails', async () => {

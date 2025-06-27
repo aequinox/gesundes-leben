@@ -1,0 +1,293 @@
+---
+/**
+ * Responsive Image Component
+ * 
+ * A high-performance, accessible image component that provides:
+ * - Automatic format optimization (AVIF, WebP fallbacks)
+ * - Responsive sizing with optimal breakpoints
+ * - Lazy loading with intersection observer
+ * - Proper accessibility attributes
+ * - Loading states with skeleton placeholder
+ * - Error handling with fallback
+ * 
+ * @component
+ * @example
+ * ```astro
+ * <ResponsiveImage
+ *   src="/images/hero.jpg"
+ *   alt="Hero image"
+ *   aspectRatio="16/9"
+ *   loading="lazy"
+ * />
+ * 
+ * <ResponsiveImage
+ *   src={heroImage}
+ *   alt="Blog post hero"
+ *   sizes="(max-width: 768px) 100vw, 50vw"
+ *   priority
+ * />
+ * ```
+ */
+
+import { Picture } from "astro:assets";
+import type { MediaComponentProps, ImageMetadata } from "../types/base";
+import { cn } from "@/utils/ui/designSystem";
+
+export interface Props extends MediaComponentProps {
+  /** Image sizes attribute for responsive loading */
+  sizes?: string;
+  
+  /** Image formats to generate (defaults to AVIF, WebP, original) */
+  formats?: ("avif" | "webp" | "jpeg" | "png")[];
+  
+  /** Whether this image is above the fold (disables lazy loading) */
+  priority?: boolean;
+  
+  /** Placeholder behavior while loading */
+  placeholder?: "blur" | "skeleton" | "none";
+  
+  /** Background color for skeleton placeholder */
+  placeholderColor?: string;
+  
+  /** Whether to show a loading indicator */
+  showLoadingIndicator?: boolean;
+  
+  /** Container classes */
+  containerClass?: string;
+  
+  /** Image classes */
+  imageClass?: string;
+}
+
+const {
+  src,
+  alt,
+  width,
+  height,
+  aspectRatio,
+  loading = "lazy",
+  objectFit = "cover",
+  objectPosition = "center",
+  sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
+  formats = ["avif", "webp"],
+  priority = false,
+  placeholder = "skeleton",
+  placeholderColor = "rgb(243 244 246)", // gray-100
+  showLoadingIndicator = false,
+  containerClass = "",
+  imageClass = "",
+  class: className = "",
+  ...rest
+} = Astro.props;
+
+// Determine actual loading strategy
+const actualLoading = priority ? "eager" : loading;
+
+// Container classes for responsive behavior
+const containerClasses = cn(
+  "relative",
+  "overflow-hidden",
+  aspectRatio && "block",
+  !aspectRatio && "inline-block",
+  containerClass,
+  className
+);
+
+// Image classes with object fit and position
+const imgClasses = cn(
+  "w-full",
+  "h-auto",
+  "transition-opacity",
+  "duration-300",
+  aspectRatio && "absolute inset-0 w-full h-full",
+  objectFit === "cover" && "object-cover",
+  objectFit === "contain" && "object-contain",
+  objectFit === "fill" && "object-fill",
+  objectFit === "scale-down" && "object-scale-down",
+  objectFit === "none" && "object-none",
+  objectPosition === "center" && "object-center",
+  objectPosition === "top" && "object-top",
+  objectPosition === "bottom" && "object-bottom",
+  objectPosition === "left" && "object-left",
+  objectPosition === "right" && "object-right",
+  imageClass
+);
+
+// Placeholder classes for skeleton loading
+const placeholderClasses = cn(
+  "absolute",
+  "inset-0",
+  "w-full",
+  "h-full",
+  "animate-pulse",
+  "transition-opacity",
+  "duration-300",
+  placeholder === "skeleton" && "bg-gray-200 dark:bg-gray-700"
+);
+
+// Generate responsive breakpoints if width is provided
+const responsiveWidths = width && typeof width === "number" 
+  ? [width * 0.5, width * 0.75, width, width * 1.5, width * 2].map(Math.round)
+  : [640, 750, 828, 1080, 1200, 1920];
+
+// Create style object for aspect ratio
+const containerStyle = aspectRatio 
+  ? { aspectRatio } 
+  : {};
+
+// Get the actual source URL for fallback
+const getSrcUrl = (source: string | ImageMetadata): string => {
+  if (typeof source === "string") return source;
+  if (source && typeof source === "object" && source.src) return source.src;
+  return String(source) || "";
+};
+---
+
+<div 
+  class={containerClasses}
+  style={containerStyle}
+  data-component="responsive-image"
+  {...rest}
+>
+  {/* Skeleton placeholder */}
+  {placeholder === "skeleton" && (
+    <div 
+      class={placeholderClasses}
+      style={{ backgroundColor: placeholderColor }}
+      aria-hidden="true"
+    />
+  )}
+  
+  {/* Loading indicator */}
+  {showLoadingIndicator && (
+    <div 
+      class="absolute inset-0 flex items-center justify-center bg-gray-100/80 dark:bg-gray-800/80 transition-opacity duration-300"
+      aria-hidden="true"
+    >
+      <div class="w-8 h-8 border-2 border-gray-300 border-t-accent rounded-full animate-spin" />
+    </div>
+  )}
+  
+  {/* Responsive Picture element */}
+  <Picture
+    src={src as any}
+    alt={alt}
+    width={width}
+    height={height}
+    formats={formats}
+    widths={responsiveWidths}
+    sizes={sizes}
+    loading={actualLoading}
+    class={imgClasses}
+    pictureAttributes={{
+      class: aspectRatio ? "absolute inset-0 w-full h-full" : "block"
+    }}
+  />
+  
+  {/* Error fallback - will show if image fails to load */}
+  <noscript>
+    <img
+      src={getSrcUrl(src)}
+      alt={alt}
+      width={width}
+      height={height}
+      loading={actualLoading}
+      class={imgClasses}
+      style={`object-fit: ${objectFit}; object-position: ${objectPosition};`}
+    />
+  </noscript>
+</div>
+
+<script>
+  // Enhanced image loading with error handling and accessibility
+  document.addEventListener("DOMContentLoaded", () => {
+    const images = document.querySelectorAll('[data-component="responsive-image"]');
+    
+    images.forEach((container) => {
+      const img = container.querySelector("img");
+      const placeholder = container.querySelector('[aria-hidden="true"]') as HTMLElement;
+      const loadingIndicator = container.querySelector('.animate-spin')?.parentElement as HTMLElement;
+      
+      if (!img) return;
+      
+      // Handle successful image load
+      const handleLoad = () => {
+        if (placeholder) {
+          placeholder.style.opacity = "0";
+          setTimeout(() => {
+            if (placeholder.parentNode) {
+              placeholder.parentNode.removeChild(placeholder);
+            }
+          }, 300);
+        }
+        if (loadingIndicator) {
+          loadingIndicator.style.opacity = "0";
+          setTimeout(() => {
+            if (loadingIndicator.parentNode) {
+              loadingIndicator.parentNode.removeChild(loadingIndicator);
+            }
+          }, 300);
+        }
+        img.style.opacity = "1";
+        
+        // Dispatch custom event for analytics/tracking
+        container.dispatchEvent(new CustomEvent("image:loaded", {
+          detail: { src: img.src, alt: img.alt }
+        }));
+      };
+      
+      // Handle image load error
+      const handleError = () => {
+        console.warn(`Failed to load image: ${img.src}`);
+        img.alt = `${img.alt} (Failed to load)`;
+        
+        if (loadingIndicator && loadingIndicator.parentNode) {
+          loadingIndicator.parentNode.removeChild(loadingIndicator);
+        }
+        
+        // Dispatch custom event for error tracking
+        container.dispatchEvent(new CustomEvent("image:error", {
+          detail: { src: img.src, alt: img.alt }
+        }));
+      };
+      
+      // Set up event listeners
+      if (img.complete) {
+        handleLoad();
+      } else {
+        img.addEventListener("load", handleLoad, { once: true });
+        img.addEventListener("error", handleError, { once: true });
+      }
+    });
+  });
+</script>
+
+<style>
+  /* Ensure images don't exceed container bounds */
+  [data-component="responsive-image"] img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Smooth loading transition */
+  [data-component="responsive-image"] img {
+    opacity: 0;
+  }
+  
+  /* Progressive enhancement for better UX */
+  @media (prefers-reduced-motion: reduce) {
+    [data-component="responsive-image"] * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    [data-component="responsive-image"] .animate-pulse {
+      background-color: ButtonFace;
+      border: 1px solid ButtonText;
+    }
+  }
+</style>

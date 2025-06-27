@@ -14,7 +14,9 @@
     "lint": "eslint .",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "analyze": "node scripts/analyze-bundle.js",
+    "build:analyze": "bun run build && bun run analyze"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.0",

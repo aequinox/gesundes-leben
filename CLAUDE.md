@@ -26,7 +26,7 @@ bun run sync
 ### Testing & Quality
 ```bash
 # Run all tests
-bun test
+bun run test
 
 # Run tests with coverage
 bun run test:coverage
