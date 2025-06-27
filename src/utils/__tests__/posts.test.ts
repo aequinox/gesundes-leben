@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * @file posts.test.ts
  * @description Comprehensive tests for post utility functions
@@ -36,6 +37,7 @@ import {
   groupByCondition,
   type GroupFunction
 } from '../posts';
+import { render } from 'astro:content';
 
 // Mock data
 const createMockPost = (overrides: Partial<Post['data']> = {}): Post => ({

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * @file slugs.test.ts
  * @description Comprehensive tests for slug utility functions
@@ -17,7 +18,7 @@ vi.mock('slugify', () => ({
   default: vi.fn((str: string, options: any = {}) => {
     if (!str || typeof str !== 'string') return '';
     
-    const { replacement = '-', lower = true, strict = false, locale = 'en', trim = true } = options;
+    const { replacement = '-', lower = true, strict = false, trim = true } = options;
     
     let result = trim ? str.trim() : str;
     
