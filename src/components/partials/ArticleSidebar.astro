@@ -9,9 +9,9 @@ const t = useTranslations(lang);
 <aside
   id="toc-sidebar"
   data-pagefind-ignore="all"
-  class="fixed top-24 hidden h-auto rounded-md 2xl:col-span-4 2xl:block"
+  class="fixed top-24 hidden h-auto rounded-xl border border-white/20 shadow-elevation-medium backdrop-blur-md bg-card/80 2xl:col-span-4 2xl:block"
   aria-label="Table of contents"
-  style="position: fixed; height: calc(100vh - 120px); right: max(2rem, calc((100vw - 1600px) / 2)); width: 400px; z-index: 30; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-out;"
+  style="position: fixed; height: calc(100vh - 120px); right: max(2rem, calc((100vw - 1600px) / 2)); width: 400px; z-index: 30; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);"
 >
   <!-- Mobile Progress Bar -->
   <div
@@ -43,15 +43,15 @@ const t = useTranslations(lang);
     <!-- TOC Navigation -->
     <nav
       id="toc"
-      class="scrollbar mx-4 h-full overflow-y-auto rounded-md bg-gradient-to-b from-card/10 to-card px-6 py-6 shadow-md"
+      class="scrollbar mx-4 mt-4 h-full overflow-y-auto rounded-lg bg-gradient-to-b from-transparent via-card/5 to-card/10 px-4 py-4"
       aria-label="Table of contents"
-      style="height: calc(100vh - 160px); max-height: calc(100vh - 160px);"
+      style="height: calc(100vh - 180px); max-height: calc(100vh - 180px);"
     >
       <h2 class="mb-4 text-base font-medium text-foreground" id="toc-heading">
         {t("toc.title")}
       </h2>
       <ul
-        class="space-y-2 text-sm text-pretty transition duration-300 ease-in-out [&>li]:flex [&>li]:items-center [&>li]:text-sm [&>li]:leading-4 [&>li]:text-foreground/80 [&>li]:transition-all [&>li]:duration-300 [&>li]:ease-[cubic-bezier(0.4,0,0.2,1)] [&>li.selected]:text-accent [&>li.selected]:opacity-100 [&>li.selected>svg]:mr-2 [&>li.selected>svg]:h-4 [&>li.selected>svg]:w-4 [&>li.selected>svg]:transition-all [&>li.selected>svg]:duration-400 [&>li.selected>svg]:ease-[cubic-bezier(0.4,0,0.2,1)] [&>li>a]:block [&>li>a]:py-1 [&>li>a]:transition-colors [&>li>a]:duration-200 [&>li>a]:ease-in-out [&>li>a]:hover:text-accent [&>li>svg]:h-0 [&>li>svg]:w-0"
+        class="space-y-2 text-sm text-pretty [&>li]:flex [&>li]:items-center [&>li]:text-sm [&>li]:leading-4 [&>li]:text-foreground/70 [&>li]:transition-all [&>li]:duration-300 [&>li]:ease-[cubic-bezier(0.4,0,0.2,1)] [&>li.selected]:text-accent [&>li.selected]:opacity-100 [&>li.selected]:scale-[1.02] [&>li.selected]:font-medium [&>li.selected>svg]:mr-2 [&>li.selected>svg]:h-4 [&>li.selected>svg]:w-4 [&>li.selected>svg]:text-accent [&>li.selected>svg]:transition-all [&>li.selected>svg]:duration-400 [&>li.selected>svg]:ease-[cubic-bezier(0.4,0,0.2,1)] [&>li>a]:block [&>li>a]:py-1 [&>li>a]:px-3 [&>li>a]:rounded-md [&>li>a]:transition-all [&>li>a]:duration-200 [&>li>a]:ease-in-out [&>li>a]:hover:text-accent [&>li>a]:hover:bg-accent/5 [&>li>a]:hover:scale-[1.01] [&>li>svg]:h-0 [&>li>svg]:w-0"
         role="list"
         aria-labelledby="toc-heading"
       >
@@ -120,31 +120,38 @@ const t = useTranslations(lang);
       const scrollDelta = currentScrollY - this.lastScrollY;
 
       // Apply some smoothing to the scroll offset
-      this.scrollOffset += scrollDelta * 0.1;
+      this.scrollOffset += scrollDelta * 0.08;
 
       // Constrain the offset to reasonable bounds
-      const maxOffset = 100;
+      const maxOffset = 80;
       this.scrollOffset = Math.max(
         -maxOffset,
         Math.min(maxOffset, this.scrollOffset)
       );
 
-      // Apply the transform for smooth movement
-      this.sidebar.style.transform = `translateY(${this.scrollOffset}px)`;
+      // Enhanced transform with subtle scale and rotation
+      const scale = 1 + Math.abs(this.scrollOffset) * 0.0001;
+      const rotation = this.scrollOffset * 0.01;
+      this.sidebar.style.transform = `translateY(${this.scrollOffset}px) scale(${scale}) rotateX(${rotation}deg)`;
 
-      // Add a subtle opacity change based on scroll speed for dynamic effect
+      // Enhanced opacity with smoother transitions
       const scrollSpeed = Math.abs(scrollDelta);
-      const opacity = Math.max(0.7, 1 - scrollSpeed * 0.01);
+      const opacity = Math.max(0.85, 1 - scrollSpeed * 0.008);
       this.sidebar.style.opacity = opacity.toString();
+
+      // Add subtle blur effect during fast scrolling
+      const blurAmount = Math.min(2, scrollSpeed * 0.1);
+      this.sidebar.style.filter = `blur(${blurAmount}px)`;
 
       this.lastScrollY = currentScrollY;
 
-      // Reset opacity after a short delay
+      // Reset effects after a short delay
       setTimeout(() => {
         if (this.sidebar) {
           this.sidebar.style.opacity = "1";
+          this.sidebar.style.filter = "blur(0px)";
         }
-      }, 150);
+      }, 200);
     }
 
     private updatePosition(): void {
@@ -234,19 +241,126 @@ const t = useTranslations(lang);
     }
   } */
 
-  /* Smooth entrance animation */
+  /* Enhanced entrance animation */
   #toc-sidebar {
-    animation: slideInRight 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: slideInFloating 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 
-  @keyframes slideInRight {
+  @keyframes slideInFloating {
+    0% {
+      transform: translateX(100%) translateY(-20px) scale(0.95);
+      opacity: 0;
+      filter: blur(4px);
+    }
+    60% {
+      transform: translateX(-10px) translateY(0) scale(1.02);
+      opacity: 0.8;
+      filter: blur(1px);
+    }
+    100% {
+      transform: translateX(0) translateY(0) scale(1);
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+
+  /* Hover effect for the entire sidebar */
+  #toc-sidebar:hover {
+    transform: translateY(-2px) scale(1.005);
+    box-shadow: 
+      0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04),
+      0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+
+  /* Progress bar enhancement */
+  #progress-aside {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      oklch(var(--color-accent) / 0.3) 20%,
+      oklch(var(--color-accent)) 50%,
+      oklch(var(--color-accent) / 0.3) 80%,
+      transparent 100%
+    );
+    height: 2px;
+    border-radius: 1px;
+  }
+
+  /* TOC heading enhancement */
+  #toc-heading {
+    color: oklch(var(--color-foreground));
+    font-weight: 600;
+    letter-spacing: 0.025em;
+  }
+
+  /* Enhanced TOC link styling */
+  #toc ul li a {
+    position: relative;
+    overflow: hidden;
+  }
+
+  #toc ul li a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      oklch(var(--color-accent) / 0.1),
+      transparent
+    );
+    transition: left 0.5s ease;
+  }
+
+  #toc ul li a:hover::before {
+    left: 100%;
+  }
+
+  /* Active state indicator */
+  #toc ul li.selected a::after {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 50%;
+    width: 3px;
+    height: 60%;
+    background: oklch(var(--color-accent));
+    border-radius: 0 2px 2px 0;
+    transform: translateY(-50%);
+    animation: slideInLeft 0.3s ease;
+  }
+
+  @keyframes slideInLeft {
     from {
-      transform: translateX(100%);
+      width: 0;
       opacity: 0;
     }
     to {
-      transform: translateX(0);
+      width: 3px;
       opacity: 1;
+    }
+  }
+
+  /* Dark mode border enhancement */
+  @media (prefers-color-scheme: dark) {
+    #toc-sidebar {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    #toc-sidebar,
+    #toc-sidebar:hover,
+    #toc ul li a::before,
+    #toc ul li.selected a::after {
+      animation: none !important;
+      transition: none !important;
+      transform: none !important;
     }
   }
 </style>
