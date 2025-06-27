@@ -22,16 +22,16 @@
  * ```
  */
 
+import {
+  animationStyles,
+  buttonBaseClasses,
+  cn,
+  focusStyles,
+  shadowStyles,
+} from "@/utils/ui/designSystem";
 import { Icon } from "astro-icon/components";
 import type { HTMLAttributes } from "astro/types";
 import LoadingSpinner from "./LoadingSpinner.astro";
-import { 
-  buttonBaseClasses, 
-  focusStyles, 
-  animationStyles, 
-  shadowStyles,
-  cn 
-} from "@/utils/ui/designSystem";
 
 type ButtonVariant =
   | "default" // Primary solid button
@@ -43,7 +43,7 @@ type ButtonVariant =
   | "link" // Behaves like a link
   | "icon"; // Icon-focused button
 
-  // Define all possible sizes
+// Define all possible sizes
 type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
 
 // Define all possible shapes
@@ -213,7 +213,9 @@ const conditionalClasses = [
   loading && animationStyles.states.loading,
   disabled && animationStyles.states.disabled,
   !disabled && !loading && "cursor-pointer",
-].flat().filter(Boolean) as string[];
+]
+  .flat()
+  .filter(Boolean) as string[];
 
 // Combine all classes using design system utility
 const buttonClasses = cn(
@@ -234,8 +236,8 @@ const buttonClasses = cn(
       class={cn(
         buttonClasses,
         focusStyles.oklchOutline,
-        variant === 'link' && 'inline p-0 min-h-0 hover:translate-y-0',
-        disabled && 'pointer-events-none'
+        variant === "link" && "inline min-h-0 p-0 hover:translate-y-0",
+        disabled && "pointer-events-none"
       )}
       aria-label={finalAriaLabel}
       target={newTab ? "_blank" : undefined}
@@ -244,7 +246,7 @@ const buttonClasses = cn(
       {...rest}
     >
       <span class="flex items-center justify-center gap-2">
-{loading && <LoadingSpinner size="sm" />}
+        {loading && <LoadingSpinner size="sm" />}
         {icon && iconPosition === "start" && !loading && (
           <Icon name={icon} class="size-4 flex-shrink-0" aria-hidden="true" />
         )}
@@ -260,9 +262,9 @@ const buttonClasses = cn(
       class={cn(
         buttonClasses,
         focusStyles.oklchOutline,
-        variant === 'icon' && 'aspect-square justify-center p-2',
-        variant === 'link' && 'inline p-0 min-h-0 hover:translate-y-0',
-        'disabled:pointer-events-none'
+        variant === "icon" && "aspect-square justify-center p-2",
+        variant === "link" && "inline min-h-0 p-0 hover:translate-y-0",
+        "disabled:pointer-events-none"
       )}
       disabled={disabled || loading}
       aria-label={finalAriaLabel}
@@ -270,7 +272,7 @@ const buttonClasses = cn(
       {...rest}
     >
       <span class="flex items-center justify-center gap-2">
-{loading && <LoadingSpinner size="sm" />}
+        {loading && <LoadingSpinner size="sm" />}
         {icon && iconPosition === "start" && !loading && (
           <Icon name={icon} class="size-4 flex-shrink-0" aria-hidden="true" />
         )}

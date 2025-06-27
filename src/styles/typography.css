@@ -1,8 +1,83 @@
 @plugin '@tailwindcss/typography';
 
 @layer base {
+  /* Tailwind Typography Custom Properties - Override defaults */
+  :root {
+    /* Base font sizes with fluid scaling */
+    --font-size-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+    --font-size-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+    --font-size-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+    --font-size-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
+    --font-size-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+    --font-size-2xl: clamp(1.5rem, 1.3rem + 1vw, 1.875rem);
+    --font-size-3xl: clamp(1.875rem, 1.6rem + 1.375vw, 2.25rem);
+    --font-size-4xl: clamp(2.25rem, 1.9rem + 1.75vw, 3rem);
+    --font-size-5xl: clamp(3rem, 2.4rem + 3vw, 4rem);
+
+    /* Reading-optimized line heights */
+    --line-height-tight: 1.2;
+    --line-height-base: 1.6;
+    --line-height-relaxed: 1.8;
+
+    /* Modern letter spacing */
+    --letter-spacing-tight: -0.025em;
+    --letter-spacing-normal: 0em;
+    --letter-spacing-wide: 0.025em;
+    --letter-spacing-wider: 0.05em;
+
+    /* Content width for optimal reading */
+    --content-width: min(65ch, 90vw);
+    --content-width-wide: min(75ch, 95vw);
+  }
+
+  /* Enhanced base typography */
+  html {
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings:
+      "kern" 1,
+      "liga" 1,
+      "calt" 1;
+  }
+
   .prose {
-    @apply prose-headings:!mb-3 prose-headings:!text-foreground prose-h3:italic prose-p:!text-foreground prose-a:!text-foreground prose-a:!decoration-solid prose-a:!decoration-from-font prose-a:underline-offset-4 hover:prose-a:text-accent prose-blockquote:!border-l-accent/50 prose-figcaption:!text-foreground prose-figcaption:opacity-70 prose-strong:!text-foreground prose-code:rounded prose-code:bg-muted/75 prose-code:p-1 prose-code:!text-foreground prose-code:before:!content-none prose-code:after:!content-none prose-ol:!text-foreground prose-ul:overflow-x-clip prose-ul:!text-foreground prose-li:marker:!text-accent prose-table:text-foreground prose-th:border prose-th:border-border prose-td:border prose-td:border-border prose-img:mx-auto prose-img:!my-2 prose-img:border-2 prose-img:border-border prose-hr:!border-border;
+    /* Modern prose foundation */
+    max-width: var(--content-width);
+    font-family: var(--font-body);
+
+    @apply prose-headings:!mb-3 prose-h3:italic prose-p:!text-foreground prose-a:!text-foreground prose-a:!decoration-solid prose-a:!decoration-from-font prose-a:underline-offset-4 hover:prose-a:text-accent prose-blockquote:!border-l-accent/50 prose-figcaption:!text-foreground prose-figcaption:opacity-70 prose-strong:!text-foreground prose-code:rounded prose-code:bg-muted/75 prose-code:p-1 prose-code:!text-foreground prose-code:before:!content-none prose-code:after:!content-none prose-ol:!text-foreground prose-ul:overflow-x-clip prose-ul:!text-foreground prose-li:marker:!text-accent prose-table:text-foreground prose-th:border prose-th:border-border prose-td:border prose-td:border-border prose-img:mx-auto prose-img:!my-2 prose-img:border-2 prose-img:border-border prose-hr:!border-border;
+    /* @apply prose-headings:!mb-3 prose-headings:!text-foreground prose-h3:italic prose-p:!text-foreground prose-a:!text-foreground prose-a:!decoration-solid prose-a:!decoration-from-font prose-a:underline-offset-4 hover:prose-a:text-accent prose-blockquote:!border-l-accent/50 prose-figcaption:!text-foreground prose-figcaption:opacity-70 prose-strong:!text-foreground prose-code:rounded prose-code:bg-muted/75 prose-code:p-1 prose-code:!text-foreground prose-code:before:!content-none prose-code:after:!content-none prose-ol:!text-foreground prose-ul:overflow-x-clip prose-ul:!text-foreground prose-li:marker:!text-accent prose-table:text-foreground prose-th:border prose-th:border-border prose-td:border prose-td:border-border prose-img:mx-auto prose-img:!my-2 prose-img:border-2 prose-img:border-border prose-hr:!border-border; */
+
+    /* Improved heading styles */
+    & :is(h1, h2, h3, h4, h5, h6) {
+      color: var(--color-foreground) !important;
+      font-family: var(--font-body);
+      letter-spacing: var(--letter-spacing-tight);
+      text-wrap: balance;
+    }
+
+    & h1 {
+      font-size: var(--font-size-4xl);
+      font-weight: 700;
+      line-height: var(--line-height-tight);
+    }
+
+    & h2 {
+      font-size: var(--font-size-3xl);
+      font-weight: 600;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    & h3 {
+      font-size: var(--font-size-2xl);
+      font-weight: 500;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
     /* TOC */
     details > ul {
       @apply max-h-0 overflow-hidden text-sm opacity-0;

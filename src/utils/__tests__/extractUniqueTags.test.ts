@@ -1,12 +1,11 @@
+import { extractUniqueTags } from "../tags";
+import type { Post } from "../types";
 import { describe, expect, test, vi } from "vitest";
 
 // Mock dependencies - must be before imports that use them
 vi.mock("@/utils/slugs", () => ({
   slugify: (str: string) => str.toLowerCase().replace(/\s+/g, "-"),
 }));
-
-import { extractUniqueTags } from "../tags";
-import type { Post } from "../types";
 
 describe("extractUniqueTags", () => {
   test("extracts unique tags from posts", () => {

@@ -31,7 +31,6 @@ const DEFAULT_OPTIONS: Required<HashtagOptions> = {
 const HASHTAG_REGEX = /(#[\p{L}\p{N}_-]+)/gu;
 const HASHTAG_MATCH_REGEX = /^#([\p{L}\p{N}_-]+)$/u;
 
-
 /**
  * Creates a link node for a hashtag
  * @param hashtag The hashtag to link to
@@ -51,7 +50,6 @@ const createHashtagLink = (hashtag: string, baseUrl: string): Link => {
   };
 };
 
-
 /**
  * Creates an HTML node for a styled hashtag
  * @param hashtag The hashtag to style
@@ -65,7 +63,6 @@ const createStyledHashtag = (hashtag: string, cssClass: string): Html => {
   };
 };
 
-
 /**
  * Creates a plain text node
  * @param value The text content of the node
@@ -78,10 +75,9 @@ function createTextNode(value: string): Text {
   };
 }
 
-
 /**
  * Checks if a given hashtag is in the list of excluded hashtags.
- * 
+ *
  * @param hashtag - The hashtag to check.
  * @param excludedTags - An array of hashtags to exclude.
  * @returns A boolean indicating whether the hashtag is excluded.
@@ -94,22 +90,21 @@ const isExcludedHashtag = (
   return excludedTags.includes(hashtag.toLowerCase());
 };
 
-
-  /**
-   * Process a single text part of a node.
-   * 
-   * If the part matches the hashtag regex, it's either linked or styled.
-   * If the hashtag is in the list of excluded hashtags, it's styled with
-   * `options.hashtagClass`. Otherwise, it's linked with
-   * `createHashtagLink`.
-   * 
-   * If the part doesn't match the hashtag regex, it's returned as a plain
-   * text node.
-   * 
-   * @param part - The text part to process.
-   * @param options - The plugin configuration options.
-   * @returns A root content node (either a text, link, or html node).
-   */
+/**
+ * Process a single text part of a node.
+ *
+ * If the part matches the hashtag regex, it's either linked or styled.
+ * If the hashtag is in the list of excluded hashtags, it's styled with
+ * `options.hashtagClass`. Otherwise, it's linked with
+ * `createHashtagLink`.
+ *
+ * If the part doesn't match the hashtag regex, it's returned as a plain
+ * text node.
+ *
+ * @param part - The text part to process.
+ * @param options - The plugin configuration options.
+ * @returns A root content node (either a text, link, or html node).
+ */
 const processTextPart = (
   part: string,
   options: Required<HashtagOptions>
@@ -128,7 +123,6 @@ const processTextPart = (
 
   return createHashtagLink(hashtag, options.baseUrl);
 };
-
 
 /**
  * A remark plugin that processes hashtags within a Markdown Abstract Syntax Tree (AST).

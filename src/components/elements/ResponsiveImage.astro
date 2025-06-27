@@ -1,7 +1,7 @@
 ---
 /**
  * Responsive Image Component
- * 
+ *
  * A high-performance, accessible image component that provides:
  * - Automatic format optimization (AVIF, WebP fallbacks)
  * - Responsive sizing with optimal breakpoints
@@ -9,7 +9,7 @@
  * - Proper accessibility attributes
  * - Loading states with skeleton placeholder
  * - Error handling with fallback
- * 
+ *
  * @component
  * @example
  * ```astro
@@ -19,7 +19,7 @@
  *   aspectRatio="16/9"
  *   loading="lazy"
  * />
- * 
+ *
  * <ResponsiveImage
  *   src={heroImage}
  *   alt="Blog post hero"
@@ -29,32 +29,32 @@
  * ```
  */
 
-import { Picture } from "astro:assets";
-import type { MediaComponentProps, ImageMetadata } from "../types/base";
 import { cn } from "@/utils/ui/designSystem";
+import { Picture } from "astro:assets";
+import type { ImageMetadata, MediaComponentProps } from "../types/base";
 
 export interface Props extends MediaComponentProps {
   /** Image sizes attribute for responsive loading */
   sizes?: string;
-  
+
   /** Image formats to generate (defaults to AVIF, WebP, original) */
   formats?: ("avif" | "webp" | "jpeg" | "png")[];
-  
+
   /** Whether this image is above the fold (disables lazy loading) */
   priority?: boolean;
-  
+
   /** Placeholder behavior while loading */
   placeholder?: "blur" | "skeleton" | "none";
-  
+
   /** Background color for skeleton placeholder */
   placeholderColor?: string;
-  
+
   /** Whether to show a loading indicator */
   showLoadingIndicator?: boolean;
-  
+
   /** Container classes */
   containerClass?: string;
-  
+
   /** Image classes */
   imageClass?: string;
 }
@@ -126,14 +126,13 @@ const placeholderClasses = cn(
 );
 
 // Generate responsive breakpoints if width is provided
-const responsiveWidths = width && typeof width === "number" 
-  ? [width * 0.5, width * 0.75, width, width * 1.5, width * 2].map(Math.round)
-  : [640, 750, 828, 1080, 1200, 1920];
+const responsiveWidths =
+  width && typeof width === "number"
+    ? [width * 0.5, width * 0.75, width, width * 1.5, width * 2].map(Math.round)
+    : [640, 750, 828, 1080, 1200, 1920];
 
 // Create style object for aspect ratio
-const containerStyle = aspectRatio 
-  ? { aspectRatio } 
-  : {};
+const containerStyle = aspectRatio ? { aspectRatio } : {};
 
 // Get the actual source URL for fallback
 const getSrcUrl = (source: string | ImageMetadata): string => {
@@ -143,31 +142,35 @@ const getSrcUrl = (source: string | ImageMetadata): string => {
 };
 ---
 
-<div 
+<div
   class={containerClasses}
   style={containerStyle}
   data-component="responsive-image"
   {...rest}
 >
   {/* Skeleton placeholder */}
-  {placeholder === "skeleton" && (
-    <div 
-      class={placeholderClasses}
-      style={{ backgroundColor: placeholderColor }}
-      aria-hidden="true"
-    />
-  )}
-  
+  {
+    placeholder === "skeleton" && (
+      <div
+        class={placeholderClasses}
+        style={{ backgroundColor: placeholderColor }}
+        aria-hidden="true"
+      />
+    )
+  }
+
   {/* Loading indicator */}
-  {showLoadingIndicator && (
-    <div 
-      class="absolute inset-0 flex items-center justify-center bg-gray-100/80 dark:bg-gray-800/80 transition-opacity duration-300"
-      aria-hidden="true"
-    >
-      <div class="w-8 h-8 border-2 border-gray-300 border-t-accent rounded-full animate-spin" />
-    </div>
-  )}
-  
+  {
+    showLoadingIndicator && (
+      <div
+        class="absolute inset-0 flex items-center justify-center bg-gray-100/80 transition-opacity duration-300 dark:bg-gray-800/80"
+        aria-hidden="true"
+      >
+        <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-accent" />
+      </div>
+    )
+  }
+
   {/* Responsive Picture element */}
   <Picture
     src={src as any}
@@ -180,10 +183,10 @@ const getSrcUrl = (source: string | ImageMetadata): string => {
     loading={actualLoading}
     class={imgClasses}
     pictureAttributes={{
-      class: aspectRatio ? "absolute inset-0 w-full h-full" : "block"
+      class: aspectRatio ? "absolute inset-0 w-full h-full" : "block",
     }}
   />
-  
+
   {/* Error fallback - will show if image fails to load */}
   <noscript>
     <img
@@ -201,15 +204,20 @@ const getSrcUrl = (source: string | ImageMetadata): string => {
 <script>
   // Enhanced image loading with error handling and accessibility
   document.addEventListener("DOMContentLoaded", () => {
-    const images = document.querySelectorAll('[data-component="responsive-image"]');
-    
-    images.forEach((container) => {
+    const images = document.querySelectorAll(
+      '[data-component="responsive-image"]'
+    );
+
+    images.forEach(container => {
       const img = container.querySelector("img");
-      const placeholder = container.querySelector('[aria-hidden="true"]') as HTMLElement;
-      const loadingIndicator = container.querySelector('.animate-spin')?.parentElement as HTMLElement;
-      
+      const placeholder = container.querySelector(
+        '[aria-hidden="true"]'
+      ) as HTMLElement;
+      const loadingIndicator = container.querySelector(".animate-spin")
+        ?.parentElement as HTMLElement;
+
       if (!img) return;
-      
+
       // Handle successful image load
       const handleLoad = () => {
         if (placeholder) {
@@ -229,28 +237,32 @@ const getSrcUrl = (source: string | ImageMetadata): string => {
           }, 300);
         }
         img.style.opacity = "1";
-        
+
         // Dispatch custom event for analytics/tracking
-        container.dispatchEvent(new CustomEvent("image:loaded", {
-          detail: { src: img.src, alt: img.alt }
-        }));
+        container.dispatchEvent(
+          new CustomEvent("image:loaded", {
+            detail: { src: img.src, alt: img.alt },
+          })
+        );
       };
-      
+
       // Handle image load error
       const handleError = () => {
         console.warn(`Failed to load image: ${img.src}`);
         img.alt = `${img.alt} (Failed to load)`;
-        
+
         if (loadingIndicator && loadingIndicator.parentNode) {
           loadingIndicator.parentNode.removeChild(loadingIndicator);
         }
-        
+
         // Dispatch custom event for error tracking
-        container.dispatchEvent(new CustomEvent("image:error", {
-          detail: { src: img.src, alt: img.alt }
-        }));
+        container.dispatchEvent(
+          new CustomEvent("image:error", {
+            detail: { src: img.src, alt: img.alt },
+          })
+        );
       };
-      
+
       // Set up event listeners
       if (img.complete) {
         handleLoad();
@@ -268,12 +280,12 @@ const getSrcUrl = (source: string | ImageMetadata): string => {
     max-width: 100%;
     height: auto;
   }
-  
+
   /* Smooth loading transition */
   [data-component="responsive-image"] img {
     opacity: 0;
   }
-  
+
   /* Progressive enhancement for better UX */
   @media (prefers-reduced-motion: reduce) {
     [data-component="responsive-image"] * {
@@ -282,7 +294,7 @@ const getSrcUrl = (source: string | ImageMetadata): string => {
       transition-duration: 0.01ms !important;
     }
   }
-  
+
   /* High contrast mode support */
   @media (prefers-contrast: high) {
     [data-component="responsive-image"] .animate-pulse {

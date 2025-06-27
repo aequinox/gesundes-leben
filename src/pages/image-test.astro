@@ -1,344 +1,390 @@
 ---
-import Layout from "../layouts/Layout.astro";
 import Image from "../components/elements/Image.astro";
+import Layout from "../layouts/Layout.astro";
 
 // Import a sample local image
 import sampleImage from "../assets/images/forrest-gump-quote.png";
 
 // Remote image URL for testing
-const remoteImageUrl = "https://images.unsplash.com/photo-1682687982501-1e58ab814714?q=80&w=1470&auto=format&fit=crop";
+const remoteImageUrl =
+  "https://images.unsplash.com/photo-1682687982501-1e58ab814714?q=80&w=1470&auto=format&fit=crop";
 ---
 
 <Layout title="Image Component Test Page">
   <main class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">Image Component Test Page</h1>
-    
+    <h1 class="mb-8 text-3xl font-bold">Image Component Test Page</h1>
+
     <section class="mb-12">
-      <h2 class="text-2xl font-semibold mb-4">Style Options</h2>
-      
+      <h2 class="mb-4 text-2xl font-semibold">Style Options</h2>
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Default Style</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Default style image" 
+        <h3 class="mb-2 text-xl font-medium">Default Style</h3>
+        <Image
+          src={sampleImage}
+          alt="Default style image"
           title="Default style image"
           style="default"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Polaroid Style</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Polaroid style image" 
+        <h3 class="mb-2 text-xl font-medium">Polaroid Style</h3>
+        <Image
+          src={sampleImage}
+          alt="Polaroid style image"
           title="Polaroid style image"
           style="polaroid"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Bordered Style</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Bordered style image" 
+        <h3 class="mb-2 text-xl font-medium">Bordered Style</h3>
+        <Image
+          src={sampleImage}
+          alt="Bordered style image"
           title="Bordered style image"
           style="bordered"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Floating Style</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Floating style image" 
+        <h3 class="mb-2 text-xl font-medium">Floating Style</h3>
+        <Image
+          src={sampleImage}
+          alt="Floating style image"
           title="Floating style image"
           style="floating"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Glass Style</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Glass style image" 
+        <h3 class="mb-2 text-xl font-medium">Glass Style</h3>
+        <Image
+          src={sampleImage}
+          alt="Glass style image"
           title="Glass style image"
           style="glass"
         />
       </div>
     </section>
-    
+
     <section class="mb-12">
-      <h2 class="text-2xl font-semibold mb-4">Effect Options</h2>
-      
+      <h2 class="mb-4 text-2xl font-semibold">Effect Options</h2>
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Zoom Effect (Hover over image)</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Zoom effect image" 
+        <h3 class="mb-2 text-xl font-medium">Zoom Effect (Hover over image)</h3>
+        <Image
+          src={sampleImage}
+          alt="Zoom effect image"
           title="Zoom effect image"
           effect="zoom"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Parallax Effect (Hover over image)</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Parallax effect image" 
+        <h3 class="mb-2 text-xl font-medium">
+          Parallax Effect (Hover over image)
+        </h3>
+        <Image
+          src={sampleImage}
+          alt="Parallax effect image"
           title="Parallax effect image"
           effect="parallax"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Tilt Effect (Move mouse over image)</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Tilt effect image" 
+        <h3 class="mb-2 text-xl font-medium">
+          Tilt Effect (Move mouse over image)
+        </h3>
+        <Image
+          src={sampleImage}
+          alt="Tilt effect image"
           title="Tilt effect image"
           effect="tilt"
         />
       </div>
     </section>
-    
+
     <section class="mb-12">
-      <h2 class="text-2xl font-semibold mb-4">Position Options</h2>
-      
+      <h2 class="mb-4 text-2xl font-semibold">Position Options</h2>
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Left Position</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Left position image" 
+        <h3 class="mb-2 text-xl font-medium">Left Position</h3>
+        <Image
+          src={sampleImage}
+          alt="Left position image"
           title="Left position image"
           position="left"
         />
         <p class="mb-4">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor posuere. Praesent id metus massa, ut blandit odio.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui
+          mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor
+          neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim.
+          Phasellus molestie magna non est bibendum non venenatis nisl tempor.
+          Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor
+          posuere. Praesent id metus massa, ut blandit odio.
         </p>
         <p>
-          Proin quis tortor orci. Etiam at risus et justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper orci. Quisque eget odio ac lectus vestibulum faucibus eget in metus. In pellentesque faucibus vestibulum. Nulla at nulla justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus in blandit.
+          Proin quis tortor orci. Etiam at risus et justo dignissim congue.
+          Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc
+          eu ullamcorper orci. Quisque eget odio ac lectus vestibulum faucibus
+          eget in metus. In pellentesque faucibus vestibulum. Nulla at nulla
+          justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus
+          in blandit.
         </p>
       </div>
-      
-      <div class="mb-8 clear-both">
-        <h3 class="text-xl font-medium mb-2">Right Position</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Right position image" 
+
+      <div class="clear-both mb-8">
+        <h3 class="mb-2 text-xl font-medium">Right Position</h3>
+        <Image
+          src={sampleImage}
+          alt="Right position image"
           title="Right position image"
           position="right"
         />
         <p class="mb-4">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor posuere. Praesent id metus massa, ut blandit odio.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui
+          mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor
+          neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim.
+          Phasellus molestie magna non est bibendum non venenatis nisl tempor.
+          Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor
+          posuere. Praesent id metus massa, ut blandit odio.
         </p>
         <p>
-          Proin quis tortor orci. Etiam at risus et justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper orci. Quisque eget odio ac lectus vestibulum faucibus eget in metus. In pellentesque faucibus vestibulum. Nulla at nulla justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus in blandit.
+          Proin quis tortor orci. Etiam at risus et justo dignissim congue.
+          Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc
+          eu ullamcorper orci. Quisque eget odio ac lectus vestibulum faucibus
+          eget in metus. In pellentesque faucibus vestibulum. Nulla at nulla
+          justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus
+          in blandit.
         </p>
       </div>
-      
-      <div class="mb-8 clear-both">
-        <h3 class="text-xl font-medium mb-2">Center Position</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Center position image" 
+
+      <div class="clear-both mb-8">
+        <h3 class="mb-2 text-xl font-medium">Center Position</h3>
+        <Image
+          src={sampleImage}
+          alt="Center position image"
           title="Center position image"
           position="center"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Full Position</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Full position image" 
+        <h3 class="mb-2 text-xl font-medium">Full Position</h3>
+        <Image
+          src={sampleImage}
+          alt="Full position image"
           title="Full position image"
           position="full"
         />
       </div>
     </section>
-    
+
     <section class="mb-12">
-      <h2 class="text-2xl font-semibold mb-4">Aspect Ratio Options</h2>
-      
+      <h2 class="mb-4 text-2xl font-semibold">Aspect Ratio Options</h2>
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Auto Aspect Ratio (Original)</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Auto aspect ratio image" 
+        <h3 class="mb-2 text-xl font-medium">Auto Aspect Ratio (Original)</h3>
+        <Image
+          src={sampleImage}
+          alt="Auto aspect ratio image"
           title="Auto aspect ratio image"
           aspectRatio="auto"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Square Aspect Ratio (1:1)</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Square aspect ratio image" 
+        <h3 class="mb-2 text-xl font-medium">Square Aspect Ratio (1:1)</h3>
+        <Image
+          src={sampleImage}
+          alt="Square aspect ratio image"
           title="Square aspect ratio image"
           aspectRatio="square"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Video Aspect Ratio (16:9)</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Video aspect ratio image" 
+        <h3 class="mb-2 text-xl font-medium">Video Aspect Ratio (16:9)</h3>
+        <Image
+          src={sampleImage}
+          alt="Video aspect ratio image"
           title="Video aspect ratio image"
           aspectRatio="video"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Portrait Aspect Ratio (3:4)</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Portrait aspect ratio image" 
+        <h3 class="mb-2 text-xl font-medium">Portrait Aspect Ratio (3:4)</h3>
+        <Image
+          src={sampleImage}
+          alt="Portrait aspect ratio image"
           title="Portrait aspect ratio image"
           aspectRatio="portrait"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Ultrawide Aspect Ratio (21:9)</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Ultrawide aspect ratio image" 
+        <h3 class="mb-2 text-xl font-medium">Ultrawide Aspect Ratio (21:9)</h3>
+        <Image
+          src={sampleImage}
+          alt="Ultrawide aspect ratio image"
           title="Ultrawide aspect ratio image"
           aspectRatio="ultrawide"
         />
       </div>
     </section>
-    
+
     <section class="mb-12">
-      <h2 class="text-2xl font-semibold mb-4">Caption Options</h2>
-      
+      <h2 class="mb-4 text-2xl font-semibold">Caption Options</h2>
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">With Caption</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Image with caption" 
+        <h3 class="mb-2 text-xl font-medium">With Caption</h3>
+        <Image
+          src={sampleImage}
+          alt="Image with caption"
           title="This is a caption for the image"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Without Caption</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Image without caption"
-        />
+        <h3 class="mb-2 text-xl font-medium">Without Caption</h3>
+        <Image src={sampleImage} alt="Image without caption" />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Caption with Left Position Control Character</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Image with left position caption" 
+        <h3 class="mb-2 text-xl font-medium">
+          Caption with Left Position Control Character
+        </h3>
+        <Image
+          src={sampleImage}
+          alt="Image with left position caption"
           title="<This caption should be left-aligned"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Caption with Right Position Control Character</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Image with right position caption" 
+        <h3 class="mb-2 text-xl font-medium">
+          Caption with Right Position Control Character
+        </h3>
+        <Image
+          src={sampleImage}
+          alt="Image with right position caption"
           title=">This caption should be right-aligned"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Caption with Center Position Control Character</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Image with center position caption" 
+        <h3 class="mb-2 text-xl font-medium">
+          Caption with Center Position Control Character
+        </h3>
+        <Image
+          src={sampleImage}
+          alt="Image with center position caption"
           title="|This caption should be center-aligned"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Caption with Full Position Control Character</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Image with full position caption" 
+        <h3 class="mb-2 text-xl font-medium">
+          Caption with Full Position Control Character
+        </h3>
+        <Image
+          src={sampleImage}
+          alt="Image with full position caption"
           title="_This caption should be for a full-width image"
         />
       </div>
     </section>
-    
+
     <section class="mb-12">
-      <h2 class="text-2xl font-semibold mb-4">Image Source Options</h2>
-      
+      <h2 class="mb-4 text-2xl font-semibold">Image Source Options</h2>
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Local Image (ImageMetadata)</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Local image" 
+        <h3 class="mb-2 text-xl font-medium">Local Image (ImageMetadata)</h3>
+        <Image
+          src={sampleImage}
+          alt="Local image"
           title="Local image using ImageMetadata"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Remote Image (URL)</h3>
-        <Image 
-          src={remoteImageUrl} 
-          alt="Remote image" 
+        <h3 class="mb-2 text-xl font-medium">Remote Image (URL)</h3>
+        <Image
+          src={remoteImageUrl}
+          alt="Remote image"
           title="Remote image using URL"
         />
       </div>
     </section>
-    
+
     <section class="mb-12">
-      <h2 class="text-2xl font-semibold mb-4">Combined Examples</h2>
-      
+      <h2 class="mb-4 text-2xl font-semibold">Combined Examples</h2>
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Polaroid Style + Tilt Effect</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Polaroid style with tilt effect" 
+        <h3 class="mb-2 text-xl font-medium">Polaroid Style + Tilt Effect</h3>
+        <Image
+          src={sampleImage}
+          alt="Polaroid style with tilt effect"
           title="Polaroid style with tilt effect"
           style="polaroid"
           effect="tilt"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Glass Style + Zoom Effect + Left Position</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Glass style with zoom effect and left position" 
+        <h3 class="mb-2 text-xl font-medium">
+          Glass Style + Zoom Effect + Left Position
+        </h3>
+        <Image
+          src={sampleImage}
+          alt="Glass style with zoom effect and left position"
           title="<Glass style with zoom effect and left position"
           style="glass"
           effect="zoom"
           position="left"
         />
         <p class="mb-4">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor posuere. Praesent id metus massa, ut blandit odio.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui
+          mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor
+          neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim.
+          Phasellus molestie magna non est bibendum non venenatis nisl tempor.
+          Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor
+          posuere. Praesent id metus massa, ut blandit odio.
         </p>
       </div>
-      
-      <div class="mb-8 clear-both">
-        <h3 class="text-xl font-medium mb-2">Floating Style + Square Aspect Ratio + Right Position</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Floating style with square aspect ratio and right position" 
+
+      <div class="clear-both mb-8">
+        <h3 class="mb-2 text-xl font-medium">
+          Floating Style + Square Aspect Ratio + Right Position
+        </h3>
+        <Image
+          src={sampleImage}
+          alt="Floating style with square aspect ratio and right position"
           title=">Floating style with square aspect ratio"
           style="floating"
           aspectRatio="square"
           position="right"
         />
         <p class="mb-4">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor posuere. Praesent id metus massa, ut blandit odio.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui
+          mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor
+          neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim.
+          Phasellus molestie magna non est bibendum non venenatis nisl tempor.
+          Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor
+          posuere. Praesent id metus massa, ut blandit odio.
         </p>
       </div>
-      
-      <div class="mb-8 clear-both">
-        <h3 class="text-xl font-medium mb-2">Bordered Style + Video Aspect Ratio + Full Position</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Bordered style with video aspect ratio and full position" 
+
+      <div class="clear-both mb-8">
+        <h3 class="mb-2 text-xl font-medium">
+          Bordered Style + Video Aspect Ratio + Full Position
+        </h3>
+        <Image
+          src={sampleImage}
+          alt="Bordered style with video aspect ratio and full position"
           title="_Bordered style with video aspect ratio and full position"
           style="bordered"
           aspectRatio="video"
@@ -346,148 +392,181 @@ const remoteImageUrl = "https://images.unsplash.com/photo-1682687982501-1e58ab81
         />
       </div>
     </section>
-    
+
     <section class="mb-12">
-      <h2 class="text-2xl font-semibold mb-4">Invert Options (Dark Mode Only)</h2>
-      
+      <h2 class="mb-4 text-2xl font-semibold">
+        Invert Options (Dark Mode Only)
+      </h2>
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Inverted Image (Using invert prop)</h3>
-        <p class="text-sm text-muted mb-2">Note: Inversion only applies in dark mode. Switch to dark mode to see the effect.</p>
-        <Image 
-          src={sampleImage} 
-          alt="Inverted image using prop" 
+        <h3 class="mb-2 text-xl font-medium">
+          Inverted Image (Using invert prop)
+        </h3>
+        <p class="mb-2 text-sm text-muted">
+          Note: Inversion only applies in dark mode. Switch to dark mode to see
+          the effect.
+        </p>
+        <Image
+          src={sampleImage}
+          alt="Inverted image using prop"
           title="Inverted image using invert prop"
           invert={true}
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Inverted Image (Using ! control character)</h3>
-        <p class="text-sm text-muted mb-2">Note: Inversion only applies in dark mode. Switch to dark mode to see the effect.</p>
-        <Image 
-          src={sampleImage} 
-          alt="Inverted image using control character" 
+        <h3 class="mb-2 text-xl font-medium">
+          Inverted Image (Using ! control character)
+        </h3>
+        <p class="mb-2 text-sm text-muted">
+          Note: Inversion only applies in dark mode. Switch to dark mode to see
+          the effect.
+        </p>
+        <Image
+          src={sampleImage}
+          alt="Inverted image using control character"
           title="!This image is inverted using the ! control character"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Combined: Invert + Style + Effect</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Inverted image with glass style and zoom effect" 
+        <h3 class="mb-2 text-xl font-medium">
+          Combined: Invert + Style + Effect
+        </h3>
+        <Image
+          src={sampleImage}
+          alt="Inverted image with glass style and zoom effect"
           title="!Inverted image with glass style and zoom effect"
           style="glass"
           effect="zoom"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Combined: Invert + Left Position</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Inverted image with left position" 
+        <h3 class="mb-2 text-xl font-medium">
+          Combined: Invert + Left Position
+        </h3>
+        <Image
+          src={sampleImage}
+          alt="Inverted image with left position"
           title="!<Inverted image with left position"
         />
         <p class="mb-4">
-          This example demonstrates combining the invert prefix (!) with a position control character (&lt;). The image is both inverted and positioned to the left. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula.
+          This example demonstrates combining the invert prefix (!) with a
+          position control character (&lt;). The image is both inverted and
+          positioned to the left. Lorem ipsum dolor sit amet, consectetur
+          adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat
+          molestie vehicula.
         </p>
       </div>
-      
-      <div class="mb-8 clear-both">
-        <h3 class="text-xl font-medium mb-2">Combined: Invert + Right Position</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Inverted image with right position" 
+
+      <div class="clear-both mb-8">
+        <h3 class="mb-2 text-xl font-medium">
+          Combined: Invert + Right Position
+        </h3>
+        <Image
+          src={sampleImage}
+          alt="Inverted image with right position"
           title="!>Inverted image with right position"
         />
         <p class="mb-4">
-          This example demonstrates combining the invert prefix (!) with a position control character (&gt;). The image is both inverted and positioned to the right. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula.
+          This example demonstrates combining the invert prefix (!) with a
+          position control character (&gt;). The image is both inverted and
+          positioned to the right. Lorem ipsum dolor sit amet, consectetur
+          adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat
+          molestie vehicula.
         </p>
       </div>
-      
-      <div class="mb-8 clear-both">
-        <h3 class="text-xl font-medium mb-2">Combined: Invert + Full Position</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Inverted image with full position" 
+
+      <div class="clear-both mb-8">
+        <h3 class="mb-2 text-xl font-medium">
+          Combined: Invert + Full Position
+        </h3>
+        <Image
+          src={sampleImage}
+          alt="Inverted image with full position"
           title="!_Inverted image with full position"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Complex Combination: Invert + Position + Style + Effect</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Complex combination example" 
+        <h3 class="mb-2 text-xl font-medium">
+          Complex Combination: Invert + Position + Style + Effect
+        </h3>
+        <Image
+          src={sampleImage}
+          alt="Complex combination example"
           title="!<Complex combination with invert, left position, glass style, and zoom effect"
           style="glass"
           effect="zoom"
         />
         <p class="mb-4">
-          This example demonstrates a complex combination of features: invert, left position, glass style, and zoom effect. The title uses both the invert prefix (!) and position control character (&lt;), while the style and effect are set via props.
+          This example demonstrates a complex combination of features: invert,
+          left position, glass style, and zoom effect. The title uses both the
+          invert prefix (!) and position control character (&lt;), while the
+          style and effect are set via props.
         </p>
       </div>
     </section>
-    
+
     <section class="mb-12">
-      <h2 class="text-2xl font-semibold mb-4">Advanced Options</h2>
-      
+      <h2 class="mb-4 text-2xl font-semibold">Advanced Options</h2>
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Custom Widths</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Image with custom widths" 
+        <h3 class="mb-2 text-xl font-medium">Custom Widths</h3>
+        <Image
+          src={sampleImage}
+          alt="Image with custom widths"
           title="Image with custom widths [300, 600, 900]"
           widths={[300, 600, 900]}
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Multiple Formats</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Image with multiple formats" 
+        <h3 class="mb-2 text-xl font-medium">Multiple Formats</h3>
+        <Image
+          src={sampleImage}
+          alt="Image with multiple formats"
           title="Image with multiple formats [webp, avif]"
           formats={["webp", "avif"]}
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Custom Quality</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Image with custom quality" 
+        <h3 class="mb-2 text-xl font-medium">Custom Quality</h3>
+        <Image
+          src={sampleImage}
+          alt="Image with custom quality"
           title="Image with custom quality (50)"
           quality={50}
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Eager Loading</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Image with eager loading" 
+        <h3 class="mb-2 text-xl font-medium">Eager Loading</h3>
+        <Image
+          src={sampleImage}
+          alt="Image with eager loading"
           title="Image with eager loading"
           loading="eager"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Custom Sizes Attribute</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Image with custom sizes attribute" 
+        <h3 class="mb-2 text-xl font-medium">Custom Sizes Attribute</h3>
+        <Image
+          src={sampleImage}
+          alt="Image with custom sizes attribute"
           title="Image with custom sizes attribute"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
       </div>
-      
+
       <div class="mb-8">
-        <h3 class="text-xl font-medium mb-2">Custom Densities</h3>
-        <Image 
-          src={sampleImage} 
-          alt="Image with custom densities" 
+        <h3 class="mb-2 text-xl font-medium">Custom Densities</h3>
+        <Image
+          src={sampleImage}
+          alt="Image with custom densities"
           title="Image with custom densities [1, 1.5, 2]"
           densities={[1, 1.5, 2]}
         />

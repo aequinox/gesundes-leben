@@ -1,25 +1,25 @@
 ---
 /**
  * Error Boundary Component
- * 
+ *
  * Provides graceful error handling for Astro components.
  * Since Astro doesn't have React-style error boundaries, this component
  * provides a pattern for wrapping potentially failing content with fallbacks.
- * 
+ *
  * Features:
  * - Graceful degradation on component errors
  * - Customizable error messages
  * - Development vs production error handling
  * - Accessibility-compliant error states
  * - Retry functionality
- * 
+ *
  * @component
  * @example
  * ```astro
  * <ErrorBoundary fallback="Something went wrong">
  *   <SomeRiskyComponent />
  * </ErrorBoundary>
- * 
+ *
  * <ErrorBoundary>
  *   <slot name="error">
  *     <p>Custom error message</p>
@@ -34,19 +34,19 @@ import { cn } from "@/utils/ui/designSystem";
 export interface Props {
   /** Custom fallback message for errors */
   fallback?: string;
-  
+
   /** Whether to show retry button */
   showRetry?: boolean;
-  
+
   /** Component identifier for error tracking */
   componentName?: string;
-  
+
   /** Whether to show detailed errors in development */
   showDetails?: boolean;
-  
+
   /** Additional CSS classes for error container */
   errorClass?: string;
-  
+
   /** Minimum height for error container */
   minHeight?: string;
 }
@@ -85,13 +85,15 @@ const errorContainerClasses = cn(
 
 // Check if this is a server error by looking for error in query params
 const url = new URL(Astro.request.url);
-const hasError = url.searchParams.has('error') || (Astro.response?.status && Astro.response.status >= 400);
+const hasError =
+  url.searchParams.has("error") ||
+  (Astro.response?.status && Astro.response.status >= 400);
 
 // In a real scenario, you'd check if the component had an error during rendering
 // For now, we'll provide the error UI structure
 ---
 
-<div 
+<div
   class={errorContainerClasses}
   style={{ minHeight }}
   data-component={componentName}
@@ -99,177 +101,182 @@ const hasError = url.searchParams.has('error') || (Astro.response?.status && Ast
   role="alert"
   aria-live="polite"
 >
-  {hasError ? (
-    <Fragment>
-      {/* Error Icon */}
-      <div class="mb-4 text-error">
-        <svg 
-          class="w-12 h-12 mx-auto" 
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <path 
-            stroke-linecap="round" 
-            stroke-linejoin="round" 
-            stroke-width="2" 
-            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      </div>
-
-      {/* Error Content */}
-      <div class="space-y-4">
-        {hasErrorSlot ? (
-          <slot name="error" />
-        ) : (
-          <Fragment>
-            <h3 class="text-lg font-semibold text-foreground">
-              {componentName} Error
-            </h3>
-            <p class="text-sm text-muted max-w-md">
-              {fallback}
-            </p>
-          </Fragment>
-        )}
-
-        {/* Development Error Details */}
-        {showDetails && import.meta.env.DEV && (
-          <details class="text-left bg-background p-4 rounded border mt-4">
-            <summary class="cursor-pointer font-medium text-sm">
-              Error Details (Development Only)
-            </summary>
-            <pre class="mt-2 text-xs text-muted whitespace-pre-wrap">
-              Component: {componentName}
-              Error ID: {errorId}
-              URL: {Astro.url.pathname}
-              Time: {new Date().toISOString()}
-            </pre>
-          </details>
-        )}
-
-        {/* Action Buttons */}
-        <div class="flex gap-3 justify-center mt-6">
-          {showRetry && (
-            <button
-              type="button"
-              class="retry-button px-4 py-2 bg-accent text-background rounded-lg font-medium transition-colors hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
-              onclick="window.location.reload()"
-            >
-              Try Again
-            </button>
-          )}
-          
-          <a
-            href="/"
-            class="home-button px-4 py-2 bg-card border border-border text-foreground rounded-lg font-medium transition-colors hover:bg-card-muted focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
+  {
+    hasError ? (
+      <Fragment>
+        {/* Error Icon */}
+        <div class="text-error mb-4">
+          <svg
+            class="mx-auto h-12 w-12"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
           >
-            Go Home
-          </a>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
         </div>
-      </div>
-    </Fragment>
-  ) : (
-    <slot />
-  )}
+
+        {/* Error Content */}
+        <div class="space-y-4">
+          {hasErrorSlot ? (
+            <slot name="error" />
+          ) : (
+            <Fragment>
+              <h3 class="text-lg font-semibold text-foreground">
+                {componentName} Error
+              </h3>
+              <p class="max-w-md text-sm text-muted">{fallback}</p>
+            </Fragment>
+          )}
+
+          {/* Development Error Details */}
+          {showDetails && import.meta.env.DEV && (
+            <details class="mt-4 rounded border bg-background p-4 text-left">
+              <summary class="cursor-pointer text-sm font-medium">
+                Error Details (Development Only)
+              </summary>
+              <pre class="mt-2 text-xs whitespace-pre-wrap text-muted">
+                Component: {componentName}
+                Error ID: {errorId}
+                URL: {Astro.url.pathname}
+                Time: {new Date().toISOString()}
+              </pre>
+            </details>
+          )}
+
+          {/* Action Buttons */}
+          <div class="mt-6 flex justify-center gap-3">
+            {showRetry && (
+              <button
+                type="button"
+                class="retry-button rounded-lg bg-accent px-4 py-2 font-medium text-background transition-colors hover:bg-accent/90 focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:outline-none"
+                onclick="window.location.reload()"
+              >
+                Try Again
+              </button>
+            )}
+
+            <a
+              href="/"
+              class="home-button rounded-lg border border-border bg-card px-4 py-2 font-medium text-foreground transition-colors hover:bg-card-muted focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:outline-none"
+            >
+              Go Home
+            </a>
+          </div>
+        </div>
+      </Fragment>
+    ) : (
+      <slot />
+    )
+  }
 </div>
 
 <script>
-import { logger } from "@/utils/logger";
+  import { logger } from "@/utils/logger";
 
   // Enhanced error boundary functionality
   class ErrorBoundaryManager {
     private errorCount = 0;
     private maxRetries = 3;
-    
+
     constructor() {
       this.init();
     }
-    
+
     private init() {
       // Global error handler
-      window.addEventListener('error', this.handleGlobalError.bind(this));
-      window.addEventListener('unhandledrejection', this.handlePromiseRejection.bind(this));
-      
+      window.addEventListener("error", this.handleGlobalError.bind(this));
+      window.addEventListener(
+        "unhandledrejection",
+        this.handlePromiseRejection.bind(this)
+      );
+
       // Component-specific error handling
       this.setupComponentErrorHandling();
     }
-    
+
     private handleGlobalError(event: ErrorEvent) {
       logger.error(`Global error: ${event.error}`);
-      this.trackError('global', event.error);
+      this.trackError("global", event.error);
     }
-    
+
     private handlePromiseRejection(event: PromiseRejectionEvent) {
       logger.error(`Unhandled promise rejection: ${event.reason}`);
-      this.trackError('promise', event.reason);
+      this.trackError("promise", event.reason);
     }
-    
+
     private setupComponentErrorHandling() {
       // Set up observers for component errors
-      const errorBoundaries = document.querySelectorAll('.error-boundary');
-      
+      const errorBoundaries = document.querySelectorAll(".error-boundary");
+
       errorBoundaries.forEach(boundary => {
-        const retryButton = boundary.querySelector('.retry-button');
+        const retryButton = boundary.querySelector(".retry-button");
         if (retryButton) {
-          retryButton.addEventListener('click', this.handleRetry.bind(this));
+          retryButton.addEventListener("click", this.handleRetry.bind(this));
         }
       });
     }
-    
+
     private handleRetry(event: Event) {
       event.preventDefault();
-      
+
       this.errorCount++;
-      
+
       if (this.errorCount >= this.maxRetries) {
-        alert('Maximum retry attempts reached. Please refresh the page manually.');
+        alert(
+          "Maximum retry attempts reached. Please refresh the page manually."
+        );
         return;
       }
-      
+
       // Add retry logic here
       window.location.reload();
     }
-    
+
     private trackError(type: string, error: Error | unknown) {
       // In a real app, you'd send this to your error tracking service
       const errorData = {
         type,
-        message: (error as Error)?.message || 'Unknown error',
+        message: (error as Error)?.message || "Unknown error",
         stack: (error as Error)?.stack,
         url: window.location.href,
         timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent
+        userAgent: navigator.userAgent,
       };
-      
+
       // For now, just log to console
       logger.error(`Error tracked: ${JSON.stringify(errorData)}`);
-      
+
       // You could send to services like Sentry, LogRocket, etc.
       // this.sendToErrorService(errorData);
     }
-    
+
     public reportError(componentName: string, error: Error) {
-      this.trackError('component', {
+      this.trackError("component", {
         ...error,
-        componentName
+        componentName,
       });
     }
   }
-  
+
   // Initialize error boundary manager
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", () => {
     new ErrorBoundaryManager();
   });
-  
+
   // Export for use by other components
   declare global {
     interface Window {
       reportComponentError: (componentName: string, error: Error) => void;
     }
   }
-  
+
   window.reportComponentError = (componentName: string, error: Error) => {
     logger.error(`Component error in ${componentName}: ${error}`);
   };
@@ -280,21 +287,21 @@ import { logger } from "@/utils/logger";
     /* Ensure error boundaries are visible */
     min-height: var(--min-height, 200px);
   }
-  
+
   .error-boundary details {
     max-width: 500px;
   }
-  
+
   .error-boundary pre {
     overflow-x: auto;
     max-height: 200px;
   }
-  
+
   /* Animation for error state */
   .error-boundary {
     animation: fadeIn 0.3s ease-in-out;
   }
-  
+
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -305,7 +312,7 @@ import { logger } from "@/utils/logger";
       transform: translateY(0);
     }
   }
-  
+
   /* High contrast mode support */
   @media (prefers-contrast: high) {
     .error-boundary {
@@ -313,7 +320,7 @@ import { logger } from "@/utils/logger";
       background: ButtonFace;
     }
   }
-  
+
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
     .error-boundary {

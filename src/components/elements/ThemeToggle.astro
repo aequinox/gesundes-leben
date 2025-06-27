@@ -22,15 +22,16 @@ const {
 }: Props = Astro.props;
 
 const t = useTranslations(lang);
-
 ---
 
 <button
   id="theme-btn"
   class:list={[
-    variant === "icon" ? "rounded-full p-2 hover:bg-accent/10 hover:text-accent" : 
-    variant === "switch" ? "inline-flex overflow-hidden rounded-full" :
-    "rounded-md p-1 hover:bg-card",
+    variant === "icon"
+      ? "rounded-full p-2 hover:bg-accent/10 hover:text-accent"
+      : variant === "switch"
+        ? "inline-flex overflow-hidden rounded-full"
+        : "rounded-md p-1 hover:bg-card",
     size === "sm" ? "scale-75" : size === "lg" ? "scale-125" : "scale-100",
     className,
   ]}

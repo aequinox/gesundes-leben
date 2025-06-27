@@ -59,7 +59,7 @@ if (title) {
   if (title.charAt(0) === "!") {
     shouldInvert = true;
     finalTitle = title.slice(1);
-    
+
     // Check if there's a position control character after the invert
     if (finalTitle.length > 0) {
       const positionChar = finalTitle.charAt(0);
@@ -67,9 +67,9 @@ if (title) {
         ">": "right",
         "<": "left",
         "|": "center",
-        "_": "full",
+        _: "full",
       };
-      
+
       if (positionMap[positionChar]) {
         finalPosition = positionMap[positionChar] as typeof position;
         finalTitle = finalTitle.slice(1);
@@ -82,7 +82,7 @@ if (title) {
       ">": "right",
       "<": "left",
       "|": "center",
-      "_": "full",
+      _: "full",
     };
 
     if (directionMap[controlChar]) {
@@ -100,7 +100,6 @@ if (isStringSource) {
   // Use the string directly for the fallback case
   stringSource = srcProp as string;
 }
-
 
 // Determine animation based on position
 const animationDirection =
@@ -150,17 +149,17 @@ if (!isStringSource && !width && !height) {
   const imgMetadata = srcProp as ImageMetadata;
   width = imgMetadata.width;
   height = imgMetadata.height;
-  
+
   // Apply aspect ratio adjustments if needed
   if (aspectRatio !== "auto" && width && height) {
     if (aspectRatio === "square") {
       height = width;
     } else if (aspectRatio === "video") {
-      height = Math.round(width * (9/16));
+      height = Math.round(width * (9 / 16));
     } else if (aspectRatio === "portrait") {
-      height = Math.round(width * (4/3));
+      height = Math.round(width * (4 / 3));
     } else if (aspectRatio === "ultrawide") {
-      height = Math.round(width * (9/21));
+      height = Math.round(width * (9 / 21));
     }
   }
 }
@@ -174,20 +173,20 @@ if (!isStringSource && !width && !height) {
     finalPosition === "left"
       ? "float-left mr-8 md:max-w-[50%] lg:max-w-[40%]"
       : finalPosition === "right"
-      ? "float-right ml-8 md:max-w-[50%] lg:max-w-[40%]"
-      : finalPosition === "center"
-      ? "mx-auto block md:max-w-[70%]"
-      : finalPosition === "full"
-      ? "mx-auto block w-full"
-      : "",
+        ? "float-right ml-8 md:max-w-[50%] lg:max-w-[40%]"
+        : finalPosition === "center"
+          ? "mx-auto block md:max-w-[70%]"
+          : finalPosition === "full"
+            ? "mx-auto block w-full"
+            : "",
     // Effect
     effect === "zoom"
-      ? "overflow-hidden group"
+      ? "group overflow-hidden"
       : effect === "parallax"
-      ? "overflow-hidden"
-      : effect === "tilt"
-      ? ""
-      : "",
+        ? "overflow-hidden"
+        : effect === "tilt"
+          ? ""
+          : "",
   ]}
   data-aos={animationDirection}
   data-effect={effect}
@@ -198,37 +197,37 @@ if (!isStringSource && !width && !height) {
       "relative overflow-hidden",
       // Style
       style === "polaroid"
-        ? "rounded-sm bg-white p-2 shadow-image-polaroid dark:bg-card"
+        ? "shadow-image-polaroid rounded-sm bg-white p-2 dark:bg-card"
         : style === "bordered"
-        ? "rounded-none border-4 border-accent/30 p-1"
-        : style === "floating"
-        ? "rounded-lg shadow-image-floating"
-        : style === "glass"
-        ? "rounded-xl bg-white/5 backdrop-blur border border-white/10 dark:bg-black/20 dark:border-white/5 shadow-image-glass"
-        : "overflow-hidden rounded-none border-0 shadow-none",
+          ? "rounded-none border-4 border-accent/30 p-1"
+          : style === "floating"
+            ? "shadow-image-floating rounded-lg"
+            : style === "glass"
+              ? "shadow-image-glass rounded-xl border border-white/10 bg-white/5 backdrop-blur dark:border-white/5 dark:bg-black/20"
+              : "overflow-hidden rounded-none border-0 shadow-none",
       // Aspect ratio
       aspectRatio === "square"
         ? "aspect-square"
         : aspectRatio === "video"
-        ? "aspect-video"
-        : aspectRatio === "portrait"
-        ? "aspect-[3/4]"
-        : aspectRatio === "ultrawide"
-        ? "aspect-[21/9]"
-        : "",
+          ? "aspect-video"
+          : aspectRatio === "portrait"
+            ? "aspect-[3/4]"
+            : aspectRatio === "ultrawide"
+              ? "aspect-[21/9]"
+              : "",
       // Effect
       effect === "zoom" ? "group" : "",
-      effect === "tilt" ? "transition-transform duration-300 will-change-transform" : "",
+      effect === "tilt"
+        ? "transition-transform duration-300 will-change-transform"
+        : "",
     ]}
-    style={
-      style === "polaroid"
-        ? "transform: rotate(var(--rotation, 0deg)); --rotation: calc(2deg - 4deg * Math.random());"
-        : undefined
-    }
+    style={style === "polaroid"
+      ? "transform: rotate(var(--rotation, 0deg)); --rotation: calc(2deg - 4deg * Math.random());"
+      : undefined}
   >
     {
       isStringSource ? (
-        stringSource.startsWith('http') ? (
+        stringSource.startsWith("http") ? (
           // For remote images, use the AstroImage component with remote optimization
           <AstroImage
             src={stringSource}
@@ -242,7 +241,9 @@ if (!isStringSource && !width && !height) {
               // Base image: h-full w-full object-cover transition-all duration-500
               "h-full w-full object-cover transition-all duration-500",
               // Zoom effect
-              effect === "zoom" ? "transition-transform duration-500 group-hover:scale-105" : "",
+              effect === "zoom"
+                ? "transition-transform duration-500 group-hover:scale-105"
+                : "",
               // Tilt effect
               effect === "tilt" ? "" : "",
               // Invert effect
@@ -261,7 +262,9 @@ if (!isStringSource && !width && !height) {
               // Base image: h-full w-full object-cover transition-all duration-500
               "h-full w-full object-cover transition-all duration-500",
               // Zoom effect
-              effect === "zoom" ? "transition-transform duration-500 group-hover:scale-105" : "",
+              effect === "zoom"
+                ? "transition-transform duration-500 group-hover:scale-105"
+                : "",
               // Tilt effect
               effect === "tilt" ? "" : "",
               // Invert effect
@@ -269,68 +272,74 @@ if (!isStringSource && !width && !height) {
             ]}
           />
         )
+      ) : // For ImageMetadata objects, use Picture for art direction or Image for simple cases
+      formats.length > 1 ? (
+        <Picture
+          src={srcProp as ImageMetadata}
+          alt={alt}
+          widths={widths}
+          formats={formats}
+          sizes={sizes}
+          quality={quality}
+          loading={loading}
+          class:list={[
+            "h-full w-full object-cover transition-all duration-500",
+            effect === "zoom"
+              ? "transition-transform duration-500 group-hover:scale-105"
+              : "",
+            effect === "tilt" ? "" : "",
+            shouldInvert ? "invert" : "",
+          ]}
+        />
       ) : (
-        // For ImageMetadata objects, use Picture for art direction or Image for simple cases
-        formats.length > 1 ? (
-          <Picture
-            src={srcProp as ImageMetadata}
-            alt={alt}
-            widths={widths}
-            formats={formats}
-            sizes={sizes}
-            quality={quality}
-            loading={loading}
-            class:list={[
-              "h-full w-full object-cover transition-all duration-500",
-              effect === "zoom" ? "transition-transform duration-500 group-hover:scale-105" : "",
-              effect === "tilt" ? "" : "",
-              shouldInvert ? "invert" : "",
-            ]}
-          />
-        ) : (
-          <AstroImage
-            src={srcProp as ImageMetadata}
-            alt={alt}
-            width={width}
-            height={height}
-            densities={densities}
-            sizes={sizes}
-            quality={quality}
-            loading={loading}
-            class:list={[
-              "h-full w-full object-cover transition-all duration-500",
-              effect === "zoom" ? "transition-transform duration-500 group-hover:scale-105" : "",
-              effect === "tilt" ? "" : "",
-              shouldInvert ? "invert" : "",
-            ]}
-          />
-        )
+        <AstroImage
+          src={srcProp as ImageMetadata}
+          alt={alt}
+          width={width}
+          height={height}
+          densities={densities}
+          sizes={sizes}
+          quality={quality}
+          loading={loading}
+          class:list={[
+            "h-full w-full object-cover transition-all duration-500",
+            effect === "zoom"
+              ? "transition-transform duration-500 group-hover:scale-105"
+              : "",
+            effect === "tilt" ? "" : "",
+            shouldInvert ? "invert" : "",
+          ]}
+        />
       )
     }
 
-    {effect === "parallax" && (
-      <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-    )}
+    {
+      effect === "parallax" && (
+        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      )
+    }
   </div>
 
-  {finalTitle && (
-    <figcaption
-      class:list={[
-        // Caption: relative text-center text-sm font-light tracking-wide text-foreground transition-all duration-300
-        "relative text-center text-sm font-light tracking-wide text-foreground transition-all duration-300",
-        // Before pseudo: handled via custom utility or plugin, fallback omitted
-        // Hover: text-accent
-        // Position-specific
-        finalPosition === "left"
-          ? "text-left"
-          : finalPosition === "right"
-          ? "text-right"
-          : "",
-      ]}
-    >
-      {finalTitle}
-    </figcaption>
-  )}
+  {
+    finalTitle && (
+      <figcaption
+        class:list={[
+          // Caption: relative text-center text-sm font-light tracking-wide text-foreground transition-all duration-300
+          "relative text-center text-sm font-light tracking-wide text-foreground transition-all duration-300",
+          // Before pseudo: handled via custom utility or plugin, fallback omitted
+          // Hover: text-accent
+          // Position-specific
+          finalPosition === "left"
+            ? "text-left"
+            : finalPosition === "right"
+              ? "text-right"
+              : "",
+        ]}
+      >
+        {finalTitle}
+      </figcaption>
+    )
+  }
 </figure>
 
 <script>

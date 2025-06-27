@@ -1,96 +1,100 @@
-import { vi, describe, beforeEach, it, expect } from 'vitest';
-
-// Mock dependencies before imports
-vi.mock('astro:content', () => ({
-  getEntry: vi.fn(),
-  getCollection: vi.fn()
-}));
-
-vi.mock('../logger', () => ({
-  logger: {
-    error: vi.fn()
-  }
-}));
-
-import { 
+import {
   getAuthorEntry,
   getAllAuthors,
   getAuthorData,
   resolveAuthors,
-  getAuthorDisplayName
-} from '../authors';
-import type { Author } from '../types';
+  getAuthorDisplayName,
+} from "../authors";
+import type { Author } from "../types";
+import { vi, describe, beforeEach, it, expect } from "vitest";
 
-describe('authors utilities', () => {
+// Mock dependencies before imports
+vi.mock("astro:content", () => ({
+  getEntry: vi.fn(),
+  getCollection: vi.fn(),
+}));
+
+vi.mock("../logger", () => ({
+  logger: {
+    error: vi.fn(),
+  },
+}));
+
+describe("authors utilities", () => {
   const mockGetEntry = vi.fn();
   const mockGetCollection = vi.fn();
   const mockLoggerError = vi.fn();
 
   const mockAuthor: Author = {
-    id: 'test-author',
-    collection: 'authors',
+    id: "test-author",
+    collection: "authors",
     data: {
-      name: 'Test Author',
-      bio: 'Test bio',
-      avatar: '/test-avatar.jpg',
+      name: "Test Author",
+      bio: "Test bio",
+      avatar: "/test-avatar.jpg",
     },
-    body: ''
+    body: "",
   };
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    
+
     // Connect mocks to imported modules
-    const astroContent = await import('astro:content');
-    const logger = await import('../logger');
-    
+    const astroContent = await import("astro:content");
+    const logger = await import("../logger");
+
     vi.mocked(astroContent.getEntry).mockImplementation(mockGetEntry);
     vi.mocked(astroContent.getCollection).mockImplementation(mockGetCollection);
     vi.mocked(logger.logger.error).mockImplementation(mockLoggerError);
   });
 
-  describe('getAuthorEntry', () => {
-    it('should return author entry by string slug', async () => {
-      const { getEntry } = await import('astro:content');
+  describe("getAuthorEntry", () => {
+    it("should return author entry by string slug", async () => {
+      const { getEntry } = await import("astro:content");
       vi.mocked(getEntry).mockResolvedValue(mockAuthor);
 
-      const result = await getAuthorEntry('test-author');
+      const result = await getAuthorEntry("test-author");
       expect(result).toEqual(mockAuthor);
-      expect(getEntry).toHaveBeenCalledWith('authors', 'test-author');
+      expect(getEntry).toHaveBeenCalledWith("authors", "test-author");
     });
 
-    it('should return author entry by reference object', async () => {
-      const { getEntry } = await import('astro:content');
+    it("should return author entry by reference object", async () => {
+      const { getEntry } = await import("astro:content");
       vi.mocked(getEntry).mockResolvedValue(mockAuthor);
 
-      const result = await getAuthorEntry({ collection: 'authors', id: 'test-author' });
+      const result = await getAuthorEntry({
+        collection: "authors",
+        id: "test-author",
+      });
       expect(result).toEqual(mockAuthor);
-      expect(getEntry).toHaveBeenCalledWith('authors', 'test-author');
+      expect(getEntry).toHaveBeenCalledWith("authors", "test-author");
     });
 
-    it('should return null and log error when getEntry fails', async () => {
-      const testError = new Error('Test error');
+    it("should return null and log error when getEntry fails", async () => {
+      const testError = new Error("Test error");
       mockGetEntry.mockRejectedValue(testError);
 
-      const result = await getAuthorEntry('test-author');
+      const result = await getAuthorEntry("test-author");
       expect(result).toBeNull();
       expect(mockLoggerError).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to fetch author with identifier: test-author')
+        expect.stringContaining(
+          "Failed to fetch author with identifier: test-author"
+        )
       );
     });
   });
 
-  describe('getAllAuthors', () => {
-    it('should return all authors', async () => {
+  describe("getAllAuthors", () => {
+    it("should return all authors", async () => {
       mockGetCollection.mockResolvedValue([mockAuthor]);
 
       const result = await getAllAuthors();
       expect(result).toEqual([mockAuthor]);
-      expect(mockGetCollection).toHaveBeenCalledWith('authors');
+      expect(mockGetCollection).toHaveBeenCalledWith("authors");
     });
 
-    it('should return empty array when getCollection fails', async () => {
-      const testError = new Error('Test error');
+    it("should return empty array when getCollection fails", async () => {
+      const testError = new Error("Test error");
       mockGetCollection.mockRejectedValue(testError);
 
       const result = await getAllAuthors();
@@ -100,67 +104,69 @@ describe('authors utilities', () => {
       // );
     });
 
-    it('should return empty array for invalid collection format', async () => {
-      mockGetCollection.mockResolvedValue({ invalid: 'format' });
+    it("should return empty array for invalid collection format", async () => {
+      mockGetCollection.mockResolvedValue({ invalid: "format" });
 
       const result = await getAllAuthors();
       expect(result).toEqual([]);
-      expect(mockLoggerError).toHaveBeenCalledWith('Invalid authors collection format');
+      expect(mockLoggerError).toHaveBeenCalledWith(
+        "Invalid authors collection format"
+      );
     });
   });
 
-  describe('getAuthorData', () => {
-    it('should return author data by slug', async () => {
+  describe("getAuthorData", () => {
+    it("should return author data by slug", async () => {
       mockGetEntry.mockResolvedValue(mockAuthor);
 
-      const result = await getAuthorData('test-author');
+      const result = await getAuthorData("test-author");
       expect(result).toEqual(mockAuthor.data);
     });
 
-    it('should return null when author not found', async () => {
+    it("should return null when author not found", async () => {
       mockGetEntry.mockResolvedValue(null);
 
-      const result = await getAuthorData('test-author');
+      const result = await getAuthorData("test-author");
       expect(result).toBeNull();
     });
   });
 
-  describe('resolveAuthors', () => {
-    it('should resolve multiple authors in parallel', async () => {
-      mockGetEntry.mockImplementation((collection: string, id: string) => 
+  describe("resolveAuthors", () => {
+    it("should resolve multiple authors in parallel", async () => {
+      mockGetEntry.mockImplementation((collection: string, id: string) =>
         Promise.resolve({ ...mockAuthor, id, collection })
       );
 
       const authors = [
-        'author1', 
-        'author2', 
-        { collection: 'authors', id: 'author3' } as const
+        "author1",
+        "author2",
+        { collection: "authors", id: "author3" } as const,
       ];
       const result = await resolveAuthors(authors);
-      
+
       expect(result).toHaveLength(3);
-      expect(result[0]?.id).toBe('author1');
-      expect(result[1]?.id).toBe('author2');
-      expect(result[2]?.id).toBe('author3');
+      expect(result[0]?.id).toBe("author1");
+      expect(result[1]?.id).toBe("author2");
+      expect(result[2]?.id).toBe("author3");
     });
   });
 
-  describe('getAuthorDisplayName', () => {
-    it('should return name from author data when available', async () => {
+  describe("getAuthorDisplayName", () => {
+    it("should return name from author data when available", async () => {
       mockGetEntry.mockResolvedValue(mockAuthor);
 
-      const result = await getAuthorDisplayName('test-author');
-      expect(result).toBe('Test Author');
+      const result = await getAuthorDisplayName("test-author");
+      expect(result).toBe("Test Author");
     });
 
-    it('should format slug as fallback name', async () => {
-      mockGetEntry.mockResolvedValue({ 
-        ...mockAuthor, 
-        data: { ...mockAuthor.data, name: undefined } 
+    it("should format slug as fallback name", async () => {
+      mockGetEntry.mockResolvedValue({
+        ...mockAuthor,
+        data: { ...mockAuthor.data, name: undefined },
       });
 
-      const result = await getAuthorDisplayName('test-author-name');
-      expect(result).toBe('Test Author Name');
+      const result = await getAuthorDisplayName("test-author-name");
+      expect(result).toBe("Test Author Name");
     });
   });
 });

@@ -181,7 +181,7 @@ const showArticle = (article: HTMLElement): void => {
     clearTimeout(parseInt(article.dataset.hideTimeoutId));
     delete article.dataset.hideTimeoutId;
   }
-  
+
   article.style.display = "";
   article.classList.remove("hide");
   article.classList.add("show");
@@ -199,7 +199,7 @@ const hideArticle = (article: HTMLElement): void => {
     clearTimeout(parseInt(article.dataset.hideTimeoutId));
     delete article.dataset.hideTimeoutId;
   }
-  
+
   article.style.display = "none";
   article.classList.remove("show");
   article.classList.add("hide");
@@ -222,7 +222,7 @@ const updateFilterCount = (count: number): void => {
  */
 const toggleNoResultsMessage = (show: boolean): void => {
   if (!elements.noResults || !elements.articleGrid) return;
-  
+
   if (show) {
     elements.noResults.style.display = "flex";
     elements.articleGrid.classList.add("hidden");
@@ -250,7 +250,7 @@ const toggleNoResultsMessage = (show: boolean): void => {
  */
 const updateGroupSelectionUI = (): void => {
   if (!elements.groupSelectors) return;
-  
+
   elements.groupSelectors.forEach(selector => {
     const group = selector.dataset.group as GroupType;
     const iconWrapper = selector.querySelector(
@@ -277,17 +277,18 @@ const updateGroupSelectionUI = (): void => {
  */
 const getAvailableCategories = (): Set<string> => {
   const availableCategories = new Set<string>();
-  
+
   if (!elements.articles) return availableCategories;
 
   elements.articles.forEach(article => {
     // Check if article would be visible with current group filter (ignoring category filter)
     const postGroup = article.dataset.group;
-    const shouldInclude = !state.selectedGroup || postGroup === state.selectedGroup;
-    
+    const shouldInclude =
+      !state.selectedGroup || postGroup === state.selectedGroup;
+
     if (shouldInclude && article.dataset.categories) {
       let postCategories: string[] = [];
-      
+
       if (article.dataset.categories.includes("|")) {
         postCategories = article.dataset.categories.split("|");
       } else if (article.dataset.categories.includes(",")) {
@@ -295,7 +296,7 @@ const getAvailableCategories = (): Set<string> => {
       } else {
         postCategories = [article.dataset.categories];
       }
-      
+
       postCategories.forEach(category => {
         const trimmedCategory = category.trim();
         if (trimmedCategory) {
@@ -310,12 +311,12 @@ const getAvailableCategories = (): Set<string> => {
 
 /**
  * Gets category counts for articles that would be visible based on the current group filter.
- * 
+ *
  * @returns A Map where keys are category names and values are article counts
  */
 const getCategoryCounts = (): Map<string, number> => {
   const categoryCounts = new Map<string, number>();
-  
+
   if (!elements.articles) return categoryCounts;
 
   // Count total articles for "Alle" category
@@ -324,14 +325,15 @@ const getCategoryCounts = (): Map<string, number> => {
   elements.articles.forEach(article => {
     // Check if article would be visible with current group filter (ignoring category filter)
     const postGroup = article.dataset.group;
-    const shouldInclude = !state.selectedGroup || postGroup === state.selectedGroup;
-    
+    const shouldInclude =
+      !state.selectedGroup || postGroup === state.selectedGroup;
+
     if (shouldInclude) {
       totalCount++;
-      
+
       if (article.dataset.categories) {
         let postCategories: string[] = [];
-        
+
         if (article.dataset.categories.includes("|")) {
           postCategories = article.dataset.categories.split("|");
         } else if (article.dataset.categories.includes(",")) {
@@ -339,11 +341,14 @@ const getCategoryCounts = (): Map<string, number> => {
         } else {
           postCategories = [article.dataset.categories];
         }
-        
+
         postCategories.forEach(category => {
           const trimmedCategory = category.trim();
           if (trimmedCategory) {
-            categoryCounts.set(trimmedCategory, (categoryCounts.get(trimmedCategory) || 0) + 1);
+            categoryCounts.set(
+              trimmedCategory,
+              (categoryCounts.get(trimmedCategory) || 0) + 1
+            );
           }
         });
       }
@@ -365,7 +370,7 @@ const updateCategoryButtonVisibility = (): void => {
   if (!elements.categoryButtons) return;
 
   const availableCategories = getAvailableCategories();
-  
+
   elements.categoryButtons.forEach(button => {
     const category = button.dataset.category;
     if (!category) return;
@@ -394,32 +399,35 @@ const updateCategoryButtonCounts = (): void => {
   if (!elements.categoryButtons) return;
 
   const categoryCounts = getCategoryCounts();
-  
+
   elements.categoryButtons.forEach(button => {
     const category = button.dataset.category;
     if (!category) return;
 
     const count = categoryCounts.get(category) || 0;
-    
+
     // Remove any existing dynamically created count elements to prevent duplicates
-    const existingDynamicCounts = button.querySelectorAll('.category-count');
+    const existingDynamicCounts = button.querySelectorAll(".category-count");
     existingDynamicCounts.forEach(el => el.remove());
-    
+
     // Find existing count badge in the button's span
-    const buttonSpan = button.querySelector('span');
-    const existingBadge = buttonSpan?.querySelector('.count-badge') as HTMLElement | null;
-    
+    const buttonSpan = button.querySelector("span");
+    const existingBadge = buttonSpan?.querySelector(
+      ".count-badge"
+    ) as HTMLElement | null;
+
     if (count > 0) {
       if (existingBadge) {
         // Update existing badge
         existingBadge.textContent = count.toString();
-        existingBadge.style.display = '';
+        existingBadge.style.display = "";
       } else {
         // Create new badge using the same classes as in the Astro component
-        const countBadge = document.createElement('span');
-        countBadge.className = 'count-badge ease-cubic-bezier-[0.22,1,0.36,1] ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-accent/20 px-1.5 text-xs font-medium transition-all duration-300 group-hover:bg-accent/30 group-data-[active=true]:bg-accent/40';
+        const countBadge = document.createElement("span");
+        countBadge.className =
+          "count-badge ease-cubic-bezier-[0.22,1,0.36,1] ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-accent/20 px-1.5 text-xs font-medium transition-all duration-300 group-hover:bg-accent/30 group-data-[active=true]:bg-accent/40";
         countBadge.textContent = count.toString();
-        
+
         if (buttonSpan) {
           buttonSpan.appendChild(countBadge);
         }
@@ -427,7 +435,7 @@ const updateCategoryButtonCounts = (): void => {
     } else {
       // Hide existing badge if count is 0
       if (existingBadge) {
-        existingBadge.style.display = 'none';
+        existingBadge.style.display = "none";
       }
     }
   });
@@ -445,7 +453,7 @@ const updateCategoryButtonCounts = (): void => {
  */
 const updateCategorySelectionUI = (): void => {
   if (!elements.categoryButtons) return;
-  
+
   elements.categoryButtons.forEach(button => {
     const category = button.dataset.category;
     if (category === state.selectedCategory) {
@@ -498,7 +506,7 @@ const handleGroupSelectorClick = (event: Event): void => {
 const handleCategoryButtonClick = (event: Event): void => {
   const target = event.currentTarget as HTMLElement;
   const category = target.dataset.category;
-  
+
   if (!category) return;
 
   if (state.selectedCategory === category) {
@@ -613,7 +621,7 @@ const prepareArticlesForFiltering = (): void => {
 
     if (!article.dataset.categories) {
       const categoryElements = article.querySelectorAll("[data-category]");
-      
+
       if (categoryElements.length > 0) {
         const categories: string[] = [];
         categoryElements.forEach(el => {
@@ -628,7 +636,7 @@ const prepareArticlesForFiltering = (): void => {
 
     if (!article.dataset.group) {
       const groupElements = article.querySelectorAll("[data-group]");
-      
+
       if (groupElements.length > 0) {
         const el = groupElements[0] as HTMLElement;
         if (el.dataset.group) article.dataset.group = el.dataset.group;
@@ -652,9 +660,7 @@ const prepareArticlesForFiltering = (): void => {
 
 export const initBlogFilter = (userOptions: FilterOptions = {}): void => {
   options = { ...DEFAULT_OPTIONS, ...userOptions };
-  logger.log(
-    "Initializing blog filter."
-  );
+  logger.log("Initializing blog filter.");
   const initialize = async () => {
     initializeElements();
     prepareArticlesForFiltering();

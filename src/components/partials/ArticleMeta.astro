@@ -45,7 +45,7 @@ const iconName = isModified ? "tabler:edit" : "tabler:calendar";
     showAuthor && author && (
       <Fragment>
         <div
-          class="relative w-0 h-4 mx-2 after:content-['|'] after:absolute after:left-0 after:text-current after:opacity-50 last:hidden last:after:hidden"
+          class="relative mx-2 h-4 w-0 after:absolute after:left-0 after:text-current after:opacity-50 after:content-['|'] last:hidden last:after:hidden"
           aria-hidden="true"
         />
         <Author author={author} size={size} classes="article-meta-author" />
@@ -57,7 +57,7 @@ const iconName = isModified ? "tabler:edit" : "tabler:calendar";
     showReadingTime && "readingTime" in post.data && post.data.readingTime && (
       <Fragment>
         <div
-          class="relative w-0 h-4 mx-2 after:content-['|'] after:absolute after:left-0 after:text-current after:opacity-50 last:hidden last:after:hidden"
+          class="relative mx-2 h-4 w-0 after:absolute after:left-0 after:text-current after:opacity-50 after:content-['|'] last:hidden last:after:hidden"
           aria-hidden="true"
         />
         <ReadingTime

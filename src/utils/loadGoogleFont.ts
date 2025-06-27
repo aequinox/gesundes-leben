@@ -45,7 +45,7 @@ type Weight = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
 /**
  * Font style type matching satori's FontStyle type
  */
-type FontStyle = 'normal' | 'italic';
+type FontStyle = "normal" | "italic";
 
 /**
  * Loads multiple Google Fonts based on the specified text, returning their data and properties.

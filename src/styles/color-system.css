@@ -1,0 +1,194 @@
+/* Enhanced Color System - OKLCH Based */
+
+@layer base {
+  /* Extended OKLCH Color Palette */
+  :root {
+    /* Primary brand colors */
+    --brand-primary: oklch(62% 0.17 215deg);
+    --brand-secondary: oklch(58% 0.15 230deg);
+    --brand-tertiary: oklch(65% 0.16 200deg);
+
+    /* Semantic color system */
+    --semantic-success: oklch(65% 0.15 145deg);
+    --semantic-warning: oklch(75% 0.16 80deg);
+    --semantic-error: oklch(62% 0.2 20deg);
+    --semantic-info: oklch(62% 0.17 215deg);
+
+    /* Neutral scale - Perfect for health/wellness content */
+    --neutral-50: oklch(98% 0.005 220deg);
+    --neutral-100: oklch(95% 0.01 220deg);
+    --neutral-200: oklch(90% 0.015 220deg);
+    --neutral-300: oklch(85% 0.02 220deg);
+    --neutral-400: oklch(75% 0.025 220deg);
+    --neutral-500: oklch(65% 0.03 220deg);
+    --neutral-600: oklch(55% 0.035 220deg);
+    --neutral-700: oklch(45% 0.04 220deg);
+    --neutral-800: oklch(35% 0.045 220deg);
+    --neutral-900: oklch(25% 0.05 220deg);
+    --neutral-950: oklch(15% 0.055 220deg);
+
+    /* Health-specific color tokens */
+    --health-nutrition: oklch(65% 0.18 120deg); /* Green for nutrition */
+    --health-fitness: oklch(62% 0.2 25deg); /* Orange for fitness */
+    --health-mental: oklch(68% 0.16 270deg); /* Purple for mental health */
+    --health-medical: oklch(62% 0.17 215deg); /* Blue for medical */
+    --health-lifestyle: oklch(75% 0.16 80deg); /* Yellow for lifestyle */
+
+    /* Interactive states */
+    --interactive-hover: oklch(from var(--accent) calc(l * 0.9) c h);
+    --interactive-active: oklch(from var(--accent) calc(l * 0.8) c h);
+    --interactive-disabled: oklch(from var(--foreground) l c h / 0.4);
+
+    /* Surface variations */
+    --surface-tint: oklch(from var(--accent) l c h / 0.05);
+    --surface-highlight: oklch(from var(--accent) l c h / 0.1);
+    --surface-overlay: oklch(0% 0 0deg / 0.5);
+
+    /* Focus and selection */
+    --focus-ring: oklch(from var(--accent) l c h / 0.3);
+    --selection-bg: oklch(from var(--accent) l c h / 0.2);
+    --selection-text: var(--foreground);
+  }
+
+  /* Dark theme color adjustments */
+  html[data-theme="dark"] {
+    /* Enhanced dark mode neutrals */
+    --neutral-50: oklch(15% 0.025 260deg);
+    --neutral-100: oklch(18% 0.03 260deg);
+    --neutral-200: oklch(22% 0.035 260deg);
+    --neutral-300: oklch(28% 0.04 260deg);
+    --neutral-400: oklch(38% 0.045 260deg);
+    --neutral-500: oklch(48% 0.05 260deg);
+    --neutral-600: oklch(58% 0.045 260deg);
+    --neutral-700: oklch(68% 0.04 260deg);
+    --neutral-800: oklch(78% 0.035 260deg);
+    --neutral-900: oklch(88% 0.03 260deg);
+    --neutral-950: oklch(95% 0.025 260deg);
+
+    /* Adjusted health colors for dark mode */
+    --health-nutrition: oklch(70% 0.18 120deg);
+    --health-fitness: oklch(67% 0.22 25deg);
+    --health-mental: oklch(73% 0.16 270deg);
+    --health-medical: oklch(72% 0.18 215deg);
+    --health-lifestyle: oklch(80% 0.18 80deg);
+
+    /* Enhanced interactive states for dark mode */
+    --interactive-hover: oklch(from var(--accent) calc(l * 1.1) c h);
+    --interactive-active: oklch(from var(--accent) calc(l * 1.2) c h);
+    --surface-overlay: oklch(0% 0 0deg / 0.7);
+  }
+
+  /* Color utility classes */
+  .text-brand-primary {
+    color: var(--brand-primary);
+  }
+  .text-brand-secondary {
+    color: var(--brand-secondary);
+  }
+  .text-brand-tertiary {
+    color: var(--brand-tertiary);
+  }
+
+  .text-success {
+    color: var(--semantic-success);
+  }
+  .text-warning {
+    color: var(--semantic-warning);
+  }
+  .text-error {
+    color: var(--semantic-error);
+  }
+  .text-info {
+    color: var(--semantic-info);
+  }
+
+  .text-health-nutrition {
+    color: var(--health-nutrition);
+  }
+  .text-health-fitness {
+    color: var(--health-fitness);
+  }
+  .text-health-mental {
+    color: var(--health-mental);
+  }
+  .text-health-medical {
+    color: var(--health-medical);
+  }
+  .text-health-lifestyle {
+    color: var(--health-lifestyle);
+  }
+
+  .bg-brand-primary {
+    background-color: var(--brand-primary);
+  }
+  .bg-brand-secondary {
+    background-color: var(--brand-secondary);
+  }
+  .bg-brand-tertiary {
+    background-color: var(--brand-tertiary);
+  }
+
+  .bg-surface-tint {
+    background-color: var(--surface-tint);
+  }
+  .bg-surface-highlight {
+    background-color: var(--surface-highlight);
+  }
+
+  /* Enhanced badge system with health categories */
+  .badge-nutrition {
+    background: var(--health-nutrition);
+    color: white;
+  }
+
+  .badge-fitness {
+    background: var(--health-fitness);
+    color: white;
+  }
+
+  .badge-mental {
+    background: var(--health-mental);
+    color: white;
+  }
+
+  .badge-medical {
+    background: var(--health-medical);
+    color: white;
+  }
+
+  .badge-lifestyle {
+    background: var(--health-lifestyle);
+    color: black;
+  }
+
+  /* Color scheme media queries */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      color-scheme: dark;
+    }
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme]) {
+      color-scheme: light;
+    }
+  }
+
+  /* High contrast mode enhancements */
+  @media (prefers-contrast: high) {
+    :root {
+      --brand-primary: CanvasText;
+      --semantic-success: #00aa00;
+      --semantic-warning: #ffaa00;
+      --semantic-error: #cc0000;
+      --semantic-info: #0066cc;
+    }
+  }
+
+  /* Reduced motion color transitions */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition-property: none !important;
+    }
+  }
+}

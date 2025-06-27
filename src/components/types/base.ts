@@ -7,14 +7,13 @@
  * @example
  * ```typescript
  * import type { BaseComponentProps, SizeVariant } from './base';
- * 
+ *
  * export interface MyComponentProps extends BaseComponentProps {
  *   size?: SizeVariant;
  *   variant?: 'primary' | 'secondary';
  * }
  * ```
  */
-
 
 // Common size variants used across components
 export type SizeVariant = "xs" | "sm" | "md" | "lg" | "xl";
@@ -23,13 +22,13 @@ export type SizeVariant = "xs" | "sm" | "md" | "lg" | "xl";
 export type ShapeVariant = "square" | "rounded" | "pill" | "circle";
 
 // Common color variants based on design system
-export type ColorVariant = 
-  | "primary" 
-  | "secondary" 
-  | "accent" 
-  | "muted" 
-  | "success" 
-  | "warning" 
+export type ColorVariant =
+  | "primary"
+  | "secondary"
+  | "accent"
+  | "muted"
+  | "success"
+  | "warning"
   | "error";
 
 // Loading states
@@ -41,19 +40,19 @@ export type LoadingState = boolean | "idle" | "loading" | "success" | "error";
 export interface BaseComponentProps {
   /** Additional CSS classes */
   class?: string;
-  
+
   /** Unique identifier */
   id?: string;
-  
+
   /** Whether the component is disabled */
   disabled?: boolean;
-  
+
   /** Loading state */
   loading?: LoadingState;
-  
+
   /** Accessible label for screen readers */
   ariaLabel?: string;
-  
+
   /** Additional data attributes */
   "data-testid"?: string;
 }
@@ -64,19 +63,19 @@ export interface BaseComponentProps {
 export interface InteractiveComponentProps extends BaseComponentProps {
   /** Click handler */
   onclick?: string;
-  
+
   /** Whether the element is focusable */
   tabindex?: number;
-  
+
   /** ARIA role override */
   role?: string;
-  
+
   /** ARIA expanded state */
   "aria-expanded"?: boolean | "true" | "false";
-  
+
   /** ARIA controls relationship */
   "aria-controls"?: string;
-  
+
   /** ARIA described by relationship */
   "aria-describedby"?: string;
 }
@@ -87,25 +86,25 @@ export interface InteractiveComponentProps extends BaseComponentProps {
 export interface FormElementProps extends InteractiveComponentProps {
   /** Form element name */
   name?: string;
-  
+
   /** Whether the field is required */
   required?: boolean;
-  
+
   /** Whether the field is readonly */
   readonly?: boolean;
-  
+
   /** Placeholder text */
   placeholder?: string;
-  
+
   /** Field value */
   value?: string | number;
-  
+
   /** Default value */
   defaultValue?: string | number;
-  
+
   /** ARIA invalid state */
   "aria-invalid"?: boolean | "true" | "false";
-  
+
   /** ARIA required state */
   "aria-required"?: boolean | "true" | "false";
 }
@@ -116,16 +115,16 @@ export interface FormElementProps extends InteractiveComponentProps {
 export interface LayoutComponentProps extends BaseComponentProps {
   /** Layout variant */
   layout?: "stack" | "cluster" | "sidebar" | "center" | "grid";
-  
+
   /** Spacing between elements */
   gap?: SizeVariant | "none";
-  
+
   /** Padding around the component */
   padding?: SizeVariant | "none";
-  
+
   /** Whether to take full width */
   fullWidth?: boolean;
-  
+
   /** Whether to take full height */
   fullHeight?: boolean;
 }
@@ -136,16 +135,16 @@ export interface LayoutComponentProps extends BaseComponentProps {
 export interface ContentComponentProps extends BaseComponentProps {
   /** Content title */
   title?: string;
-  
+
   /** Content description */
   description?: string;
-  
+
   /** Whether to show the title */
   showTitle?: boolean;
-  
+
   /** Whether to show the description */
   showDescription?: boolean;
-  
+
   /** Content variant */
   variant?: "default" | "outlined" | "filled" | "ghost";
 }
@@ -156,16 +155,16 @@ export interface ContentComponentProps extends BaseComponentProps {
 export interface NavigationComponentProps extends InteractiveComponentProps {
   /** Link href */
   href?: string;
-  
+
   /** Whether to open in new tab */
   newTab?: boolean;
-  
+
   /** Whether the link is active/current */
   active?: boolean;
-  
+
   /** Download attribute for links */
   download?: string;
-  
+
   /** Relationship attribute for links */
   rel?: string;
 }
@@ -173,28 +172,29 @@ export interface NavigationComponentProps extends InteractiveComponentProps {
 /**
  * Base props for media components (images, videos, etc.)
  */
-export interface MediaComponentProps extends Omit<BaseComponentProps, 'loading'> {
+export interface MediaComponentProps
+  extends Omit<BaseComponentProps, "loading"> {
   /** Media source URL or ImageMetadata */
   src: string | ImageMetadata;
-  
+
   /** Alternative text */
   alt: string;
-  
+
   /** Loading strategy */
   loading?: "lazy" | "eager";
-  
+
   /** Object fit behavior */
   objectFit?: "cover" | "contain" | "fill" | "scale-down" | "none";
-  
+
   /** Object position */
   objectPosition?: "center" | "top" | "bottom" | "left" | "right" | string;
-  
+
   /** Media width */
   width?: number;
-  
+
   /** Media height */
   height?: number;
-  
+
   /** Aspect ratio */
   aspectRatio?: string;
 }
@@ -215,19 +215,19 @@ export interface ImageMetadata {
 export interface TypographyComponentProps extends BaseComponentProps {
   /** Text size variant */
   size?: SizeVariant;
-  
+
   /** Font weight */
   weight?: "light" | "normal" | "medium" | "semibold" | "bold";
-  
+
   /** Text alignment */
   align?: "left" | "center" | "right" | "justify";
-  
+
   /** Text color variant */
   color?: ColorVariant | "inherit";
-  
+
   /** Whether to truncate long text */
   truncate?: boolean | number;
-  
+
   /** Text transform */
   transform?: "uppercase" | "lowercase" | "capitalize" | "none";
 }
@@ -235,14 +235,14 @@ export interface TypographyComponentProps extends BaseComponentProps {
 /**
  * Utility type for extracting HTML attributes for specific elements
  */
-export type HTMLProps = 
-  Record<string, any> & BaseComponentProps;
+export type HTMLProps = Record<string, any> & BaseComponentProps;
 
 /**
  * Props for components that can render as different HTML elements
  */
-export interface PolymorphicComponentProps<T extends keyof HTMLElementTagNameMap = "div"> 
-  extends BaseComponentProps {
+export interface PolymorphicComponentProps<
+  T extends keyof HTMLElementTagNameMap = "div",
+> extends BaseComponentProps {
   /** The HTML element to render as */
   as?: T;
 }
@@ -253,13 +253,13 @@ export interface PolymorphicComponentProps<T extends keyof HTMLElementTagNameMap
 export interface AnimationProps {
   /** Animation duration */
   duration?: "fast" | "normal" | "slow" | number;
-  
+
   /** Animation delay */
   delay?: number;
-  
+
   /** Animation easing */
   easing?: "linear" | "ease" | "ease-in" | "ease-out" | "ease-in-out";
-  
+
   /** Whether to respect motion preferences */
   respectMotion?: boolean;
 }
@@ -270,10 +270,10 @@ export interface AnimationProps {
 export interface ThemeProps {
   /** Theme variant */
   theme?: "light" | "dark" | "auto";
-  
+
   /** Color scheme override */
   colorScheme?: "light" | "dark";
-  
+
   /** High contrast mode */
   highContrast?: boolean;
 }

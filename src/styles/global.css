@@ -1,5 +1,8 @@
 @import "tailwindcss";
 @import "./typography.css";
+/* @import "./typography-enhanced.css"; */
+@import "./modern-enhancements.css";
+@import "./color-system.css";
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
@@ -209,7 +212,13 @@ html[data-theme="dark"] .invert {
     @apply scroll-pt-16 overflow-y-scroll scroll-smooth;
   }
   body {
-    @apply flex min-h-svh flex-col bg-background pt-16 font-(family-name:--font-poppins) text-foreground selection:bg-accent/75 selection:text-background;
+    @apply flex min-h-svh flex-col bg-background pt-16 text-foreground;
+  }
+
+  ::selection {
+    background: oklch(from var(--accent) l c h / 0.2);
+    color: var(--foreground);
+    text-shadow: none;
   }
   a,
   button {
@@ -226,16 +235,21 @@ html[data-theme="dark"] .invert {
 
   #article > section:nth-child(2) {
     & > h1:nth-child(1) {
-      @apply text-center leading-8 break-words !text-accent;
+      @apply text-center leading-tight break-words !text-accent;
+      font-size: var(--font-size-3xl);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      text-wrap: balance;
+      margin-block: 0 1rem;
     }
 
     & > p:nth-child(2) {
-      @apply !text-center text-base leading-relaxed tracking-wide hyphens-auto xl:text-lg;
+      @apply !text-center leading-relaxed tracking-wide hyphens-auto;
+      font-size: var(--font-size-lg);
+      color: oklch(from var(--foreground) calc(l * 0.9) c h);
+      text-wrap: pretty;
+      margin-block: 0 2rem;
     }
-  }
-
-  .hashtag {
-    color: red;
   }
 }
 

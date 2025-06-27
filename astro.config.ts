@@ -91,7 +91,7 @@ export default defineConfig({
       {
         name: "Poppins",
         provider: "local",
-        cssVariable: "--font-poppins",
+        cssVariable: "--font-body",
         // Weight and style are not specified so Astro
         // will try to infer them for each variant
         variants: [

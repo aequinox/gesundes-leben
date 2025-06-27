@@ -60,7 +60,10 @@ const resizerScriptUrl =
 }
 
 <!-- Client-side script for loading and initializing the iframe -->
-<script is:inline define:vars={{ iframeId, resizerScriptUrl, heightMethod, checkOrigin }}>
+<script
+  is:inline
+  define:vars={{ iframeId, resizerScriptUrl, heightMethod, checkOrigin }}
+>
   // Note: cannot import in inline scripts, so we'll use console for logging
 
   // Use IIFE to avoid polluting global scope

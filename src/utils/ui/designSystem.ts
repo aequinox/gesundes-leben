@@ -7,7 +7,7 @@
  * @example
  * ```typescript
  * import { focusStyles, shadowStyles, buttonBaseClasses } from './designSystem';
- * 
+ *
  * const buttonClasses = [
  *   ...buttonBaseClasses,
  *   ...focusStyles.ring,
@@ -21,14 +21,14 @@ export const DESIGN_TOKENS = {
   // Spacing scale
   spacing: {
     xs: "0.25rem", // 4px
-    sm: "0.5rem",  // 8px
-    md: "1rem",    // 16px
-    lg: "1.5rem",  // 24px
-    xl: "2rem",    // 32px
+    sm: "0.5rem", // 8px
+    md: "1rem", // 16px
+    lg: "1.5rem", // 24px
+    xl: "2rem", // 32px
     "2xl": "3rem", // 48px
     "3xl": "4rem", // 64px
   },
-  
+
   // Border radius scale
   borderRadius: {
     none: "0",
@@ -39,14 +39,14 @@ export const DESIGN_TOKENS = {
     "2xl": "1rem",
     full: "9999px",
   },
-  
+
   // Animation durations
   animation: {
     fast: "150ms",
     normal: "300ms",
     slow: "500ms",
   },
-  
+
   // Breakpoints
   breakpoints: {
     sm: "640px",
@@ -66,7 +66,7 @@ export const focusStyles = {
     "focus-visible:ring-accent",
     "focus-visible:ring-offset-2",
   ] as string[],
-  
+
   // Focus ring with background offset
   ringWithOffset: [
     "focus-visible:outline-none",
@@ -75,17 +75,15 @@ export const focusStyles = {
     "focus-visible:ring-offset-2",
     "focus-visible:ring-offset-background",
   ] as string[],
-  
+
   // Custom OKLCH focus outline
   oklchOutline: [
     "focus-visible:[outline:2px_solid_oklch(var(--color-accent))]",
     "focus-visible:[outline-offset:2px]",
   ] as string[],
-  
+
   // Focus without outline (for custom implementations)
-  noOutline: [
-    "focus-visible:outline-none",
-  ] as string[],
+  noOutline: ["focus-visible:outline-none"] as string[],
 };
 
 // Shadow system
@@ -96,18 +94,18 @@ export const shadowStyles = {
     medium: ["shadow-[var(--shadow-elevation-medium)]"],
     high: ["shadow-[var(--shadow-elevation-high)]"],
   },
-  
+
   surface: ["shadow-[var(--shadow-surface)]"],
   ambient: ["shadow-[var(--shadow-ambient)]"],
   inner: ["shadow-[var(--shadow-inner)]"],
-  
+
   // Colored shadows for specific use cases
   colored: {
     pro: ["shadow-[var(--shadow-pro)]"],
     contra: ["shadow-[var(--shadow-contra)]"],
     questionTime: ["shadow-[var(--shadow-question-time)]"],
   },
-  
+
   // Hover shadow transitions
   hoverTransitions: {
     elevate: [
@@ -135,14 +133,14 @@ export const animationStyles = {
     opacity: ["transition-opacity", "duration-200", "ease-out"],
     shadow: ["transition-shadow", "duration-300", "ease-out"],
   },
-  
+
   // Common hover effects
   hover: {
     lift: ["hover:translate-y-[-1px]", "active:translate-y-0"],
     scale: ["hover:scale-105", "active:scale-100"],
     fade: ["hover:opacity-80"],
   },
-  
+
   // Loading and disabled states
   states: {
     loading: ["cursor-wait", "pointer-events-none"],
@@ -153,7 +151,7 @@ export const animationStyles = {
       "pointer-events-none",
     ],
   },
-  
+
   // Motion reduction
   motionSafe: [
     "motion-reduce:transform-none",
@@ -169,16 +167,16 @@ export const buttonBaseClasses = [
   "items-center",
   "justify-center",
   "gap-2",
-  
+
   // Typography
   "font-medium",
   "text-center",
   "no-underline",
-  
+
   // Interaction
   "cursor-pointer",
   "select-none",
-  
+
   // Accessibility
   "forced-colors:border",
   "forced-colors:border-[ButtonText]",
@@ -189,11 +187,11 @@ export const inputBaseClasses = [
   // Layout
   "block",
   "w-full",
-  
+
   // Typography
   "text-sm",
   "font-normal",
-  
+
   // Styling
   "bg-background",
   "border",
@@ -201,7 +199,7 @@ export const inputBaseClasses = [
   "rounded-lg",
   "px-3",
   "py-2",
-  
+
   // States
   "placeholder:text-muted",
   "disabled:cursor-not-allowed",
@@ -214,13 +212,13 @@ export const cardBaseClasses = [
   // Layout
   "relative",
   "overflow-hidden",
-  
+
   // Styling
   "bg-card",
   "border",
   "border-border",
   "rounded-lg",
-  
+
   // Interaction
   "transition-all",
   "duration-300",
@@ -232,23 +230,21 @@ export const linkBaseClasses = [
   // Styling
   "text-accent",
   "no-underline",
-  
+
   // Interaction
   "transition-colors",
   "duration-200",
   "ease-out",
   "hover:text-accent/80",
-  
+
   // States
   "visited:text-accent",
 ] as const;
 
 // Screen reader utilities
 export const screenReaderStyles = {
-  only: [
-    "sr-only",
-  ],
-  
+  only: ["sr-only"],
+
   focusable: [
     "sr-only",
     "focus:not-sr-only",
@@ -275,26 +271,22 @@ export const iconStyles = {
     lg: ["size-6"],
     xl: ["size-8"],
   },
-  
-  common: [
-    "flex-shrink-0",
-    "select-none",
-  ],
-  
-  decorative: [
-    "aria-hidden",
-  ],
+
+  common: ["flex-shrink-0", "select-none"],
+
+  decorative: ["aria-hidden"],
 } as const;
 
 // Utility functions for combining classes
-export function cn(...classes: (string | string[] | undefined | null | false)[]): string {
-  return classes
-    .flat()
-    .filter(Boolean)
-    .join(" ");
+export function cn(
+  ...classes: (string | string[] | undefined | null | false)[]
+): string {
+  return classes.flat().filter(Boolean).join(" ");
 }
 
-export function combineClasses(...classSets: (readonly string[] | string[])[]): string[] {
+export function combineClasses(
+  ...classSets: (readonly string[] | string[])[]
+): string[] {
   return classSets.flat();
 }
 
@@ -304,13 +296,13 @@ export function responsive(
   variants: Partial<Record<keyof typeof DESIGN_TOKENS.breakpoints, string[]>>
 ): string[] {
   const result = [...base];
-  
+
   Object.entries(variants).forEach(([breakpoint, classes]) => {
     if (classes) {
       result.push(...classes.map(cls => `${breakpoint}:${cls}`));
     }
   });
-  
+
   return result;
 }
 

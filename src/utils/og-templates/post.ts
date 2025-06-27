@@ -1,11 +1,11 @@
 // import { html } from "satori-html";
+import { defaultLang } from "../../i18n/ui";
+import { useTranslations } from "../../i18n/utils";
 import { getAuthorDisplayName } from "../authors";
 import { loadGoogleFonts } from "../loadGoogleFont";
 import { logger } from "../logger";
 import type { Post } from "../types";
 import { SITE } from "@/config";
-import { useTranslations } from "../../i18n/utils";
-import { defaultLang } from "../../i18n/ui";
 import satori from "satori";
 
 const COLORS = {
@@ -144,7 +144,7 @@ export default async (post: Post) => {
                 borderRadius: "50%",
                 background: typeColorSet.gradient,
                 opacity: 0.2,
-                filter: "blur(15px)"
+                filter: "blur(15px)",
               },
             },
           },
@@ -160,7 +160,7 @@ export default async (post: Post) => {
                 borderRadius: "50%",
                 background: typeColorSet.gradient,
                 opacity: 0.1,
-                filter: "blur(5px)"
+                filter: "blur(5px)",
               },
             },
           },
