@@ -30,7 +30,7 @@ const DEFAULT_OPTIONS: SlugifyOptions = {
   replacement: "-",
   remove: undefined,
   lower: true,
-  strict: false,
+  strict: true,
   locale: "de",
   trim: true,
 };
@@ -50,7 +50,7 @@ export const getPostSlug = (post: Post): string => {
   // Get the title and remove any date prefix (YYYY-MM-DD-)
   const title = post.data.title;
   logger.info(title);
-  const titleWithoutDate = title.replace(/^\d{4}-\d{2}-\d{2}-\s*/, "");
+  const titleWithoutDate = title.replace(/^\d{4}-\d{2}-\d{2}[-\s]\s*/, "");
 
   return slugifyStr(titleWithoutDate);
 };
@@ -62,8 +62,11 @@ const slugifyStr = (
   str: string,
   options: Partial<SlugifyOptions> = {}
 ): string => {
-  if (!str || typeof str !== "string") {
+  if (typeof str !== "string") {
     throw new Error("Invalid input: string required");
+  }
+  if (str.trim() === "") {
+    return "";
   }
   return slugifier(str.trim(), { ...DEFAULT_OPTIONS, ...options });
 };

@@ -31,6 +31,14 @@ const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
 const dateFormatterCache = new Map<string, Intl.DateTimeFormat>();
 
 /**
+ * Clears the date formatter cache (used for testing)
+ * @internal
+ */
+export const clearDateFormatterCache = (): void => {
+  dateFormatterCache.clear();
+};
+
+/**
  * Gets or creates a cached date formatter for consistent formatting
  * @param options - Formatting options for the date
  * @returns A date formatter instance
