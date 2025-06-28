@@ -53,6 +53,7 @@ const blog = defineCollection({
         .number()
         .positive("Reading time must be positive")
         .optional(),
+      references: z.array(z.string()).default([]),
     }),
 });
 
@@ -79,4 +80,25 @@ const favorites = defineCollection({
   }),
 });
 
-export const collections = { authors, blog, favorites, glossary };
+const references = defineCollection({
+  loader: glob({ pattern: "references.json", base: PATHS.references }),
+  schema: z.record(
+    z.string(),
+    z.object({
+      type: z.enum(["journal", "website"]),
+      title: z.string().min(1, "Title cannot be empty"),
+      authors: z.array(z.string()),
+      year: z.number(),
+      journal: z.string().optional(),
+      volume: z.number().optional(),
+      issue: z.number().optional(),
+      pages: z.string().optional(),
+      doi: z.string().optional(),
+      url: z.string().url("Invalid URL format"),
+      keywords: z.array(z.string()).default([]),
+      abstract: z.string().optional(),
+    })
+  ),
+});
+
+export const collections = { authors, blog, favorites, glossary, references };

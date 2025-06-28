@@ -137,6 +137,7 @@ describe("Slug Utilities", () => {
       } as any,
       keywords: ["test"],
       group: "pro",
+      references: [],
     },
     rendered: undefined,
   });
