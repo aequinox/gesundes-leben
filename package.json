@@ -17,7 +17,10 @@
     "test:coverage": "bun test --coverage",
     "test:watch": "bun test --watch",
     "analyze": "node scripts/analyze-bundle.js",
-    "build:analyze": "bun run build && bun run analyze"
+    "build:analyze": "bun run build && bun run analyze",
+    "perf:test": "node tests/performance/run-tests.js",
+    "docs:generate": "node scripts/generate-component-docs.js",
+    "a11y:test": "node tests/accessibility/a11y-test.js"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.1",

@@ -121,6 +121,7 @@ const structuredData = {
   }
 
   <ClientRouter />
-  <Font cssVariable="--font-body" preload />
+  <!-- Load all font variants without automatic preloading -->
+  <Font cssVariable="--font-body" />
   <script is:inline src="/toggle-theme.js"></script>
 </head>

@@ -1,0 +1,45 @@
+# Bun Configuration for Healthy Life Project
+# https://bun.sh/docs/runtime/bunfig
+
+[test]
+# Test configuration
+preload = ["./tests/setup.ts"]
+timeout = 30000
+coverage = true
+coverage-threshold = 80
+# Run tests with coverage by default
+coverage-dir = "./coverage"
+coverage-reporter = ["lcov", "text", "html"]
+
+# Test patterns
+test = [
+  "**/*.test.{ts,tsx,js,jsx}",
+  "**/*.spec.{ts,tsx,js,jsx}"
+]
+
+# Ignore patterns for tests
+ignore = [
+  "**/node_modules/**",
+  "**/dist/**", 
+  "**/public/**",
+  "**/.astro/**"
+]
+
+[install]
+# Package manager configuration
+cache = true
+production = false
+frozen-lockfile = true
+
+# Registry configuration  
+registry = "https://registry.npmjs.org/"
+
+[run]
+# Runtime configuration
+shell = "/bin/bash"
+
+# Environment variables for development
+[define]
+# Define compile-time constants
+__DEV__ = "true"
+__TEST__ = "process.env.NODE_ENV === 'test'"

@@ -1,4 +1,63 @@
 ---
+/**
+ * Enhanced Image Component
+ *
+ * A high-performance image component built on Astro's optimized Image component.
+ * Provides advanced features for modern web performance and user experience.
+ *
+ * Features:
+ * - Automatic image optimization (WebP, AVIF support)
+ * - Responsive image generation with srcset
+ * - Lazy loading with intersection observer
+ * - Multiple visual styles and effects
+ * - Aspect ratio preservation
+ * - Accessibility-first design
+ * - Dark mode inversion support
+ *
+ * @component
+ * @since 1.0.0
+ * @author Healthy Life Team
+ *
+ * @example Basic usage
+ * ```astro
+ * ---
+ * import Image from '@/components/elements/Image.astro';
+ * import heroImage from '@/assets/images/hero.jpg';
+ * ---
+ * <Image src={heroImage} alt="Hero image description" />
+ * ```
+ *
+ * @example With responsive configuration
+ * ```astro
+ * ---
+ * import Image from '@/components/elements/Image.astro';
+ * ---
+ * <Image
+ *   src="/images/large-image.jpg"
+ *   alt="Large responsive image"
+ *   widths={[400, 800, 1200]}
+ *   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+ *   formats={['avif', 'webp', 'jpeg']}
+ *   loading="eager"
+ * />
+ * ```
+ *
+ * @example With visual effects
+ * ```astro
+ * ---
+ * import Image from '@/components/elements/Image.astro';
+ * ---
+ * <Image
+ *   src="/images/portrait.jpg"
+ *   alt="Portrait with effects"
+ *   aspectRatio="portrait"
+ *   style="polaroid"
+ *   effect="tilt"
+ *   position="center"
+ * />
+ * ```
+ */
+
 import type { ImageMetadata } from "astro";
 import { Image as AstroImage, Picture } from "astro:assets";
 

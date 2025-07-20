@@ -11,11 +11,50 @@
  * - Smooth animations with reduced motion support
  * - Internationalization support
  * - Print and high contrast mode optimizations
+ * - Skip-to-content link for screen readers
+ * - Astro page transition support
  *
  * @component
- * @example
+ * @since 1.0.0
+ * @author Healthy Life Team
+ *
+ * @example Basic usage
  * ```astro
+ * ---
+ * import Header from '@/components/sections/Header.astro';
+ * ---
+ * <Header />
+ * ```
+ *
+ * @example With active navigation
+ * ```astro
+ * ---
+ * import Header from '@/components/sections/Header.astro';
+ * ---
  * <Header activeNav="posts" />
+ * ```
+ *
+ * @example In a layout
+ * ```astro
+ * ---
+ * import Header from '@/components/sections/Header.astro';
+ * import type { NavigationLink } from '@/types';
+ *
+ * interface Props {
+ *   activeNav?: NavigationLink;
+ * }
+ *
+ * const { activeNav } = Astro.props;
+ * ---
+ * <!DOCTYPE html>
+ * <html>
+ *   <body>
+ *     <Header activeNav={activeNav} />
+ *     <main id="main-content">
+ *       <slot />
+ *     </main>
+ *   </body>
+ * </html>
  * ```
  */
 

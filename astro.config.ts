@@ -92,26 +92,30 @@ export default defineConfig({
         name: "Poppins",
         provider: "local",
         cssVariable: "--font-body",
-        // Weight and style are not specified so Astro
-        // will try to infer them for each variant
         variants: [
           {
             src: [
               "./src/assets/fonts/Poppins-400.woff2",
               "./src/assets/fonts/Poppins-400.woff",
             ],
+            weight: "400",
+            style: "normal",
           },
           {
             src: [
               "./src/assets/fonts/Poppins-600.woff2",
               "./src/assets/fonts/Poppins-600.woff",
             ],
+            weight: "600",
+            style: "normal",
           },
           {
             src: [
               "./src/assets/fonts/Poppins-800.woff2",
               "./src/assets/fonts/Poppins-800.woff",
             ],
+            weight: "800",
+            style: "normal",
           },
         ],
       },
