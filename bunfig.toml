@@ -36,7 +36,7 @@ registry = "https://registry.npmjs.org/"
 
 [run]
 # Runtime configuration
-shell = "/bin/bash"
+shell = "system"
 
 # Environment variables for development
 [define]

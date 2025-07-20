@@ -9,7 +9,7 @@ import {
   extractEmailDomain,
   normalizeEmail,
 } from "../validation";
-import { describe, it, expect } from "bun:test";
+import { describe, it, expect, vi } from "bun:test";
 
 describe("isValidEmail", () => {
   describe("valid emails", () => {
@@ -229,6 +229,71 @@ describe("error handling", () => {
     expect(isValidEmail(123 as unknown as string)).toBe(false);
     expect(isValidEmail({} as unknown as string)).toBe(false);
     expect(isValidEmail([] as unknown as string)).toBe(false);
+  });
+
+  it("should handle errors in validation process", () => {
+    // Test error catching in isValidEmail - lines 143-146
+    // Create a mock email string that will cause an error during validation
+    const mockEmail = "test@example.com";
+
+    // Mock the logger.error to track calls
+    const loggerErrorSpy = vi.fn();
+    const originalError = (globalThis as any).logger?.error;
+    if ((globalThis as any).logger) {
+      (globalThis as any).logger.error = loggerErrorSpy;
+    }
+
+    // Create a malformed input that will cause type conversion errors
+    const malformedInput = {
+      trim: () => {
+        throw new Error("Trim error");
+      },
+      toString: () => mockEmail,
+    };
+
+    expect(isValidEmail(malformedInput as any)).toBe(false);
+
+    // Restore original logger
+    if ((globalThis as any).logger) {
+      (globalThis as any).logger.error = originalError;
+    }
+  });
+
+  it("should handle local part validation edge cases", () => {
+    // Test lines 169-170 - consecutive dots in local part
+    expect(isValidEmail("user..name@example.com")).toBe(false);
+
+    // Test leading/trailing dots - lines that should be covered
+    expect(isValidEmail(".user@example.com")).toBe(false);
+    expect(isValidEmail("user.@example.com")).toBe(false);
+  });
+
+  it("should handle domain part validation edge cases", () => {
+    // Test lines 206-209 - domain throwing on error
+    expect(isValidEmail("user@domain.with..consecutive.dots.com")).toBe(false);
+    expect(isValidEmail("user@.example.com")).toBe(false);
+    expect(isValidEmail("user@example.com.")).toBe(false);
+    expect(isValidEmail("user@-example.com")).toBe(false);
+    expect(isValidEmail("user@example-.com")).toBe(false);
+  });
+
+  it("should handle invalid domain labels", () => {
+    // Test lines 267-268 - domain label validation
+    expect(isValidEmail("user@exam_ple.com")).toBe(false); // underscore not allowed
+    expect(isValidEmail("user@-example.com")).toBe(false); // leading hyphen
+    expect(isValidEmail("user@example-.com")).toBe(false); // trailing hyphen
+
+    // Test very long domain label (over 63 chars)
+    const longLabel = "a".repeat(64);
+    expect(isValidEmail(`user@${longLabel}.com`)).toBe(false);
+  });
+
+  it("should handle domain validation failure scenarios", () => {
+    // Test lines 236-237 - insufficient labels
+    expect(isValidEmail("user@domain")).toBe(false);
+
+    // Test TLD too short
+    expect(isValidEmail("user@example.c", { minDomainLength: 2 })).toBe(false);
   });
 });
 
