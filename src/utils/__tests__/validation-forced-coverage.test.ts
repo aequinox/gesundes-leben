@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * @file validation-forced-coverage.test.ts
  * @description Forced coverage tests targeting specific uncovered lines in validation.ts
  */
-import { describe, it, expect, vi } from "bun:test";
+import { describe, it, expect } from "bun:test";
 
 describe("Forced Validation Coverage", () => {
   it("should trigger error handler lines 143-146", async () => {
@@ -41,7 +42,7 @@ describe("Forced Validation Coverage", () => {
 
     // Mock logger debug to verify it's called
     const originalLogger = (globalThis as any).logger;
-    const mockLogger = { debug: vi.fn(), error: vi.fn() };
+    const mockLogger = { debug: () => {}, error: () => {} };
     (globalThis as any).logger = mockLogger;
 
     // Test consecutive dots in local part
@@ -60,7 +61,7 @@ describe("Forced Validation Coverage", () => {
 
     // Mock logger debug to verify it's called
     const originalLogger = (globalThis as any).logger;
-    const mockLogger = { debug: vi.fn(), error: vi.fn() };
+    const mockLogger = { debug: () => {}, error: () => {} };
     (globalThis as any).logger = mockLogger;
 
     // Test scenarios that trigger domain part debug logs
@@ -79,7 +80,7 @@ describe("Forced Validation Coverage", () => {
 
     // Mock logger debug to verify it's called
     const originalLogger = (globalThis as any).logger;
-    const mockLogger = { debug: vi.fn(), error: vi.fn() };
+    const mockLogger = { debug: () => {}, error: () => {} };
     (globalThis as any).logger = mockLogger;
 
     // Test insufficient domain labels
@@ -95,7 +96,7 @@ describe("Forced Validation Coverage", () => {
 
     // Mock logger debug to verify it's called
     const originalLogger = (globalThis as any).logger;
-    const mockLogger = { debug: vi.fn(), error: vi.fn() };
+    const mockLogger = { debug: () => {}, error: () => {} };
     (globalThis as any).logger = mockLogger;
 
     // Test invalid domain label scenarios

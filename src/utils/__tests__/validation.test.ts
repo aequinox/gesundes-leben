@@ -9,7 +9,7 @@ import {
   extractEmailDomain,
   normalizeEmail,
 } from "../validation";
-import { describe, it, expect, vi } from "bun:test";
+import { describe, it, expect } from "bun:test";
 
 describe("isValidEmail", () => {
   describe("valid emails", () => {
@@ -237,7 +237,7 @@ describe("error handling", () => {
     const mockEmail = "test@example.com";
 
     // Mock the logger.error to track calls
-    const loggerErrorSpy = vi.fn();
+    const loggerErrorSpy = () => {};
     const originalError = (globalThis as any).logger?.error;
     if ((globalThis as any).logger) {
       (globalThis as any).logger.error = loggerErrorSpy;

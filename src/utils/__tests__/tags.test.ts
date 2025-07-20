@@ -9,15 +9,18 @@ import type { Post } from "../types";
 import { describe, expect, it, beforeEach } from "bun:test";
 
 // Mock data for testing
-const createMockPost = (overrides: Partial<Post["data"]> = {}): Post => ({
+const createMockPost = (overrides: any = {}): any => ({
   data: {
     title: "Test Post",
     description: "Test description",
     pubDatetime: new Date("2024-01-15"),
-    categories: ["health"],
+    categories: ["Ernährung"],
     draft: false,
     featured: false,
     tags: ["test", "health"],
+    references: [],
+    author: "test-author",
+    keywords: [],
     ...overrides,
   },
   slug: "test-post",

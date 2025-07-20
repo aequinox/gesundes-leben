@@ -2,7 +2,7 @@
  * @file validation-error-paths.test.ts
  * @description Targeted tests to hit the exact uncovered error handling paths in validation.ts
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from "bun:test";
+import { describe, it, expect, beforeEach, afterEach } from "bun:test";
 
 describe("Validation Error Paths - 100% Coverage", () => {
   let originalLogger: any;
@@ -11,17 +11,17 @@ describe("Validation Error Paths - 100% Coverage", () => {
   beforeEach(() => {
     originalLogger = (globalThis as any).logger;
     mockLogger = {
-      debug: vi.fn(),
-      error: vi.fn(),
-      info: vi.fn(),
-      warn: vi.fn(),
+      debug: () => {},
+      error: () => {},
+      info: () => {},
+      warn: () => {},
     };
     (globalThis as any).logger = mockLogger;
   });
 
   afterEach(() => {
     (globalThis as any).logger = originalLogger;
-    vi.clearAllMocks();
+    // No need to clear mocks in bun:test
   });
 
   describe("Target lines 143-146 (error catch block)", () => {
@@ -94,9 +94,7 @@ describe("Validation Error Paths - 100% Coverage", () => {
     it("should cover all remaining validation paths", async () => {
       const { isValidEmail } = await import("../validation");
 
-      // Clear previous mocks
-      mockLogger.debug.mockClear();
-      mockLogger.error.mockClear();
+      // Note: No need to clear mocks with simple functions
 
       // Test comprehensive error scenarios
       const errorScenarios = [
@@ -132,7 +130,7 @@ describe("Validation Error Paths - 100% Coverage", () => {
 
       errorScenarios.forEach(({ input, description }) => {
         const result = isValidEmail(input as any);
-        expect(result).toBe(false, `Should return false for ${description}`);
+        expect(result).toBe(false);
       });
 
       // Domain validation scenarios

@@ -2,7 +2,7 @@
  * @file validation-complete.test.ts
  * @description Final comprehensive test to achieve 100% validation coverage
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from "bun:test";
+import { describe, it, expect, beforeEach, afterEach } from "bun:test";
 
 describe("Complete Validation Coverage", () => {
   let originalLogger: any;
@@ -11,17 +11,17 @@ describe("Complete Validation Coverage", () => {
   beforeEach(() => {
     originalLogger = (globalThis as any).logger;
     mockLogger = {
-      debug: vi.fn(),
-      error: vi.fn(),
-      info: vi.fn(),
-      warn: vi.fn(),
+      debug: () => {},
+      error: () => {},
+      info: () => {},
+      warn: () => {},
     };
     (globalThis as any).logger = mockLogger;
   });
 
   afterEach(() => {
     (globalThis as any).logger = originalLogger;
-    vi.clearAllMocks();
+    // No need to clear mocks in bun:test
   });
 
   it("should achieve 100% coverage with targeted scenarios", async () => {
@@ -58,7 +58,7 @@ describe("Complete Validation Coverage", () => {
 
     errorCasingObjects.forEach((obj, index) => {
       const result = isValidEmail(obj as any);
-      expect(result).toBe(false, `Error object ${index} should return false`);
+      expect(result).toBe(false);
     });
 
     // Test domain validation scenarios for lines 206-209

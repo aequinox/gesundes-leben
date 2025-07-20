@@ -2,22 +2,22 @@
  * @file final-100-coverage.test.ts
  * @description Final targeted tests to achieve exactly 100% coverage
  */
-import { describe, it, expect, vi } from "bun:test";
+import { describe, it, expect } from "bun:test";
 
 describe("Final 100% Coverage Push", () => {
   describe("Validation Error Coverage", () => {
     it("should trigger validation error handling with proper error logging", async () => {
       // Mock logger first
       const originalLogger = (globalThis as any).logger;
-      const mockError = vi.fn();
-      const mockDebug = vi.fn();
+      const mockError = () => {};
+      const mockDebug = () => {};
 
       // Create logger that will actually be called
       (globalThis as any).logger = {
         error: mockError,
         debug: mockDebug,
-        info: vi.fn(),
-        warn: vi.fn(),
+        info: () => {},
+        warn: () => {},
       };
 
       try {
@@ -134,18 +134,20 @@ describe("Final 100% Coverage Push", () => {
     it("should execute custom matcher logic directly", () => {
       // Test toBeAccessible logic with successful path
       const successElement = {
-        querySelectorAll: vi
-          .fn()
-          .mockReturnValueOnce([
-            {
-              getAttribute: vi.fn((attr: string) =>
-                attr === "aria-label" ? "Label" : null
-              ),
+        querySelectorAll: (selector: string) => {
+          if (selector.includes('button')) {
+            return [{
+              getAttribute: (attr: string) =>
+                attr === "aria-label" ? "Label" : null,
               tagName: "BUTTON",
               textContent: null,
-            },
-          ])
-          .mockReturnValueOnce([{ tagName: "H1" }]),
+            }];
+          }
+          if (selector.includes('h1')) {
+            return [{ tagName: "H1" }];
+          }
+          return [];
+        },
       };
 
       // Simulate the matcher logic from lines 114-120
@@ -172,11 +174,11 @@ describe("Final 100% Coverage Push", () => {
       // Test toHaveValidMarkup logic from lines 131-137
       const validElement = {
         children: { length: 1 },
-        textContent: null,
+        textContent: null as string | null,
       };
 
       const hasValidStructure =
-        validElement.children.length > 0 || validElement.textContent?.trim();
+        validElement.children.length > 0 || (validElement.textContent?.trim() || false);
       const markupResult = {
         message: () =>
           hasValidStructure
@@ -190,12 +192,12 @@ describe("Final 100% Coverage Push", () => {
       // Test invalid markup
       const invalidElement = {
         children: { length: 0 },
-        textContent: null,
+        textContent: null as string | null,
       };
 
       const hasInvalidStructure =
         invalidElement.children.length > 0 ||
-        invalidElement.textContent?.trim();
+        (invalidElement.textContent?.trim() || false);
       const invalidResult = {
         message: () =>
           hasInvalidStructure

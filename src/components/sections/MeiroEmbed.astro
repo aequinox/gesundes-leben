@@ -106,7 +106,10 @@ const resizerScriptUrl =
             console.warn("iFrameResize function not available");
           }
         };
-        iframe.getElementById("__nuxt").style.visibility = "invisible";
+        const nuxtElement = iframe.contentDocument?.getElementById("__nuxt");
+        if (nuxtElement) {
+          nuxtElement.style.visibility = "invisible";
+        }
       }
     }
   })();

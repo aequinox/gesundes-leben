@@ -3,7 +3,7 @@
  * @description Edge case tests specifically targeting uncovered lines in validation.ts
  */
 import { isValidEmail } from "../validation";
-import { describe, it, expect, vi } from "bun:test";
+import { describe, it, expect } from "bun:test";
 
 describe("Validation Edge Cases - Coverage Completion", () => {
   describe("Error handling coverage", () => {
@@ -155,10 +155,7 @@ describe("Validation Edge Cases - Coverage Completion", () => {
 
       basicInvalidEmails.forEach((email, index) => {
         const result = isValidEmail(email);
-        expect(result).toBe(
-          false,
-          `Email at index ${index} (${JSON.stringify(email)}) should be invalid but was valid`
-        );
+        expect(result).toBe(false);
       });
     });
   });
