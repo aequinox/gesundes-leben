@@ -28,7 +28,7 @@ const postsByYear = groupByCondition(
   post => post.data.pubDatetime.getFullYear(),
   {
     onError: (post, error) => {
-      logger.error(`Error grouping post ${post.id} by year: ${error}`);
+      logger.error("Error grouping post", post.id, "by year:", error);
       return "Unknown Year";
     },
   }

@@ -173,22 +173,46 @@ class LoggerService {
   }
 
   /**
-   * Formats a message for logging
-   * @param content The content to format
+   * Formats a message for logging with support for multiple arguments
+   * @param args The arguments to format
    * @returns Formatted string representation
    */
-  private formatMessage(content: LogContent): string {
-    if (content instanceof Error) {
-      return `${content.message}\n${content.stack || ""}`;
-    } else if (typeof content === "object" && content !== null) {
-      try {
-        return JSON.stringify(content, null, 2);
-      } catch (error) {
-        return `[Object] (Failed to stringify: ${error})`;
-      }
-    } else {
-      return String(content);
+  private formatMessage(...args: unknown[]): string {
+    if (args.length === 0) {
+      return "";
     }
+
+    if (args.length === 1) {
+      const content = args[0];
+      if (content instanceof Error) {
+        return `${content.message}\n${content.stack || ""}`;
+      } else if (typeof content === "object" && content !== null) {
+        try {
+          return JSON.stringify(content, null, 2);
+        } catch (error) {
+          return `[Object] (Failed to stringify: ${error})`;
+        }
+      } else {
+        return String(content);
+      }
+    }
+
+    // Multiple arguments - format like console.log
+    return args
+      .map(arg => {
+        if (arg instanceof Error) {
+          return `${arg.message}\n${arg.stack || ""}`;
+        } else if (typeof arg === "object" && arg !== null) {
+          try {
+            return JSON.stringify(arg, null, 2);
+          } catch (error) {
+            return `[Object] (Failed to stringify: ${error})`;
+          }
+        } else {
+          return String(arg);
+        }
+      })
+      .join(" ");
   }
 
   /**
@@ -212,9 +236,9 @@ class LoggerService {
   /**
    * Internal method to log a message with a specific level
    * @param level Log level to use
-   * @param content Content to log
+   * @param args Arguments to log
    */
-  private logMessage(level: LogLevelName, content: LogContent): void {
+  private logMessage(level: LogLevelName, ...args: unknown[]): void {
     const logLevel = this.levels[level];
 
     // Skip if below minimum log level
@@ -222,7 +246,7 @@ class LoggerService {
 
     try {
       const timestamp = this.getTimestamp();
-      const formattedMessage = this.formatMessage(content);
+      const formattedMessage = this.formatMessage(...args);
       const styledLevel = this.styleText(
         `[${logLevel.name}]`,
         ...logLevel.styles
@@ -260,7 +284,7 @@ class LoggerService {
       // eslint-disable-next-line no-console
       console.error(`[LOGGER_ERROR] Failed to log message: ${errorMessage}`);
       // eslint-disable-next-line no-console
-      console.error(`Original content: ${String(content)}`);
+      console.error(`Original content: ${args.map(String).join(" ")}`);
     }
   }
 
@@ -310,66 +334,66 @@ class LoggerService {
 
   /**
    * Logs a silly message (lowest priority)
-   * @param content Content to log
+   * @param args Content to log
    */
-  silly(content: LogContent): void {
-    this.logMessage(LogLevelName.SILLY, content);
+  silly(...args: unknown[]): void {
+    this.logMessage(LogLevelName.SILLY, ...args);
   }
 
   /**
    * Logs a trace message
-   * @param content Content to log
+   * @param args Content to log
    */
-  trace(content: LogContent): void {
-    this.logMessage(LogLevelName.TRACE, content);
+  trace(...args: unknown[]): void {
+    this.logMessage(LogLevelName.TRACE, ...args);
   }
 
   /**
    * Logs a debug message
-   * @param content Content to log
+   * @param args Content to log
    */
-  debug(content: LogContent): void {
-    this.logMessage(LogLevelName.DEBUG, content);
+  debug(...args: unknown[]): void {
+    this.logMessage(LogLevelName.DEBUG, ...args);
   }
 
   /**
    * Logs an info message
-   * @param content Content to log
+   * @param args Content to log
    */
-  info(content: LogContent): void {
-    this.logMessage(LogLevelName.INFO, content);
+  info(...args: unknown[]): void {
+    this.logMessage(LogLevelName.INFO, ...args);
   }
 
   /**
    * Logs a warning message
-   * @param content Content to log
+   * @param args Content to log
    */
-  warn(content: LogContent): void {
-    this.logMessage(LogLevelName.WARN, content);
+  warn(...args: unknown[]): void {
+    this.logMessage(LogLevelName.WARN, ...args);
   }
 
   /**
    * Logs an error message
-   * @param content Content to log
+   * @param args Content to log
    */
-  error(content: LogContent): void {
-    this.logMessage(LogLevelName.ERROR, content);
+  error(...args: unknown[]): void {
+    this.logMessage(LogLevelName.ERROR, ...args);
   }
 
   /**
    * Logs a fatal error message (highest priority)
-   * @param content Content to log
+   * @param args Content to log
    */
-  fatal(content: LogContent): void {
-    this.logMessage(LogLevelName.FATAL, content);
+  fatal(...args: unknown[]): void {
+    this.logMessage(LogLevelName.FATAL, ...args);
   }
 
   /**
    * Legacy method for backward compatibility
-   * @param content Content to log
+   * @param args Content to log
    */
-  log(content: LogContent): void {
-    this.info(content);
+  log(...args: unknown[]): void {
+    this.info(...args);
   }
 }
 

@@ -147,7 +147,7 @@ function createItemState(
   const isOpen = element.classList.contains(CSS_CLASSES.OPEN);
 
   if (options.debug) {
-    logger.log(`Creating item state for index ${index}: open=${isOpen}`);
+    logger.log("Creating item state for index", index, ": open=", isOpen);
   }
 
   return {
@@ -252,7 +252,7 @@ function closeItem(itemState: AccordionItemState): void {
 function toggleItem(accordionState: AccordionState, itemIndex: number): void {
   const itemState = accordionState.items.get(itemIndex);
   if (!itemState) {
-    logger.warn(`Item with index ${itemIndex} not found`);
+    logger.warn("Item with index", itemIndex, "not found");
     return;
   }
 
@@ -260,7 +260,10 @@ function toggleItem(accordionState: AccordionState, itemIndex: number): void {
 
   if (options.debug) {
     logger.log(
-      `Toggling item ${itemIndex}: currently ${wasOpen ? "open" : "closed"}`
+      "Toggling item",
+      itemIndex,
+      ": currently",
+      wasOpen ? "open" : "closed"
     );
   }
 
@@ -312,7 +315,7 @@ function handleTriggerClick(event: Event): void {
   const itemIndex = parseInt((item as HTMLElement).dataset.index || "0", 10);
 
   if (options.debug) {
-    logger.log(`Trigger clicked for item ${itemIndex}`);
+    logger.log("Trigger clicked for item", itemIndex);
   }
 
   toggleItem(accordionState, itemIndex);
@@ -334,7 +337,10 @@ function initializeAccordion(accordion: HTMLElement): void {
 
   if (options.debug) {
     logger.log(
-      `Initializing accordion with ${items.length} items, allowMultiple: ${allowMultiple}`
+      "Initializing accordion with",
+      items.length,
+      "items, allowMultiple:",
+      allowMultiple
     );
   }
 
@@ -392,7 +398,7 @@ function initializeAllAccordions(): void {
   const accordions = document.querySelectorAll(options.accordionSelector);
 
   if (options.debug) {
-    logger.log(`Found ${accordions.length} accordion containers`);
+    logger.log("Found", accordions.length, "accordion containers");
   }
 
   accordions.forEach(accordion => {
@@ -430,7 +436,8 @@ export function initAccordionEngine(userOptions: AccordionOptions = {}): void {
 
   if (options.debug) {
     logger.log(
-      `Initializing AccordionEngine with options: ${JSON.stringify(options)}`
+      "Initializing AccordionEngine with options:",
+      JSON.stringify(options)
     );
   }
 
@@ -447,7 +454,7 @@ export function initAccordionEngine(userOptions: AccordionOptions = {}): void {
         logger.log("AccordionEngine initialized successfully");
       }
     } catch (error) {
-      logger.error(`Error initializing AccordionEngine: ${error}`);
+      logger.error("Error initializing AccordionEngine:", error);
     }
   };
 
@@ -489,7 +496,7 @@ export function openAccordionItem(
 
   const itemState = accordionState.items.get(itemIndex);
   if (!itemState) {
-    logger.warn(`Item with index ${itemIndex} not found`);
+    logger.warn("Item with index", itemIndex, "not found");
     return;
   }
 
@@ -516,7 +523,7 @@ export function closeAccordionItem(
 
   const itemState = accordionState.items.get(itemIndex);
   if (!itemState) {
-    logger.warn(`Item with index ${itemIndex} not found`);
+    logger.warn("Item with index", itemIndex, "not found");
     return;
   }
 

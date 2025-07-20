@@ -32,7 +32,7 @@ export class TableOfContents {
     this.tocList = document.querySelector<HTMLUListElement>("#toc ul");
 
     // Debug: Log article element
-    logger.debug(`Article element: ${this.article}`);
+    logger.debug("Article element:", this.article);
 
     // Try to find all headings in the document if article is not found
     if (!this.article) {
@@ -64,9 +64,9 @@ export class TableOfContents {
     }
 
     // Debug: Log found headings
-    logger.debug(`Found headings: ${this.headings.length}`);
+    logger.debug("Found headings:", this.headings.length);
     this.headings.forEach((h, i) => {
-      logger.debug(`Heading ${i}: ${h.tagName} - ${h.textContent}`);
+      logger.debug("Heading", i, ":", h.tagName, "-", h.textContent);
     });
 
     this.observer = new IntersectionObserver(
@@ -235,12 +235,12 @@ export class TableOfContents {
             // Update selected state in TOC
             this.setSelectedLinkById(targetId);
           } catch (error) {
-            logger.error(`Error navigating to section ${targetId}: ${error}`);
+            logger.error("Error navigating to section", targetId, ":", error);
             // Fallback to standard navigation if smooth scroll fails
             window.location.hash = targetId;
           }
         } else {
-          logger.warn(`Target element with ID ${targetId} not found`);
+          logger.warn("Target element with ID", targetId, "not found");
         }
       }
     });
@@ -284,8 +284,8 @@ export class TableOfContents {
     }
 
     // Debug: Log TOC list element
-    logger.debug(`TOC list element: ${this.tocList}`);
-    logger.debug(`Headings length: ${this.headings.length}`);
+    logger.debug("TOC list element:", this.tocList);
+    logger.debug("Headings length:", this.headings.length);
 
     // Clear existing TOC items if any
     while (this.tocList.firstChild) {
@@ -302,20 +302,23 @@ export class TableOfContents {
 
       const listItem = this.createListItem(heading);
       this.tocList?.appendChild(listItem);
-      logger.debug(`Added TOC item for heading: ${heading.textContent}`);
+      logger.debug("Added TOC item for heading:", heading.textContent);
 
       // Only observe elements that exist in the DOM
       try {
         this.observer.observe(heading);
       } catch (error) {
         logger.error(
-          `Failed to observe heading: ${heading.id}. Error: ${error} `
+          "Failed to observe heading:",
+          heading.id,
+          ". Error:",
+          error
         );
       }
     });
 
     // Debug: Log final TOC content
-    logger.debug(`Final TOC content: ${this.tocList.innerHTML}`);
+    logger.debug("Final TOC content:", this.tocList.innerHTML);
 
     // Add keyboard navigation for accessibility
     this.addKeyboardNavigation();

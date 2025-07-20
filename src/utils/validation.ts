@@ -100,7 +100,8 @@ export const isValidEmail = (
     // Check length constraints
     if (trimmedEmail.length === 0 || trimmedEmail.length > opts.maxLength) {
       logger.debug(
-        `Email validation failed: length constraint (${trimmedEmail.length})`
+        "Email validation failed: length constraint",
+        trimmedEmail.length
       );
       return false;
     }
@@ -142,7 +143,8 @@ export const isValidEmail = (
     return isValid;
   } catch (error) {
     logger.error(
-      `Error in email validation: ${error instanceof Error ? error.message : String(error)}`
+      "Error in email validation:",
+      error instanceof Error ? error.message : String(error)
     );
     return false;
   }
@@ -160,7 +162,7 @@ const isValidLocalPart = (
 ): boolean => {
   // Check length (RFC 5321: max 64 characters)
   if (localPart.length === 0 || localPart.length > 64) {
-    logger.debug(`Local part validation failed: length (${localPart.length})`);
+    logger.debug("Local part validation failed: length", localPart.length);
     return false;
   }
 
@@ -203,9 +205,7 @@ const isValidDomainPart = (
 ): boolean => {
   // Check length (RFC 5321: max 253 characters)
   if (domainPart.length === 0 || domainPart.length > 253) {
-    logger.debug(
-      `Domain part validation failed: length (${domainPart.length})`
-    );
+    logger.debug("Domain part validation failed: length", domainPart.length);
     return false;
   }
 
@@ -240,9 +240,7 @@ const isValidDomainPart = (
   // Check TLD length
   const tld = labels[labels.length - 1];
   if (tld.length < options.minDomainLength) {
-    logger.debug(
-      `Domain part validation failed: TLD too short (${tld.length})`
-    );
+    logger.debug("Domain part validation failed: TLD too short", tld.length);
     return false;
   }
 
@@ -264,7 +262,7 @@ const isValidDomainPart = (
 const isValidDomainLabel = (label: string): boolean => {
   // Check length (RFC 1035: max 63 characters per label)
   if (label.length === 0 || label.length > 63) {
-    logger.debug(`Domain label validation failed: length (${label.length})`);
+    logger.debug("Domain label validation failed: length", label.length);
     return false;
   }
 

@@ -80,7 +80,10 @@ export async function safelyRender<T>(
             : "";
 
         logger.error(
-          `Error in ${fullConfig.componentName}${attemptMsg}: ${formatErrorMessage(error)}`
+          "Error in",
+          fullConfig.componentName + attemptMsg,
+          ":",
+          formatErrorMessage(error)
         );
       }
 
@@ -131,7 +134,10 @@ export function safelyExecute<T>(
   } catch (error) {
     if (fullConfig.logErrors) {
       logger.error(
-        `Error in ${fullConfig.componentName}: ${formatErrorMessage(error)}`
+        "Error in",
+        fullConfig.componentName,
+        ":",
+        formatErrorMessage(error)
       );
     }
 

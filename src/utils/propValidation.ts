@@ -186,11 +186,14 @@ export function validateProps<T extends Record<string, any>>(
   if (import.meta.env.DEV && !isValid) {
     const componentName = context.componentName || "Unknown Component";
     logger.warn(
-      `Prop validation failed for ${componentName}: ${JSON.stringify({
+      "Prop validation failed for",
+      componentName,
+      ":",
+      JSON.stringify({
         errors: allErrors,
         warnings: allWarnings,
         props: props,
-      })}`
+      })
     );
   }
 
@@ -379,7 +382,10 @@ export function withValidation<T extends Record<string, any>>(
 
     if (!validation.isValid && import.meta.env.DEV) {
       logger.error(
-        `Invalid props for ${componentName || "component"}: ${JSON.stringify(validation.errors)}`
+        "Invalid props for",
+        componentName || "component",
+        ":",
+        JSON.stringify(validation.errors)
       );
     }
 
@@ -418,12 +424,15 @@ export function inspectProps(
   if (!import.meta.env.DEV) return;
 
   logger.debug(
-    `Props for ${componentName}: ${JSON.stringify({
+    "Props for",
+    componentName,
+    ":",
+    JSON.stringify({
       props,
       propCount: Object.keys(props).length,
       hasChildren: "children" in props,
       hasSlots: "slots" in props,
-    })}`
+    })
   );
 }
 
@@ -442,7 +451,10 @@ export function measureValidation<T extends Record<string, any>>(
 
   if (duration > 5 && import.meta.env.DEV) {
     logger.warn(
-      `Slow prop validation for ${componentName}: ${duration.toFixed(2)}ms`
+      "Slow prop validation for",
+      componentName,
+      ":",
+      duration.toFixed(2) + "ms"
     );
   }
 

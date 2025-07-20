@@ -201,6 +201,67 @@ describe("Logger", () => {
         expect.stringContaining('"value": 123')
       );
     });
+
+    it("should handle multiple arguments like console.log", () => {
+      const str = "User:";
+      const obj = { name: "John", age: 30 };
+      const num = 42;
+
+      logger.info(str, obj, num);
+
+      // Should include all arguments separated by spaces
+      expect(consoleSpy.log).toHaveBeenCalledWith(
+        expect.stringContaining("User:")
+      );
+      expect(consoleSpy.log).toHaveBeenCalledWith(
+        expect.stringContaining('"name": "John"')
+      );
+      expect(consoleSpy.log).toHaveBeenCalledWith(
+        expect.stringContaining("42")
+      );
+    });
+
+    it("should handle mixed argument types", () => {
+      const error = new Error("Test error");
+      const message = "Processing failed:";
+      const data = { id: 123 };
+
+      logger.error(message, error, data);
+
+      // Should include string message
+      expect(consoleSpy.log).toHaveBeenCalledWith(
+        expect.stringContaining("Processing failed:")
+      );
+
+      // Should include error message and stack
+      expect(consoleSpy.log).toHaveBeenCalledWith(
+        expect.stringContaining("Test error")
+      );
+
+      // Should include object data
+      expect(consoleSpy.log).toHaveBeenCalledWith(
+        expect.stringContaining('"id": 123')
+      );
+    });
+
+    it("should handle empty arguments", () => {
+      logger.info();
+      expect(consoleSpy.log).toHaveBeenCalledWith(
+        expect.stringContaining("[INFO]")
+      );
+    });
+
+    it("should maintain backward compatibility with single arguments", () => {
+      const message = "Single argument test";
+      logger.warn(message);
+
+      expect(consoleSpy.log).toHaveBeenCalledWith(
+        expect.stringContaining(message)
+      );
+      expect(consoleSpy.log).toHaveBeenCalledWith(
+        expect.stringContaining("[WARN]")
+      );
+    });
   });
 
   describe("Timestamp Formats", () => {

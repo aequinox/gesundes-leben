@@ -34,9 +34,9 @@ export interface ProcessPostsOptions {
 export const getAllPosts = async (includeDrafts = false): Promise<Post[]> => {
   return handleAsync(async () => {
     try {
-      logger.log(`Getting all posts, includeDrafts: ${includeDrafts}`);
+      logger.log("Getting all posts, includeDrafts:", includeDrafts);
       const allPosts = await getCollection("blog");
-      logger.log(`Total posts found: ${allPosts.length}`);
+      logger.log("Total posts found:", allPosts.length);
 
       // In development mode, include all posts
       if (includeDrafts || import.meta.env.DEV) {
@@ -46,20 +46,20 @@ export const getAllPosts = async (includeDrafts = false): Promise<Post[]> => {
 
       const now = Date.now();
       const scheduledPostMargin = SITE.scheduledPostMargin ?? 0;
-      logger.log(`Current time: ${now}`);
-      logger.log(`Scheduled post margin: ${scheduledPostMargin}`);
+      logger.log("Current time:", now);
+      logger.log("Scheduled post margin:", scheduledPostMargin);
 
       const filteredPosts = allPosts.filter((post: Post) => {
         const { draft, pubDatetime } = post.data;
 
         if (!pubDatetime) {
-          logger.log(`Post ${post.id} has no pubDatetime, excluding`);
+          logger.log("Post", post.id, "has no pubDatetime, excluding");
           return false;
         }
 
         const pubDate = new Date(pubDatetime);
         if (isNaN(pubDate.getTime())) {
-          logger.log(`Post ${post.id} has invalid pubDatetime, excluding`);
+          logger.log("Post", post.id, "has invalid pubDatetime, excluding");
           return false;
         }
 
@@ -69,21 +69,25 @@ export const getAllPosts = async (includeDrafts = false): Promise<Post[]> => {
 
         if (!isPastPublication) {
           logger.log(
-            `Post ${post.id} is scheduled for future (${pubDate.toISOString()}), excluding`
+            "Post",
+            post.id,
+            "is scheduled for future",
+            pubDate.toISOString(),
+            "excluding"
           );
         }
 
         if (!isNotDraft) {
-          logger.log(`Post ${post.id} is a draft, excluding`);
+          logger.log("Post", post.id, "is a draft, excluding");
         }
 
         return isNotDraft && isPastPublication;
       });
 
-      logger.log(`Filtered posts count:", filteredPosts.length`);
+      logger.log("Filtered posts count:", filteredPosts.length);
       return filteredPosts;
     } catch (e) {
-      logger.error(`Error in getAllPosts: ${e}`);
+      logger.error("Error in getAllPosts:", e);
       return [];
     }
   });
@@ -106,7 +110,7 @@ export const getSortedPosts = (
   sortDirection: "asc" | "desc" = "desc"
 ): Post[] => {
   try {
-    logger.log(`Sorting posts, count: ${posts.length}`);
+    logger.log("Sorting posts, count:", posts.length);
 
     const sortedPosts = [...posts].sort((a, b) => {
       const dateA = new Date(
@@ -119,10 +123,10 @@ export const getSortedPosts = (
       return sortDirection === "desc" ? dateB - dateA : dateA - dateB;
     });
 
-    logger.log(`Sorted posts count: ${sortedPosts.length}`);
+    logger.log("Sorted posts count:", sortedPosts.length);
     return sortedPosts;
   } catch (error) {
-    logger.error(`Error in getSortedPosts: ${error}`);
+    logger.error("Error in getSortedPosts:", error);
     return posts; // Return unsorted posts on error
   }
 };
@@ -144,10 +148,10 @@ export const getFeaturedPosts = async (posts?: Post[]): Promise<Post[]> => {
       logger.log("Getting featured posts");
       const postsToFilter = posts || (await getAllPosts());
       const featuredPosts = postsToFilter.filter(post => post.data.featured);
-      logger.log(`Featured posts count: ${featuredPosts.length}`);
+      logger.log("Featured posts count:", featuredPosts.length);
       return featuredPosts;
     } catch (error) {
-      logger.error(`Error in getFeaturedPosts: ${error}`);
+      logger.error("Error in getFeaturedPosts:", error);
       return [];
     }
   });
@@ -169,10 +173,10 @@ export const getRecentPosts = async (posts?: Post[]): Promise<Post[]> => {
       logger.log("Getting recent (non-featured) posts");
       const postsToFilter = posts || (await getAllPosts());
       const recentPosts = postsToFilter.filter(post => !post.data.featured);
-      logger.log(`Recent posts count: ${recentPosts.length}`);
+      logger.log("Recent posts count:", recentPosts.length);
       return recentPosts;
     } catch (error) {
-      logger.error(`Error in getRecentPosts: ${error}`);
+      logger.error("Error in getRecentPosts:", error);
       return [];
     }
   });
@@ -269,14 +273,21 @@ export const getPostsWithReadingTime = async (
           if (remarkPluginFrontmatter?.readingTime) {
             post.data.readingTime = remarkPluginFrontmatter.readingTime;
             logger.log(
-              `Reading time for post ${post.id} calculated: ${remarkPluginFrontmatter.readingTime} minutes`
+              "Reading time for post",
+              post.id,
+              "calculated:",
+              remarkPluginFrontmatter.readingTime,
+              "minutes"
             );
           }
 
           return post;
         } catch (e) {
           logger.error(
-            `Error calculating reading time for post ${post.id}: ${e}`
+            "Error calculating reading time for post",
+            post.id,
+            ":",
+            e
           );
           return post;
         }
@@ -316,7 +327,7 @@ export const processAllPosts = async (
 
       // Return cached results if available
       if (postCache[cacheKey]) {
-        logger.log(`Returning cached posts for options: ${cacheKey}`);
+        logger.log("Returning cached posts for options:", cacheKey);
         return postCache[cacheKey];
       }
 
@@ -326,7 +337,7 @@ export const processAllPosts = async (
         maxPosts = Infinity,
       } = options;
 
-      logger.log(`Processing all posts with options: ${cacheKey}`);
+      logger.log("Processing all posts with options:", cacheKey);
 
       // Step 1: Get all posts (filtered by draft status)
       const filteredPosts = await getAllPosts(includeDrafts);
@@ -346,10 +357,10 @@ export const processAllPosts = async (
       // Cache the results
       postCache[cacheKey] = limitedPosts;
 
-      logger.log(`Processed posts count: ${limitedPosts.length}`);
+      logger.log("Processed posts count:", limitedPosts.length);
       return limitedPosts;
     } catch (e) {
-      logger.error(`Error in processAllPosts: ${e}`);
+      logger.error("Error in processAllPosts:", e);
       return [];
     }
   });
@@ -372,10 +383,15 @@ const getPostsBy = async (
   return handleAsync(async () => {
     try {
       logger.log(
-        `Filtering posts by ${type}: ${value}, posts count: ${posts.length}`
+        "Filtering posts by",
+        type,
+        ":",
+        value,
+        ", posts count:",
+        posts.length
       );
       const slugifiedValue = slugify(value);
-      logger.log(`Slugified value: ${slugifiedValue}`);
+      logger.log("Slugified value:", slugifiedValue);
 
       const filteredPosts =
         type === "group"
@@ -386,10 +402,10 @@ const getPostsBy = async (
               )
             );
 
-      logger.log(`Filtered posts count: ${filteredPosts.length}`);
+      logger.log("Filtered posts count:", filteredPosts.length);
       return filteredPosts;
     } catch (err) {
-      logger.error(`Error in getPostsBy (${type}): ${err}`);
+      logger.error("Error in getPostsBy", type, ":", err);
       return []; // Return empty array on error
     }
   });
@@ -448,14 +464,14 @@ export const getPostsByGroup = async (
 
 export const getAllPostsByGroup = async (group: string): Promise<Post[]> => {
   try {
-    logger.log(`Getting all posts by group: ${group}`);
+    logger.log("Getting all posts by group:", group);
     const posts = await processAllPosts();
-    logger.log(`Posts count before filtering by group: ${posts.length}`);
+    logger.log("Posts count before filtering by group:", posts.length);
     const groupPosts = await getPostsByGroup(posts, group);
-    logger.log(`Posts count after filtering by group: ${groupPosts.length}`);
+    logger.log("Posts count after filtering by group:", groupPosts.length);
     return groupPosts;
   } catch (err) {
-    logger.error(`Error in getAllPostsByGroup: ${err}`);
+    logger.error("Error in getAllPostsByGroup:", err);
     return []; // Return empty array on error
   }
 };
@@ -550,7 +566,7 @@ export const groupByCondition = <T>(
 
     return result;
   } catch (error) {
-    logger.error(`Error in groupByCondition: ${error}`);
+    logger.error("Error in groupByCondition:", error);
     return options?.initialGroups || {};
   }
 };
@@ -566,7 +582,7 @@ export const getPostsByGroupCondition = (
   try {
     return groupByCondition(posts, groupFunction);
   } catch (error) {
-    logger.error(`Error in getPostsByGroupCondition: ${error}`);
+    logger.error("Error in getPostsByGroupCondition:", error);
     return {};
   }
 };

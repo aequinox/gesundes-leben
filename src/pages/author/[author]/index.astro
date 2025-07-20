@@ -10,7 +10,7 @@ export async function getStaticPaths() {
   const authors = await getAllAuthors();
 
   // Log author IDs for debugging
-  logger.log(`Author IDs: ${authors.map(author => author.id).join(", ")}`);
+  logger.log("Author IDs:", authors.map(author => author.id).join(", "));
 
   // Make sure to handle file extensions in author IDs
   return authors.map(author => {

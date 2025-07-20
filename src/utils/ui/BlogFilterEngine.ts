@@ -681,7 +681,7 @@ export const initBlogFilter = (userOptions: FilterOptions = {}): void => {
         logger.log("Blog filter initialized successfully.");
       })
       .catch(error => {
-        logger.error(`Blog filter initialization failed: ${error.message}`);
+        logger.error("Blog filter initialization failed:", error.message);
       });
   }
 };

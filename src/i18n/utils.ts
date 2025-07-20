@@ -22,7 +22,7 @@ export function getLangFromUrl(url: URL): SupportedLanguage {
     const [, lang] = url.pathname.split("/");
     return isValidLanguage(lang) ? lang : defaultLang;
   } catch (error) {
-    logger.error(`Error extracting language from URL: ${error}`);
+    logger.error("Error extracting language from URL:", error);
     return defaultLang;
   }
 }
@@ -53,14 +53,12 @@ export function useTranslations(lang: SupportedLanguage) {
         getTranslationValue(ui[defaultLang], key);
 
       if (value === undefined) {
-        logger.warn(
-          `Translation missing for key "${key}" in language "${lang}"`
-        );
+        logger.warn("Translation missing for key", key, "in language", lang);
         return key;
       }
       return value;
     } catch (error) {
-      logger.error(`Translation error for key "${key}": ${error}`);
+      logger.error("Translation error for key", key, ":", error);
       return key;
     }
   };

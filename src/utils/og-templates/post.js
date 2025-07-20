@@ -17,7 +17,7 @@ import satori from "satori";
 export default async post => {
   const title = post.data.title;
   const author = await getAuthorDisplayName(post.data.author);
-  logger.log(`Generating OG image for post: ${title} by ${author}`);
+  logger.log("Generating OG image for post:", title, "by", author);
 
   // Set up translations (use default language for OG images)
   const t = useTranslations(defaultLang);

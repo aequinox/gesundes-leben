@@ -43,7 +43,7 @@ if (typeof srcProp === "string") {
   try {
     src = srcProp.src || "";
   } catch (error) {
-    logger.error(`Error extracting src from ImageMetadata: ${error}`);
+    logger.error("Error extracting src from ImageMetadata:", error);
     src = "";
   }
 }

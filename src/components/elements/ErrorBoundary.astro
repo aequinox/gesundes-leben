@@ -202,12 +202,12 @@ const hasError =
     }
 
     private handleGlobalError(event: ErrorEvent) {
-      logger.error(`Global error: ${event.error}`);
+      logger.error("Global error:", event.error);
       this.trackError("global", event.error);
     }
 
     private handlePromiseRejection(event: PromiseRejectionEvent) {
-      logger.error(`Unhandled promise rejection: ${event.reason}`);
+      logger.error("Unhandled promise rejection:", event.reason);
       this.trackError("promise", event.reason);
     }
 
@@ -251,7 +251,7 @@ const hasError =
       };
 
       // For now, just log to console
-      logger.error(`Error tracked: ${JSON.stringify(errorData)}`);
+      logger.error("Error tracked:", JSON.stringify(errorData));
 
       // You could send to services like Sentry, LogRocket, etc.
       // this.sendToErrorService(errorData);
@@ -278,7 +278,7 @@ const hasError =
   }
 
   window.reportComponentError = (componentName: string, error: Error) => {
-    logger.error(`Component error in ${componentName}: ${error}`);
+    logger.error("Component error in", componentName, ":", error);
   };
 </script>
 
