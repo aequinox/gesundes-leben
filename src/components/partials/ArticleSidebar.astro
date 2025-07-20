@@ -9,7 +9,7 @@ const t = useTranslations(lang);
 <aside
   id="toc-sidebar"
   data-pagefind-ignore="all"
-  class="fixed top-24 hidden h-auto rounded-xl border border-white/20 shadow-elevation-medium backdrop-blur-md bg-card/80 2xl:col-span-4 2xl:block"
+  class="fixed top-24 hidden h-auto rounded-xl border border-white/20 bg-card/80 shadow-elevation-medium backdrop-blur-md 2xl:col-span-4 2xl:block"
   aria-label="Table of contents"
   style="position: fixed; height: calc(100vh - 120px); right: max(2rem, calc((100vw - 1600px) / 2)); width: 400px; z-index: 30; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-out;"
 >
@@ -51,7 +51,7 @@ const t = useTranslations(lang);
         {t("toc.title")}
       </h2>
       <ul
-        class="space-y-2 text-sm text-pretty [&>li]:flex [&>li]:items-center [&>li]:text-sm [&>li]:leading-4 [&>li]:text-foreground/70 [&>li]:transition-all [&>li]:duration-300 [&>li]:ease-[cubic-bezier(0.4,0,0.2,1)] [&>li.selected]:text-accent [&>li.selected]:opacity-100 [&>li.selected]:scale-[1.02] [&>li.selected]:font-medium [&>li.selected>svg]:mr-2 [&>li.selected>svg]:h-4 [&>li.selected>svg]:w-4 [&>li.selected>svg]:text-accent [&>li.selected>svg]:transition-all [&>li.selected>svg]:duration-400 [&>li.selected>svg]:ease-[cubic-bezier(0.4,0,0.2,1)] [&>li>a]:block [&>li>a]:py-1 [&>li>a]:px-3 [&>li>a]:rounded-md [&>li>a]:transition-all [&>li>a]:duration-200 [&>li>a]:ease-in-out [&>li>a]:hover:text-accent [&>li>a]:hover:bg-accent/5 [&>li>a]:hover:scale-[1.01] [&>li>svg]:h-0 [&>li>svg]:w-0"
+        class="space-y-2 text-sm text-pretty [&>li]:flex [&>li]:items-center [&>li]:text-sm [&>li]:leading-4 [&>li]:text-foreground/70 [&>li]:transition-all [&>li]:duration-300 [&>li]:ease-[cubic-bezier(0.4,0,0.2,1)] [&>li.selected]:scale-[1.02] [&>li.selected]:font-medium [&>li.selected]:text-accent [&>li.selected]:opacity-100 [&>li.selected>svg]:mr-2 [&>li.selected>svg]:h-4 [&>li.selected>svg]:w-4 [&>li.selected>svg]:text-accent [&>li.selected>svg]:transition-all [&>li.selected>svg]:duration-400 [&>li.selected>svg]:ease-[cubic-bezier(0.4,0,0.2,1)] [&>li>a]:block [&>li>a]:rounded-md [&>li>a]:px-3 [&>li>a]:py-1 [&>li>a]:transition-all [&>li>a]:duration-200 [&>li>a]:ease-in-out [&>li>a]:hover:scale-[1.01] [&>li>a]:hover:bg-accent/5 [&>li>a]:hover:text-accent [&>li>svg]:h-0 [&>li>svg]:w-0"
         role="list"
         aria-labelledby="toc-heading"
       >
@@ -267,7 +267,7 @@ const t = useTranslations(lang);
   /* Hover effect for the entire sidebar */
   #toc-sidebar:hover {
     transform: translateY(-2px) scale(1.005);
-    box-shadow: 
+    box-shadow:
       0 20px 25px -5px rgba(0, 0, 0, 0.1),
       0 10px 10px -5px rgba(0, 0, 0, 0.04),
       0 0 0 1px rgba(255, 255, 255, 0.1);
@@ -301,7 +301,7 @@ const t = useTranslations(lang);
   }
 
   #toc ul li a::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: -100%;
@@ -322,7 +322,7 @@ const t = useTranslations(lang);
 
   /* Active state indicator */
   #toc ul li.selected a::after {
-    content: '';
+    content: "";
     position: absolute;
     left: -6px;
     top: 50%;

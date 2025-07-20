@@ -4,7 +4,6 @@ import { useTranslations } from "../../i18n/utils";
 import { getAuthorDisplayName } from "../authors";
 import { loadGoogleFonts } from "../loadGoogleFont";
 import { logger } from "../logger";
-import type { Post } from "../types";
 import { SITE } from "@/config";
 import satori from "satori";
 
@@ -56,9 +55,9 @@ const COLORS = {
   },
 };
 
-export default async (post: Post) => {
+export default async post => {
   const title = post.data.title;
-  const author = await getAuthorDisplayName(post.data.author as string);
+  const author = await getAuthorDisplayName(post.data.author);
   logger.log(`Generating OG image for post: ${title} by ${author}`);
 
   // Set up translations (use default language for OG images)
@@ -69,7 +68,7 @@ export default async (post: Post) => {
   const postType = "group" in post.data ? post.data.group : "";
 
   // Get type-specific colors or default to accent
-  const typeColorSet = COLORS.types[postType as keyof typeof COLORS.types] || {
+  const typeColorSet = COLORS.types[postType] || {
     primary: COLORS.light.accent,
     secondary: "#f0f4ff",
     gradient: `linear-gradient(135deg, ${COLORS.light.accent} 0%, #2b4bb2 100%)`,

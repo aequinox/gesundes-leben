@@ -23,7 +23,9 @@ describe("Slug Utilities", () => {
 
       it("should remove special characters", () => {
         expect(slugify("Hello & World!")).toBe("hello-und-world");
-        expect(slugify("Test@#$%^&*()String")).toBe("testdollarprozentundstring");
+        expect(slugify("Test@#$%^&*()String")).toBe(
+          "testdollarprozentundstring"
+        );
         expect(slugify("Multiple---Dashes")).toBe("multiple-dashes");
       });
 

@@ -25,8 +25,8 @@ function setPreference() {
 
 function reflectPreference() {
   // Add temporary class for faster theme switching
-  document.documentElement.classList.add('theme-transitioning');
-  
+  document.documentElement.classList.add("theme-transitioning");
+
   document.firstElementChild.setAttribute("data-theme", themeValue);
   document.querySelector("#theme-btn")?.setAttribute("aria-label", themeValue);
 
@@ -52,7 +52,7 @@ function reflectPreference() {
 
   // Remove temporary class after transition
   setTimeout(() => {
-    document.documentElement.classList.remove('theme-transitioning');
+    document.documentElement.classList.remove("theme-transitioning");
   }, 200);
 }
 
@@ -66,14 +66,14 @@ window.onload = () => {
 
     // Debounce function to prevent rapid theme switching
     let themeToggleTimeout;
-    
+
     // now this script can find and listen for clicks on the control
     document.querySelector("#theme-btn")?.addEventListener("click", () => {
       // Clear any existing timeout
       if (themeToggleTimeout) {
         clearTimeout(themeToggleTimeout);
       }
-      
+
       // Debounce the theme change
       themeToggleTimeout = setTimeout(() => {
         themeValue = themeValue === "light" ? "dark" : "light";

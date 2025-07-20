@@ -53,7 +53,7 @@ describe("date utilities", () => {
         return {
           format: (date: Date) => {
             const year = date.getFullYear();
-            const month = date.toLocaleDateString('en-US', { month: 'short' });
+            const month = date.toLocaleDateString("en-US", { month: "short" });
             const day = date.getDate();
             return `${month} ${day}, ${year}`;
           },
@@ -66,7 +66,7 @@ describe("date utilities", () => {
             weekday: undefined,
             era: undefined,
             year: "numeric",
-            month: "short", 
+            month: "short",
             day: "numeric",
             hour: undefined,
             minute: undefined,
@@ -113,12 +113,14 @@ describe("date utilities", () => {
         throw mockError;
       } as any;
 
-      expect(() => formatDate(testDate)).toThrow("Failed to format date: Formatting error");
+      expect(() => formatDate(testDate)).toThrow(
+        "Failed to format date: Formatting error"
+      );
     });
 
     it("should use first locale from config", () => {
       let calledWith: any = null;
-      
+
       Intl.DateTimeFormat = function (locale: any, options: any) {
         calledWith = { locale, options };
         return {
@@ -132,7 +134,7 @@ describe("date utilities", () => {
       expect(calledWith?.options).toEqual(
         expect.objectContaining({
           year: "numeric",
-          month: "short", 
+          month: "short",
           day: "numeric",
         })
       );
@@ -140,7 +142,7 @@ describe("date utilities", () => {
 
     it("should fallback to en-US if no locales configured", () => {
       let calledWith: any = null;
-      
+
       // Mock empty langTag array
       const originalLangTag = LOCALE.langTag;
       (LOCALE as any).langTag = [];
@@ -155,7 +157,7 @@ describe("date utilities", () => {
       formatDate(testDate);
 
       expect(calledWith?.locale).toBe("en-US");
-      
+
       // Restore original
       (LOCALE as any).langTag = originalLangTag;
     });

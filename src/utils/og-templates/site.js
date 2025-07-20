@@ -2,7 +2,7 @@ import { loadGoogleFonts } from "../loadGoogleFont";
 import { SITE } from "@/config";
 import satori from "satori";
 
-export default async (): Promise<string> => {
+export default async () => {
   return satori(
     {
       type: "div",
