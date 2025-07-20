@@ -1,0 +1,38 @@
+---
+/**
+ * ButtonIcon Component
+ *
+ * Handles icon rendering within buttons.
+ * Manages icon positioning and sizing.
+ *
+ * Single Responsibility: Icon rendering and positioning
+ */
+
+import { Icon } from "astro-icon/components";
+import { iconClasses } from "./ButtonVariants";
+
+export interface ButtonIconProps {
+  /** Icon identifier from astro-icon */
+  icon: string;
+  /** Icon position relative to text */
+  position?: "start" | "end" | "only";
+  /** Whether this is the only content (no text) */
+  hasText?: boolean;
+}
+
+const { icon, position = "start", hasText = true } = Astro.props;
+
+// Determine icon classes based on position and text presence
+const getIconClasses = () => {
+  if (!hasText) return iconClasses.only;
+  return iconClasses[position as keyof typeof iconClasses] || iconClasses.start;
+};
+
+const iconClassList = getIconClasses();
+---
+
+<Icon
+  name={icon}
+  class:list={["size-4", "flex-shrink-0", ...iconClassList]}
+  aria-hidden="true"
+/>

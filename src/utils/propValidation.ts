@@ -80,8 +80,7 @@ export interface ValidationContext {
 export function validateProp(
   value: any,
   rule: PropValidationRule,
-  propName: string,
-  context: ValidationContext = {}
+  propName: string
 ): ValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];
@@ -173,12 +172,7 @@ export function validateProps<T extends Record<string, any>>(
       (validatedProps as any)[propName] = rule.defaultValue;
     }
 
-    const validation = validateProp(
-      validatedProps[propName],
-      rule,
-      propName,
-      context
-    );
+    const validation = validateProp(validatedProps[propName], rule, propName);
 
     allErrors.push(...validation.errors);
     if (validation.warnings) {

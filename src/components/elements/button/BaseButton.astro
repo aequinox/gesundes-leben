@@ -1,0 +1,53 @@
+---
+/**
+ * BaseButton Component
+ *
+ * Core button functionality without variant-specific styling.
+ * Handles basic button behavior, accessibility, and state management.
+ *
+ * Single Responsibility: Core button behavior and HTML rendering
+ */
+
+import type { HTMLAttributes } from "astro/types";
+import LoadingSpinner from "../LoadingSpinner.astro";
+
+export interface BaseButtonProps extends HTMLAttributes<"button"> {
+  /** HTML button type */
+  type?: "button" | "submit" | "reset";
+  /** Whether the button is disabled */
+  disabled?: boolean;
+  /** Whether to show loading state */
+  loading?: boolean;
+  /** Accessible label */
+  ariaLabel?: string;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  type = "button",
+  disabled = false,
+  loading = false,
+  ariaLabel,
+  "aria-label": ariaLabelAttr,
+  class: className = "",
+  ...rest
+} = Astro.props;
+
+// Use either ariaLabel prop or aria-label attribute
+const finalAriaLabel = ariaLabel || ariaLabelAttr;
+
+// Handle disabled state when loading
+const isDisabled = disabled || loading;
+---
+
+<button
+  type={type}
+  disabled={isDisabled}
+  aria-label={finalAriaLabel}
+  class={className}
+  {...rest}
+>
+  {loading && <LoadingSpinner size="sm" />}
+  <slot />
+</button>

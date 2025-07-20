@@ -284,12 +284,6 @@ export function cn(
   return classes.flat().filter(Boolean).join(" ");
 }
 
-export function combineClasses(
-  ...classSets: (readonly string[] | string[])[]
-): string[] {
-  return classSets.flat();
-}
-
 // Responsive utility builder
 export function responsive(
   base: string[],

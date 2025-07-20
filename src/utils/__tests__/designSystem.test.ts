@@ -4,7 +4,6 @@
  */
 import {
   cn,
-  combineClasses,
   responsive,
   createSizeVariants,
   createColorVariants,
@@ -45,23 +44,6 @@ describe("Design System Utilities", () => {
 
     it("should return empty string for no valid classes", () => {
       expect(cn(false, null, undefined)).toBe("");
-    });
-  });
-
-  describe("combineClasses", () => {
-    it("should combine multiple class sets", () => {
-      const set1 = ["class1", "class2"];
-      const set2 = ["class3", "class4"];
-      expect(combineClasses(set1, set2)).toEqual([
-        "class1",
-        "class2",
-        "class3",
-        "class4",
-      ]);
-    });
-
-    it("should handle empty arrays", () => {
-      expect(combineClasses([], ["class1"])).toEqual(["class1"]);
     });
   });
 

@@ -1,4 +1,10 @@
 import { loadGoogleFonts } from "../loadGoogleFont";
+import {
+  OG_COLORS,
+  OG_IMAGE_DIMENSIONS,
+  OG_TYPOGRAPHY,
+  OG_LAYOUT,
+} from "./constants";
 import { SITE } from "@/config";
 import satori from "satori";
 
@@ -8,7 +14,7 @@ export default async () => {
       type: "div",
       props: {
         style: {
-          background: "#fefbfb",
+          background: OG_COLORS.site.background,
           width: "100%",
           height: "100%",
           display: "flex",
@@ -23,13 +29,13 @@ export default async () => {
                 position: "absolute",
                 top: "-1px",
                 right: "-1px",
-                border: "4px solid #000",
-                background: "#ecebeb",
-                opacity: "0.9",
-                borderRadius: "4px",
+                border: `${OG_LAYOUT.borderWidth} solid ${OG_COLORS.site.border}`,
+                background: OG_COLORS.site.shadowBackground,
+                opacity: OG_LAYOUT.opacity.shadowLayer,
+                borderRadius: OG_LAYOUT.borderRadius,
                 display: "flex",
                 justifyContent: "center",
-                margin: "2.5rem",
+                margin: OG_LAYOUT.margin.shadow,
                 width: "88%",
                 height: "80%",
               },
@@ -39,12 +45,12 @@ export default async () => {
             type: "div",
             props: {
               style: {
-                border: "4px solid #000",
-                background: "#fefbfb",
-                borderRadius: "4px",
+                border: `${OG_LAYOUT.borderWidth} solid ${OG_COLORS.site.border}`,
+                background: OG_COLORS.site.background,
+                borderRadius: OG_LAYOUT.borderRadius,
                 display: "flex",
                 justifyContent: "center",
-                margin: "2rem",
+                margin: OG_LAYOUT.margin.outer,
                 width: "88%",
                 height: "80%",
               },
@@ -55,7 +61,7 @@ export default async () => {
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-between",
-                    margin: "20px",
+                    margin: OG_LAYOUT.margin.inner,
                     width: "90%",
                     height: "90%",
                   },
@@ -77,14 +83,17 @@ export default async () => {
                           {
                             type: "p",
                             props: {
-                              style: { fontSize: 72, fontWeight: "bold" },
+                              style: {
+                                fontSize: OG_TYPOGRAPHY.sizes.title.site,
+                                fontWeight: OG_TYPOGRAPHY.weights.bold,
+                              },
                               children: SITE.title,
                             },
                           },
                           {
                             type: "p",
                             props: {
-                              style: { fontSize: 28 },
+                              style: { fontSize: OG_TYPOGRAPHY.sizes.subtitle },
                               children: SITE.desc,
                             },
                           },
@@ -99,12 +108,15 @@ export default async () => {
                           justifyContent: "flex-end",
                           width: "100%",
                           marginBottom: "8px",
-                          fontSize: 28,
+                          fontSize: OG_TYPOGRAPHY.sizes.subtitle,
                         },
                         children: {
                           type: "span",
                           props: {
-                            style: { overflow: "hidden", fontWeight: "bold" },
+                            style: {
+                              overflow: "hidden",
+                              fontWeight: OG_TYPOGRAPHY.weights.bold,
+                            },
                             children: new URL(SITE.website).hostname,
                           },
                         },
@@ -119,8 +131,8 @@ export default async () => {
       },
     },
     {
-      width: 1200,
-      height: 630,
+      width: OG_IMAGE_DIMENSIONS.width,
+      height: OG_IMAGE_DIMENSIONS.height,
       embedFont: true,
       fonts: await loadGoogleFonts(SITE.title + SITE.desc + SITE.website),
     }

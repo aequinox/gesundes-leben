@@ -1,0 +1,59 @@
+---
+/**
+ * BaseLink Component
+ *
+ * Core link functionality without variant-specific styling.
+ * Handles link behavior, accessibility, and navigation.
+ *
+ * Single Responsibility: Core link behavior and HTML rendering
+ */
+
+import type { HTMLAttributes } from "astro/types";
+
+export interface BaseLinkProps extends HTMLAttributes<"a"> {
+  /** Link destination URL */
+  href: string;
+  /** Whether to open link in new tab */
+  newTab?: boolean;
+  /** Whether the link is disabled */
+  disabled?: boolean;
+  /** Accessible label */
+  ariaLabel?: string;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  href,
+  newTab = false,
+  disabled = false,
+  ariaLabel,
+  "aria-label": ariaLabelAttr,
+  class: className = "",
+  ...rest
+} = Astro.props;
+
+// Use either ariaLabel prop or aria-label attribute
+const finalAriaLabel = ariaLabel || ariaLabelAttr;
+
+// Handle new tab attributes
+const linkProps = newTab
+  ? { target: "_blank", rel: "noopener noreferrer" }
+  : {};
+
+// Handle disabled state
+const disabledProps = disabled
+  ? { "aria-disabled": "true" as const, tabindex: -1 }
+  : {};
+---
+
+<a
+  href={disabled ? undefined : href}
+  aria-label={finalAriaLabel}
+  class={className}
+  {...linkProps}
+  {...disabledProps}
+  {...rest}
+>
+  <slot />
+</a>
