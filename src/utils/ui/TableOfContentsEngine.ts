@@ -79,8 +79,8 @@ export class TableOfContents {
       },
       {
         root: null,
-        rootMargin: "0px 0px -40% 0px",
-        threshold: [0.1, 0.5, 1.0],
+        rootMargin: "-120px 0px -60% 0px", // Detection zone starts at 120px (sidebar position)
+        threshold: [0.5],
       }
     );
 
@@ -197,10 +197,16 @@ export class TableOfContents {
         const targetElement = document.getElementById(targetId);
         if (targetElement) {
           try {
-            // Smooth scroll to the target
-            targetElement.scrollIntoView({
+            // Position heading just below the sidebar (top-24 = 96px + some margin)
+            // This aligns the heading with the sidebar content area
+            const elementTop =
+              targetElement.getBoundingClientRect().top + window.scrollY;
+            const sidebarOffset = 120; // 96px (top-24) + 24px margin
+            const targetScrollPosition = elementTop - sidebarOffset;
+
+            window.scrollTo({
+              top: Math.max(0, targetScrollPosition),
               behavior: "smooth",
-              block: "start",
             });
 
             // Update URL without causing a page jump
@@ -257,7 +263,21 @@ export class TableOfContents {
    */
   private createListItem(heading: HTMLElement): HTMLLIElement {
     const listItem = document.createElement("li");
-    listItem.className = `toc-level-${heading.tagName.toLowerCase()}`;
+    const headingLevel = heading.tagName.toLowerCase();
+    listItem.className = `toc-level-${headingLevel}`;
+
+    // Apply indentation directly via inline styles
+    const indentationMap: Record<string, string> = {
+      h1: "0px",
+      h2: "8px",
+      h3: "16px",
+      h4: "24px",
+    };
+
+    if (indentationMap[headingLevel]) {
+      listItem.style.marginLeft = indentationMap[headingLevel];
+      listItem.style.paddingLeft = "0px";
+    }
 
     const svg = this.createSvgElement();
     const link = this.createLink(heading);

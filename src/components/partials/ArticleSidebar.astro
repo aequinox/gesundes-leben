@@ -51,7 +51,7 @@ const t = useTranslations(lang);
         {t("toc.title")}
       </h2>
       <ul
-        class="space-y-2 text-sm text-pretty [&>li]:flex [&>li]:items-center [&>li]:text-sm [&>li]:leading-4 [&>li]:text-foreground/70 [&>li]:transition-all [&>li]:duration-300 [&>li]:ease-[cubic-bezier(0.4,0,0.2,1)] [&>li.selected]:scale-[1.02] [&>li.selected]:font-medium [&>li.selected]:text-accent [&>li.selected]:opacity-100 [&>li.selected>svg]:mr-2 [&>li.selected>svg]:h-4 [&>li.selected>svg]:w-4 [&>li.selected>svg]:text-accent [&>li.selected>svg]:transition-all [&>li.selected>svg]:duration-400 [&>li.selected>svg]:ease-[cubic-bezier(0.4,0,0.2,1)] [&>li>a]:block [&>li>a]:rounded-md [&>li>a]:px-3 [&>li>a]:py-1 [&>li>a]:transition-all [&>li>a]:duration-200 [&>li>a]:ease-in-out [&>li>a]:hover:scale-[1.01] [&>li>a]:hover:bg-accent/5 [&>li>a]:hover:text-accent [&>li>svg]:h-0 [&>li>svg]:w-0"
+        class="space-y-1 text-sm text-pretty [&>li]:flex [&>li]:items-center [&>li]:text-sm [&>li]:leading-tight [&>li]:text-foreground/70 [&>li]:transition-all [&>li]:duration-300 [&>li]:ease-[cubic-bezier(0.4,0,0.2,1)] [&>li.selected]:scale-[1.02] [&>li.selected]:font-medium [&>li.selected]:text-accent [&>li.selected]:opacity-100 [&>li.selected>svg]:mr-2 [&>li.selected>svg]:h-4 [&>li.selected>svg]:w-4 [&>li.selected>svg]:text-accent [&>li.selected>svg]:transition-all [&>li.selected>svg]:duration-400 [&>li.selected>svg]:ease-[cubic-bezier(0.4,0,0.2,1)] [&>li>a]:block [&>li>a]:rounded-md [&>li>a]:py-1 [&>li>a]:transition-all [&>li>a]:duration-200 [&>li>a]:ease-in-out [&>li>a]:hover:scale-[1.01] [&>li>a]:hover:bg-accent/5 [&>li>a]:hover:text-accent [&>li>svg]:h-0 [&>li>svg]:w-0"
         role="list"
         aria-labelledby="toc-heading"
       >
@@ -350,6 +350,80 @@ const t = useTranslations(lang);
     #toc-sidebar {
       border-color: rgba(255, 255, 255, 0.1);
     }
+  }
+
+  /* TOC Heading Level Indentation */
+  #toc ul li.toc-level-h1 a {
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    border-left: 3px solid transparent;
+  }
+
+  #toc ul li.toc-level-h2 a {
+    font-weight: 500;
+    font-size: 0.85rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    border-left: 2px solid #e5e7eb;
+  }
+
+  #toc ul li.toc-level-h3 a {
+    font-weight: 400;
+    font-size: 0.8rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    border-left: 1px solid #e5e7eb;
+    opacity: 0.8;
+  }
+
+  #toc ul li.toc-level-h4 a {
+    font-weight: 400;
+    font-size: 0.75rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    border-left: 1px solid #e5e7eb;
+    opacity: 0.7;
+    font-style: italic;
+  }
+
+  /* Selected state adjustments for different levels */
+  #toc ul li.toc-level-h1.selected a {
+    border-left-color: hsl(var(--accent));
+    background: linear-gradient(90deg, hsl(var(--accent) / 0.1), transparent);
+  }
+
+  #toc ul li.toc-level-h2.selected a {
+    border-left-color: hsl(var(--accent));
+    background: linear-gradient(90deg, hsl(var(--accent) / 0.08), transparent);
+  }
+
+  #toc ul li.toc-level-h3.selected a {
+    border-left-color: hsl(var(--accent));
+    background: linear-gradient(90deg, hsl(var(--accent) / 0.06), transparent);
+  }
+
+  #toc ul li.toc-level-h4.selected a {
+    border-left-color: hsl(var(--accent));
+    background: linear-gradient(90deg, hsl(var(--accent) / 0.04), transparent);
+  }
+
+  /* Hover states for different levels */
+  #toc ul li.toc-level-h1 a:hover {
+    border-left-color: hsl(var(--accent) / 0.6);
+  }
+
+  #toc ul li.toc-level-h2 a:hover {
+    border-left-color: hsl(var(--accent) / 0.5);
+  }
+
+  #toc ul li.toc-level-h3 a:hover {
+    border-left-color: hsl(var(--accent) / 0.4);
+  }
+
+  #toc ul li.toc-level-h4 a:hover {
+    border-left-color: hsl(var(--accent) / 0.3);
   }
 
   /* Reduced motion preferences */
