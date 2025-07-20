@@ -28,3 +28,7 @@ public/pagefind
 
 # improvements file
 @IMPROVEMENTS.md
+
+# performance test results
+tests/performance/results/
+tests/performance/baseline-*.json

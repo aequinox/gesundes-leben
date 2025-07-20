@@ -87,6 +87,8 @@ src/components/
 
 **Best Practices**: Adhere to industry standards for TypeScript, Astro, and modern web development including proper error handling, performance optimization, and maintainable code structure.
 
+**Logging Standards**: Use the project's logger utility (`src/utils/logger.ts`) instead of console statements in all Astro components, utilities, and server-side code. For standalone Node.js scripts (like performance tests), console.log is acceptable for user-facing output.
+
 ### Plugin System
 
 **Remark Plugins** (Markdown processing):
