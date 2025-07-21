@@ -45,6 +45,7 @@
     "docs:generate": "node scripts/generate-component-docs.js",
     "a11y:test": "node tests/accessibility/a11y-test.js",
     "prepare": "husky",
+    "wp-convert": "tsx src/scripts/wp-to-mdx/index.ts convert",
     "deploy": "bun run build && git checkout --orphan gh-pages && git --work-tree dist add --all && git --work-tree dist commit -m 'Deploy' && git push github gh-pages --force && git checkout -f main && git branch -D gh-pages"
   },
   "dependencies": {
@@ -58,7 +59,9 @@
     "astro": "5.12.0",
     "astro-icon": "^1.1.5",
     "astro-pagefind": "^1.8.3",
+    "axios": "^1.10.0",
     "chalk": "^5.4.1",
+    "commander": "^14.0.0",
     "dayjs": "^1.11.13",
     "hast-util-to-string": "^3.0.1",
     "lodash.kebabcase": "^4.1.1",
@@ -71,7 +74,12 @@
     "satori": "^0.15.2",
     "sharp": "^0.34.3",
     "slugify": "^1.6.6",
-    "tailwindcss": "^4.1.11"
+    "tailwindcss": "^4.1.11",
+    "turndown": "^7.2.0",
+    "turndown-plugin-gfm": "^1.0.2",
+    "uuid": "^11.1.0",
+    "xml2js": "^0.6.2",
+    "zod": "^4.0.5"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
@@ -81,6 +89,9 @@
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/bun": "^1.2.19",
     "@types/lodash.kebabcase": "^4.1.9",
+    "@types/turndown": "^5.0.5",
+    "@types/uuid": "^10.0.0",
+    "@types/xml2js": "^0.4.14",
     "@typescript-eslint/eslint-plugin": "^8.37.0",
     "@typescript-eslint/parser": "^8.37.0",
     "@vitest/coverage-v8": "^3.2.4",
@@ -100,6 +111,7 @@
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-astro-organize-imports": "^0.4.11",
     "prettier-plugin-tailwindcss": "^0.6.14",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.37.0",
     "vitest": "^3.2.4"
