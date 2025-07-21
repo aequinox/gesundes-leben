@@ -390,8 +390,16 @@ if (Object.values(groupPostCounts).every(count => count === 0)) {
 <script>
   import { initBlogFilter } from "@/utils/ui/BlogFilterEngine";
 
-  // Initialize the blog filter with debug mode enabled in development
-  initBlogFilter({
-    defaultCategory: "Alle",
-  });
+  // Initialize the blog filter
+  const initializeFilter = () => {
+    initBlogFilter({
+      defaultCategory: "Alle",
+    });
+  };
+
+  // Initialize on first load
+  initializeFilter();
+
+  // Re-initialize on Astro page navigation (view transitions)
+  document.addEventListener("astro:page-load", initializeFilter);
 </script>

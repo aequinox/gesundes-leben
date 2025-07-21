@@ -241,6 +241,11 @@ class LoggerService {
    * @param args Arguments to log
    */
   private logMessage(level: LogLevelName, ...args: unknown[]): void {
+    // Skip all logging in production environment
+    if (import.meta.env.PROD) {
+      return;
+    }
+
     const logLevel = this.levels[level];
 
     // Skip if below minimum log level
