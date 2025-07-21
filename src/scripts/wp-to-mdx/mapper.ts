@@ -1,6 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
 import { logger } from "./logger";
-import { CATEGORIES, GROUPS } from "@/utils/types";
 import type {
   WordPressPost,
   AstroBlogPost,
@@ -8,6 +6,8 @@ import type {
   AuthorMapping,
   ConversionConfig,
 } from "./types";
+import { CATEGORIES, GROUPS } from "@/utils/types";
+import { v4 as uuidv4 } from "uuid";
 
 export class SchemaMapper {
   private config: ConversionConfig;
@@ -34,7 +34,7 @@ export class SchemaMapper {
       const slug = this.generateSlug(wpPost);
       const folderPath = this.generateFolderPath(wpPost);
       const heroImage = this.mapHeroImage(wpPost, imageFiles);
-      
+
       const astroBlogPost: AstroBlogPost = {
         id: wpPost.id || uuidv4(),
         title: wpPost.title.trim(),
@@ -72,28 +72,28 @@ export class SchemaMapper {
   private createCategoryMapping(): CategoryMapping {
     return {
       // German WordPress categories to Astro categories
-      "ernährung": ["Ernährung"],
+      ernährung: ["Ernährung"],
       "ernährung & immunsystem": ["Ernährung", "Immunsystem"],
-      "immunsystem": ["Immunsystem"],
-      "gesundheit": ["Immunsystem"],
-      "lifestyle": ["Lifestyle & Psyche"],
-      "psyche": ["Lifestyle & Psyche"],
+      immunsystem: ["Immunsystem"],
+      gesundheit: ["Immunsystem"],
+      lifestyle: ["Lifestyle & Psyche"],
+      psyche: ["Lifestyle & Psyche"],
       "lifestyle & psyche": ["Lifestyle & Psyche"],
-      "mikronährstoffe": ["Mikronährstoffe"],
-      "vitamine": ["Mikronährstoffe"],
-      "mineralien": ["Mikronährstoffe"],
-      "organsysteme": ["Organsysteme"],
-      "wissenschaftliches": ["Wissenschaftliches"],
-      "studien": ["Wissenschaftliches"],
-      "wissenswertes": ["Wissenswertes"],
-      "tipps": ["Wissenswertes"],
-      "lesenswertes": ["Lesenswertes"],
-      "bücher": ["Lesenswertes"],
-      "buchempfehlung": ["Lesenswertes"],
-      
+      mikronährstoffe: ["Mikronährstoffe"],
+      vitamine: ["Mikronährstoffe"],
+      mineralien: ["Mikronährstoffe"],
+      organsysteme: ["Organsysteme"],
+      wissenschaftliches: ["Wissenschaftliches"],
+      studien: ["Wissenschaftliches"],
+      wissenswertes: ["Wissenswertes"],
+      tipps: ["Wissenswertes"],
+      lesenswertes: ["Lesenswertes"],
+      bücher: ["Lesenswertes"],
+      buchempfehlung: ["Lesenswertes"],
+
       // Fallback for unmapped categories
-      "allgemein": ["Wissenswertes"],
-      "uncategorized": ["Wissenswertes"],
+      allgemein: ["Wissenswertes"],
+      uncategorized: ["Wissenswertes"],
       ...this.config.categoryMapping,
     };
   }
@@ -103,14 +103,14 @@ export class SchemaMapper {
    */
   private createAuthorMapping(): AuthorMapping {
     return {
-      "KRenner": "kai-renner",
-      "Kai": "kai-renner",
-      "kai": "kai-renner",
+      KRenner: "kai-renner",
+      Kai: "kai-renner",
+      kai: "kai-renner",
       "kai renner": "kai-renner",
-      "Sandra": "sandra-pfeiffer", 
-      "sandra": "sandra-pfeiffer",
+      Sandra: "sandra-pfeiffer",
+      sandra: "sandra-pfeiffer",
       "sandra pfeiffer": "sandra-pfeiffer",
-      "admin": "kai-renner", // default fallback
+      admin: "kai-renner", // default fallback
       ...this.config.authorMapping,
     };
   }
@@ -157,7 +157,7 @@ export class SchemaMapper {
     for (const wpCategory of wpCategories) {
       const normalized = wpCategory.toLowerCase().trim();
       const mapped = this.categoryMapping[normalized];
-      
+
       if (mapped) {
         mapped.forEach(cat => astroCategories.add(cat));
       } else {
@@ -195,10 +195,12 @@ export class SchemaMapper {
   /**
    * Determine post group based on WordPress categories and content
    */
-  private determineGroup(wpPost: WordPressPost): "pro" | "kontra" | "fragezeichen" {
-    // Check custom WordPress taxonomy "beitragsart" 
+  private determineGroup(
+    wpPost: WordPressPost
+  ): "pro" | "kontra" | "fragezeichen" {
+    // Check custom WordPress taxonomy "beitragsart"
     const categories = wpPost.categories.map(cat => cat.toLowerCase());
-    
+
     if (categories.includes("pro")) return "pro";
     if (categories.includes("kontra")) return "kontra";
     if (categories.includes("fragezeichen")) return "fragezeichen";
@@ -209,20 +211,47 @@ export class SchemaMapper {
 
     // Keywords that suggest "kontra" (warnings, dangers, problems)
     const kontraKeywords = [
-      "gefahr", "risiko", "problem", "schaden", "warnung", "achtung",
-      "vermeiden", "stoppen", "nachteil", "negativ", "schlecht"
+      "gefahr",
+      "risiko",
+      "problem",
+      "schaden",
+      "warnung",
+      "achtung",
+      "vermeiden",
+      "stoppen",
+      "nachteil",
+      "negativ",
+      "schlecht",
     ];
 
-    // Keywords that suggest "pro" (benefits, advantages, positive)  
+    // Keywords that suggest "pro" (benefits, advantages, positive)
     const proKeywords = [
-      "vorteil", "nutzen", "gesund", "positiv", "fördern", "stärken",
-      "verbessern", "helfen", "unterstützen", "empfehlen", "gut"
+      "vorteil",
+      "nutzen",
+      "gesund",
+      "positiv",
+      "fördern",
+      "stärken",
+      "verbessern",
+      "helfen",
+      "unterstützen",
+      "empfehlen",
+      "gut",
     ];
 
     // Keywords that suggest "fragezeichen" (questions, uncertainty)
     const frageKeywords = [
-      "frage", "warum", "wie", "was", "wann", "wo", "unsicher",
-      "vielleicht", "möglich", "könnte", "eventuell"
+      "frage",
+      "warum",
+      "wie",
+      "was",
+      "wann",
+      "wo",
+      "unsicher",
+      "vielleicht",
+      "möglich",
+      "könnte",
+      "eventuell",
     ];
 
     const titleAndExcerpt = title + " " + wpPost.excerpt.toLowerCase();
@@ -260,12 +289,15 @@ export class SchemaMapper {
   /**
    * Map hero image from WordPress
    */
-  private mapHeroImage(wpPost: WordPressPost, imageFiles: string[]): { src: string; alt: string } {
+  private mapHeroImage(
+    wpPost: WordPressPost,
+    imageFiles: string[]
+  ): { src: string; alt: string } {
     // Try to find featured image
     if (wpPost.featuredImageUrl && imageFiles.length > 0) {
       const filename = this.extractFilenameFromUrl(wpPost.featuredImageUrl);
       const matchingImage = imageFiles.find(img => img.includes(filename));
-      
+
       if (matchingImage) {
         return {
           src: `./images/${matchingImage}`,
@@ -292,7 +324,10 @@ export class SchemaMapper {
   /**
    * Generate description from WordPress post
    */
-  private generateDescription(wpPost: WordPressPost, mdxContent: string): string {
+  private generateDescription(
+    wpPost: WordPressPost,
+    mdxContent: string
+  ): string {
     // Use WordPress excerpt if available
     if (wpPost.excerpt && wpPost.excerpt.trim().length > 10) {
       let desc = wpPost.excerpt.trim();
@@ -312,11 +347,11 @@ export class SchemaMapper {
     let text = mdxContent.replace(/[#*_`\[\]]/g, "");
     text = text.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1");
     text = text.replace(/\s+/g, " ").trim();
-    
+
     if (text.length > 160) {
       text = text.substring(0, 157) + "...";
     }
-    
+
     return text || "Ein Artikel über Gesundheit und Wohlbefinden.";
   }
 
@@ -340,15 +375,40 @@ export class SchemaMapper {
 
     // Add health-related German keywords found in content
     const healthKeywords = [
-      "Gesundheit", "Ernährung", "Vitamine", "Mineralien", "Mikronährstoffe",
-      "Immunsystem", "Darm", "Mikrobiom", "Probiotika", "Antioxidantien",
-      "Omega-3", "Vitamin D", "Magnesium", "Zink", "Eisen", "B-Vitamine",
-      "Homöopathie", "Naturheilkunde", "Heilpraktiker", "Wellness",
-      "Prävention", "Therapie", "Diagnose", "Laborwerte"
+      "Gesundheit",
+      "Ernährung",
+      "Vitamine",
+      "Mineralien",
+      "Mikronährstoffe",
+      "Immunsystem",
+      "Darm",
+      "Mikrobiom",
+      "Probiotika",
+      "Antioxidantien",
+      "Omega-3",
+      "Vitamin D",
+      "Magnesium",
+      "Zink",
+      "Eisen",
+      "B-Vitamine",
+      "Homöopathie",
+      "Naturheilkunde",
+      "Heilpraktiker",
+      "Wellness",
+      "Prävention",
+      "Therapie",
+      "Diagnose",
+      "Laborwerte",
     ];
 
-    const contentLower = (wpPost.title + " " + wpPost.content + " " + mdxContent).toLowerCase();
-    
+    const contentLower = (
+      wpPost.title +
+      " " +
+      wpPost.content +
+      " " +
+      mdxContent
+    ).toLowerCase();
+
     for (const keyword of healthKeywords) {
       if (contentLower.includes(keyword.toLowerCase())) {
         keywords.add(keyword);
@@ -363,15 +423,18 @@ export class SchemaMapper {
    */
   private determineFeatured(wpPost: WordPressPost): boolean {
     // Check WordPress custom fields for featured status
-    const isFeatured = wpPost.customFields["_featured_post"] === "1" ||
-                      wpPost.customFields["is_featured"] === "true";
-    
+    const isFeatured =
+      wpPost.customFields["_featured_post"] === "1" ||
+      wpPost.customFields["is_featured"] === "true";
+
     if (isFeatured) return true;
 
     // Feature recent high-quality posts (heuristic)
-    const isRecent = wpPost.pubDate > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // 30 days
+    const isRecent =
+      wpPost.pubDate > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // 30 days
     const isLongContent = wpPost.content.length > 3000;
-    const hasGoodSeoScore = parseInt(wpPost.customFields["rank_math_seo_score"]) > 80;
+    const hasGoodSeoScore =
+      parseInt(wpPost.customFields["rank_math_seo_score"]) > 80;
 
     return isRecent && isLongContent && hasGoodSeoScore;
   }
@@ -417,20 +480,25 @@ export class SchemaMapper {
     if (!post.description.trim()) errors.push("Description is required");
     if (!post.author.trim()) errors.push("Author is required");
     if (!post.pubDatetime) errors.push("Publication date is required");
-    if (!post.categories.length) errors.push("At least one category is required");
+    if (!post.categories.length)
+      errors.push("At least one category is required");
     if (!post.heroImage?.src) errors.push("Hero image is required");
 
     // Categories validation
-    const validCategories = post.categories.filter(cat => 
+    const validCategories = post.categories.filter(cat =>
       CATEGORIES.includes(cat as any)
     );
     if (validCategories.length !== post.categories.length) {
-      errors.push(`Invalid categories found. Valid categories: ${CATEGORIES.join(", ")}`);
+      errors.push(
+        `Invalid categories found. Valid categories: ${CATEGORIES.join(", ")}`
+      );
     }
 
     // Group validation
     if (!GROUPS.includes(post.group as any)) {
-      errors.push(`Invalid group: ${post.group}. Valid groups: ${GROUPS.join(", ")}`);
+      errors.push(
+        `Invalid group: ${post.group}. Valid groups: ${GROUPS.join(", ")}`
+      );
     }
 
     // Author validation (basic check)

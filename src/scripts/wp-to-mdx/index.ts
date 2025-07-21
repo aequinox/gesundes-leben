@@ -1,18 +1,17 @@
 #!/usr/bin/env node
-
-import { Command } from "commander";
-import { resolve } from "path";
 import { logger } from "./logger";
+import { SchemaMapper } from "./mapper";
 import { WordPressParser } from "./parser";
 import { ContentTranslator } from "./translator";
-import { SchemaMapper } from "./mapper";
-import { FileWriter } from "./writer";
-import { ContentValidator } from "./validator";
 import type { ConversionConfig, ConversionResult } from "./types";
+import { ContentValidator } from "./validator";
+import { FileWriter } from "./writer";
+import { Command } from "commander";
+import { resolve } from "path";
 
 class WordPressToAstroConverter {
   private parser = new WordPressParser();
-  private translator = new ContentTranslator();
+  private translator!: ContentTranslator;
   private mapper!: SchemaMapper;
   private writer!: FileWriter;
   private validator = new ContentValidator();
@@ -20,6 +19,7 @@ class WordPressToAstroConverter {
 
   async convert(config: ConversionConfig): Promise<ConversionResult> {
     this.config = config;
+    this.translator = new ContentTranslator(config.smartImagePositioning);
     this.mapper = new SchemaMapper(config);
     this.writer = new FileWriter(config);
 
@@ -99,7 +99,7 @@ class WordPressToAstroConverter {
     // Check if post already exists
     const folderPath = this.generateFolderPath(wpPost);
     const exists = await this.writer.checkExistingPost(folderPath);
-    
+
     if (exists && !this.config.dryRun) {
       const action = await this.handleExistingPost(wpPost.title, folderPath);
       if (action === "skip") {
@@ -112,7 +112,7 @@ class WordPressToAstroConverter {
     }
 
     // Convert content to MDX
-    const mdxContent = this.translator.convertToMDX(wpPost.content, {
+    const mdxContent = await this.translator.convertToMDX(wpPost.content, {
       generateTOC: this.config.generateTOC,
       rewriteImagePaths: this.config.downloadImages,
     });
@@ -128,12 +128,18 @@ class WordPressToAstroConverter {
     );
 
     // Update content with local image paths
-    astroBlogPost.content = this.writer.updateContentImagePaths(astroBlogPost.content);
+    astroBlogPost.content = this.writer.updateContentImagePaths(
+      astroBlogPost.content
+    );
 
     // Validate the mapped post
-    const isValid = this.validator.validatePost(astroBlogPost) &&
-                   this.validator.validateMDXContent(astroBlogPost.content, astroBlogPost.title) &&
-                   this.validator.validateFileStructure(astroBlogPost);
+    const isValid =
+      this.validator.validatePost(astroBlogPost) &&
+      this.validator.validateMDXContent(
+        astroBlogPost.content,
+        astroBlogPost.title
+      ) &&
+      this.validator.validateFileStructure(astroBlogPost);
 
     if (!isValid) {
       logger.warn(`Validation failed for post: ${wpPost.title}`);
@@ -155,7 +161,10 @@ class WordPressToAstroConverter {
       }
 
       // Filter by date range
-      if (this.config.filterDateFrom && post.pubDate < this.config.filterDateFrom) {
+      if (
+        this.config.filterDateFrom &&
+        post.pubDate < this.config.filterDateFrom
+      ) {
         return false;
       }
       if (this.config.filterDateTo && post.pubDate > this.config.filterDateTo) {
@@ -188,7 +197,10 @@ class WordPressToAstroConverter {
       .replace(/^-|-$/g, "");
   }
 
-  private async handleExistingPost(postTitle: string, folderPath: string): Promise<"skip" | "backup" | "overwrite"> {
+  private async handleExistingPost(
+    postTitle: string,
+    folderPath: string
+  ): Promise<"skip" | "backup" | "overwrite"> {
     // For now, default to backup - you could make this configurable
     logger.warn(`Post already exists: ${postTitle}`);
     return "backup";
@@ -196,27 +208,44 @@ class WordPressToAstroConverter {
 
   private extractImageFiles(wpPost: any, attachments: any[]): string[] {
     const imageFiles: string[] = [];
-    
+
     // Extract from content
-    const imageRegex = /https?:\/\/[^\s"']+\/wp-content\/uploads\/[^\s"')]+\.(jpg|jpeg|png|gif|webp|svg)/gi;
+    const imageRegex =
+      /https?:\/\/[^\s"']+\/wp-content\/uploads\/[^\s"')]+\.(jpg|jpeg|png|gif|webp|svg)/gi;
     const contentImages = wpPost.content.match(imageRegex) || [];
-    
+
     contentImages.forEach((url: string) => {
-      const filename = url.split("/").pop();
+      let filename = url.split("/").pop();
       if (filename) {
-        imageFiles.push(filename);
+        // Strip WordPress dimension suffixes to match what the smart positioning system will generate
+        filename = this.stripWordPressDimensionSuffix(filename);
+        if (!imageFiles.includes(filename)) {
+          imageFiles.push(filename);
+        }
       }
     });
 
     // Add featured image
     if (wpPost.featuredImageUrl) {
-      const filename = wpPost.featuredImageUrl.split("/").pop();
-      if (filename && !imageFiles.includes(filename)) {
-        imageFiles.push(filename);
+      let filename = wpPost.featuredImageUrl.split("/").pop();
+      if (filename) {
+        filename = this.stripWordPressDimensionSuffix(filename);
+        if (!imageFiles.includes(filename)) {
+          imageFiles.push(filename);
+        }
       }
     }
 
     return imageFiles;
+  }
+
+  /**
+   * Strip WordPress dimension suffixes from filenames
+   */
+  private stripWordPressDimensionSuffix(filename: string): string {
+    // Remove WordPress dimension suffixes like -300x200, -1024x768, etc.
+    // but keep the file extension
+    return filename.replace(/-\d+x\d+(\.[^.]+)$/, "$1");
   }
 
   private logSummary(result: ConversionResult): void {
@@ -263,11 +292,43 @@ program
   .option("--skip-drafts", "Skip draft posts", true)
   .option("--no-download-images", "Skip downloading images")
   .option("--no-generate-toc", "Skip generating table of contents")
-  .option("--filter-date-from <date>", "Only convert posts from this date (YYYY-MM-DD)")
-  .option("--filter-date-to <date>", "Only convert posts until this date (YYYY-MM-DD)")
+  .option(
+    "--filter-date-from <date>",
+    "Only convert posts from this date (YYYY-MM-DD)"
+  )
+  .option(
+    "--filter-date-to <date>",
+    "Only convert posts until this date (YYYY-MM-DD)"
+  )
   .option("--author-mapping <file>", "JSON file with author mapping")
   .option("--category-mapping <file>", "JSON file with category mapping")
-  .action(async (options) => {
+  .option(
+    "--smart-positioning",
+    "Enable smart image positioning based on dimensions",
+    true
+  )
+  .option("--no-smart-positioning", "Disable smart image positioning")
+  .option(
+    "--small-image-threshold <pixels>",
+    "Pixel width threshold for small images",
+    "400"
+  )
+  .option(
+    "--portrait-threshold <ratio>",
+    "Aspect ratio threshold for portrait images",
+    "0.75"
+  )
+  .option(
+    "--landscape-threshold <ratio>",
+    "Aspect ratio threshold for landscape images",
+    "1.5"
+  )
+  .option(
+    "--square-threshold <ratio>",
+    "Aspect ratio difference to consider square",
+    "0.1"
+  )
+  .action(async options => {
     try {
       const config: ConversionConfig = {
         inputFile: resolve(options.input),
@@ -276,10 +337,25 @@ program
         dryRun: options.dryRun,
         skipDrafts: options.skipDrafts,
         generateTOC: options.generateToc !== false,
-        filterDateFrom: options.filterDateFrom ? new Date(options.filterDateFrom) : undefined,
-        filterDateTo: options.filterDateTo ? new Date(options.filterDateTo) : undefined,
-        authorMapping: options.authorMapping ? await import(resolve(options.authorMapping)).then(m => m.default) : undefined,
-        categoryMapping: options.categoryMapping ? await import(resolve(options.categoryMapping)).then(m => m.default) : undefined,
+        filterDateFrom: options.filterDateFrom
+          ? new Date(options.filterDateFrom)
+          : undefined,
+        filterDateTo: options.filterDateTo
+          ? new Date(options.filterDateTo)
+          : undefined,
+        authorMapping: options.authorMapping
+          ? await import(resolve(options.authorMapping)).then(m => m.default)
+          : undefined,
+        categoryMapping: options.categoryMapping
+          ? await import(resolve(options.categoryMapping)).then(m => m.default)
+          : undefined,
+        smartImagePositioning: {
+          enableSmartPositioning: options.smartPositioning !== false,
+          smallImageThreshold: parseInt(options.smallImageThreshold),
+          portraitThreshold: parseFloat(options.portraitThreshold),
+          landscapeThreshold: parseFloat(options.landscapeThreshold),
+          squareThreshold: parseFloat(options.squareThreshold),
+        },
       };
 
       const converter = new WordPressToAstroConverter();

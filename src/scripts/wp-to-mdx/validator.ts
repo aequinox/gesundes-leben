@@ -1,7 +1,7 @@
-import { z } from "zod";
-import { CATEGORIES, GROUPS } from "@/utils/types";
 import { logger } from "./logger";
 import type { AstroBlogPost, ConversionError } from "./types";
+import { CATEGORIES, GROUPS } from "@/utils/types";
+import { z } from "zod";
 
 export class ContentValidator {
   private errors: ConversionError[] = [];
@@ -11,7 +11,7 @@ export class ContentValidator {
    */
   validatePost(post: AstroBlogPost): boolean {
     const errors = this.validatePostSchema(post);
-    
+
     if (errors.length > 0) {
       errors.forEach(error => {
         const conversionError: ConversionError = {
@@ -22,8 +22,10 @@ export class ContentValidator {
         };
         this.errors.push(conversionError);
       });
-      
-      logger.error(`Validation failed for post "${post.title}": ${errors.join(", ")}`);
+
+      logger.error(
+        `Validation failed for post "${post.title}": ${errors.join(", ")}`
+      );
       return false;
     }
 
@@ -43,7 +45,9 @@ export class ContentValidator {
         id: z.string().optional(),
         title: z.string(),
         author: z.string(),
-        description: z.string().min(10, "Description must be at least 10 characters"),
+        description: z
+          .string()
+          .min(10, "Description must be at least 10 characters"),
         pubDatetime: z.date(),
         modDatetime: z.date().optional(),
         keywords: z.array(z.string()).default([""]),
@@ -87,7 +91,6 @@ export class ContentValidator {
 
       // Validate against schema
       blogSchema.parse(validationData);
-
     } catch (zodError) {
       if (zodError instanceof z.ZodError) {
         zodError.errors.forEach(err => {
@@ -128,12 +131,14 @@ export class ContentValidator {
     // Author validation - check against known authors
     const validAuthors = ["kai-renner", "sandra-pfeiffer"];
     if (!validAuthors.includes(post.author)) {
-      errors.push(`Invalid author: ${post.author}. Valid authors: ${validAuthors.join(", ")}`);
+      errors.push(
+        `Invalid author: ${post.author}. Valid authors: ${validAuthors.join(", ")}`
+      );
     }
 
     // Categories validation - ensure they exist in CATEGORIES
-    const invalidCategories = post.categories.filter(cat => 
-      !CATEGORIES.includes(cat as any)
+    const invalidCategories = post.categories.filter(
+      cat => !CATEGORIES.includes(cat as any)
     );
     if (invalidCategories.length > 0) {
       errors.push(`Invalid categories: ${invalidCategories.join(", ")}`);
@@ -141,7 +146,9 @@ export class ContentValidator {
 
     // Group validation
     if (!GROUPS.includes(post.group as any)) {
-      errors.push(`Invalid group: ${post.group}. Valid groups: ${GROUPS.join(", ")}`);
+      errors.push(
+        `Invalid group: ${post.group}. Valid groups: ${GROUPS.join(", ")}`
+      );
     }
 
     // Tags validation
@@ -156,7 +163,9 @@ export class ContentValidator {
     if (post.heroImage.src && !post.heroImage.src.startsWith("./images/")) {
       // Only warn for local images
       if (!post.heroImage.src.startsWith("http")) {
-        errors.push("Hero image src should start with './images/' for local images");
+        errors.push(
+          "Hero image src should start with './images/' for local images"
+        );
       }
     }
 
@@ -195,7 +204,9 @@ export class ContentValidator {
     } else {
       const validSlugPattern = /^[a-z0-9-]+$/;
       if (!validSlugPattern.test(post.slug)) {
-        errors.push("Slug contains invalid characters (only lowercase letters, numbers, and hyphens allowed)");
+        errors.push(
+          "Slug contains invalid characters (only lowercase letters, numbers, and hyphens allowed)"
+        );
       }
     }
 
@@ -220,7 +231,7 @@ export class ContentValidator {
 
     try {
       // Basic MDX syntax validation
-      
+
       // Check for unclosed code blocks
       const codeBlockMatches = content.match(/```/g);
       if (codeBlockMatches && codeBlockMatches.length % 2 !== 0) {
@@ -253,7 +264,9 @@ export class ContentValidator {
       // Check for HTML tags that might cause issues
       const problematicTags = /<(script|iframe|embed|object|style)/gi;
       if (problematicTags.test(content)) {
-        logger.warn(`Post "${postTitle}" contains potentially problematic HTML tags`);
+        logger.warn(
+          `Post "${postTitle}" contains potentially problematic HTML tags`
+        );
       }
 
       // Check for German language content (basic check)
@@ -261,7 +274,6 @@ export class ContentValidator {
       if (!germanChars.test(content)) {
         logger.warn(`Post "${postTitle}" might not contain German content`);
       }
-
     } catch (error) {
       errors.push(`MDX validation error: ${error}`);
     }
@@ -275,8 +287,10 @@ export class ContentValidator {
         };
         this.errors.push(conversionError);
       });
-      
-      logger.error(`MDX validation failed for post "${postTitle}": ${errors.join(", ")}`);
+
+      logger.error(
+        `MDX validation failed for post "${postTitle}": ${errors.join(", ")}`
+      );
       return false;
     }
 
@@ -297,14 +311,17 @@ export class ContentValidator {
     // Check image references
     const imageRefs = post.content.match(/!\[.*?\]\((.*?)\)/g) || [];
     const localImages = imageRefs.filter(ref => ref.includes("./images/"));
-    
+
     localImages.forEach(imageRef => {
-      const match = imageRef.match(/!\[.*?\]\(\.(\/images\/.*?)\)/);
+      // Updated regex to handle titles/captions - stop at first space, quote, or closing paren
+      const match = imageRef.match(/!\[.*?\]\(\.(\/images\/[^\s")]+)/);
       if (match) {
         const imagePath = match[1];
         const filename = imagePath.split("/").pop();
         if (!post.images.includes(filename || "")) {
-          errors.push(`Referenced image not found in images array: ${filename}`);
+          errors.push(
+            `Referenced image not found in images array: ${filename}`
+          );
         }
       }
     });
@@ -327,8 +344,10 @@ export class ContentValidator {
         };
         this.errors.push(conversionError);
       });
-      
-      logger.error(`File structure validation failed for post "${post.title}": ${errors.join(", ")}`);
+
+      logger.error(
+        `File structure validation failed for post "${post.title}": ${errors.join(", ")}`
+      );
       return false;
     }
 
@@ -350,14 +369,18 @@ export class ContentValidator {
 
     // Check for duplicate slugs
     const slugs = posts.map(p => p.slug).filter(Boolean);
-    const duplicateSlugs = slugs.filter((slug, index) => slugs.indexOf(slug) !== index);
+    const duplicateSlugs = slugs.filter(
+      (slug, index) => slugs.indexOf(slug) !== index
+    );
     if (duplicateSlugs.length > 0) {
       errors.push(`Duplicate post slugs found: ${duplicateSlugs.join(", ")}`);
     }
 
     // Check for duplicate folder paths
     const folderPaths = posts.map(p => p.folderPath).filter(Boolean);
-    const duplicatePaths = folderPaths.filter((path, index) => folderPaths.indexOf(path) !== index);
+    const duplicatePaths = folderPaths.filter(
+      (path, index) => folderPaths.indexOf(path) !== index
+    );
     if (duplicatePaths.length > 0) {
       errors.push(`Duplicate folder paths found: ${duplicatePaths.join(", ")}`);
     }
@@ -370,7 +393,7 @@ export class ContentValidator {
         };
         this.errors.push(conversionError);
       });
-      
+
       logger.error(`Batch validation failed: ${errors.join(", ")}`);
       return false;
     }

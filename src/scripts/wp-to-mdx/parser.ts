@@ -1,5 +1,3 @@
-import { parseString } from "xml2js";
-import { readFileSync } from "fs";
 import { logger } from "./logger";
 import type {
   WordPressPost,
@@ -8,13 +6,15 @@ import type {
   WordPressCategory,
   WordPressExport,
 } from "./types";
+import { readFileSync } from "fs";
+import { parseString } from "xml2js";
 
 export class WordPressParser {
   private xmlData: any;
 
   async parseFromFile(filePath: string): Promise<WordPressExport> {
     logger.info(`Parsing WordPress XML file: ${filePath}`);
-    
+
     try {
       const xmlContent = readFileSync(filePath, "utf8");
       return await this.parseFromString(xmlContent);
@@ -36,7 +36,9 @@ export class WordPressParser {
         try {
           this.xmlData = result;
           const wpExport = this.extractWordPressData();
-          logger.info(`Successfully parsed ${wpExport.posts.length} posts, ${wpExport.attachments.length} attachments`);
+          logger.info(
+            `Successfully parsed ${wpExport.posts.length} posts, ${wpExport.attachments.length} attachments`
+          );
           resolve(wpExport);
         } catch (parseError) {
           logger.error(`Data extraction error: ${parseError}`);
@@ -49,7 +51,9 @@ export class WordPressParser {
   private extractWordPressData(): WordPressExport {
     const rss = this.xmlData.rss;
     const channel = rss.channel;
-    const items = Array.isArray(channel.item) ? channel.item : [channel.item].filter(Boolean);
+    const items = Array.isArray(channel.item)
+      ? channel.item
+      : [channel.item].filter(Boolean);
 
     const posts: WordPressPost[] = [];
     const attachments: WordPressAttachment[] = [];
@@ -58,7 +62,7 @@ export class WordPressParser {
 
     for (const item of items) {
       const postType = this.getMetaValue(item, "wp:post_type");
-      
+
       if (postType === "post" || postType === "page") {
         const post = this.parsePost(item);
         if (post) {
@@ -83,7 +87,7 @@ export class WordPressParser {
   private parsePost(item: any): WordPressPost | null {
     try {
       const status = this.getMetaValue(item, "wp:status");
-      
+
       // Skip auto-drafts and revisions
       if (status === "auto-draft" || status === "revision") {
         return null;
@@ -124,7 +128,9 @@ export class WordPressParser {
         id: this.getMetaValue(item, "wp:post_id") || "",
         title: item.title || "",
         url: this.getMetaValue(item, "wp:attachment_url") || "",
-        filename: this.extractFilename(this.getMetaValue(item, "wp:attachment_url") || ""),
+        filename: this.extractFilename(
+          this.getMetaValue(item, "wp:attachment_url") || ""
+        ),
         alt: this.getMetaValue(item, "_wp_attachment_image_alt") || "",
         caption: this.getMetaValue(item, "excerpt:encoded") || "",
         description: this.getMetaValue(item, "content:encoded") || "",
@@ -141,7 +147,7 @@ export class WordPressParser {
   private extractAuthors(channel: any): WordPressAuthor[] {
     const authors: WordPressAuthor[] = [];
     const wpAuthors = channel["wp:author"];
-    
+
     if (!wpAuthors) return authors;
 
     const authorList = Array.isArray(wpAuthors) ? wpAuthors : [wpAuthors];
@@ -163,10 +169,12 @@ export class WordPressParser {
   private extractCategories(channel: any): WordPressCategory[] {
     const categories: WordPressCategory[] = [];
     const wpCategories = channel["wp:category"];
-    
+
     if (!wpCategories) return categories;
 
-    const categoryList = Array.isArray(wpCategories) ? wpCategories : [wpCategories];
+    const categoryList = Array.isArray(wpCategories)
+      ? wpCategories
+      : [wpCategories];
 
     for (const category of categoryList) {
       if (category["wp:category_nicename"]) {
@@ -184,8 +192,10 @@ export class WordPressParser {
 
   private extractPostCategories(item: any): string[] {
     if (!item.category) return [];
-    
-    const categories = Array.isArray(item.category) ? item.category : [item.category];
+
+    const categories = Array.isArray(item.category)
+      ? item.category
+      : [item.category];
     return categories
       .filter((cat: any) => cat.$ && cat.$.domain === "category")
       .map((cat: any) => cat._ || cat)
@@ -194,8 +204,10 @@ export class WordPressParser {
 
   private extractPostTags(item: any): string[] {
     if (!item.category) return [];
-    
-    const categories = Array.isArray(item.category) ? item.category : [item.category];
+
+    const categories = Array.isArray(item.category)
+      ? item.category
+      : [item.category];
     return categories
       .filter((cat: any) => cat.$ && cat.$.domain === "post_tag")
       .map((cat: any) => cat._ || cat)
@@ -204,17 +216,17 @@ export class WordPressParser {
 
   private extractCustomFields(item: any): Record<string, any> {
     const customFields: Record<string, any> = {};
-    
+
     if (!item["wp:postmeta"]) return customFields;
 
-    const postMeta = Array.isArray(item["wp:postmeta"]) 
-      ? item["wp:postmeta"] 
+    const postMeta = Array.isArray(item["wp:postmeta"])
+      ? item["wp:postmeta"]
       : [item["wp:postmeta"]];
 
     for (const meta of postMeta) {
       const key = meta["wp:meta_key"];
       const value = meta["wp:meta_value"];
-      
+
       if (key && value) {
         customFields[key] = value;
       }
@@ -231,8 +243,8 @@ export class WordPressParser {
 
     // Handle postmeta fields
     if (metaKey.startsWith("_") && item["wp:postmeta"]) {
-      const postMeta = Array.isArray(item["wp:postmeta"]) 
-        ? item["wp:postmeta"] 
+      const postMeta = Array.isArray(item["wp:postmeta"])
+        ? item["wp:postmeta"]
         : [item["wp:postmeta"]];
 
       for (const meta of postMeta) {
@@ -255,7 +267,7 @@ export class WordPressParser {
 
   private parseModifiedDate(item: any): Date | undefined {
     const pubDate = new Date(item.pubDate || item["wp:post_date"]);
-    
+
     // Try different modified date fields
     const modifiedFields = [
       item["wp:post_date_gmt"],
@@ -277,7 +289,10 @@ export class WordPressParser {
   }
 
   // Helper method to resolve featured images after parsing
-  resolveFeaturedImages(posts: WordPressPost[], attachments: WordPressAttachment[]): void {
+  resolveFeaturedImages(
+    posts: WordPressPost[],
+    attachments: WordPressAttachment[]
+  ): void {
     const attachmentMap = new Map(attachments.map(att => [att.id, att]));
 
     for (const post of posts) {

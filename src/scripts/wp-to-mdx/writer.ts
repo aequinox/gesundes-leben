@@ -1,8 +1,13 @@
+import { logger } from "./logger";
+import type {
+  AstroBlogPost,
+  WordPressAttachment,
+  ConversionConfig,
+  ConversionError,
+} from "./types";
+import axios from "axios";
 import { promises as fs } from "fs";
 import { join, dirname } from "path";
-import axios from "axios";
-import { logger } from "./logger";
-import type { AstroBlogPost, WordPressAttachment, ConversionConfig, ConversionError } from "./types";
 
 export class FileWriter {
   private config: ConversionConfig;
@@ -23,11 +28,11 @@ export class FileWriter {
       logger.info(`Writing post: ${post.title}`);
 
       const postDir = join(this.config.outputDir, post.folderPath);
-      
+
       // Create post directory
       if (!this.config.dryRun) {
         await fs.mkdir(postDir, { recursive: true });
-        
+
         // Create images directory
         const imagesDir = join(postDir, "images");
         await fs.mkdir(imagesDir, { recursive: true });
@@ -41,7 +46,7 @@ export class FileWriter {
       // Write MDX file
       const mdxContent = this.generateMDXContent(post);
       const mdxPath = join(postDir, "index.mdx");
-      
+
       if (!this.config.dryRun) {
         await fs.writeFile(mdxPath, mdxContent, "utf8");
       }
@@ -79,7 +84,7 @@ export class FileWriter {
     lines.push(`title: ${this.yamlEscape(post.title)}`);
     lines.push(`author: ${post.author}`);
     lines.push(`pubDatetime: ${post.pubDatetime.toISOString()}`);
-    
+
     // Optional modDatetime
     if (post.modDatetime) {
       lines.push(`modDatetime: ${post.modDatetime.toISOString()}`);
@@ -162,13 +167,13 @@ export class FileWriter {
    */
   private yamlEscape(str: string): string {
     if (!str) return '""';
-    
+
     // Check if string contains special YAML characters
     if (str.match(/[:"'|\>@`{}[\]&*#?|-]/)) {
       // Escape quotes and wrap in quotes
       return `"${str.replace(/"/g, '\\"')}"`;
     }
-    
+
     return str;
   }
 
@@ -183,9 +188,10 @@ export class FileWriter {
     logger.info(`Downloading images for post: ${post.title}`);
 
     const imageUrls = new Set<string>();
-    
+
     // Extract image URLs from content
-    const imageRegex = /https?:\/\/[^\s"']+\/wp-content\/uploads\/[^\s"')]+\.(jpg|jpeg|png|gif|webp|svg)/gi;
+    const imageRegex =
+      /https?:\/\/[^\s"']+\/wp-content\/uploads\/[^\s"')]+\.(jpg|jpeg|png|gif|webp|svg)/gi;
     const contentImages = post.content.match(imageRegex) || [];
     contentImages.forEach(url => imageUrls.add(url));
 
@@ -222,7 +228,10 @@ export class FileWriter {
   /**
    * Download a single image
    */
-  private async downloadSingleImage(url: string, imagesDir: string): Promise<void> {
+  private async downloadSingleImage(
+    url: string,
+    imagesDir: string
+  ): Promise<void> {
     try {
       const filename = this.extractFilenameFromUrl(url);
       const filePath = join(imagesDir, filename);
@@ -242,7 +251,8 @@ export class FileWriter {
         responseType: "arraybuffer",
         timeout: 30000, // 30 second timeout
         headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; WordPress-to-Astro-Converter/1.0)",
+          "User-Agent":
+            "Mozilla/5.0 (compatible; WordPress-to-Astro-Converter/1.0)",
         },
       });
 
@@ -251,7 +261,7 @@ export class FileWriter {
       }
 
       logger.debug(`Successfully downloaded: ${filename}`);
-      
+
       // Small delay to avoid overwhelming the server
       await this.delay(100);
     } catch (error) {
@@ -267,12 +277,12 @@ export class FileWriter {
       const urlObj = new URL(url);
       const pathname = urlObj.pathname;
       const filename = pathname.split("/").pop() || "unknown";
-      
+
       // Ensure filename has an extension
       if (!filename.includes(".")) {
         return filename + ".jpg";
       }
-      
+
       return filename;
     } catch {
       return `image-${Date.now()}.jpg`;
@@ -300,9 +310,10 @@ export class FileWriter {
    */
   updateContentImagePaths(content: string): string {
     // Replace WordPress image URLs with local references
-    const imageRegex = /https?:\/\/[^\s"']+\/wp-content\/uploads\/[^\s"')]+\.(jpg|jpeg|png|gif|webp|svg)/gi;
-    
-    return content.replace(imageRegex, (match) => {
+    const imageRegex =
+      /https?:\/\/[^\s"']+\/wp-content\/uploads\/[^\s"')]+\.(jpg|jpeg|png|gif|webp|svg)/gi;
+
+    return content.replace(imageRegex, match => {
       const filename = this.extractFilenameFromUrl(match);
       return `./images/${filename}`;
     });
@@ -315,7 +326,7 @@ export class FileWriter {
     try {
       const fullPath = join(this.config.outputDir, folderPath);
       const indexPath = join(fullPath, "index.mdx");
-      
+
       await fs.access(indexPath);
       return true;
     } catch {
@@ -344,7 +355,7 @@ export class FileWriter {
     try {
       const fullPath = join(this.config.outputDir, folderPath);
       const backupPath = `${fullPath}-backup-${Date.now()}`;
-      
+
       await fs.rename(fullPath, backupPath);
       logger.info(`Backed up existing post to: ${backupPath}`);
     } catch (error) {
@@ -359,7 +370,9 @@ export class FileWriter {
     try {
       await fs.access(this.config.outputDir);
     } catch {
-      throw new Error(`Output directory does not exist: ${this.config.outputDir}`);
+      throw new Error(
+        `Output directory does not exist: ${this.config.outputDir}`
+      );
     }
 
     // Check if it looks like a blog directory
@@ -367,7 +380,9 @@ export class FileWriter {
     try {
       await fs.access(join(expectedStructure, "src", "content.config.ts"));
     } catch {
-      logger.warn("Warning: Output directory might not be a valid Astro blog directory");
+      logger.warn(
+        "Warning: Output directory might not be a valid Astro blog directory"
+      );
     }
   }
 }

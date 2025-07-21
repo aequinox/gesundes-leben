@@ -65,6 +65,14 @@ export interface ConversionConfig {
   categoryMapping?: Record<string, string[]>;
   skipDrafts: boolean;
   generateTOC: boolean;
+  // Image positioning configuration
+  smartImagePositioning?: {
+    enableSmartPositioning: boolean;
+    squareThreshold: number;
+    portraitThreshold: number;
+    landscapeThreshold: number;
+    smallImageThreshold: number;
+  };
 }
 
 // Astro Blog Post Schema (matching content.config.ts)
