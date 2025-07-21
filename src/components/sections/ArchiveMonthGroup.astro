@@ -14,10 +14,11 @@
  * ```
  */
 
+import Card from "./Card.astro";
+
 import type { TranslationKey } from "@/i18n/ui";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import type { Post } from "@/utils/types";
-import Card from "./Card.astro";
 
 export interface Props {
   /** The month index (0-11) to display */

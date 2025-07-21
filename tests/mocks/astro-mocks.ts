@@ -6,8 +6,8 @@
  * content collections, image optimization, and component rendering.
  */
 
-import { vi } from 'vitest';
 import type { CollectionEntry } from 'astro:content';
+import { vi } from 'vitest';
 
 /**
  * Mock Astro content collections for health blog testing

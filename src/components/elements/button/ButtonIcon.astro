@@ -9,6 +9,7 @@
  */
 
 import { Icon } from "astro-icon/components";
+
 import { iconClasses } from "./ButtonVariants";
 
 export interface ButtonIconProps {
@@ -24,7 +25,9 @@ const { icon, position = "start", hasText = true } = Astro.props;
 
 // Determine icon classes based on position and text presence
 const getIconClasses = () => {
-  if (!hasText) return iconClasses.only;
+  if (!hasText) {
+    return iconClasses.only;
+  }
   return iconClasses[position as keyof typeof iconClasses] || iconClasses.start;
 };
 

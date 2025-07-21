@@ -294,22 +294,32 @@ function toggleItem(accordionState: AccordionState, itemIndex: number): void {
  * @param event - The click event
  */
 function handleTriggerClick(event: Event): void {
-  if (!event.target) return;
+  if (!event.target) {
+    return;
+  }
 
   const trigger = (event.target as Element).closest(options.triggerSelector);
-  if (!trigger) return;
+  if (!trigger) {
+    return;
+  }
 
   event.preventDefault();
 
   const item = trigger.closest(options.itemSelector);
-  if (!item) return;
+  if (!item) {
+    return;
+  }
 
   // Find the accordion container
   const accordion = item.closest(options.accordionSelector);
-  if (!accordion) return;
+  if (!accordion) {
+    return;
+  }
 
   const accordionState = accordionStates.get(accordion as HTMLElement);
-  if (!accordionState) return;
+  if (!accordionState) {
+    return;
+  }
 
   // Find the item index
   const itemIndex = parseInt((item as HTMLElement).dataset.index || "0", 10);

@@ -1,4 +1,6 @@
 ---
+import { Icon } from "astro-icon/components";
+
 import Button from "@/components/elements/Button.astro";
 import Footer from "@/components/sections/Footer.astro";
 import Header from "@/components/sections/Header.astro";
@@ -6,7 +8,6 @@ import { SITE } from "@/config";
 import type { TranslationKey } from "@/i18n/ui";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
-import { Icon } from "astro-icon/components";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);

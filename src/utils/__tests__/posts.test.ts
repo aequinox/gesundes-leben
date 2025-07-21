@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * @file posts.test.ts
  * @description Comprehensive tests for post utility functions

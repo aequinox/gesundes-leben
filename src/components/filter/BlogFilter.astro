@@ -8,14 +8,15 @@
  *
  */
 
+import { Icon } from "astro-icon/components";
+import { getCollection } from "astro:content";
+
 import Card from "@/components/sections/Card.astro";
 import { LOCALE } from "@/config";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { getSortedPosts } from "@/utils/posts";
 import { CATEGORIES } from "@/utils/types";
 import type { GroupType } from "@/utils/ui/BlogFilterEngine";
-import { Icon } from "astro-icon/components";
-import { getCollection } from "astro:content";
 
 // Get current language and translations
 const lang = getLangFromUrl(Astro.url);

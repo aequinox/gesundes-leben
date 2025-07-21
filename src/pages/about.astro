@@ -6,20 +6,20 @@
  * Structured with clear sections and responsive design.
  */
 
+import imageKai from "@/assets/images/about/Portrait-Kai-1-GIT-round-1-300x300.png";
+import imageSandra from "@/assets/images/about/Portrait-Sandra-1.1-GIT-round-1-300x300.png";
 import Hr from "@/components/elements/Hr.astro";
 import VisionImage from "@/components/elements/VisionImage.astro";
 import Footer from "@/components/sections/Footer.astro";
 import Header from "@/components/sections/Header.astro";
 import PageHero from "@/components/sections/PageHero.astro";
 import { SITE } from "@/config";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 
 // Import founder images
 // import imageKai from "@/assets/images/about/Kai.webp";
 // import imageSandra from "@/assets/images/about/Sandra.webp";
-import imageKai from "@/assets/images/about/Portrait-Kai-1-GIT-round-1-300x300.png";
-import imageSandra from "@/assets/images/about/Portrait-Sandra-1.1-GIT-round-1-300x300.png";
-import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);

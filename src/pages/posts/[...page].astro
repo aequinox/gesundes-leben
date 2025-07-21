@@ -1,4 +1,7 @@
 ---
+import type { GetStaticPaths } from "astro";
+import { Icon } from "astro-icon/components";
+
 import Hr from "@/components/elements/Hr.astro";
 import BlogFilter from "@/components/filter/BlogFilter.astro";
 import Footer from "@/components/sections/Footer.astro";
@@ -8,8 +11,6 @@ import { SITE } from "@/config";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import { processAllPosts } from "@/utils/posts";
-import type { GetStaticPaths } from "astro";
-import { Icon } from "astro-icon/components";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);

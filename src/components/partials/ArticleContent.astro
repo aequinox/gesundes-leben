@@ -1,4 +1,7 @@
 ---
+import { Picture } from "astro:assets";
+import { render, type CollectionEntry } from "astro:content";
+
 import Blockquote from "@/components/elements/Blockquote.astro";
 import H1 from "@/components/elements/H1.astro";
 import H2 from "@/components/elements/H2.astro";
@@ -9,8 +12,6 @@ import H6 from "@/components/elements/H6.astro";
 import Image from "@/components/elements/Image.astro";
 import Paragraph from "@/components/elements/Paragraph.astro";
 import { slugify } from "@/utils/slugs";
-import { Picture } from "astro:assets";
-import { render, type CollectionEntry } from "astro:content";
 
 export interface Props {
   post: CollectionEntry<"blog">;
@@ -90,7 +91,9 @@ const components = {
         "hero-parallax-image"
       ) as HTMLElement;
 
-      if (!parallaxContainer || !parallaxImage) return;
+      if (!parallaxContainer || !parallaxImage) {
+        return;
+      }
 
       // Check for reduced motion preference
       const prefersReducedMotion = window.matchMedia(

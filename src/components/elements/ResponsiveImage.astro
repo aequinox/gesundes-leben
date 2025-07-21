@@ -29,9 +29,11 @@
  * ```
  */
 
-import { cn } from "@/utils/ui/designSystem";
 import { Picture } from "astro:assets";
+
 import type { ImageMetadata, MediaComponentProps } from "../types/base";
+
+import { cn } from "@/utils/ui/designSystem";
 
 export interface Props extends MediaComponentProps {
   /** Image sizes attribute for responsive loading */
@@ -136,8 +138,12 @@ const containerStyle = aspectRatio ? { aspectRatio } : {};
 
 // Get the actual source URL for fallback
 const getSrcUrl = (source: string | ImageMetadata): string => {
-  if (typeof source === "string") return source;
-  if (source && typeof source === "object" && source.src) return source.src;
+  if (typeof source === "string") {
+    return source;
+  }
+  if (source && typeof source === "object" && source.src) {
+    return source.src;
+  }
   return String(source) || "";
 };
 ---
@@ -216,7 +222,9 @@ const getSrcUrl = (source: string | ImageMetadata): string => {
       const loadingIndicator = container.querySelector(".animate-spin")
         ?.parentElement as HTMLElement;
 
-      if (!img) return;
+      if (!img) {
+        return;
+      }
 
       // Handle successful image load
       const handleLoad = () => {

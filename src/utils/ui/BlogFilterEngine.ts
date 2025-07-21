@@ -89,7 +89,9 @@ let options: Required<FilterOptions>;
  * @returns A boolean indicating if the post should be visible.
  */
 const shouldPostBeVisible = (article: HTMLElement): boolean => {
-  if (!state.selectedGroup && !state.selectedCategory) return true;
+  if (!state.selectedGroup && !state.selectedCategory) {
+    return true;
+  }
 
   const postGroup = article.dataset.group;
   let postCategories: string[] = [];
@@ -108,7 +110,9 @@ const shouldPostBeVisible = (article: HTMLElement): boolean => {
   }
 
   if (!state.selectedGroup && state.selectedCategory) {
-    if (state.selectedCategory === "Alle") return true;
+    if (state.selectedCategory === "Alle") {
+      return true;
+    }
     return postCategories.some(
       category =>
         category.toLowerCase() === state.selectedCategory?.toLowerCase()
@@ -116,8 +120,9 @@ const shouldPostBeVisible = (article: HTMLElement): boolean => {
   }
 
   if (state.selectedGroup && state.selectedCategory) {
-    if (state.selectedCategory === "Alle")
+    if (state.selectedCategory === "Alle") {
       return postGroup === state.selectedGroup;
+    }
     const hasCategory = postCategories.some(
       category =>
         category.toLowerCase() === state.selectedCategory?.toLowerCase()
@@ -140,7 +145,9 @@ const shouldPostBeVisible = (article: HTMLElement): boolean => {
  * are visible.
  */
 const applyFilters = (): void => {
-  if (!elements.articles) return;
+  if (!elements.articles) {
+    return;
+  }
 
   let visibleCount = 0;
   const visibleArticles: HTMLElement[] = [];
@@ -221,7 +228,9 @@ const updateFilterCount = (count: number): void => {
  * @param show - Whether to show the "no results" message.
  */
 const toggleNoResultsMessage = (show: boolean): void => {
-  if (!elements.noResults || !elements.articleGrid) return;
+  if (!elements.noResults || !elements.articleGrid) {
+    return;
+  }
 
   if (show) {
     elements.noResults.style.display = "flex";
@@ -249,7 +258,9 @@ const toggleNoResultsMessage = (show: boolean): void => {
  * removed.
  */
 const updateGroupSelectionUI = (): void => {
-  if (!elements.groupSelectors) return;
+  if (!elements.groupSelectors) {
+    return;
+  }
 
   elements.groupSelectors.forEach(selector => {
     const group = selector.dataset.group as GroupType;
@@ -260,11 +271,15 @@ const updateGroupSelectionUI = (): void => {
     if (group === state.selectedGroup) {
       selector.setAttribute("aria-pressed", "true");
       selector.classList.add("active-group");
-      if (iconWrapper) iconWrapper.classList.add(`selected-${group}`);
+      if (iconWrapper) {
+        iconWrapper.classList.add(`selected-${group}`);
+      }
     } else {
       selector.setAttribute("aria-pressed", "false");
       selector.classList.remove("active-group");
-      if (iconWrapper) iconWrapper.classList.remove(`selected-${group}`);
+      if (iconWrapper) {
+        iconWrapper.classList.remove(`selected-${group}`);
+      }
     }
   });
 };
@@ -278,7 +293,9 @@ const updateGroupSelectionUI = (): void => {
 const getAvailableCategories = (): Set<string> => {
   const availableCategories = new Set<string>();
 
-  if (!elements.articles) return availableCategories;
+  if (!elements.articles) {
+    return availableCategories;
+  }
 
   elements.articles.forEach(article => {
     // Check if article would be visible with current group filter (ignoring category filter)
@@ -317,7 +334,9 @@ const getAvailableCategories = (): Set<string> => {
 const getCategoryCounts = (): Map<string, number> => {
   const categoryCounts = new Map<string, number>();
 
-  if (!elements.articles) return categoryCounts;
+  if (!elements.articles) {
+    return categoryCounts;
+  }
 
   // Count total articles for "Alle" category
   let totalCount = 0;
@@ -367,13 +386,17 @@ const getCategoryCounts = (): Map<string, number> => {
  * The "Alle" (All) category button is always visible.
  */
 const updateCategoryButtonVisibility = (): void => {
-  if (!elements.categoryButtons) return;
+  if (!elements.categoryButtons) {
+    return;
+  }
 
   const availableCategories = getAvailableCategories();
 
   elements.categoryButtons.forEach(button => {
     const category = button.dataset.category;
-    if (!category) return;
+    if (!category) {
+      return;
+    }
 
     // Always show the "Alle" (All) button
     if (category === options.defaultCategory) {
@@ -396,13 +419,17 @@ const updateCategoryButtonVisibility = (): void => {
  * Removes any existing count elements to prevent duplicates and uses existing badge styling.
  */
 const updateCategoryButtonCounts = (): void => {
-  if (!elements.categoryButtons) return;
+  if (!elements.categoryButtons) {
+    return;
+  }
 
   const categoryCounts = getCategoryCounts();
 
   elements.categoryButtons.forEach(button => {
     const category = button.dataset.category;
-    if (!category) return;
+    if (!category) {
+      return;
+    }
 
     const count = categoryCounts.get(category) || 0;
 
@@ -452,7 +479,9 @@ const updateCategoryButtonCounts = (): void => {
  * pressed and the data-active attribute is set to false.
  */
 const updateCategorySelectionUI = (): void => {
-  if (!elements.categoryButtons) return;
+  if (!elements.categoryButtons) {
+    return;
+  }
 
   elements.categoryButtons.forEach(button => {
     const category = button.dataset.category;
@@ -507,7 +536,9 @@ const handleCategoryButtonClick = (event: Event): void => {
   const target = event.currentTarget as HTMLElement;
   const category = target.dataset.category;
 
-  if (!category) return;
+  if (!category) {
+    return;
+  }
 
   if (state.selectedCategory === category) {
     if (category !== options.defaultCategory) {
@@ -604,7 +635,9 @@ const attachEventListeners = (): void => {
  * @returns {void}
  */
 const prepareArticlesForFiltering = (): void => {
-  if (!elements.articles) return;
+  if (!elements.articles) {
+    return;
+  }
 
   elements.articles.forEach(article => {
     if (!article.dataset.group || !article.dataset.categories) {
@@ -612,10 +645,12 @@ const prepareArticlesForFiltering = (): void => {
         "article"
       ) as HTMLElement | null;
       if (articleCard) {
-        if (articleCard.dataset.group)
+        if (articleCard.dataset.group) {
           article.dataset.group = articleCard.dataset.group;
-        if (articleCard.dataset.categories)
+        }
+        if (articleCard.dataset.categories) {
           article.dataset.categories = articleCard.dataset.categories;
+        }
       }
     }
 
@@ -626,7 +661,9 @@ const prepareArticlesForFiltering = (): void => {
         const categories: string[] = [];
         categoryElements.forEach(el => {
           const category = (el as HTMLElement).dataset.category;
-          if (category) categories.push(category);
+          if (category) {
+            categories.push(category);
+          }
         });
         if (categories.length > 0) {
           article.dataset.categories = categories.join("|");
@@ -639,7 +676,9 @@ const prepareArticlesForFiltering = (): void => {
 
       if (groupElements.length > 0) {
         const el = groupElements[0] as HTMLElement;
-        if (el.dataset.group) article.dataset.group = el.dataset.group;
+        if (el.dataset.group) {
+          article.dataset.group = el.dataset.group;
+        }
       }
     }
   });

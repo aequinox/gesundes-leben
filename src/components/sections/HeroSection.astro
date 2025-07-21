@@ -1,7 +1,8 @@
 ---
+import { Icon } from "astro-icon/components";
+
 import Socials from "@/components/socials/Socials.astro";
 import { SOCIALS } from "@/socials";
-import { Icon } from "astro-icon/components";
 
 // Count active social links for conditional rendering
 const socialCount = SOCIALS.filter(social => social.active).length;

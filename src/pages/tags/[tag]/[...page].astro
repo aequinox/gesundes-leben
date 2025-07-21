@@ -1,4 +1,6 @@
 ---
+import type { GetStaticPathsOptions } from "astro";
+
 import Hr from "@/components/elements/Hr.astro";
 import Pagination from "@/components/Pagination.astro";
 import Card from "@/components/sections/Card.astro";
@@ -10,7 +12,6 @@ import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import getPostsByTag, { processAllPosts } from "@/utils/posts";
 import { extractUniqueTags } from "@/utils/tags";
-import type { GetStaticPathsOptions } from "astro";
 
 export const getStaticPaths = async ({ paginate }: GetStaticPathsOptions) => {
   // Use the unified post processing function

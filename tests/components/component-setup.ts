@@ -7,9 +7,10 @@
  */
 
 import { beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
+
 import '@testing-library/jest-dom';
-import { setupBrowserMocks } from '../mocks/browser-apis';
 import { setupAstroMocks } from '../mocks/astro-mocks';
+import { setupBrowserMocks } from '../mocks/browser-apis';
 
 // =============================================================================
 // Component Test Environment Configuration
@@ -299,8 +300,8 @@ afterEach(() => {
   vi.clearAllMocks();
   
   // Clean up mock environments
-  if (browserMocks) browserMocks.cleanup();
-  if (astroMocks) astroMocks.cleanup();
+  if (browserMocks) {browserMocks.cleanup();}
+  if (astroMocks) {astroMocks.cleanup();}
   
   // Clean up DOM
   document.body.innerHTML = '';
@@ -315,6 +316,6 @@ afterAll(() => {
   vi.restoreAllMocks();
   
   // Final cleanup of mock environments
-  if (browserMocks) browserMocks.cleanup();
-  if (astroMocks) astroMocks.cleanup();
+  if (browserMocks) {browserMocks.cleanup();}
+  if (astroMocks) {astroMocks.cleanup();}
 });

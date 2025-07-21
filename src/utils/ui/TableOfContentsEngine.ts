@@ -113,7 +113,9 @@ export class TableOfContents {
    */
   private scrollIntoViewIfNeeded(element: HTMLElement): void {
     const container = document.querySelector<HTMLElement>("#toc");
-    if (!container) return;
+    if (!container) {
+      return;
+    }
 
     const { top: containerTop, bottom: containerBottom } =
       container.getBoundingClientRect();
@@ -360,7 +362,9 @@ export class TableOfContents {
   private getAccessibleName(element: HTMLElement): string {
     // Check for aria-label
     const ariaLabel = element.getAttribute("aria-label");
-    if (ariaLabel) return ariaLabel;
+    if (ariaLabel) {
+      return ariaLabel;
+    }
 
     // Check for aria-labelledby
     const ariaLabelledBy = element.getAttribute("aria-labelledby");
@@ -375,7 +379,9 @@ export class TableOfContents {
     const img = element.querySelector("img");
     if (img) {
       const altText = img.getAttribute("alt");
-      if (altText) return altText;
+      if (altText) {
+        return altText;
+      }
     }
 
     // Check for SVG with title
@@ -424,7 +430,9 @@ export class TableOfContents {
    * screen reader support.
    */
   private addKeyboardNavigation(): void {
-    if (!this.tocList) return;
+    if (!this.tocList) {
+      return;
+    }
 
     // Add keyboard event listeners to each link instead of the list
     const links = Array.from(this.tocList.querySelectorAll("a"));
@@ -433,7 +441,9 @@ export class TableOfContents {
       // Ensure links are properly focusable (they are by default)
       link.addEventListener("keydown", event => {
         const items = links;
-        if (!items.length) return;
+        if (!items.length) {
+          return;
+        }
 
         switch (event.key) {
           case "ArrowDown": {
@@ -502,11 +512,15 @@ export class ScrollProgress {
    * aria-valuenow attribute to the current progress percentage.
    */
   public update(): void {
-    if (this.ticking) return;
+    if (this.ticking) {
+      return;
+    }
 
     this.ticking = true;
     requestAnimationFrame(() => {
-      if (!this.article) return;
+      if (!this.article) {
+        return;
+      }
 
       const scrollPosition = window.scrollY;
       const windowHeight = window.innerHeight;

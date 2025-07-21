@@ -1,9 +1,10 @@
 ---
+import Socials from "../socials/Socials.astro";
+
 import Hr from "@/components/elements/Hr.astro";
 import { SITE } from "@/config";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { getAuthorDisplayName } from "@/utils/authors";
-import Socials from "../socials/Socials.astro";
 
 // Internationalization setup
 const lang = getLangFromUrl(Astro.url);

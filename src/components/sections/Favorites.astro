@@ -6,13 +6,14 @@
  * Focuses on essential information with minimal visual clutter.
  * Hidden by default in an accordion for optional viewing.
  */
+import { Icon } from "astro-icon/components";
+import { getCollection, type CollectionEntry } from "astro:content";
+
 import Badge from "@/components/elements/Badge.astro";
 import Button from "@/components/elements/Button.astro";
 import Accordion from "@/components/sections/Accordion.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { logger } from "@/utils/logger";
-import { Icon } from "astro-icon/components";
-import { getCollection, type CollectionEntry } from "astro:content";
 
 interface Props {
   data?: Record<string, string[]>;

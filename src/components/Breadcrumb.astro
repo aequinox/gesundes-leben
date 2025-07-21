@@ -1,9 +1,10 @@
 ---
+import { getCollection } from "astro:content";
+
 import Badge from "@/components/elements/Badge.astro";
 import type { UITranslations } from "@/i18n/ui";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { getPostSlug } from "@/utils/slugs";
-import { getCollection } from "astro:content";
 
 interface Props {
   class?: string;

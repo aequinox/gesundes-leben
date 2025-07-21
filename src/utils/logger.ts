@@ -222,7 +222,9 @@ class LoggerService {
    * @returns Styled text
    */
   private styleText(text: string, ...styles: ChalkInstance[]): string {
-    if (!this.settings.useColors) return text;
+    if (!this.settings.useColors) {
+      return text;
+    }
 
     try {
       return styles.reduce((acc, style) => style(acc), text);
@@ -242,7 +244,9 @@ class LoggerService {
     const logLevel = this.levels[level];
 
     // Skip if below minimum log level
-    if (logLevel.id < this.settings.minLevel) return;
+    if (logLevel.id < this.settings.minLevel) {
+      return;
+    }
 
     try {
       const timestamp = this.getTimestamp();

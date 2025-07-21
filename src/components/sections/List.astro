@@ -502,11 +502,15 @@ const containerClass =
   let cleanup = setupListAnimation();
 
   document.addEventListener("astro:after-swap", () => {
-    if (cleanup) cleanup();
+    if (cleanup) {
+      cleanup();
+    }
     cleanup = setupListAnimation();
   });
 
   document.addEventListener("astro:before-swap", () => {
-    if (cleanup) cleanup();
+    if (cleanup) {
+      cleanup();
+    }
   });
 </script>

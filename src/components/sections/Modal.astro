@@ -1,5 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
+
 import Button from "../elements/Button.astro";
 
 export interface Props {
@@ -191,7 +192,9 @@ const {
 
   // Initialize modal system
   const initializeModals = () => {
-    if (isModalInitialized) return;
+    if (isModalInitialized) {
+      return;
+    }
 
     // Use event delegation for modal triggers - works regardless of timing
     document.addEventListener("click", e => {

@@ -334,8 +334,9 @@ const ACTIONS = actionItems;
         !this.mobileMenu ||
         !this.menuIcon ||
         !this.xIcon
-      )
+      ) {
         return;
+      }
 
       const isExpanded =
         this.mobileToggle.getAttribute("aria-expanded") === "true";
@@ -365,8 +366,9 @@ const ACTIONS = actionItems;
         !this.mobileMenu ||
         !this.menuIcon ||
         !this.xIcon
-      )
+      ) {
         return;
+      }
 
       this.mobileToggle.setAttribute("aria-expanded", "false");
       this.mobileMenu.setAttribute("aria-hidden", "true");
@@ -386,7 +388,9 @@ const ACTIONS = actionItems;
      */
     private handleScrollEvent = (): void => {
       // Skip if already processing a scroll event
-      if (this.isScrolling) return;
+      if (this.isScrolling) {
+        return;
+      }
 
       // Use requestAnimationFrame for better performance
       this.isScrolling = true;
@@ -402,7 +406,9 @@ const ACTIONS = actionItems;
      * Optimized for performance with minimal DOM operations
      */
     private handleScroll = (): void => {
-      if (!this.nav) return;
+      if (!this.nav) {
+        return;
+      }
 
       // Don't hide nav when mobile menu is open
       if (this.mobileToggle?.getAttribute("aria-expanded") === "true") {

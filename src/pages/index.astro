@@ -1,4 +1,6 @@
 ---
+import { Icon } from "astro-icon/components";
+
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
 import Hr from "@/components/elements/Hr.astro";
 import LinkButton from "@/components/elements/LinkButton.astro";
@@ -11,7 +13,6 @@ import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import { SOCIALS } from "@/socials";
 import { processAllPosts } from "@/utils/posts";
-import { Icon } from "astro-icon/components";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);

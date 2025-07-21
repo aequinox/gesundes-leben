@@ -1,8 +1,9 @@
 ---
-import AuthorPosts from "@/layouts/AuthorPosts.astro";
-import { getAllAuthors } from "@/utils/authors";
 import type { GetStaticPathsOptions } from "astro";
 import { getCollection } from "astro:content";
+
+import AuthorPosts from "@/layouts/AuthorPosts.astro";
+import { getAllAuthors } from "@/utils/authors";
 
 export const getStaticPaths = async ({ paginate }: GetStaticPathsOptions) => {
   const posts = await getCollection("blog");

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * @file validation-forced-coverage.test.ts
  * @description Forced coverage tests targeting specific uncovered lines in validation.ts

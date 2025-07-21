@@ -1,8 +1,9 @@
 ---
+import { getCollection, type CollectionEntry } from "astro:content";
+
 import type { Pagination } from "@/components/types";
 import Glossary from "@/layouts/Glossary.astro";
 import { generatePagination } from "@/utils/pagination";
-import { getCollection, type CollectionEntry } from "astro:content";
 
 const glossaryEntries: CollectionEntry<"glossary">[] =
   await getCollection("glossary");

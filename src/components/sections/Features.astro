@@ -21,9 +21,10 @@
  * ```
  */
 
-import type { Features as Props } from "@/components/types/";
 import Headline from "./Headline.astro";
 import ItemGrid from "./ItemGrid.astro";
+
+import type { Features as Props } from "@/components/types/";
 
 type HeadlineClasses = Record<string, string>;
 
@@ -187,7 +188,9 @@ const containerClasses = ["max-w-5xl", classes?.container]
   function setupFeatures() {
     const features = document.querySelectorAll('section[id^="features-"]');
 
-    if (!("IntersectionObserver" in window)) return;
+    if (!("IntersectionObserver" in window)) {
+      return;
+    }
 
     const observer = new IntersectionObserver(
       entries => {

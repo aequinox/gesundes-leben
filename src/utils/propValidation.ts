@@ -163,7 +163,9 @@ export function validateProps<T extends Record<string, any>>(
 
   // Apply defaults and validate each property
   for (const [propName, rule] of Object.entries(schema)) {
-    if (!rule) continue;
+    if (!rule) {
+      continue;
+    }
 
     const propValue = props[propName];
 
@@ -421,7 +423,9 @@ export function inspectProps(
   props: Record<string, any>,
   componentName: string
 ): void {
-  if (!import.meta.env.DEV) return;
+  if (!import.meta.env.DEV) {
+    return;
+  }
 
   logger.debug(
     "Props for",
@@ -468,12 +472,16 @@ export function generateInterface(
   schema: PropValidationSchema<any>,
   interfaceName: string
 ): string {
-  if (!import.meta.env.DEV) return "";
+  if (!import.meta.env.DEV) {
+    return "";
+  }
 
   let interfaceStr = `interface ${interfaceName} {\n`;
 
   for (const [propName, rule] of Object.entries(schema)) {
-    if (!rule) continue;
+    if (!rule) {
+      continue;
+    }
 
     const optional = rule.required ? "" : "?";
     const type = rule.type || "any";

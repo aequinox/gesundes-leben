@@ -1,8 +1,10 @@
 ---
+import { Icon } from "astro-icon/components";
+
+import LinkButton from "./elements/LinkButton.astro";
+
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { SHARE_LINKS, type SocialObject } from "@/socials";
-import { Icon } from "astro-icon/components";
-import LinkButton from "./elements/LinkButton.astro";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);

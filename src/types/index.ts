@@ -352,7 +352,9 @@ export const isNonEmptyString = (value: any): value is string => {
  * Type guard for checking if value is a valid URL
  */
 export const isValidURL = (value: any): value is string => {
-  if (!isNonEmptyString(value)) return false;
+  if (!isNonEmptyString(value)) {
+    return false;
+  }
   try {
     new URL(value);
     return true;

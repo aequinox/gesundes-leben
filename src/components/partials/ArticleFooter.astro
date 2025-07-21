@@ -1,4 +1,6 @@
 ---
+import ShareLinks from "../ShareLinks.astro";
+
 import Button from "@/components/elements/Button.astro";
 import Hr from "@/components/elements/Hr.astro";
 import Tag from "@/components/elements/Tag.astro";
@@ -6,7 +8,6 @@ import RelatedPosts from "@/components/partials/RelatedPosts.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { slugify } from "@/utils/slugs";
 import type { Post } from "@/utils/types";
-import ShareLinks from "../ShareLinks.astro";
 
 interface Props {
   post: Post;

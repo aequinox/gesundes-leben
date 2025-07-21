@@ -1,7 +1,8 @@
 ---
+import { type CollectionEntry } from "astro:content";
+
 import ArticleMeta from "@/components/partials/ArticleMeta.astro";
 import { slugify } from "@/utils/slugs";
-import { type CollectionEntry } from "astro:content";
 
 export interface Props {
   post: CollectionEntry<"blog">;

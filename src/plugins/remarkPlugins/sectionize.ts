@@ -51,7 +51,6 @@ export interface SectionNode extends Parent {
 const DEFAULT_OPTIONS: Required<SectionizeOptions> = {
   maxDepth: 6,
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getSectionData: (_depth: number) => ({
     hName: "section",
     hProperties: {

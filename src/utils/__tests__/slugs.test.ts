@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * @file slugs.test.ts
  * @description Comprehensive tests for slug utility functions

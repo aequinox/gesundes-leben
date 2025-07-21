@@ -152,7 +152,7 @@ export const unitTestHelpers = {
   ): boolean => {
     return Object.entries(expected).every(([key, expectedValue]) => {
       const actualValue = input[key];
-      if (actualValue === undefined) return false;
+      if (actualValue === undefined) {return false;}
       
       const difference = Math.abs(actualValue - expectedValue);
       const percentDifference = difference / expectedValue;
@@ -167,10 +167,10 @@ export const unitTestHelpers = {
   validateReference: (reference: any): { valid: boolean; score: number } => {
     let score = 1.0;
     
-    if (!reference.doi && !reference.url) score -= 0.3;
-    if (!reference.authors || reference.authors.length === 0) score -= 0.3;
-    if (!reference.year || reference.year < 2000) score -= 0.2;
-    if (!reference.title) score -= 0.2;
+    if (!reference.doi && !reference.url) {score -= 0.3;}
+    if (!reference.authors || reference.authors.length === 0) {score -= 0.3;}
+    if (!reference.year || reference.year < 2000) {score -= 0.2;}
+    if (!reference.title) {score -= 0.2;}
     
     return {
       valid: score >= 0.7,

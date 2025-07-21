@@ -7,6 +7,7 @@
  */
 
 import { expect } from 'vitest';
+
 import {
   HealthContentValidator,
   NutritionValidator,

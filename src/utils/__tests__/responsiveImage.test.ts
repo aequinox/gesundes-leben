@@ -8,8 +8,12 @@ describe("ResponsiveImage Component Logic", () => {
   describe("getSrcUrl utility", () => {
     // This function would be extracted from the component for testing
     const getSrcUrl = (source: string | any): string => {
-      if (typeof source === "string") return source;
-      if (source && typeof source === "object" && source.src) return source.src;
+      if (typeof source === "string") {
+        return source;
+      }
+      if (source && typeof source === "object" && source.src) {
+        return source.src;
+      }
       return source?.toString() || "";
     };
 
@@ -81,11 +85,21 @@ describe("ResponsiveImage Component Logic", () => {
   describe("object position classes", () => {
     const getObjectPositionClass = (position?: string): string[] => {
       const classes: string[] = [];
-      if (position === "center") classes.push("object-center");
-      if (position === "top") classes.push("object-top");
-      if (position === "bottom") classes.push("object-bottom");
-      if (position === "left") classes.push("object-left");
-      if (position === "right") classes.push("object-right");
+      if (position === "center") {
+        classes.push("object-center");
+      }
+      if (position === "top") {
+        classes.push("object-top");
+      }
+      if (position === "bottom") {
+        classes.push("object-bottom");
+      }
+      if (position === "left") {
+        classes.push("object-left");
+      }
+      if (position === "right") {
+        classes.push("object-right");
+      }
       return classes;
     };
 
@@ -192,8 +206,12 @@ describe("DOM Interaction Logic", () => {
 describe("Edge Cases", () => {
   describe("malformed data handling", () => {
     const getSrcUrl = (source: string | any): string => {
-      if (typeof source === "string") return source;
-      if (source && typeof source === "object" && source.src) return source.src;
+      if (typeof source === "string") {
+        return source;
+      }
+      if (source && typeof source === "object" && source.src) {
+        return source.src;
+      }
       return source?.toString() || "";
     };
 

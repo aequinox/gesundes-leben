@@ -10,8 +10,9 @@
  * - Accessibility features
  */
 
-import type { TagInfo } from "@/utils/tags";
 import { Icon } from "astro-icon/components";
+
+import type { TagInfo } from "@/utils/tags";
 
 export interface Props {
   /** Tags to display in the cloud */
@@ -55,7 +56,9 @@ const MAX_SIZE = 2.5;
 // Calculate size for each tag
 const getTagSize = (count: number): number => {
   // If all tags have the same count, return middle size
-  if (minCount === maxCount) return (MIN_SIZE + MAX_SIZE) / 2;
+  if (minCount === maxCount) {
+    return (MIN_SIZE + MAX_SIZE) / 2;
+  }
 
   // Linear scaling between min and max sizes
   return (
@@ -66,7 +69,9 @@ const getTagSize = (count: number): number => {
 
 // Calculate font weight for each tag (300-700)
 const getTagWeight = (count: number): number => {
-  if (minCount === maxCount) return 500;
+  if (minCount === maxCount) {
+    return 500;
+  }
   const weightRange = 400; // from 300 to 700
   const normalizedCount = (count - minCount) / (maxCount - minCount);
   return 300 + Math.round(normalizedCount * weightRange);
@@ -74,13 +79,17 @@ const getTagWeight = (count: number): number => {
 
 // Calculate z-index for 3D effect (1-10)
 const getZIndex = (count: number): number => {
-  if (minCount === maxCount) return 5;
+  if (minCount === maxCount) {
+    return 5;
+  }
   return Math.round(1 + ((count - minCount) / (maxCount - minCount)) * 9);
 };
 
 // Calculate opacity/saturation (0.6-1)
 const getOpacity = (count: number): number => {
-  if (minCount === maxCount) return 0.8;
+  if (minCount === maxCount) {
+    return 0.8;
+  }
   return 0.6 + ((count - minCount) / (maxCount - minCount)) * 0.4;
 };
 
@@ -215,7 +224,9 @@ const animationClass = getAnimationClass();
           const now = performance.now();
 
           // Throttle the event handling
-          if (now - lastExecution < THROTTLE_DELAY) return;
+          if (now - lastExecution < THROTTLE_DELAY) {
+            return;
+          }
           lastExecution = now;
 
           // Cancel any pending animation frame

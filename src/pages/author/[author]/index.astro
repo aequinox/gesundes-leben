@@ -1,9 +1,10 @@
 ---
+import { getCollection } from "astro:content";
+
 import AuthorPosts from "@/layouts/AuthorPosts.astro";
 import { getAllAuthors } from "@/utils/authors";
 import { logger } from "@/utils/logger";
 import { generatePagination } from "@/utils/pagination";
-import { getCollection } from "astro:content";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
