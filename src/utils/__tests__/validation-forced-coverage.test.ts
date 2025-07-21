@@ -3,7 +3,7 @@
  * @file validation-forced-coverage.test.ts
  * @description Forced coverage tests targeting specific uncovered lines in validation.ts
  */
-import { describe, it, expect } from "bun:test";
+import { describe, it, expect } from "vitest";
 
 describe("Forced Validation Coverage", () => {
   it("should trigger error handler lines 143-146", async () => {

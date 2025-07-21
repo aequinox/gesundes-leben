@@ -2,8 +2,8 @@
  * @file date-100-coverage.test.ts
  * @description Tests to achieve 100% coverage for date.ts
  */
-import { clearDateFormatterCache } from "../date";
-import { describe, it, expect, beforeEach } from "bun:test";
+import { clearDateFormatterCache, formatDate, createSafeDate } from "../date";
+import { describe, it, expect, beforeEach } from "vitest";
 
 describe("Date Utilities - 100% Coverage", () => {
   beforeEach(() => {
@@ -13,10 +13,7 @@ describe("Date Utilities - 100% Coverage", () => {
 
   describe("Cache functionality", () => {
     it("should clear the date formatter cache", () => {
-      // Import and use date utilities to populate cache
-      const { formatDate } = require("../date");
-
-      // Format a date to populate the cache
+      // Use date utilities to populate cache
       formatDate(new Date("2024-01-15"));
 
       // Clear the cache
@@ -27,8 +24,6 @@ describe("Date Utilities - 100% Coverage", () => {
     });
 
     it("should handle date formatter caching", () => {
-      const { formatDate } = require("../date");
-
       // Format the same date multiple times to test caching
       const date = new Date("2024-01-15");
       const result1 = formatDate(date);
@@ -39,8 +34,6 @@ describe("Date Utilities - 100% Coverage", () => {
     });
 
     it("should handle different locale configurations", () => {
-      const { formatDate } = require("../date");
-
       // Test with a specific date
       const date = new Date("2024-01-15");
       const result = formatDate(date);
@@ -50,8 +43,6 @@ describe("Date Utilities - 100% Coverage", () => {
     });
 
     it("should test locale resolution", () => {
-      const { formatDate } = require("../date");
-
       // Test formatting with different configurations
       const testDates = [
         new Date("2024-01-01"),
@@ -67,8 +58,6 @@ describe("Date Utilities - 100% Coverage", () => {
     });
 
     it("should handle edge cases in date formatting", () => {
-      const { formatDate, createSafeDate } = require("../date");
-
       // Test various edge cases
       const edgeCases = [
         "2024-01-01T00:00:00.000Z",
@@ -87,8 +76,6 @@ describe("Date Utilities - 100% Coverage", () => {
 
   describe("Internal utilities coverage", () => {
     it("should test date formatter options", () => {
-      const { formatDate } = require("../date");
-
       // Test with leap year date
       const leapYearDate = new Date("2024-02-29");
       const result = formatDate(leapYearDate);
@@ -98,8 +85,6 @@ describe("Date Utilities - 100% Coverage", () => {
     });
 
     it("should handle date object creation edge cases", () => {
-      const { createSafeDate } = require("../date");
-
       // Test with various valid inputs
       const validInputs = [
         new Date(),
@@ -118,8 +103,6 @@ describe("Date Utilities - 100% Coverage", () => {
 
     it("should test locale configuration handling", () => {
       // Test the module's internal locale handling
-      const { formatDate } = require("../date");
-
       // Test multiple times to ensure consistent behavior
       const date = new Date("2024-01-15T12:00:00Z");
 

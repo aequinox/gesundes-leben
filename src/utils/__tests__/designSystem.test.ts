@@ -18,7 +18,7 @@ import {
   iconStyles,
   DESIGN_TOKENS,
 } from "../ui/designSystem";
-import { describe, it, expect } from "bun:test";
+import { describe, it, expect } from "vitest";
 
 describe("Design System Utilities", () => {
   describe("cn (class name utility)", () => {

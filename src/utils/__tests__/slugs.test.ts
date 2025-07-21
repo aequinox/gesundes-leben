@@ -5,7 +5,7 @@
  */
 import { slugify, getPostSlug } from "../slugs";
 import type { Post } from "../types";
-import { describe, it, expect, mock } from "bun:test";
+import { describe, it, expect, vi } from "vitest";
 
 describe("Slug Utilities", () => {
   describe("slugify", () => {

@@ -9,7 +9,7 @@ import {
   extractEmailDomain,
   normalizeEmail,
 } from "../validation";
-import { describe, it, expect } from "bun:test";
+import { describe, it, expect } from "vitest";
 
 describe("isValidEmail", () => {
   describe("valid emails", () => {

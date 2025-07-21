@@ -3,7 +3,7 @@
  * @description Tests to achieve 100% coverage for slugs.ts
  */
 import { slugify } from "../slugs";
-import { describe, it, expect } from "bun:test";
+import { describe, it, expect } from "vitest";
 
 describe("Slugs Utilities - 100% Coverage", () => {
   describe("Slugify edge cases", () => {

@@ -2,7 +2,7 @@
  * @file validation-complete.test.ts
  * @description Final comprehensive test to achieve 100% validation coverage
  */
-import { describe, it, expect, beforeEach, afterEach } from "bun:test";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
 describe("Complete Validation Coverage", () => {
   let originalLogger: any;

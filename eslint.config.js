@@ -13,6 +13,25 @@ export default [
       },
     },
   },
+  {
+    files: ["**/*.test.ts", "**/*.spec.ts"],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        // Vitest globals
+        describe: "readonly",
+        it: "readonly",
+        test: "readonly",
+        expect: "readonly",
+        vi: "readonly",
+        beforeEach: "readonly",
+        afterEach: "readonly",
+        beforeAll: "readonly",
+        afterAll: "readonly",
+      },
+    },
+  },
   { rules: { "no-console": "error" } },
   { ignores: ["dist/**", ".astro", "public/pagefind/**"] },
 ];

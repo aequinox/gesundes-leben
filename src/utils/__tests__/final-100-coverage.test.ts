@@ -2,7 +2,10 @@
  * @file final-100-coverage.test.ts
  * @description Final targeted tests to achieve exactly 100% coverage
  */
-import { describe, it, expect } from "bun:test";
+import { formatDate, createSafeDate, clearDateFormatterCache } from "../date";
+import { slugify } from "../slugs";
+import { isValidEmail } from "../validation";
+import { describe, it, expect } from "vitest";
 
 describe("Final 100% Coverage Push", () => {
   describe("Validation Error Coverage", () => {
@@ -69,11 +72,7 @@ describe("Final 100% Coverage Push", () => {
 
   describe("Date Cache Coverage", () => {
     it("should exercise all date utility paths", () => {
-      const {
-        clearDateFormatterCache,
-        formatDate,
-        createSafeDate,
-      } = require("../date");
+      // Use imported date functions
 
       // Test cache clearing
       clearDateFormatterCache();
@@ -102,7 +101,7 @@ describe("Final 100% Coverage Push", () => {
 
   describe("Slugs Coverage", () => {
     it("should test all slugify option combinations", () => {
-      const { slugify } = require("../slugs");
+      // Use imported slugify function
 
       // Test all possible option combinations for complete coverage
       const testText = "Complex Test & Example!";
@@ -135,15 +134,17 @@ describe("Final 100% Coverage Push", () => {
       // Test toBeAccessible logic with successful path
       const successElement = {
         querySelectorAll: (selector: string) => {
-          if (selector.includes('button')) {
-            return [{
-              getAttribute: (attr: string) =>
-                attr === "aria-label" ? "Label" : null,
-              tagName: "BUTTON",
-              textContent: null,
-            }];
+          if (selector.includes("button")) {
+            return [
+              {
+                getAttribute: (attr: string) =>
+                  attr === "aria-label" ? "Label" : null,
+                tagName: "BUTTON",
+                textContent: null,
+              },
+            ];
           }
-          if (selector.includes('h1')) {
+          if (selector.includes("h1")) {
             return [{ tagName: "H1" }];
           }
           return [];
@@ -178,7 +179,9 @@ describe("Final 100% Coverage Push", () => {
       };
 
       const hasValidStructure =
-        validElement.children.length > 0 || (validElement.textContent?.trim() || false);
+        validElement.children.length > 0 ||
+        validElement.textContent?.trim() ||
+        false;
       const markupResult = {
         message: () =>
           hasValidStructure
@@ -197,7 +200,8 @@ describe("Final 100% Coverage Push", () => {
 
       const hasInvalidStructure =
         invalidElement.children.length > 0 ||
-        (invalidElement.textContent?.trim() || false);
+        invalidElement.textContent?.trim() ||
+        false;
       const invalidResult = {
         message: () =>
           hasInvalidStructure
@@ -213,8 +217,7 @@ describe("Final 100% Coverage Push", () => {
   describe("Complete Edge Case Coverage", () => {
     it("should cover every remaining edge case", () => {
       // Test validation with comprehensive error scenarios
-      const validationModule = require("../validation");
-      const { isValidEmail } = validationModule;
+      // Use imported validation functions
 
       // Edge cases for complete coverage
       const testCases = [

@@ -1,9 +1,9 @@
 import { extractUniqueTags } from "../tags";
 import type { Post } from "../types";
-import { describe, expect, test, mock } from "bun:test";
+import { describe, expect, test, vi } from "vitest";
 
 // Mock the slugify function
-const slugify = mock((str: string) => str.toLowerCase().replace(/\s+/g, "-"));
+const slugify = vi.fn((str: string) => str.toLowerCase().replace(/\s+/g, "-"));
 
 describe("extractUniqueTags", () => {
   test("extracts unique tags from posts", () => {
@@ -31,7 +31,7 @@ describe("extractUniqueTags", () => {
           categories: ["Ernährung"],
           group: "pro",
         },
-        render: mock(),
+        render: vi.fn(),
       },
       {
         id: "post-2",
@@ -55,7 +55,7 @@ describe("extractUniqueTags", () => {
           categories: ["Immunsystem"],
           group: "pro",
         },
-        render: mock(),
+        render: vi.fn(),
       },
     ] as unknown as Post[];
 
@@ -93,7 +93,7 @@ describe("extractUniqueTags", () => {
           categories: ["Ernährung"],
           group: "pro",
         },
-        render: mock(),
+        render: vi.fn(),
       },
       {
         id: "draft-post",
@@ -117,7 +117,7 @@ describe("extractUniqueTags", () => {
           categories: ["Immunsystem"],
           group: "pro",
         },
-        render: mock(),
+        render: vi.fn(),
       },
     ] as unknown as Post[];
 
@@ -156,7 +156,7 @@ describe("extractUniqueTags", () => {
           categories: ["Ernährung"],
           group: "pro",
         },
-        render: mock(),
+        render: vi.fn(),
       },
     ] as unknown as Post[];
 
@@ -189,7 +189,7 @@ describe("extractUniqueTags", () => {
           categories: ["Ernährung"],
           group: "pro",
         },
-        render: mock(),
+        render: vi.fn(),
       },
       {
         id: "post-2",
@@ -213,7 +213,7 @@ describe("extractUniqueTags", () => {
           categories: ["Immunsystem"],
           group: "pro",
         },
-        render: mock(),
+        render: vi.fn(),
       },
     ] as unknown as Post[];
 
@@ -247,7 +247,7 @@ describe("extractUniqueTags", () => {
           categories: ["Ernährung"],
           group: "pro",
         },
-        render: mock(),
+        render: vi.fn(),
       },
     ] as unknown as Post[];
 

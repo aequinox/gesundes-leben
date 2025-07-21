@@ -1,11 +1,11 @@
 import { logger, LogLevelName, type TimestampFormat } from "../logger";
-import { describe, it, expect, mock, beforeEach, afterEach } from "bun:test";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 describe("Logger", () => {
   // Spy on console methods
   const consoleSpy = {
-    log: mock(() => {}),
-    error: mock(() => {}),
+    log: vi.fn(() => {}),
+    error: vi.fn(() => {}),
   };
 
   // Replace console methods with mocks
@@ -13,7 +13,7 @@ describe("Logger", () => {
   console.error = consoleSpy.error;
 
   // Mock process.stdout.write
-  const stdoutWriteSpy = mock(() => true);
+  const stdoutWriteSpy = vi.fn(() => true);
   process.stdout.write = stdoutWriteSpy;
 
   // Store original settings to restore after tests
@@ -355,7 +355,7 @@ describe("Logger", () => {
 
   describe("Custom Log Handler", () => {
     it("should use custom log handler when provided", () => {
-      const customHandler = mock();
+      const customHandler = vi.fn();
 
       logger.configure({
         logHandler: customHandler,

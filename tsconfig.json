@@ -30,6 +30,12 @@
      */
     "baseUrl": ".",
     /**
+     * Include Vitest type definitions for testing
+     *
+     * @see https://vitest.dev/guide/
+     */
+    "types": ["vitest/globals"],
+    /**
      * Specify JSX syntax with Astro JSX support
      *
      * @see https://docs.astro.build/en/guides/typescript/#jsx-configuration
