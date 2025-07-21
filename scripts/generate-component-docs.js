@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 /**
  * @file generate-component-docs.js
@@ -26,7 +27,7 @@
  */
 
 import { readFile, writeFile, readdir, mkdir } from 'fs/promises';
-import { join, basename, extname, resolve, dirname } from 'path';
+import { join, basename, resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);

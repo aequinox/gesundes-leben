@@ -25,7 +25,7 @@
  */
 
 import { readdir, readFile, writeFile, stat } from 'fs/promises';
-import { join, basename, extname, resolve } from 'path';
+import { join, basename, resolve } from 'path';
 import { createHash } from 'crypto';
 
 // === Configuration ===
@@ -174,7 +174,6 @@ async function analyzeDirectory(dirPath, baseDir = dirPath) {
  * Determine file type category
  */
 function getFileType(fileName) {
-  const ext = extname(fileName).toLowerCase();
   
   if (CONFIG.patterns.js.test(fileName)) return 'javascript';
   if (CONFIG.patterns.css.test(fileName)) return 'stylesheet';
@@ -412,7 +411,7 @@ function displaySummary(report) {
   
   if (report.recommendations.length > 0) {
     console.log('\n💡 Recommendations:');
-    report.recommendations.forEach((rec, i) => {
+    report.recommendations.forEach((rec) => {
       const icon = rec.type === 'warning' ? '⚠️' : rec.type === 'error' ? '❌' : 'ℹ️';
       console.log(`  ${icon} ${rec.message}`);
       if (rec.solutions && rec.solutions.length > 0) {
@@ -462,7 +461,7 @@ async function analyzeBundleSize() {
     const report = generateReport(files);
     
     // Save results
-    const savedPath = await saveResults(report);
+    await saveResults(report);
     
     // Display summary
     displaySummary(report);
