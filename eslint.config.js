@@ -1,4 +1,5 @@
 import eslintPluginAstro from "eslint-plugin-astro";
+import eslintPluginImport from "eslint-plugin-import";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
@@ -6,11 +7,52 @@ export default [
   ...tseslint.configs.recommended,
   ...eslintPluginAstro.configs.recommended,
   {
+    plugins: {
+      import: eslintPluginImport,
+    },
     languageOptions: {
       globals: {
         ...globals.browser,
         ...globals.node,
       },
+    },
+    rules: {
+      // TypeScript-specific rules
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_" },
+      ],
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-var-requires": "error",
+
+      // Import rules
+      "import/order": [
+        "error",
+        {
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            "parent",
+            "sibling",
+            "index",
+          ],
+          "newlines-between": "always",
+          alphabetize: { order: "asc", caseInsensitive: true },
+        },
+      ],
+      "import/newline-after-import": "error",
+      "import/no-duplicates": "error",
+      "import/no-unresolved": "off", // Handled by TypeScript
+
+      // General code quality
+      "no-console": "error",
+      "prefer-const": "error",
+      "no-var": "error",
+      eqeqeq: ["error", "always"],
+      curly: ["error", "all"],
     },
   },
   {
@@ -31,7 +73,26 @@ export default [
         afterAll: "readonly",
       },
     },
+    rules: {
+      // Allow console in test files for debugging
+      "no-console": "off",
+      // Allow any in test files for mocking
+      "@typescript-eslint/no-explicit-any": "off",
+    },
   },
-  { rules: { "no-console": "error" } },
-  { ignores: ["dist/**", ".astro", "public/pagefind/**"] },
+  {
+    ignores: [
+      "dist/**",
+      ".astro/**",
+      "public/**",
+      "html/**",
+      "coverage/**",
+      "node_modules/**",
+      "*.config.js",
+      "*.config.ts",
+      "docs/**",
+      "scripts/**/*.js",
+      "tests/**/*.js",
+    ],
+  },
 ];

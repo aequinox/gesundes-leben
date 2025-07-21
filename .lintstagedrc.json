@@ -1,0 +1,12 @@
+{
+  "*.{ts,js,astro}": [
+    "eslint --fix",
+    "prettier --write"
+  ],
+  "*.{md,json,yaml,yml}": [
+    "prettier --write"
+  ],
+  "*.ts": [
+    "bash -c 'bun run check'"
+  ]
+}
