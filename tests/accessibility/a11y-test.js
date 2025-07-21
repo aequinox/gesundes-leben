@@ -29,7 +29,7 @@
  */
 
 import { spawn } from 'child_process';
-import { readFile, writeFile, mkdir } from 'fs/promises';
+import { writeFile, mkdir } from 'fs/promises';
 import { join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
