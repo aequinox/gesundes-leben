@@ -116,6 +116,8 @@ sortedPosts.forEach(post => {
       normalizedGroup = "question-time";
     } else if (normalizedGroup === "kontra") {
       normalizedGroup = "contra";
+    } else if (normalizedGroup === "pro") {
+      normalizedGroup = "pro";
     }
 
     if (groupPostCounts[normalizedGroup] !== undefined) {
