@@ -22,6 +22,7 @@ export class ContentTranslator {
   private positioningConfig: ImagePositioningConfig;
   private imageImports: Map<string, string> = new Map(); // Track image imports
   private imageCounter: number = 1; // Counter for BlogImage_X naming
+  private alternatingPosition: boolean = true; // Track alternating left/right position
 
   constructor(positioningConfig?: Partial<ImagePositioningConfig>) {
     this.positioningConfig = {
@@ -66,6 +67,7 @@ export class ContentTranslator {
       // Reset image tracking for new conversion
       this.imageImports.clear();
       this.imageCounter = 1;
+      this.alternatingPosition = true;
 
       // Preprocess HTML content
       let processedContent = this.preprocessHTML(htmlContent, options);
@@ -565,46 +567,25 @@ export class ContentTranslator {
   }
 
   /**
-   * Determine optimal image position based on dimensions
+   * Determine optimal image position based on dimensions with alternating left/right
    */
   private determineImagePosition(dimensions: ImageDimensions): string {
     if (!this.positioningConfig.enableSmartPositioning) {
       return ""; // No positioning, use default (center)
     }
 
-    const { aspectRatio, width } = dimensions;
+    const { aspectRatio } = dimensions;
 
-    // Small images should be positioned left or right to allow text flow
-    if (width < this.positioningConfig.smallImageThreshold) {
-      // Alternate left/right for visual variety (could be made more sophisticated)
-      return Math.random() > 0.5 ? "!<" : "!>";
-    }
-
-    // Square or near-square images work well centered
-    if (Math.abs(aspectRatio - 1) < this.positioningConfig.squareThreshold) {
-      return ""; // Center (default)
-    }
-
-    // Portrait images (tall) work well centered
-    if (aspectRatio < this.positioningConfig.portraitThreshold) {
-      return ""; // Center (default)
-    }
-
-    // Wide landscape images work well centered to show full content
+    // Only clearly wide landscape images should be centered
+    // This means aspect ratio > 1.5 (width significantly larger than height)
     if (aspectRatio > this.positioningConfig.landscapeThreshold) {
-      return ""; // Center (default)
+      return ""; // Center for wide landscape images
     }
 
-    // Medium landscape images can be positioned left/right
-    if (
-      aspectRatio > 1 &&
-      aspectRatio <= this.positioningConfig.landscapeThreshold
-    ) {
-      return Math.random() > 0.5 ? "!<" : "!>";
-    }
-
-    // Default to center for any other cases
-    return "";
+    // All other images (square, portrait, medium landscape) alternate left/right
+    // Toggle the alternating position for visual variety
+    this.alternatingPosition = !this.alternatingPosition;
+    return this.alternatingPosition ? "!<" : "!>";
   }
 
   /**
@@ -689,7 +670,7 @@ export class ContentTranslator {
     cleanAlt = cleanAlt.replace(/^["„"]+|["„"]+$/g, "");
     cleanCaption = cleanCaption.replace(/^["„"]+|["„"]+$/g, "");
 
-    const jsx = `<Image src={${importName}} alt="${cleanAlt}" />`;
+    const jsx = `<Image src={${importName}} alt="${cleanAlt}" position="${position}" />`;
 
     return jsx;
   }
@@ -722,7 +703,7 @@ export class ContentTranslator {
       )
       .join("\n");
 
-    const imageImport = `import { Image } from "astro:assets";`;
+    const imageImport = `import Image from "@/components/elements/Image.astro";`;
     const allImports = `${imports}\n${imageImport}`;
 
     logger.debug(`Generated imports: ${allImports}`);
