@@ -1,6 +1,9 @@
 import { vi } from 'vitest';
 import '@testing-library/jest-dom';
 
+// Import health matchers for all tests (disabled temporarily while fixing)
+// import './matchers/health-matchers';
+
 // =============================================================================
 // Global Test Environment Setup for Healthy Life Blog
 // =============================================================================
