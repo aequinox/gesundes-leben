@@ -1,5 +1,6 @@
 // Grid Types
-import type { CSSClasses, Item } from ".";
+import type { CSSClasses } from "./css";
+import type { Item } from "./item";
 
 /** Item grid configuration */
 export interface ItemGrid {

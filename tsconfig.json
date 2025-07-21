@@ -78,6 +78,18 @@
      *
      * @see https://www.typescriptlang.org/tsconfig#moduleResolution
      */
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    /**
+     * Enable incremental compilation
+     *
+     * @see https://www.typescriptlang.org/tsconfig#incremental
+     */
+    "incremental": true,
+    /**
+     * Skip type checking of declaration files
+     *
+     * @see https://www.typescriptlang.org/tsconfig#skipLibCheck
+     */
+    "skipLibCheck": true
   }
 }

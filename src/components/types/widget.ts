@@ -1,5 +1,5 @@
 // Widget Types
-import type { CSSClasses } from ".";
+import type { CSSClasses } from "./css";
 
 /** Available widget background styles */
 export const WIDGET_BACKGROUNDS = [

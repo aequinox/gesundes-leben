@@ -1,11 +1,8 @@
-import type {
-  CallToAction,
-  Headline,
-  ImageSource,
-  Item,
-  Video,
-  Widget,
-} from ".";
+import type { CallToAction } from "./callToAction";
+import type { Headline } from "./headline";
+import type { Item } from "./item";
+import type { ImageSource, Video } from "./media";
+import type { Widget } from "./widget";
 
 /** Features section configuration */
 export interface Features extends Omit<Headline, "classes">, Widget {

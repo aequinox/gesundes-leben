@@ -1,4 +1,4 @@
-import type { CSSClasses } from ".";
+import type { CSSClasses } from "./css";
 
 /** Headline component properties */
 export interface Headline {

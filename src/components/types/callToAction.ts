@@ -1,5 +1,5 @@
 // Call to Action Types
-import type { ButtonType } from ".";
+import type { ButtonType } from "./button";
 
 /** Available call to action variants */
 export const CALL_TO_ACTION_VARIANTS = [

@@ -1,4 +1,6 @@
-import type { CallToAction, CSSClasses, Image } from ".";
+import type { CallToAction } from "./callToAction";
+import type { CSSClasses } from "./css";
+import type { Image } from "./media";
 
 /** Generic item configuration */
 export interface Item {
