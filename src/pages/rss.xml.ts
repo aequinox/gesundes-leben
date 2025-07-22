@@ -1,7 +1,7 @@
-import rss from "@astrojs/rss";
-
 import { SITE } from "@/config";
+import { logger } from "@/utils/logger";
 import { processAllPosts } from "@/utils/posts";
+import rss from "@astrojs/rss";
 
 export async function GET() {
   // Temporary fix: Simplify RSS generation to avoid schema issues
@@ -19,8 +19,7 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error("RSS generation failed:", error);
+    logger.error("RSS generation failed:", error);
     // Return minimal RSS feed as fallback
     return rss({
       title: SITE.title,

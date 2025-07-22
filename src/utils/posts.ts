@@ -1,11 +1,9 @@
-import { getCollection, render } from "astro:content";
-
 import { handleAsync } from "./errors";
 import { logger } from "./logger";
 import { slugify } from "./slugs";
 import type { Post, Category, Tag } from "./types";
-
 import { SITE } from "@/config";
+import { getCollection, render } from "astro:content";
 
 /**
  * Interface for post processing options
@@ -570,21 +568,5 @@ export const groupByCondition = <T>(
   } catch (error) {
     logger.error("Error in groupByCondition:", error);
     return options?.initialGroups || {};
-  }
-};
-
-/**
- * Legacy function for backward compatibility.
- * @deprecated Use groupByCondition instead
- */
-export const getPostsByGroupCondition = (
-  posts: Post[],
-  groupFunction: GroupFunction<Post>
-): Record<GroupKey, Post[]> => {
-  try {
-    return groupByCondition(posts, groupFunction);
-  } catch (error) {
-    logger.error("Error in getPostsByGroupCondition:", error);
-    return {};
   }
 };

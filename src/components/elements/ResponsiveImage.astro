@@ -257,8 +257,9 @@ const getSrcUrl = (source: string | ImageMetadata): string => {
 
       // Handle image load error
       const handleError = () => {
-        // eslint-disable-next-line no-console
-        console.warn(`Failed to load image: ${img.src}`);
+        import("@/utils/logger").then(({ logger }) => {
+          logger.warn(`Failed to load image: ${img.src}`);
+        });
         img.alt = `${img.alt} (Failed to load)`;
 
         if (loadingIndicator && loadingIndicator.parentNode) {
