@@ -78,12 +78,12 @@ const {
 } = Astro.props;
 
 // Determine if this should be a link
-const isLink = !!href && !disabled;
+const isLink = Boolean(href) && !disabled;
 
 // Get content from slot
 const slotContent = await Astro.slots.render("default");
-const hasSlotContent = !!slotContent.trim();
-const hasTextContent = !!(text || hasSlotContent);
+const hasSlotContent = Boolean(slotContent.trim());
+const hasTextContent = Boolean(text || hasSlotContent);
 
 // Build CSS classes
 const buttonClasses = buildButtonClasses({

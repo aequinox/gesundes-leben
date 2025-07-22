@@ -57,7 +57,7 @@ export class SchemaMapper {
         draft: wpPost.status !== "publish",
         tags: this.cleanTags(wpPost.tags),
         categories: this.mapCategories(wpPost.categories),
-        group: this.determineGroup(wpPost),
+        group: this.determineGroup(wpPost) as "pro" | "kontra" | "fragezeiten",
         heroImage: heroImage,
         ogImage: heroImage.src,
         canonicalURL: this.generateCanonicalURL(wpPost),

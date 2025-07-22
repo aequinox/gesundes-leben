@@ -243,7 +243,7 @@ export class ErrorTracker {
       if (strategy.canRecover(error)) {
         try {
           logger.info(`Attempting recovery strategy: ${strategy.description}`);
-          await strategy.recover(error, context);
+          await strategy.recover(error, _context);
           return;
         } catch (recoveryError) {
           logger.warn(`Recovery strategy failed: ${strategy.description}`, recoveryError);

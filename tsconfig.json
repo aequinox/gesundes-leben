@@ -16,7 +16,7 @@
    *
    * @see https://www.typescriptlang.org/tsconfig#exclude
    */
-  "exclude": ["dist", "public/pagefind"],
+  "exclude": ["dist", "public/pagefind", "src/scripts/wp-to-mdx/**"],
   /**
    * Configure TypeScript compiler options
    *
