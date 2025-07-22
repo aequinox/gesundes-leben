@@ -7,7 +7,7 @@
  * such as blog posts, pages, and different content types.
  */
 
-import SEO, { type Props as SEOProps } from "./SEO.astro";
+import SEOComponent, { type Props as SEOProps } from "./SEO.astro";
 
 // Example 1: Basic webpage SEO
 const basicWebpageProps: SEOProps = {
@@ -81,7 +81,7 @@ const categoryProps: SEOProps = {
 <html lang="de">
   <head>
     <!-- Example 1: Basic About Page -->
-    <SEO {...basicWebpageProps} />
+    <SEOComponent {...basicWebpageProps} />
 
     <!-- Additional page-specific meta tags can be added here -->
     <link
@@ -129,7 +129,7 @@ const { title, description, pubDatetime, modDatetime, author, tags, ogImage } = 
 ---
 <html lang="de">
 <head>
-  <SEO
+  <SEOComponent
     title={title}
     description={description}
     keywords={tags}
@@ -153,7 +153,7 @@ const { title, description, pubDatetime, modDatetime, author, tags, ogImage } = 
 ---
 <html lang="de">
   <head>
-    <SEO
+    <SEOComponent
       title="Über uns - Gesundes Leben"
       description="Erfahren Sie mehr über unsere Mission"
       pageType="aboutpage"

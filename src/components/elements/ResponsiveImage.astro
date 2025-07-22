@@ -29,6 +29,7 @@
  * ```
  */
 
+import type { ImageMetadata as AstroImageMetadata } from "astro";
 import { Picture } from "astro:assets";
 
 import type { ImageMetadata, MediaComponentProps } from "../types/base";
@@ -179,7 +180,7 @@ const getSrcUrl = (source: string | ImageMetadata): string => {
 
   {/* Responsive Picture element */}
   <Picture
-    src={src as ImageMetadata}
+    src={src as AstroImageMetadata}
     alt={alt}
     width={width}
     height={height}

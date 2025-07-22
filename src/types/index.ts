@@ -250,14 +250,22 @@ export type DeepPartial<T> = {
 };
 
 /**
- * Extract function parameters as tuple (using built-in TypeScript utility)
+ * Extract function parameters as tuple (re-export built-in TypeScript utility)
  */
-export type { Parameters } from "typescript";
+export type Parameters<T extends (...args: any) => any> = T extends (
+  ...args: infer P
+) => any
+  ? P
+  : never;
 
 /**
- * Extract function return type (using built-in TypeScript utility)
+ * Extract function return type (re-export built-in TypeScript utility)
  */
-export type { ReturnType } from "typescript";
+export type ReturnType<T extends (...args: any) => any> = T extends (
+  ...args: any
+) => infer R
+  ? R
+  : any;
 
 /**
  * Non-empty array type

@@ -17,7 +17,6 @@ export const createAstroContentMocks = () => {
   const mockBlogPosts: CollectionEntry<'blog'>[] = [
     {
       id: 'test-nutrition-article.mdx',
-      slug: 'test-nutrition-article',
       body: 'This is a test nutrition article content...',
       collection: 'blog',
       data: {
@@ -25,29 +24,34 @@ export const createAstroContentMocks = () => {
         description: 'Ein umfassender Leitfaden für gesunde Ernährung',
         author: 'dr-health',
         pubDatetime: new Date('2024-01-15'),
-        categories: ['Ernährung', 'Lifestyle'] as const,
+        categories: ['Ernährung', 'Lifestyle & Psyche'] as const,
+        group: 'pro' as const,
         featured: true,
         draft: false,
         heroImage: {
-          src: './images/nutrition-hero.jpg',
+          src: {
+            format: 'jpg' as const,
+            src: './images/nutrition-hero.jpg',
+            width: 800,
+            height: 600
+          },
           alt: 'Gesunde Lebensmittel auf einem Tisch'
         },
         tags: ['Ernährung', 'Gesundheit', 'Vitamine'],
         keywords: ['gesunde ernährung', 'vitamine', 'nährstoffe'],
         references: ['nutrition-study-2024', 'vitamin-research-2023']
       },
-      render: vi.fn().mockResolvedValue({
+      rendered: {
         Content: () => '<p>Mock content</p>',
         headings: [
           { depth: 1, slug: 'introduction', text: 'Einführung' },
           { depth: 2, slug: 'vitamins', text: 'Vitamine' }
         ],
         remarkPluginFrontmatter: {}
-      })
+      }
     },
     {
       id: 'test-wellness-article.mdx',
-      slug: 'test-wellness-article',
       body: 'This is a test wellness article content...',
       collection: 'blog',
       data: {
@@ -55,25 +59,31 @@ export const createAstroContentMocks = () => {
         description: 'Tipps für mentale Gesundheit und Wohlbefinden',
         author: 'wellness-expert',
         pubDatetime: new Date('2024-01-20'),
-        categories: ['Wellness', 'Mental Health'] as const,
+        categories: ['Lifestyle & Psyche'] as const,
+        group: 'kontra' as const,
         featured: false,
         draft: false,
         heroImage: {
-          src: './images/wellness-hero.jpg',
+          src: {
+            format: 'jpg' as const,
+            src: './images/wellness-hero.jpg',
+            width: 800,
+            height: 600
+          },
           alt: 'Person bei Meditation'
         },
         tags: ['Achtsamkeit', 'Meditation', 'Stress'],
         keywords: ['achtsamkeit', 'meditation', 'stressabbau'],
         references: ['mindfulness-study-2024']
       },
-      render: vi.fn().mockResolvedValue({
+      rendered: {
         Content: () => '<p>Mock wellness content</p>',
         headings: [
           { depth: 1, slug: 'mindfulness', text: 'Achtsamkeit' },
           { depth: 2, slug: 'techniques', text: 'Techniken' }
         ],
         remarkPluginFrontmatter: {}
-      })
+      }
     }
   ];
 
@@ -81,26 +91,18 @@ export const createAstroContentMocks = () => {
   const mockAuthors: CollectionEntry<'authors'>[] = [
     {
       id: 'dr-health.md',
-      slug: 'dr-health',
       body: 'Dr. Health is a nutrition expert...',
       collection: 'authors',
       data: {
         name: 'Dr. Health Expert',
         avatar: './images/dr-health.jpg',
         bio: 'Ernährungswissenschaftler mit 15 Jahren Erfahrung',
-        expertise: ['Ernährung', 'Präventionsmedizin'],
-        credentials: ['Dr. med.', 'M.Sc. Ernährungswissenschaften'],
-        social: {
-          email: 'dr.health@example.com',
-          twitter: 'drhealth',
-          linkedin: 'dr-health'
-        }
       },
-      render: vi.fn().mockResolvedValue({
+      rendered: {
         Content: () => '<p>Mock author bio</p>',
         headings: [],
         remarkPluginFrontmatter: {}
-      })
+      }
     }
   ];
 
@@ -108,21 +110,19 @@ export const createAstroContentMocks = () => {
   const mockGlossary: CollectionEntry<'glossary'>[] = [
     {
       id: 'antioxidantien.md',
-      slug: 'antioxidantien',
       body: 'Antioxidantien sind Verbindungen...',
       collection: 'glossary',
       data: {
-        term: 'Antioxidantien',
-        definition: 'Verbindungen, die freie Radikale neutralisieren',
-        category: 'Ernährung',
-        relatedTerms: ['Freie Radikale', 'Vitamin C'],
-        sources: ['nutrition-textbook-2023']
+        title: 'Antioxidantien',
+        author: 'dr-health',
+        pubDatetime: new Date('2024-01-01'),
+        modDatetime: new Date('2024-01-02')
       },
-      render: vi.fn().mockResolvedValue({
+      rendered: {
         Content: () => '<p>Mock glossary definition</p>',
         headings: [],
         remarkPluginFrontmatter: {}
-      })
+      }
     }
   ];
 
@@ -149,11 +149,11 @@ export const createAstroContentMocks = () => {
     getEntry: vi.fn().mockImplementation((collection: string, slug: string) => {
       switch (collection) {
         case 'blog':
-          return Promise.resolve(mockBlogPosts.find(post => post.slug === slug));
+          return Promise.resolve(mockBlogPosts.find(post => post.id.includes(slug)));
         case 'authors':
-          return Promise.resolve(mockAuthors.find(author => author.slug === slug));
+          return Promise.resolve(mockAuthors.find(author => author.id.includes(slug)));
         case 'glossary':
-          return Promise.resolve(mockGlossary.find(term => term.slug === slug));
+          return Promise.resolve(mockGlossary.find(term => term.id.includes(slug)));
         default:
           return Promise.resolve(undefined);
       }
@@ -165,11 +165,11 @@ export const createAstroContentMocks = () => {
         if (typeof ref === 'object' && ref.collection && ref.slug) {
           switch (ref.collection) {
             case 'blog':
-              return mockBlogPosts.find(post => post.slug === ref.slug);
+              return mockBlogPosts.find(post => post.id.includes(ref.slug || ref.id || ''));
             case 'authors':
-              return mockAuthors.find(author => author.slug === ref.slug);
+              return mockAuthors.find(author => author.id.includes(ref.slug || ref.id || ''));
             case 'glossary':
-              return mockGlossary.find(term => term.slug === ref.slug);
+              return mockGlossary.find(term => term.id.includes(ref.slug || ref.id || ''));
           }
         }
         return undefined;
