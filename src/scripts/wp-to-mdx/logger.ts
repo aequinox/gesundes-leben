@@ -12,19 +12,27 @@ export class Logger {
   }
 
   info(message: string): void {
+    // Use console for standalone script logging
+    // eslint-disable-next-line no-console
     console.log(`[INFO] ${new Date().toISOString()} ${message}`);
   }
 
   warn(message: string): void {
+    // Use console for standalone script logging
+    // eslint-disable-next-line no-console
     console.warn(`[WARN] ${new Date().toISOString()} ${message}`);
   }
 
   error(message: string): void {
+    // Use console for standalone script logging
+    // eslint-disable-next-line no-console
     console.error(`[ERROR] ${new Date().toISOString()} ${message}`);
   }
 
   debug(message: string): void {
     if (process.env.DEBUG) {
+      // Use console for standalone script logging
+      // eslint-disable-next-line no-console
       console.debug(`[DEBUG] ${new Date().toISOString()} ${message}`);
     }
   }

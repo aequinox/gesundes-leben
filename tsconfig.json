@@ -90,6 +90,36 @@
      *
      * @see https://www.typescriptlang.org/tsconfig#skipLibCheck
      */
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    /**
+     * Enable stricter type checking for better code quality (disabled for gradual migration)
+     *
+     * @see https://www.typescriptlang.org/tsconfig#exactOptionalPropertyTypes
+     */
+    "exactOptionalPropertyTypes": false,
+    /**
+     * Ensure consistent casing in imports
+     *
+     * @see https://www.typescriptlang.org/tsconfig#forceConsistentCasingInFileNames
+     */
+    "forceConsistentCasingInFileNames": true,
+    /**
+     * Error on unreachable code patterns
+     *
+     * @see https://www.typescriptlang.org/tsconfig#allowUnreachableCode
+     */
+    "allowUnreachableCode": false,
+    /**
+     * Error on unused local variables (disabled for scripts and tests)
+     *
+     * @see https://www.typescriptlang.org/tsconfig#noUnusedLocals
+     */
+    "noUnusedLocals": false,
+    /**
+     * Error on unused function parameters (disabled for scripts and tests)
+     *
+     * @see https://www.typescriptlang.org/tsconfig#noUnusedParameters
+     */
+    "noUnusedParameters": false
   }
 }

@@ -4,6 +4,18 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default [
+  {
+    files: ["**/*.{js,mjs,cjs,ts,jsx,tsx,astro}"],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+        project: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
   ...tseslint.configs.recommended,
   ...eslintPluginAstro.configs.recommended,
   {
@@ -20,12 +32,16 @@ export default [
       // TypeScript-specific rules
       "@typescript-eslint/no-unused-vars": [
         "error",
-        { argsIgnorePattern: "^_" },
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-var-requires": "error",
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        { prefer: "type-imports" }
+      ],
 
       // Import rules
       "import/order": [
@@ -53,6 +69,11 @@ export default [
       "no-var": "error",
       eqeqeq: ["error", "always"],
       curly: ["error", "all"],
+      "no-implicit-coercion": "error",
+      "no-unused-expressions": "error",
+      "prefer-template": "error",
+      "object-shorthand": "error",
+      "no-duplicate-imports": "error",
     },
   },
   {
@@ -78,6 +99,8 @@ export default [
       "no-console": "off",
       // Allow any in test files for mocking
       "@typescript-eslint/no-explicit-any": "off",
+      // Relax strict boolean expressions in tests
+      "@typescript-eslint/strict-boolean-expressions": "off",
     },
   },
   {

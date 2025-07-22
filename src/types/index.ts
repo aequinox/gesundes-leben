@@ -70,13 +70,15 @@ export type {
 // === Utility Types ===
 
 /**
- * Generic API response wrapper
+ * Generic API response wrapper with improved type safety
  */
-export interface APIResponse<T = any> {
+export interface APIResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
   message?: string;
+  timestamp?: string;
+  requestId?: string;
 }
 
 /**
@@ -122,7 +124,7 @@ export interface SEOMetadata {
   canonicalURL?: string;
   ogImage?: string;
   twitterCard?: "summary" | "summary_large_image";
-  structuredData?: Record<string, any>;
+  structuredData?: Record<string, unknown>;
 }
 
 /**
@@ -140,7 +142,7 @@ export interface FormFieldConfig {
     maxLength?: number;
     min?: number;
     max?: number;
-    custom?: (value: any) => ValidationResult;
+    custom?: (value: unknown) => ValidationResult;
   };
 }
 
@@ -186,7 +188,7 @@ export interface AnalyticsEvent {
   category: string;
   label?: string;
   value?: number;
-  customProperties?: Record<string, any>;
+  customProperties?: Record<string, unknown>;
 }
 
 /**
@@ -200,7 +202,7 @@ export interface SearchResult {
   type: "post" | "page" | "glossary" | "author";
   relevanceScore: number;
   highlights?: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -248,22 +250,14 @@ export type DeepPartial<T> = {
 };
 
 /**
- * Extract function parameters as tuple
+ * Extract function parameters as tuple (using built-in TypeScript utility)
  */
-export type Parameters<T extends (...args: any) => any> = T extends (
-  ...args: infer P
-) => any
-  ? P
-  : never;
+export type { Parameters } from "typescript";
 
 /**
- * Extract function return type
+ * Extract function return type (using built-in TypeScript utility)
  */
-export type ReturnType<T extends (...args: any) => any> = T extends (
-  ...args: any
-) => infer R
-  ? R
-  : any;
+export type { ReturnType } from "typescript";
 
 /**
  * Non-empty array type
@@ -326,7 +320,7 @@ export type AsyncState<T> =
 /**
  * Component factory configuration
  */
-export interface ComponentFactory<T extends Record<string, any>> {
+export interface ComponentFactory<T extends Record<string, unknown>> {
   defaultProps: Partial<T>;
   variants: Record<string, Partial<T>>;
   validation?: (props: T) => ValidationResult;
@@ -344,14 +338,14 @@ export const isDefined = <T>(value: T | undefined | null): value is T => {
 /**
  * Type guard for checking if value is a non-empty string
  */
-export const isNonEmptyString = (value: any): value is string => {
+export const isNonEmptyString = (value: unknown): value is string => {
   return typeof value === "string" && value.trim().length > 0;
 };
 
 /**
  * Type guard for checking if value is a valid URL
  */
-export const isValidURL = (value: any): value is string => {
+export const isValidURL = (value: unknown): value is string => {
   if (!isNonEmptyString(value)) {
     return false;
   }
@@ -366,11 +360,14 @@ export const isValidURL = (value: any): value is string => {
 /**
  * Type guard for checking if object has required properties
  */
-export const hasRequiredProps = <T extends Record<string, any>>(
-  obj: any,
+export const hasRequiredProps = <T extends Record<string, unknown>>(
+  obj: unknown,
   keys: (keyof T)[]
 ): obj is T => {
-  return keys.every(key => key in obj && isDefined(obj[key]));
+  if (typeof obj !== "object" || obj === null) {
+    return false;
+  }
+  return keys.every(key => key in obj && isDefined((obj as Record<string, unknown>)[key as string]));
 };
 
 // === Constants ===
