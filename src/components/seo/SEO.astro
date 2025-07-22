@@ -348,6 +348,9 @@ const robotsContent = import.meta.env.PROD
   : "noindex, nofollow";
 ---
 
+<!-- Character Encoding -->
+<meta charset="UTF-8" />
+
 <!-- Essential Meta Tags -->
 <title>{seoTitle}</title>
 <meta name="description" content={seoDescription} />
@@ -520,14 +523,8 @@ const robotsContent = import.meta.env.PROD
 <link rel="dns-prefetch" href="//connect.facebook.net" />
 
 <!-- Resource Hints for Performance -->
-<link
-  rel="preload"
-  href="/fonts/Poppins-400.woff2"
-  as="font"
-  type="font/woff2"
-  crossorigin
-/>
-<link rel="modulepreload" href="/src/scripts/search.js" />
+<!-- Font preloading handled by Astro automatically -->
+<!-- Search functionality provided by Pagefind -->
 
 <style>
   /* Ensure proper font loading and prevent layout shift */
