@@ -262,7 +262,7 @@ export class ErrorTracker {
   /**
    * Retry an operation after an error
    */
-  private retryOperation(componentName: string, error: Error): void {
+  private retryOperation(componentName: string, _error: Error): void {
     logger.info(`Retrying operation for ${componentName}`);
     // Implementation would depend on the specific operation
     // For now, we'll just reload the page as a last resort
