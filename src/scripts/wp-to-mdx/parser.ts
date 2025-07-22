@@ -1,16 +1,26 @@
+import { readFileSync } from "fs";
+
+import { parseString } from "xml2js";
+
+import { ErrorFactory, ConversionErrorCollector } from "./errors";
 import { logger } from "./logger";
+import { SecuritySanitizer } from "./security";
 import type {
   WordPressPost,
   WordPressAttachment,
   WordPressAuthor,
   WordPressCategory,
   WordPressExport,
+  WordPressXMLRoot,
+  WordPressXMLItem,
+  WordPressXMLChannel,
+  WordPressXMLCategory,
+  WordPressXMLPostMeta,
 } from "./types";
-import { readFileSync } from "fs";
-import { parseString } from "xml2js";
 
 export class WordPressParser {
-  private xmlData: any;
+  private xmlData: WordPressXMLRoot;
+  private errorCollector = new ConversionErrorCollector();
 
   async parseFromFile(filePath: string): Promise<WordPressExport> {
     logger.info(`Parsing WordPress XML file: ${filePath}`);
@@ -26,22 +36,31 @@ export class WordPressParser {
 
   async parseFromString(xmlContent: string): Promise<WordPressExport> {
     return new Promise((resolve, reject) => {
-      parseString(xmlContent, { explicitArray: false }, (err, result) => {
+      // Sanitize XML content first
+      const sanitizedContent = SecuritySanitizer.sanitizeHTML(xmlContent);
+
+      parseString(sanitizedContent, { explicitArray: false }, (err, result) => {
         if (err) {
-          logger.error(`XML parsing error: ${err}`);
+          const error = ErrorFactory.createParseError(
+            `XML parsing error: ${err.message}`
+          );
+          this.errorCollector.addError(error);
           reject(new Error(`Failed to parse XML: ${err.message}`));
           return;
         }
 
         try {
-          this.xmlData = result;
+          this.xmlData = result as WordPressXMLRoot;
           const wpExport = this.extractWordPressData();
           logger.info(
             `Successfully parsed ${wpExport.posts.length} posts, ${wpExport.attachments.length} attachments`
           );
           resolve(wpExport);
         } catch (parseError) {
-          logger.error(`Data extraction error: ${parseError}`);
+          const error = ErrorFactory.createParseError(
+            `Data extraction failed: ${parseError}`
+          );
+          this.errorCollector.addError(error);
           reject(new Error(`Failed to extract WordPress data: ${parseError}`));
         }
       });
@@ -84,7 +103,7 @@ export class WordPressParser {
     };
   }
 
-  private parsePost(item: any): WordPressPost | null {
+  private parsePost(item: WordPressXMLItem): WordPressPost | null {
     try {
       const status = this.getMetaValue(item, "wp:status");
 
@@ -93,17 +112,28 @@ export class WordPressParser {
         return null;
       }
 
+      // Sanitize content before creating post
+      const sanitizedContent = SecuritySanitizer.sanitizeWordPressContent(
+        this.getMetaValue(item, "content:encoded") || ""
+      );
+      const sanitizedExcerpt = SecuritySanitizer.sanitizeWordPressContent(
+        this.getMetaValue(item, "excerpt:encoded") || ""
+      );
+
       const post: WordPressPost = {
         id: this.getMetaValue(item, "wp:post_id") || "",
-        title: item.title || "",
-        content: this.getMetaValue(item, "content:encoded") || "",
-        excerpt: this.getMetaValue(item, "excerpt:encoded") || "",
-        pubDate: new Date(item.pubDate || item["wp:post_date"]),
+        title: SecuritySanitizer.sanitizeYAMLValue(item.title || ""),
+        content: sanitizedContent,
+        excerpt: sanitizedExcerpt,
+        pubDate:
+          SecuritySanitizer.sanitizeDate(
+            item.pubDate || item["wp:post_date"]
+          ) || new Date(),
         modifiedDate: this.parseModifiedDate(item),
-        author: item["dc:creator"] || "",
+        author: SecuritySanitizer.sanitizeAuthorName(item["dc:creator"] || ""),
         categories: this.extractPostCategories(item),
         tags: this.extractPostTags(item),
-        status: (status as any) || "publish",
+        status: (status as "publish" | "draft" | "private") || "publish",
         slug: this.getMetaValue(item, "wp:post_name") || "",
         featuredImageId: this.getMetaValue(item, "_thumbnail_id"),
         customFields: this.extractCustomFields(item),
@@ -122,7 +152,7 @@ export class WordPressParser {
     }
   }
 
-  private parseAttachment(item: any): WordPressAttachment | null {
+  private parseAttachment(item: WordPressXMLItem): WordPressAttachment | null {
     try {
       const attachment: WordPressAttachment = {
         id: this.getMetaValue(item, "wp:post_id") || "",
@@ -148,7 +178,7 @@ export class WordPressParser {
     const authors: WordPressAuthor[] = [];
     const wpAuthors = channel["wp:author"];
 
-    if (!wpAuthors) return authors;
+    if (!wpAuthors) {return authors;}
 
     const authorList = Array.isArray(wpAuthors) ? wpAuthors : [wpAuthors];
 
@@ -170,7 +200,7 @@ export class WordPressParser {
     const categories: WordPressCategory[] = [];
     const wpCategories = channel["wp:category"];
 
-    if (!wpCategories) return categories;
+    if (!wpCategories) {return categories;}
 
     const categoryList = Array.isArray(wpCategories)
       ? wpCategories
@@ -191,7 +221,7 @@ export class WordPressParser {
   }
 
   private extractPostCategories(item: any): string[] {
-    if (!item.category) return [];
+    if (!item.category) {return [];}
 
     const categories = Array.isArray(item.category)
       ? item.category
@@ -203,7 +233,7 @@ export class WordPressParser {
   }
 
   private extractPostTags(item: any): string[] {
-    if (!item.category) return [];
+    if (!item.category) {return [];}
 
     const categories = Array.isArray(item.category)
       ? item.category
@@ -217,7 +247,7 @@ export class WordPressParser {
   private extractCustomFields(item: any): Record<string, any> {
     const customFields: Record<string, any> = {};
 
-    if (!item["wp:postmeta"]) return customFields;
+    if (!item["wp:postmeta"]) {return customFields;}
 
     const postMeta = Array.isArray(item["wp:postmeta"])
       ? item["wp:postmeta"]
@@ -303,5 +333,19 @@ export class WordPressParser {
         }
       }
     }
+  }
+
+  /**
+   * Get parsing errors
+   */
+  getErrors(): ConversionErrorCollector {
+    return this.errorCollector;
+  }
+
+  /**
+   * Clear parsing errors
+   */
+  clearErrors(): void {
+    this.errorCollector.clear();
   }
 }

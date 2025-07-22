@@ -2,10 +2,11 @@
  * @file final-100-coverage.test.ts
  * @description Final targeted tests to achieve exactly 100% coverage
  */
+import { describe, it, expect } from "vitest";
+
 import { formatDate, createSafeDate, clearDateFormatterCache } from "../date";
 import { slugify } from "../slugs";
 import { isValidEmail } from "../validation";
-import { describe, it, expect } from "vitest";
 
 describe("Final 100% Coverage Push", () => {
   describe("Validation Error Coverage", () => {

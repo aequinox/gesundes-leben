@@ -270,17 +270,44 @@ src/data/blog/
 
 ### Architecture
 
-- **Parser** (`parser.ts`) - WordPress XML processing with xml2js
-- **Translator** (`translator.ts`) - HTML→MDX with Turndown + GFM
-- **Mapper** (`mapper.ts`) - WordPress→Astro schema transformation
-- **Writer** (`writer.ts`) - File creation and image management
-- **Validator** (`validator.ts`) - Quality assurance and validation
+The converter has been completely redesigned with modern software engineering principles:
+
+#### Core Components
+
+- **Parser** (`parser.ts`) - WordPress XML processing with enhanced type safety
+- **Translator** (`translator.ts`) - HTML→MDX with extensible processor pipeline
+- **Mapper** (`mapper.ts`) - WordPress→Astro schema transformation with validation
+- **Writer** (`writer.ts`) - File creation with dependency injection for image downloading
+- **Validator** (`validator.ts`) - Comprehensive quality assurance and validation
+
+#### New Improvements (v2.0)
+
+- **🏗️ SOLID Architecture** - Single responsibility, dependency injection, extensible design
+- **⚡ Performance Optimization** - Concurrent processing, caching, retry mechanisms
+- **🔒 Security First** - Input sanitization, content validation, safe file handling
+- **🧩 Plugin System** - Extensible content processors for custom transformations
+- **📊 Enhanced Error Handling** - Detailed error collection, categorization, and reporting
+- **🎯 Type Safety** - Replaced all `any` types with proper TypeScript interfaces
+- **⚙️ Configuration Management** - Centralized constants and configurable thresholds
+
+#### Processing Pipeline
+
+1. **XML Parsing** - Secure parsing with content sanitization
+2. **Content Processing** - Extensible pipeline with multiple processors:
+   - Security sanitization processor
+   - WordPress shortcode handler
+   - German content optimizer
+   - Image path rewriter
+   - Table of contents generator
+3. **Schema Mapping** - Intelligent WordPress to Astro conversion
+4. **Concurrent Processing** - Batch processing for improved performance
+5. **Validation** - Multi-layered validation with detailed reporting
 
 ### Dependencies
 
 - `xml2js` - WordPress XML parsing
 - `turndown` + `turndown-plugin-gfm` - HTML to Markdown conversion
-- `axios` - Image downloading
+- `axios` - Image downloading with retry logic
 - `commander` - CLI interface
 - `uuid` - Unique ID generation
 - `zod` - Schema validation

@@ -1,4 +1,11 @@
 #!/usr/bin/env node
+import { resolve } from "path";
+
+import { Command } from "commander";
+
+import { CONVERSION_DEFAULTS } from "./config";
+import { ConversionErrorCollector, ErrorHandler } from "./errors";
+import { HttpImageDownloader, MockImageDownloader } from "./image-downloader";
 import { logger } from "./logger";
 import { SchemaMapper } from "./mapper";
 import { WordPressParser } from "./parser";
@@ -6,8 +13,6 @@ import { ContentTranslator } from "./translator";
 import type { ConversionConfig, ConversionResult } from "./types";
 import { ContentValidator } from "./validator";
 import { FileWriter } from "./writer";
-import { Command } from "commander";
-import { resolve } from "path";
 
 class WordPressToAstroConverter {
   private parser = new WordPressParser();
@@ -16,12 +21,18 @@ class WordPressToAstroConverter {
   private writer!: FileWriter;
   private validator = new ContentValidator();
   private config!: ConversionConfig;
+  private errorCollector = new ConversionErrorCollector();
 
   async convert(config: ConversionConfig): Promise<ConversionResult> {
     this.config = config;
     this.translator = new ContentTranslator(config.smartImagePositioning);
     this.mapper = new SchemaMapper(config);
-    this.writer = new FileWriter(config);
+
+    // Create image downloader based on dry run setting
+    const imageDownloader = config.dryRun
+      ? new MockImageDownloader()
+      : new HttpImageDownloader();
+    this.writer = new FileWriter(config, imageDownloader);
 
     const result: ConversionResult = {
       success: false,
@@ -53,25 +64,22 @@ class WordPressToAstroConverter {
       const filteredPosts = this.filterPosts(wpExport.posts);
       logger.info(`Processing ${filteredPosts.length} posts after filtering`);
 
-      // Process each post
-      for (const wpPost of filteredPosts) {
-        try {
-          await this.processPost(wpPost, wpExport.attachments, result);
-        } catch (error) {
-          logger.error(`Failed to process post "${wpPost.title}": ${error}`);
-          result.errors.push({
-            type: "convert",
-            message: `Failed to process post: ${error}`,
-            postId: wpPost.id,
-            postTitle: wpPost.title,
-          });
-          result.postsSkipped++;
-        }
-      }
+      // Process posts concurrently in batches
+      await this.processPostsConcurrently(
+        filteredPosts,
+        wpExport.attachments,
+        result
+      );
 
-      // Collect all errors
+      // Collect all errors from different components
+      result.errors.push(...this.errorCollector.getErrors());
+      result.errors.push(...this.parser.getErrors().getErrors());
+      result.errors.push(...this.mapper.getErrors().getErrors());
       result.errors.push(...this.writer.getErrors());
       result.errors.push(...this.validator.getErrors());
+
+      // Collect warnings
+      result.warnings.push(...this.errorCollector.getWarnings());
 
       result.success = result.errors.length === 0;
 
@@ -87,6 +95,64 @@ class WordPressToAstroConverter {
       });
       return result;
     }
+  }
+
+  /**
+   * Process posts concurrently in batches for better performance
+   */
+  private async processPostsConcurrently(
+    posts: any[],
+    attachments: any[],
+    result: ConversionResult
+  ): Promise<void> {
+    const batchSize = CONVERSION_DEFAULTS.CONCURRENT_BATCH_SIZE;
+
+    logger.info(`Processing ${posts.length} posts in batches of ${batchSize}`);
+
+    for (let i = 0; i < posts.length; i += batchSize) {
+      const batch = posts.slice(i, i + batchSize);
+
+      logger.info(
+        `Processing batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(posts.length / batchSize)}`
+      );
+
+      const batchPromises = batch.map(post =>
+        this.processPostSafe(post, attachments, result)
+      );
+
+      await Promise.all(batchPromises);
+
+      // Small delay between batches to avoid overwhelming the system
+      if (i + batchSize < posts.length) {
+        await this.delay(500);
+      }
+    }
+  }
+
+  /**
+   * Process a single post with error handling
+   */
+  private async processPostSafe(
+    wpPost: any,
+    attachments: any[],
+    result: ConversionResult
+  ): Promise<void> {
+    return ErrorHandler.withErrorHandling(
+      () => this.processPost(wpPost, attachments, result),
+      this.errorCollector,
+      () => ({
+        type: "convert" as const,
+        message: `Failed to process post: ${wpPost.title}`,
+        postId: wpPost.id,
+        postTitle: wpPost.title,
+      })
+    ).then(success => {
+      if (success) {
+        result.postsConverted++;
+      } else {
+        result.postsSkipped++;
+      }
+    });
   }
 
   private async processPost(
@@ -149,7 +215,6 @@ class WordPressToAstroConverter {
     // Write the post
     await this.writer.writePost(astroBlogPost, attachments);
 
-    result.postsConverted++;
     result.imagesDownloaded += imageFiles.length;
   }
 
@@ -246,6 +311,13 @@ class WordPressToAstroConverter {
     // Remove WordPress dimension suffixes like -300x200, -1024x768, etc.
     // but keep the file extension
     return filename.replace(/-\d+x\d+(\.[^.]+)$/, "$1");
+  }
+
+  /**
+   * Utility method for delays
+   */
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   private logSummary(result: ConversionResult): void {

@@ -1,12 +1,15 @@
+import satori from "satori";
+
 import { loadGoogleFonts } from "../loadGoogleFont";
+
 import {
   OG_COLORS,
   OG_IMAGE_DIMENSIONS,
   OG_TYPOGRAPHY,
   OG_LAYOUT,
 } from "./constants";
+
 import { SITE } from "@/config";
-import satori from "satori";
 
 export default async () => {
   return satori(

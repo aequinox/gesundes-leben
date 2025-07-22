@@ -1,6 +1,7 @@
+import { describe, expect, test, vi } from "vitest";
+
 import { extractUniqueTags } from "../tags";
 import type { Post } from "../types";
-import { describe, expect, test, vi } from "vitest";
 
 // Mock the slugify function
 const slugify = vi.fn((str: string) => str.toLowerCase().replace(/\s+/g, "-"));

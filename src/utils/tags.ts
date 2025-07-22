@@ -5,6 +5,7 @@
  * Provides functionality for extracting, filtering, and manipulating tags.
  */
 import type { Post } from "./types";
+
 import { SITE } from "@/config";
 import { slugify } from "@/utils/slugs";
 

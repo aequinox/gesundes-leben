@@ -1,6 +1,7 @@
+import slugifier from "slugify";
+
 import { logger } from "./logger";
 import type { Post } from "./types";
-import slugifier from "slugify";
 
 /**
  * Configuration options for slug generation

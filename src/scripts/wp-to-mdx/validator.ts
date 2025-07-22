@@ -1,7 +1,9 @@
+import { z } from "zod";
+
 import { logger } from "./logger";
 import type { AstroBlogPost, ConversionError } from "./types";
+
 import { CATEGORIES, GROUPS } from "@/utils/types";
-import { z } from "zod";
 
 export class ContentValidator {
   private errors: ConversionError[] = [];

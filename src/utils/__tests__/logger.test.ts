@@ -1,5 +1,6 @@
-import { logger, LogLevelName, type TimestampFormat } from "../logger";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+
+import { logger, LogLevelName, type TimestampFormat } from "../logger";
 
 describe("Logger", () => {
   // Spy on console methods

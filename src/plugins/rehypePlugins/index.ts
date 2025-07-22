@@ -1,14 +1,15 @@
+import type { RehypePlugins } from "astro";
+import { toString } from "hast-util-to-string";
+import { h } from "hastscript";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypeSlug from "rehype-slug";
+
 import type {
   SRLabelProperties,
   AutolinkConfig,
   AutolinkBehavior,
   AnchorIconProperties,
 } from "./types";
-import type { RehypePlugins } from "astro";
-import { toString } from "hast-util-to-string";
-import { h } from "hastscript";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import rehypeSlug from "rehype-slug";
 
 /**
  * SVG icon for anchor links

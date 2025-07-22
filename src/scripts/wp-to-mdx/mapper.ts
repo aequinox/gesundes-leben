@@ -1,4 +1,13 @@
+import { v4 as uuidv4 } from "uuid";
+
+import {
+  CONVERSION_DEFAULTS,
+  DEFAULT_CATEGORY_MAPPING,
+  DEFAULT_AUTHOR_MAPPING,
+} from "./config";
+import { ErrorFactory, ConversionErrorCollector } from "./errors";
 import { logger } from "./logger";
+import { SecuritySanitizer } from "./security";
 import type {
   WordPressPost,
   AstroBlogPost,
@@ -6,13 +15,14 @@ import type {
   AuthorMapping,
   ConversionConfig,
 } from "./types";
+
 import { CATEGORIES, GROUPS } from "@/utils/types";
-import { v4 as uuidv4 } from "uuid";
 
 export class SchemaMapper {
   private config: ConversionConfig;
   private categoryMapping: CategoryMapping;
   private authorMapping: AuthorMapping;
+  private errorCollector = new ConversionErrorCollector();
 
   constructor(config: ConversionConfig) {
     this.config = config;
@@ -67,50 +77,21 @@ export class SchemaMapper {
   }
 
   /**
-   * Create default category mapping
+   * Create category mapping with defaults and user overrides
    */
   private createCategoryMapping(): CategoryMapping {
     return {
-      // German WordPress categories to Astro categories
-      ernährung: ["Ernährung"],
-      "ernährung & immunsystem": ["Ernährung", "Immunsystem"],
-      immunsystem: ["Immunsystem"],
-      gesundheit: ["Immunsystem"],
-      lifestyle: ["Lifestyle & Psyche"],
-      psyche: ["Lifestyle & Psyche"],
-      "lifestyle & psyche": ["Lifestyle & Psyche"],
-      mikronährstoffe: ["Mikronährstoffe"],
-      vitamine: ["Mikronährstoffe"],
-      mineralien: ["Mikronährstoffe"],
-      organsysteme: ["Organsysteme"],
-      wissenschaftliches: ["Wissenschaftliches"],
-      studien: ["Wissenschaftliches"],
-      wissenswertes: ["Wissenswertes"],
-      tipps: ["Wissenswertes"],
-      lesenswertes: ["Lesenswertes"],
-      bücher: ["Lesenswertes"],
-      buchempfehlung: ["Lesenswertes"],
-
-      // Fallback for unmapped categories
-      allgemein: ["Wissenswertes"],
-      uncategorized: ["Wissenswertes"],
+      ...DEFAULT_CATEGORY_MAPPING,
       ...this.config.categoryMapping,
     };
   }
 
   /**
-   * Create default author mapping
+   * Create author mapping with defaults and user overrides
    */
   private createAuthorMapping(): AuthorMapping {
     return {
-      KRenner: "kai-renner",
-      Kai: "kai-renner",
-      kai: "kai-renner",
-      "kai renner": "kai-renner",
-      Sandra: "sandra-pfeiffer",
-      sandra: "sandra-pfeiffer",
-      "sandra pfeiffer": "sandra-pfeiffer",
-      admin: "kai-renner", // default fallback
+      ...DEFAULT_AUTHOR_MAPPING,
       ...this.config.authorMapping,
     };
   }
@@ -201,58 +182,18 @@ export class SchemaMapper {
     // Check custom WordPress taxonomy "beitragsart"
     const categories = wpPost.categories.map(cat => cat.toLowerCase());
 
-    if (categories.includes("pro")) return "pro";
-    if (categories.includes("kontra")) return "kontra";
-    if (categories.includes("fragezeichen")) return "fragezeichen";
+    if (categories.includes("pro")) {return "pro";}
+    if (categories.includes("kontra")) {return "kontra";}
+    if (categories.includes("fragezeichen")) {return "fragezeichen";}
 
     // Analyze content sentiment or topic
     const title = wpPost.title.toLowerCase();
     const content = wpPost.content.toLowerCase();
 
-    // Keywords that suggest "kontra" (warnings, dangers, problems)
-    const kontraKeywords = [
-      "gefahr",
-      "risiko",
-      "problem",
-      "schaden",
-      "warnung",
-      "achtung",
-      "vermeiden",
-      "stoppen",
-      "nachteil",
-      "negativ",
-      "schlecht",
-    ];
-
-    // Keywords that suggest "pro" (benefits, advantages, positive)
-    const proKeywords = [
-      "vorteil",
-      "nutzen",
-      "gesund",
-      "positiv",
-      "fördern",
-      "stärken",
-      "verbessern",
-      "helfen",
-      "unterstützen",
-      "empfehlen",
-      "gut",
-    ];
-
-    // Keywords that suggest "fragezeichen" (questions, uncertainty)
-    const frageKeywords = [
-      "frage",
-      "warum",
-      "wie",
-      "was",
-      "wann",
-      "wo",
-      "unsicher",
-      "vielleicht",
-      "möglich",
-      "könnte",
-      "eventuell",
-    ];
+    // Use keywords from configuration
+    const kontraKeywords = CONVERSION_DEFAULTS.KONTRA_KEYWORDS;
+    const proKeywords = CONVERSION_DEFAULTS.PRO_KEYWORDS;
+    const frageKeywords = CONVERSION_DEFAULTS.FRAGE_KEYWORDS;
 
     const titleAndExcerpt = title + " " + wpPost.excerpt.toLowerCase();
 
@@ -369,37 +310,12 @@ export class SchemaMapper {
     if (focusKeywords) {
       focusKeywords.split(",").forEach((keyword: string) => {
         const clean = keyword.trim();
-        if (clean) keywords.add(clean);
+        if (clean) {keywords.add(clean);}
       });
     }
 
     // Add health-related German keywords found in content
-    const healthKeywords = [
-      "Gesundheit",
-      "Ernährung",
-      "Vitamine",
-      "Mineralien",
-      "Mikronährstoffe",
-      "Immunsystem",
-      "Darm",
-      "Mikrobiom",
-      "Probiotika",
-      "Antioxidantien",
-      "Omega-3",
-      "Vitamin D",
-      "Magnesium",
-      "Zink",
-      "Eisen",
-      "B-Vitamine",
-      "Homöopathie",
-      "Naturheilkunde",
-      "Heilpraktiker",
-      "Wellness",
-      "Prävention",
-      "Therapie",
-      "Diagnose",
-      "Laborwerte",
-    ];
+    const healthKeywords = CONVERSION_DEFAULTS.HEALTH_KEYWORDS;
 
     const contentLower = (
       wpPost.title +
@@ -415,7 +331,7 @@ export class SchemaMapper {
       }
     }
 
-    return Array.from(keywords).slice(0, 15); // Limit keywords
+    return Array.from(keywords).slice(0, CONVERSION_DEFAULTS.MAX_KEYWORDS);
   }
 
   /**
@@ -427,7 +343,7 @@ export class SchemaMapper {
       wpPost.customFields["_featured_post"] === "1" ||
       wpPost.customFields["is_featured"] === "true";
 
-    if (isFeatured) return true;
+    if (isFeatured) {return true;}
 
     // Feature recent high-quality posts (heuristic)
     const isRecent =
@@ -476,13 +392,13 @@ export class SchemaMapper {
     const errors: string[] = [];
 
     // Required fields validation
-    if (!post.title.trim()) errors.push("Title is required");
-    if (!post.description.trim()) errors.push("Description is required");
-    if (!post.author.trim()) errors.push("Author is required");
-    if (!post.pubDatetime) errors.push("Publication date is required");
+    if (!post.title.trim()) {errors.push("Title is required");}
+    if (!post.description.trim()) {errors.push("Description is required");}
+    if (!post.author.trim()) {errors.push("Author is required");}
+    if (!post.pubDatetime) {errors.push("Publication date is required");}
     if (!post.categories.length)
-      errors.push("At least one category is required");
-    if (!post.heroImage?.src) errors.push("Hero image is required");
+      {errors.push("At least one category is required");}
+    if (!post.heroImage?.src) {errors.push("Hero image is required");}
 
     // Categories validation
     const validCategories = post.categories.filter(cat =>
@@ -507,5 +423,19 @@ export class SchemaMapper {
     }
 
     return errors;
+  }
+
+  /**
+   * Get mapping errors
+   */
+  getErrors(): ConversionErrorCollector {
+    return this.errorCollector;
+  }
+
+  /**
+   * Clear mapping errors
+   */
+  clearErrors(): void {
+    this.errorCollector.clear();
   }
 }

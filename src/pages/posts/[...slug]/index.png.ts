@@ -1,9 +1,10 @@
+import type { APIRoute } from "astro";
+
 import { SITE } from "@/config";
 import { generateOgImageForPost } from "@/utils/generateOgImages";
 import { processAllPosts } from "@/utils/posts";
 import { getPostSlug } from "@/utils/slugs";
 import type { Post } from "@/utils/types";
-import type { APIRoute } from "astro";
 
 export async function getStaticPaths() {
   if (!SITE.dynamicOgImage) {

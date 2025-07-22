@@ -70,10 +70,72 @@ const components = {
   }
 
   {/* Article Content */}
-  <article id="article" class="mx-auto prose mt-6 max-w-none">
+  <article id="article" class="article-content mx-auto prose mt-6 max-w-none">
     <Content components={components} />
   </article>
 </Fragment>
+
+<style>
+  /* Override prose styles to ensure Image component positioning works correctly */
+  .article-content {
+    /* Ensure container allows floated elements to work properly */
+    overflow: visible;
+  }
+
+  .article-content figure {
+    /* Override prose figure styles that might interfere with positioning */
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-inline: 0 !important;
+  }
+
+  .article-content figure.float-left {
+    float: left !important;
+    margin-right: 2rem !important;
+    margin-bottom: 1rem !important;
+    max-width: 50% !important;
+    clear: left !important;
+  }
+
+  .article-content figure.float-right {
+    float: right !important;
+    margin-left: 2rem !important;
+    margin-bottom: 1rem !important;
+    max-width: 50% !important;
+    clear: right !important;
+  }
+
+  .article-content figure.block {
+    float: none !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    max-width: 70% !important;
+    clear: both !important;
+  }
+
+  /* Ensure text wraps properly around floated images */
+  .article-content p {
+    overflow: visible;
+  }
+
+  /* Add clearfix for the article container */
+  .article-content::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .article-content figure.float-left,
+    .article-content figure.float-right {
+      float: none !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      max-width: 100% !important;
+    }
+  }
+</style>
 
 <script>
   import { TableOfContents } from "@/utils/ui/TableOfContentsEngine";

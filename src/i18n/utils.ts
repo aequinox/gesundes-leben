@@ -1,5 +1,6 @@
 import { ui, defaultLang } from "./ui";
 import type { Languages, TranslationKey } from "./ui";
+
 import { logger } from "@/utils/logger";
 
 /**

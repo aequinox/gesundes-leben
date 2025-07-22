@@ -36,7 +36,7 @@ references: []
 import BlogImage_1 from "./images/Teabag-Plastic-Header.jpg";
 import BlogImage_3 from "./images/mikroplastik_3.png";
 import BlogImage_2 from "./images/mikroplastik_4-1.png";
-import { Image } from "astro:assets";
+import Image from "@/components/elements/Image.astro";
 
 ## Inhaltsverzeichnis
 
@@ -66,9 +66,9 @@ Mikroplastik findet sich nicht nur in offensichtlichen Produkten, sondern auch i
 
 Die weitreichende Präsenz von Mikroplastik zeigt sich besonders in unserem Trinkwasser – PVC-Partikel aus Wasserleitungen können ins Leitungswasser gelangen und stellen somit eine große Quelle für Mikroplastiken dar.
 
-Warum ist das wichtig? Leitungswasser wird oft durch Umwelteinflüsse kontaminiert, während Flaschenwasser eine zusätzliche Schicht von Plastikfreisetzungen durch die Verpackung selbst hinzufügt. Eine mögliche Lösung ist es, dein Leitungswasser zu filtern, bevor du es trinkst oder zum Kochen verwendest. Gute Filter entfernen nicht nur Mikroplastik, sondern auch Medikamentenrückstände, Hormone, Pestizide etc., die leider auch im Trinkwasser zu finden sind. Wenn du mehr darüber wissen willst, lies den Artikel: [6 Faktoren, die dein Immunsystem schwächen.](https://gesundheit-in-tuebingen.de/was-dein-immunsystem-schwaechen-kann/)
+Warum ist das wichtig? Leitungswasser wird oft durch Umwelteinflüsse kontaminiert, während Flaschenwasser eine zusätzliche Schicht von Plastikfreisetzungen durch die Verpackung selbst hinzufügt. Eine mögliche Lösung ist es, dein Leitungswasser zu filtern, bevor du es trinkst oder zum Kochen verwendest. Gute Filter entfernen nicht nur Mikroplastik, sondern auch Medikamentenrückstände, Hormone, Pestizide etc., die leider auch im Trinkwasser zu finden sind. Wenn du mehr darüber wissen willst, lies den Artikel: (https://gesundheit-in-tuebingen.de/was-dein-immunsystem-schwaechen-kann/)
 
-##### Unsere Favoriten[\*](#affiliates)
+##### Unsere Favoriten(#affiliates)
 
 Wir werben für Partner und Produkte, von denen wir überzeugt sind und mit denen wir in der Praxis ausgezeichnete Erfahrungen gemacht haben. Das bedeutet, diese entsprechen hohen Standards bezüglich Qualität, Preis-Leistungs-Verhältnis, therapeutisch wirksamer Dosierung, Reinheit und Nachhaltigkeit. Die Einnahmen, die wir durch manche der Empfehlungen erzielen, kommen dem Blog zugute. **#weildueswertbist**
 
@@ -85,7 +85,7 @@ Wir werben für Partner und Produkte, von denen wir überzeugt sind und mit dene
 
 PFAs sind langlebig in der Umwelt und im menschlichen Körper, was zu Bedenken hinsichtlich ihrer potenziellen gesundheitlichen Auswirkungen führt. Sie können sich im Laufe der Zeit in Organismen anreichern und **werden nicht nur mit hormonellen Störungen und bestimmten Krebsarten in Verbindung gebracht, sondern auch mit einer Unterdrückung des Immunsystems sowie einer Dysfunktion der Schilddrüse.**
 
-Die sogenannten „Forever Chemicals“ wie PFAS sind problematisch. Diese Chemikalien haben eine lange Halbwertszeit und reichern sich im Körper an. Schon eine Studie aus dem Jahr 2013[1](#c86a617a-caec-4822-9b58-27c3e6ebaec2) zeigte alarmierende PFAS-Werte in mehreren beliebten Mineralwassermarken auf. Daher ist es entscheidend, die Kontrolle über die Wasserqualität zu Hause zu übernehmen.
+Die sogenannten „Forever Chemicals“ wie PFAS sind problematisch. Diese Chemikalien haben eine lange Halbwertszeit und reichern sich im Körper an. Schon eine Studie aus dem Jahr 2013(#c86a617a-caec-4822-9b58-27c3e6ebaec2) zeigte alarmierende PFAS-Werte in mehreren beliebten Mineralwassermarken auf. Daher ist es entscheidend, die Kontrolle über die Wasserqualität zu Hause zu übernehmen.
 
 ### Unterschätzte Gefahren: Hitze
 
@@ -103,7 +103,7 @@ Diese allgegenwärtige Präsenz von Mikroplastik unterstreicht, wie wichtig es i
 
 #### Mikroplastik in Teebeuteln: Ein globales Problem
 
-Ein weiteres, oft übersehenes Problem sind Teebeutel aus Kunststoff. Wissenschaftliche Studien[2](#245f80a4-2643-439f-baa2-cf2050d703f5) haben gezeigt, dass ein einziger Plastik-Teebeutel beim Aufbrühen mit heißem Wasser bis zu **11,6 Milliarden Mikroplastikpartikel** und **3,1 Milliarden Nanoplastikpartikel** freisetzen kann. Die meisten handelsüblichen Teebeutel bestehen nicht mehr aus reinem Papier, sondern enthalten Kunststoffe wie Polypropylen, die dem Material mehr Stabilität verleihen sollen. Beim Überbrühen mit heißem Wasser lösen sich diese Kunststoffpartikel und gelangen direkt in das Getränk.
+Ein weiteres, oft übersehenes Problem sind Teebeutel aus Kunststoff. Wissenschaftliche Studien(#245f80a4-2643-439f-baa2-cf2050d703f5) haben gezeigt, dass ein einziger Plastik-Teebeutel beim Aufbrühen mit heißem Wasser bis zu **11,6 Milliarden Mikroplastikpartikel** und **3,1 Milliarden Nanoplastikpartikel** freisetzen kann. Die meisten handelsüblichen Teebeutel bestehen nicht mehr aus reinem Papier, sondern enthalten Kunststoffe wie Polypropylen, die dem Material mehr Stabilität verleihen sollen. Beim Überbrühen mit heißem Wasser lösen sich diese Kunststoffpartikel und gelangen direkt in das Getränk.
 
 Um diese zusätzliche Mikroplastikbelastung zu vermeiden, empfehlen wir dir:
 
@@ -115,6 +115,7 @@ Um diese zusätzliche Mikroplastikbelastung zu vermeiden, empfehlen wir dir:
 <Image
   src={BlogImage_1}
   alt="Eine weiße Tasse mit einem Totenkopfsymbol, die eine dampfende Flüssigkeit enthält, steht auf einer passenden Untertasse vor einem schwarzen Hintergrund und weckt Gedanken an Mikroplastik, das unsichtbar in Alltagsgegenständen lauert."
+  position="right"
 />
 
 Diese allgegenwärtige Präsenz von Mikroplastik unterstreicht, wie wichtig es ist, dass wir ein Verständnis darüber erlangen, wie wir die Verbreitung von Mikroplastik eindämmen und die Aufnahme in unseren Körper so gut wie möglich vermeiden können.
@@ -133,9 +134,9 @@ BPA, BPS und Phthalate werden als hormonelle Disruptoren (Störfaktoren) eingest
 
 ## 3\. Gefahr: Organbelastung
 
-**Ein weiteres kritisches Thema ist die Belastung unserer Lungen.** Eine Studie[3](#8c913867-0cc0-4760-8ee8-27ecc20d8c52) aus dem Jahr 2022 untersuchte Lungengewebe von chirurgischen Patienten und fand Mikroplastik in jeder Probe. Dabei hatten diese Patienten keine signifikanten Expositionen außerhalb des normalen Alltagslebens. Verschiedene Arten von Mikroplastik, darunter Polyethylen und Polypropylen, wurden nachgewiesen – dieselben Kunststoffe, die in alltäglichen Gegenständen wie Taschen und Flaschen vorkommen.
+**Ein weiteres kritisches Thema ist die Belastung unserer Lungen.** Eine Studie(#8c913867-0cc0-4760-8ee8-27ecc20d8c52) aus dem Jahr 2022 untersuchte Lungengewebe von chirurgischen Patienten und fand Mikroplastik in jeder Probe. Dabei hatten diese Patienten keine signifikanten Expositionen außerhalb des normalen Alltagslebens. Verschiedene Arten von Mikroplastik, darunter Polyethylen und Polypropylen, wurden nachgewiesen – dieselben Kunststoffe, die in alltäglichen Gegenständen wie Taschen und Flaschen vorkommen.
 
-**Mikroplastik kann Entzündungen und oxidativen Stress verursachen und zu Atemwegserkrankungen wie Asthma und COPD (chronisch obstruktive Lungenerkrankung) beitragen**. Eine Studie[4](#f6c09a2f-ffbe-4466-987f-15d7388a19b0) fand heraus, dass Mikroplastik die tieferen Regionen der Lunge erreichen kann, was bisher aufgrund der natürlichen Filtrationsmechanismen des Körpers als unwahrscheinlich galt. Diese Entdeckung legt nahe, dass Inhalation ein bedeutenderer Weg der Mikroplastikexposition ist als bisher angenommen.
+**Mikroplastik kann Entzündungen und oxidativen Stress verursachen und zu Atemwegserkrankungen wie Asthma und COPD (chronisch obstruktive Lungenerkrankung) beitragen**. Eine Studie(#f6c09a2f-ffbe-4466-987f-15d7388a19b0) fand heraus, dass Mikroplastik die tieferen Regionen der Lunge erreichen kann, was bisher aufgrund der natürlichen Filtrationsmechanismen des Körpers als unwahrscheinlich galt. Diese Entdeckung legt nahe, dass Inhalation ein bedeutenderer Weg der Mikroplastikexposition ist als bisher angenommen.
 
 Die Leber ist ein weiteres kritisches Organ, in dem sich Mikroplastiken ansammeln. Forschungen zeigen, dass Leberzellen bei Exposition gegenüber Mikroplastik signifikante Funktionsstörungen aufweisen können, einschließlich **Schäden an den Mitochondrien und erhöhtem oxidativem Stress – beides Schlüsseltreiber für Erkrankungen wie nichtalkoholische Fettlebererkrankung.**
 
@@ -145,7 +146,7 @@ Noch beunruhigender sind die Auswirkungen auf das Gehirn. **In Tierstudien sowie
 
 Einmal im Gehirn aktivieren Mikroplastiken Mikrogliazellen – das sind die Immunzellen des Gehirns. Aktivierte Mikroglia können neuroinflammatorische Reaktionen (=Entzündungen in deinem Gehirn) auslösen, die im Laufe der Zeit zu **neurodegenerativen Erkrankungen wie Alzheimer oder Parkinso**n beitragen können, also zu Gedächtnisverlust führen.
 
-Weitere Studien (siehe unter [Quellen](#quellen)) zeigen, dass Polystyrol-Mikroplastiken sich in kritischen Gehirnregionen ansammeln können, wie dem Hippocampus und dem präfrontalen Cortex – Regionen, die für **Gedächtnis, Lernen und emotionale Regulation** verantwortlich sind.
+Weitere Studien (siehe unter (#quellen)) zeigen, dass Polystyrol-Mikroplastiken sich in kritischen Gehirnregionen ansammeln können, wie dem Hippocampus und dem präfrontalen Cortex – Regionen, die für **Gedächtnis, Lernen und emotionale Regulation** verantwortlich sind.
 
 ### Alarmierend hohe Konzentrationen im Gehirngewebe
 
@@ -157,11 +158,11 @@ Diese Korrelation wirft ernsthafte Fragen auf über die Rolle von Mikroplastiken
 
 Diese besorgniserregende Entwicklung spiegelt den Anstieg der Mikroplastikkonzentrationen in unserer Umwelt wider und legt nahe, dass mit zunehmender Umweltverschmutzung auch die Anreicherung von Plastik in menschlichem Gewebe wie dem Gehirn zunimmt.
 
-**Besonders gefährdet sind ungeborene und junge Kinder**: In städtischen Umgebungen mit hoher Luftverschmutzung durch Mikroplastik könnten sie einem höheren Risiko für Probleme wie Autismus oder ADHS ausgesetzt sein[5](#4af59dbe-412f-4d1c-8fe4-ed7d1f8fbfd3).
+**Besonders gefährdet sind ungeborene und junge Kinder**: In städtischen Umgebungen mit hoher Luftverschmutzung durch Mikroplastik könnten sie einem höheren Risiko für Probleme wie Autismus oder ADHS ausgesetzt sein(#4af59dbe-412f-4d1c-8fe4-ed7d1f8fbfd3).
 
 ## 5\. Gefahr: Einfluss auf die Fruchtbarkeit
 
-Mikroplastik und seine Auswirkungen auf die Fruchtbarkeit sind ein Thema wachsender Bedeutung. Besonders besorgniserregend sind die schädlichen Chemikalien wie BPA, die in Alltagsgegenständen enthalten sind. Es gibt umfangreiche Forschungen, die zeigen, dass BPA die Fortpflanzungsgesundheit von Frauen erheblich beeinträchtigen kann. Eine Studie[6](#0e1b0476-1502-45da-97d3-39152f74d20c) über Frauen, die sich einer In-vitro-Fertilisation (IVF) unterziehen, hat aufgedeckt, dass Frauen mit höheren BPA-Werten im Urin nur halb so viele lebensfähige Eizellen hatten wie Frauen mit niedrigeren Werten. Das ist ein dramatischer Befund.
+Mikroplastik und seine Auswirkungen auf die Fruchtbarkeit sind ein Thema wachsender Bedeutung. Besonders besorgniserregend sind die schädlichen Chemikalien wie BPA, die in Alltagsgegenständen enthalten sind. Es gibt umfangreiche Forschungen, die zeigen, dass BPA die Fortpflanzungsgesundheit von Frauen erheblich beeinträchtigen kann. Eine Studie(#0e1b0476-1502-45da-97d3-39152f74d20c) über Frauen, die sich einer In-vitro-Fertilisation (IVF) unterziehen, hat aufgedeckt, dass Frauen mit höheren BPA-Werten im Urin nur halb so viele lebensfähige Eizellen hatten wie Frauen mit niedrigeren Werten. Das ist ein dramatischer Befund.
 
 ### Mikroplastik und die weibliche Fruchtbarkeit
 
@@ -169,11 +170,11 @@ Mikroplastik und seine Auswirkungen auf die Fruchtbarkeit sind ein Thema wachsen
 
 Ein weiterer kritischer Punkt ist die Implantation des befruchteten Eis in der Gebärmutterwand. Auch wenn alle anderen Faktoren stimmen, kann BPA das Endometrium beeinflussen und es schwieriger machen, dass ein befruchtetes Ei sich festsetzt. In einer Studie wurde festgestellt, dass Frauen mit höheren BPA-Werten eine niedrigere Implantationsrate während der IVF hatten.
 
-BPA kann auch in der Pubertät eine Rolle spielen. Untersuchungen zeigen, dass eine Exposition gegenüber BPA in kritischen Entwicklungsstadien zu einer **verfrühten Pubertät bei Mädchen** führen kann. Eine Studie[7](#2ef5acdc-99be-4c03-9b25-4375df909c99) aus dem Jahr 2016 fand heraus, dass Mädchen mit höherer pränataler BPA-Exposition früher Brustentwicklung und Menarche erlebten – was gesundheitliche Langzeitfolgen haben kann.
+BPA kann auch in der Pubertät eine Rolle spielen. Untersuchungen zeigen, dass eine Exposition gegenüber BPA in kritischen Entwicklungsstadien zu einer **verfrühten Pubertät bei Mädchen** führen kann. Eine Studie(#2ef5acdc-99be-4c03-9b25-4375df909c99) aus dem Jahr 2016 fand heraus, dass Mädchen mit höherer pränataler BPA-Exposition früher Brustentwicklung und Menarche erlebten – was gesundheitliche Langzeitfolgen haben kann.
 
 ### Mikroplastik und die männliche Fruchtbarkeit
 
-Auch bei Männern ist die Exposition gegenüber BPA bedenklich für die Fruchtbarkeit. Es ist bekannt, dass BPA im Körper wie Östrogen wirkt und das hormonelle Gleichgewicht stören kann. Eine Studie aus dem Jahr 2021[8](#10ea52f6-f34f-4e14-9a85-e6fbd2ff39b0) fand heraus, dass **Männer mit höheren BPA-Werten niedrigere Testosteronspiegel hatten und ihre Spermienqualität erheblich reduziert war** – von niedriger Spermienzahl über verringerte Beweglichkeit hin zu strukturellen Anomalien.
+Auch bei Männern ist die Exposition gegenüber BPA bedenklich für die Fruchtbarkeit. Es ist bekannt, dass BPA im Körper wie Östrogen wirkt und das hormonelle Gleichgewicht stören kann. Eine Studie aus dem Jahr 2021(#10ea52f6-f34f-4e14-9a85-e6fbd2ff39b0) fand heraus, dass **Männer mit höheren BPA-Werten niedrigere Testosteronspiegel hatten und ihre Spermienqualität erheblich reduziert war** – von niedriger Spermienzahl über verringerte Beweglichkeit hin zu strukturellen Anomalien.
 
 Mikroplastik spielt ebenfalls eine Rolle bei der Beeinträchtigung der Fruchtbarkeit. Eine Untersuchung von Samenproben zeigte das Vorhandensein von Mikroplastikpartikeln bei allen untersuchten Proben gesunder junger Männer im reproduktiven Alter. Diese Partikel waren nicht harmlos; sie wurden mit **abnormalen Spermienformen und beeinträchtigter Beweglichkeit** in Verbindung gebracht.
 
@@ -189,7 +190,7 @@ Mikroplastik wurde selbst in arteriellen Plaques (Gefäßablagerungen) gefunden.
 
 Das Aufkommen dieser Erkenntnisse legt nahe, dass chronische Exposition gegenüber diesen Partikeln eine bedeutende Rolle bei kardiovaskulären Ereignissen spielen könnte. Mikroplastiken können chronische Entzündungen fördern – ein Haupttreiber für Arteriosklerose oder Plaquebildung in den Arterien.
 
-Ein weiteres Anliegen ist der Zusammenhang zwischen BPA-Exposition und Bluthochdruck – eine Erkrankung, die bereits fast ein Drittel der Weltbevölkerung betrifft. Eine randomisierte kontrollierte Studie[9](#a60a9c5b-ce50-4bb9-b81d-2f65306ec4e5) ergab, dass **Teilnehmer, die aus BPA-haltigen Dosen tranken, einen signifikanten Anstieg des Blutdrucks** erlebten – etwa 4,5 mmHg Zunahme des systolischen Blutdrucks innerhalb von Stunden.
+Ein weiteres Anliegen ist der Zusammenhang zwischen BPA-Exposition und Bluthochdruck – eine Erkrankung, die bereits fast ein Drittel der Weltbevölkerung betrifft. Eine randomisierte kontrollierte Studie(#a60a9c5b-ce50-4bb9-b81d-2f65306ec4e5) ergab, dass **Teilnehmer, die aus BPA-haltigen Dosen tranken, einen signifikanten Anstieg des Blutdrucks** erlebten – etwa 4,5 mmHg Zunahme des systolischen Blutdrucks innerhalb von Stunden.
 
 > BPA beeinflusst nicht nur unsere Hormone. Es wirkt sich tatsächlich direkt auf die Funktionsfähigkeit unseres Herzens aus.
 >
@@ -198,23 +199,24 @@ Ein weiteres Anliegen ist der Zusammenhang zwischen BPA-Exposition und Bluthochd
 <Image
   src={BlogImage_2}
   alt="Diagramm einer menschlichen Figur, das die gesundheitlichen Auswirkungen der Exposition gegenüber Mikroplastik veranschaulicht, das in Kosmetika und Lebensmitteln häufig vorkommt: neurologische Erkrankungen, Herzgesundheit, Atemwegserkrankungen, Verdauungsprobleme und Fortpflanzungsstörungen, mit Symbolen."
+  position="left"
 />
 
 ## 7\. Gefahr: Mikroplastik und Krebsrisiko
 
 Besorgniserregend ist, dass **Mikroplastik als Träger für krebserregende Chemikalien wie Phthalate und Bisphenol A (BPA)** dient. Diese Stoffe, die über die Plastikpartikel transportiert werden, können das Hormonsystem stören und in der Folge möglicherweise das Risiko für die Entstehung von Krebs erhöhen.
 
-Phthalate sind ein Beispiel dafür. *E*ine Studie aus dem Jahr 2022[10](#b926790d-a305-46a0-b823-85626cb94c78) untersuchte etwa 1,3 Millionen Kinder in Dänemark über einen Zeitraum von zwanzig Jahren. Dabei wurde festgestellt, dass die **kindliche Exposition gegenüber Phthalaten mit einem um 20 % höheren Risiko für Kinderkrebs** verbunden ist. Besonders auffällig war das fast dreifach erhöhte Risiko für Osteosarkom, einem seltenen Knochenkrebs, sowie ein doppelt so hohes Risiko für Lymphome, eine Art Blutkrebs.
+Phthalate sind ein Beispiel dafür. *E*ine Studie aus dem Jahr 2022(#b926790d-a305-46a0-b823-85626cb94c78) untersuchte etwa 1,3 Millionen Kinder in Dänemark über einen Zeitraum von zwanzig Jahren. Dabei wurde festgestellt, dass die **kindliche Exposition gegenüber Phthalaten mit einem um 20 % höheren Risiko für Kinderkrebs** verbunden ist. Besonders auffällig war das fast dreifach erhöhte Risiko für Osteosarkom, einem seltenen Knochenkrebs, sowie ein doppelt so hohes Risiko für Lymphome, eine Art Blutkrebs.
 
 Diese Studie aus Dänemark ist besonders aussagekräftig aufgrund der genauen Datenerfassung durch das universelle Gesundheitssystem des Landes, das eine präzise Nachverfolgung der Phthalat-Exposition über Medikamente ermöglicht.
 
-Auch ein möglicher Zusammenhang zwischen Phthalaten und Brustkrebs wird zunehmend untersucht. Eine Meta-Analyse von neun Fall-Kontroll-Studien[11](#10903304-87cb-48fe-be49-ba3c33808c5c) mit über 7.800 Teilnehmern aus dem Jahr 2021 zeigte eine positive Verbindung zwischen bestimmten Phthalat-Abbauprodukten und einem erhöhten Brustkrebsrisiko.
+Auch ein möglicher Zusammenhang zwischen Phthalaten und Brustkrebs wird zunehmend untersucht. Eine Meta-Analyse von neun Fall-Kontroll-Studien(#10903304-87cb-48fe-be49-ba3c33808c5c) mit über 7.800 Teilnehmern aus dem Jahr 2021 zeigte eine positive Verbindung zwischen bestimmten Phthalat-Abbauprodukten und einem erhöhten Brustkrebsrisiko.
 
 Auch Bisphenol A (BPA) wird mit Krebs in Verbindung gebracht. BPA imitiert Östrogen und spielt eine zentrale Rolle bei der Entwicklung von Brustkrebs. Selbst niedrige Dosen von BPA können in Laborstudien das Wachstum östrogensensitiver Brustkrebszellen fördern.
 
 Ein besonders besorgniserregender Aspekt von Mikroplastik ist ihre Rolle als Träger dieser Chemikalien. Mikroplastiken sind auch Träger schwerer Metalle und können diese zusammen mit BPA und Phthalaten in unseren Körper transportieren – durch Luft, Wasser und Nahrung.
 
-Mikroplastik wurde auch in menschlichen Tumorgeweben gefunden.[12](#8be4d94c-f6ce-4464-8d17-2b1d6a12a5d0) Die Anwesenheit von Mikroplastik im Tumorgewebe ist alarmierend. In einer Studie[13](#31f76cf3-6233-4ceb-aedf-5618508e9fab) an Lungenkrebspatienten wurden Mikroplastikpartikel im Tumorgewebe entdeckt. Dies deutet darauf hin, dass diese Fremdpartikel möglicherweise eine Rolle bei der Krebsentwicklung oder -progression spielen könnten. Die Anwesenheit dieser Partikel im Tumorgewebe könnte chronische Entzündungen verursachen oder schädliche Chemikalien direkt ins Tumormilieu transportieren.
+Mikroplastik wurde auch in menschlichen Tumorgeweben gefunden.(#8be4d94c-f6ce-4464-8d17-2b1d6a12a5d0) Die Anwesenheit von Mikroplastik im Tumorgewebe ist alarmierend. In einer Studie(#31f76cf3-6233-4ceb-aedf-5618508e9fab) an Lungenkrebspatienten wurden Mikroplastikpartikel im Tumorgewebe entdeckt. Dies deutet darauf hin, dass diese Fremdpartikel möglicherweise eine Rolle bei der Krebsentwicklung oder -progression spielen könnten. Die Anwesenheit dieser Partikel im Tumorgewebe könnte chronische Entzündungen verursachen oder schädliche Chemikalien direkt ins Tumormilieu transportieren.
 
 Obwohl bisher nicht vollständig geklärt ist, ob diese Partikel direkt Krebs verursachen können, zeigt ihre Fähigkeit zur Infiltration von Tumorgewebe ihr potenzielles Risiko auf die Tumorbiologie – möglicherweise durch Verschärfung von Entzündungen oder Störung der Immunantworten.
 
@@ -236,18 +238,17 @@ Es ist uns klar, dass diese Zusammenfassung der gesundheitlichen Risiken durch M
 <Image
   src={BlogImage_3}
   alt="Infografik mit vier Tipps: Plastikverbrauch reduzieren, Mehrwegprodukte verwenden, Mikroplastik in Kosmetik vermeiden und Plastikmüll richtig entsorgen."
+  position="right"
 />
 
 Du kannst den Belastungen nicht überall entkommen. Aber du kannst für dich sorgen und die Exposition dort einschränken, wo du Einfluss nehmen kannst. Durch bewusste Entscheidungen kannst du aktiv deine Mikroplastik-Exposition verringern und deine Gesundheit schützen. Und denke daran: Unsere individuellen Handlungen multiplizieren sich über Gemeinschaften hinweg und können einen bedeutenden Einfluss haben. **#sogehtgesund**
 
 Fußnoten:
 
-Quellen:
-
-1.  Ghosh, S., Sinha, J. K., Ghosh, S., Vashisth, K., Han, S., & Bhaskar, R. (2023). Microplastics as an Emerging Threat to the Global Environment and Human Health. _Sustainability_, _15_(14), 10821. [https://doi.org/10.3390/su151410821](https://doi.org/10.3390/su151410821)
-2.  Campanale, C., Massarelli, C., Savino, I., Locaputo, V., & Uricchio, V. F. (2020). A Detailed Review Study on Potential Effects of Microplastics and Additives of Concern on Human Health. _International Journal of Environmental Research and Public Health_, _17_(4), 1212. [https://doi.org/10.3390/ijerph17041212](https://doi.org/10.3390/ijerph17041212)
-3.  Hussain, K. A., Romanova, S., Okur, I., Zhang, D., Kuebler, J., Huang, X., Wang, B., Fernandez-Ballester, L., Lu, Y., Schubert, M., & Li, Y. (2023). Assessing the Release of Microplastics and Nanoplastics from Plastic Containers and Reusable Food Pouches: Implications for Human Health. _Environmental Science &amp; Technology_, _57_(26), 9782 – 9792. [https://doi.org/10.1021/acs.est.3c01942](https://doi.org/10.1021/acs.est.3c01942)
-4.  Zhao, B., Rehati, P., Yang, Z., Cai, Z., Guo, C., & Li, Y. (2024). The potential toxicity of microplastics on human health. _Science of The Total Environment_, _912_, 168946. [https://doi.org/10.1016/j.scitotenv.2023.168946](https://doi.org/10.1016/j.scitotenv.2023.168946)
-5.  Rose, P. K., Yadav, S., Kataria, N., & Khoo, K. S. (2023). Microplastics and nanoplastics in the terrestrial food chain: Uptake, translocation, trophic transfer, ecotoxicology, and human health risk. _TrAC Trends in Analytical Chemistry_, _167_, 117249. [https://doi.org/10.1016/j.trac.2023.117249](https://doi.org/10.1016/j.trac.2023.117249)
-6.  Paulose, T., Speroni, L., Sonnenschein, C., & Soto, A. M. (2015). Estrogens in the wrong place at the wrong time: Fetal BPA exposure and mammary cancer. _Reproductive Toxicology_, _54_, 58 – 65. [https://doi.org/10.1016/j.reprotox.2014.09.012](https://doi.org/10.1016/j.reprotox.2014.09.012)
-7.  Le, H. H., Carlson, E. M., Chua, J. P., & Belcher, S. M. (2008). Bisphenol A is released from polycarbonate drinking bottles and mimics the neurotoxic actions of estrogen in developing cerebellar neurons. _Toxicology Letters_, _176_(2), 149 – 156. [https://doi.org/10.1016/j.toxlet.2007.11.001](https://doi.org/10.1016/j.toxlet.2007.11.001)
+1.  Ghosh, S., Sinha, J. K., Ghosh, S., Vashisth, K., Han, S., & Bhaskar, R. (2023). Microplastics as an Emerging Threat to the Global Environment and Human Health. _Sustainability_, _15_(14), 10821. (https://doi.org/10.3390/su151410821)
+2.  Campanale, C., Massarelli, C., Savino, I., Locaputo, V., & Uricchio, V. F. (2020). A Detailed Review Study on Potential Effects of Microplastics and Additives of Concern on Human Health. _International Journal of Environmental Research and Public Health_, _17_(4), 1212. (https://doi.org/10.3390/ijerph17041212)
+3.  Hussain, K. A., Romanova, S., Okur, I., Zhang, D., Kuebler, J., Huang, X., Wang, B., Fernandez-Ballester, L., Lu, Y., Schubert, M., & Li, Y. (2023). Assessing the Release of Microplastics and Nanoplastics from Plastic Containers and Reusable Food Pouches: Implications for Human Health. _Environmental Science &amp; Technology_, _57_(26), 9782 – 9792. (https://doi.org/10.1021/acs.est.3c01942)
+4.  Zhao, B., Rehati, P., Yang, Z., Cai, Z., Guo, C., & Li, Y. (2024). The potential toxicity of microplastics on human health. _Science of The Total Environment_, _912_, 168946. (https://doi.org/10.1016/j.scitotenv.2023.168946)
+5.  Rose, P. K., Yadav, S., Kataria, N., & Khoo, K. S. (2023). Microplastics and nanoplastics in the terrestrial food chain: Uptake, translocation, trophic transfer, ecotoxicology, and human health risk. _TrAC Trends in Analytical Chemistry_, _167_, 117249. (https://doi.org/10.1016/j.trac.2023.117249)
+6.  Paulose, T., Speroni, L., Sonnenschein, C., & Soto, A. M. (2015). Estrogens in the wrong place at the wrong time: Fetal BPA exposure and mammary cancer. _Reproductive Toxicology_, _54_, 58 – 65. (https://doi.org/10.1016/j.reprotox.2014.09.012)
+7.  Le, H. H., Carlson, E. M., Chua, J. P., & Belcher, S. M. (2008). Bisphenol A is released from polycarbonate drinking bottles and mimics the neurotoxic actions of estrogen in developing cerebellar neurons. _Toxicology Letters_, _176_(2), 149 – 156. (https://doi.org/10.1016/j.toxlet.2007.11.001)

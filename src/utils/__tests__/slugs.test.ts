@@ -2,9 +2,10 @@
  * @file slugs.test.ts
  * @description Comprehensive tests for slug utility functions
  */
+import { describe, it, expect, vi } from "vitest";
+
 import { slugify, getPostSlug } from "../slugs";
 import type { Post } from "../types";
-import { describe, it, expect, vi } from "vitest";
 
 describe("Slug Utilities", () => {
   describe("slugify", () => {

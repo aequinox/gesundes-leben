@@ -1,7 +1,8 @@
+import rss from "@astrojs/rss";
+
 import { SITE } from "@/config";
 import { getPath } from "@/utils/getPath";
 import { processAllPosts } from "@/utils/posts";
-import rss from "@astrojs/rss";
 
 export async function GET() {
   // Use the unified post processing function

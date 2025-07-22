@@ -1,30 +1,30 @@
-import { logger } from "./logger";
 import axios from "axios";
 import TurndownService from "turndown";
 import { gfm } from "turndown-plugin-gfm";
 
-interface ImageDimensions {
-  width: number;
-  height: number;
-  aspectRatio: number;
-}
-
-interface ImagePositioningConfig {
-  enableSmartPositioning: boolean;
-  squareThreshold: number; // aspect ratio difference to consider square
-  portraitThreshold: number; // aspect ratio threshold for portrait
-  landscapeThreshold: number; // aspect ratio threshold for landscape
-  smallImageThreshold: number; // pixel width threshold for small images
-}
+import { CONVERSION_DEFAULTS } from "./config";
+import { logger } from "./logger";
+import { ContentProcessorPipeline } from "./processors";
+import { SecuritySanitizer } from "./security";
+import type {
+  ProcessingOptions,
+  ProcessingContext,
+  ImageDimensions,
+} from "./types";
 
 export class ContentTranslator {
   private turndownService: TurndownService;
-  private positioningConfig: ImagePositioningConfig;
+  private positioningConfig: any; // TODO: Use ImagePositioningConfig type
   private imageImports: Map<string, string> = new Map(); // Track image imports
   private imageCounter: number = 1; // Counter for BlogImage_X naming
   private alternatingPosition: boolean = true; // Track alternating left/right position
+  private processorPipeline: ContentProcessorPipeline;
+  private dimensionCache = new Map<string, ImageDimensions>();
 
-  constructor(positioningConfig?: Partial<ImagePositioningConfig>) {
+  constructor(
+    positioningConfig?: any,
+    processorPipeline?: ContentProcessorPipeline
+  ) {
     this.positioningConfig = {
       enableSmartPositioning: true,
       squareThreshold: 0.1, // within 10% of 1:1 ratio considered square
@@ -33,6 +33,9 @@ export class ContentTranslator {
       smallImageThreshold: 400, // images < 400px wide considered small
       ...positioningConfig,
     };
+
+    this.processorPipeline =
+      processorPipeline || ContentProcessorPipeline.createDefault();
     this.turndownService = new TurndownService({
       headingStyle: "atx",
       codeBlockStyle: "fenced",
@@ -55,11 +58,7 @@ export class ContentTranslator {
    */
   async convertToMDX(
     htmlContent: string,
-    options: {
-      generateTOC?: boolean;
-      preserveWordPressShortcodes?: boolean;
-      rewriteImagePaths?: boolean;
-    } = {}
+    options: ProcessingOptions = {}
   ): Promise<string> {
     try {
       logger.debug("Converting HTML content to MDX");
@@ -70,21 +69,25 @@ export class ContentTranslator {
       this.alternatingPosition = true;
 
       // Preprocess HTML content
-      let processedContent = this.preprocessHTML(htmlContent, options);
+      const processedContent = this.preprocessHTML(htmlContent, options);
 
-      // Convert to Markdown
+      // Convert to Markdown using Turndown
       let markdown = this.turndownService.turndown(processedContent);
 
-      // Post-process Markdown (now async for smart image positioning)
+      // Post-process Markdown (async for smart image positioning)
       markdown = await this.postprocessMarkdown(markdown, options);
 
       // Add image imports at the top
       markdown = this.addImageImports(markdown);
 
-      // Add TOC if requested
-      if (options.generateTOC) {
-        markdown = this.addTableOfContents(markdown);
-      }
+      // Run through content processor pipeline
+      const processingContext: ProcessingContext = {
+        options: options,
+      };
+      markdown = await this.processorPipeline.process(
+        markdown,
+        processingContext
+      );
 
       return markdown;
     } catch (error) {
@@ -175,9 +178,9 @@ export class ContentTranslator {
         // Create a mock element for processing
         const mockImg = {
           getAttribute: (attr: string) => {
-            if (attr === "src") return originalSrc;
-            if (attr === "alt") return alt;
-            if (attr === "title") return caption;
+            if (attr === "src") {return originalSrc;}
+            if (attr === "alt") {return alt;}
+            if (attr === "title") {return caption;}
             return null;
           },
         } as Element;
@@ -513,35 +516,56 @@ export class ContentTranslator {
   }
 
   /**
-   * Get image dimensions from URL
+   * Get image dimensions from URL with caching
    */
   private async getImageDimensions(
     imageUrl: string
   ): Promise<ImageDimensions | null> {
+    // Check cache first
+    const cacheKey = this.extractCacheKey(imageUrl);
+    if (this.dimensionCache.has(cacheKey)) {
+      return this.dimensionCache.get(cacheKey)!;
+    }
+
     try {
+      let dimensions: ImageDimensions | null = null;
+
       // Try to extract dimensions from filename first (common WordPress pattern)
       const dimensionsFromFilename =
         this.extractDimensionsFromFilename(imageUrl);
       if (dimensionsFromFilename) {
-        return dimensionsFromFilename;
+        dimensions = dimensionsFromFilename;
+      } else {
+        // Use default dimensions from config if we can't determine actual dimensions
+        dimensions = {
+          width: CONVERSION_DEFAULTS.DEFAULT_IMAGE_DIMENSIONS.width,
+          height: CONVERSION_DEFAULTS.DEFAULT_IMAGE_DIMENSIONS.height,
+          aspectRatio: CONVERSION_DEFAULTS.DEFAULT_IMAGE_DIMENSIONS.aspectRatio,
+        };
+        logger.debug(`Using default dimensions for ${imageUrl}`);
       }
 
-      // If not available in filename, make a HEAD request to get image info
-      const response = await axios.head(imageUrl, { timeout: 5000 });
-      const contentType = response.headers["content-type"];
-
-      if (!contentType?.startsWith("image/")) {
-        return null;
+      // Cache the result
+      if (dimensions) {
+        this.dimensionCache.set(cacheKey, dimensions);
       }
 
-      // For a more accurate approach, we'd need to partially download and analyze
-      // the image headers, but for now we'll use reasonable defaults based on
-      // common image patterns or return null
-      logger.debug(`Could not determine dimensions for ${imageUrl}`);
-      return null;
+      return dimensions;
     } catch (error) {
       logger.debug(`Failed to get dimensions for ${imageUrl}: ${error}`);
       return null;
+    }
+  }
+
+  /**
+   * Extract cache key from image URL
+   */
+  private extractCacheKey(imageUrl: string): string {
+    try {
+      const url = new URL(imageUrl);
+      return url.pathname; // Use pathname as cache key
+    } catch {
+      return imageUrl; // Fallback to full URL if parsing fails
     }
   }
 
@@ -568,24 +592,22 @@ export class ContentTranslator {
 
   /**
    * Determine optimal image position based on dimensions with alternating left/right
+   * Only landscape images with 3:1 ratio or higher should be centered
    */
-  private determineImagePosition(dimensions: ImageDimensions): string {
-    if (!this.positioningConfig.enableSmartPositioning) {
-      return ""; // No positioning, use default (center)
-    }
-
+  private determineImagePosition(
+    dimensions: ImageDimensions
+  ): "left" | "right" | "center" {
     const { aspectRatio } = dimensions;
 
-    // Only clearly wide landscape images should be centered
-    // This means aspect ratio > 1.5 (width significantly larger than height)
-    if (aspectRatio > this.positioningConfig.landscapeThreshold) {
-      return ""; // Center for wide landscape images
+    // Only very wide landscape images (3:1 ratio or higher) should be centered
+    if (aspectRatio >= CONVERSION_DEFAULTS.VERY_WIDE_LANDSCAPE_THRESHOLD) {
+      return "center";
     }
 
     // All other images (square, portrait, medium landscape) alternate left/right
     // Toggle the alternating position for visual variety
     this.alternatingPosition = !this.alternatingPosition;
-    return this.alternatingPosition ? "!<" : "!>";
+    return this.alternatingPosition ? "left" : "right";
   }
 
   /**
@@ -599,7 +621,7 @@ export class ContentTranslator {
     const title = imgElement.getAttribute("title") || "";
 
     let caption = title;
-    let position = "center"; // Default position
+    let position: "left" | "right" | "center" = "right"; // Default alternating position
 
     // Check if the title already contains positioning syntax
     const existingPositionMatch = title.match(/^(!<?[<>|_]?)(.*)/);
@@ -623,27 +645,26 @@ export class ContentTranslator {
       try {
         const dimensions = await this.getImageDimensions(originalSrc);
         if (dimensions) {
-          const smartPositionPrefix = this.determineImagePosition(dimensions);
-
-          // Convert positioning prefix to position prop
-          switch (smartPositionPrefix) {
-            case "!<":
-              position = "left";
-              break;
-            case "!>":
-              position = "right";
-              break;
-            default:
-              position = "center";
-          }
+          position = this.determineImagePosition(dimensions);
 
           logger.debug(
             `Smart positioning for ${originalSrc}: ${position} (${dimensions.width}x${dimensions.height}, AR: ${dimensions.aspectRatio.toFixed(2)})`
           );
+        } else {
+          // Fallback: alternate left/right when dimensions can't be determined
+          this.alternatingPosition = !this.alternatingPosition;
+          position = this.alternatingPosition ? "left" : "right";
         }
       } catch (error) {
         logger.debug(`Failed to analyze image for smart positioning: ${error}`);
+        // Fallback: alternate left/right when analysis fails
+        this.alternatingPosition = !this.alternatingPosition;
+        position = this.alternatingPosition ? "left" : "right";
       }
+    } else {
+      // Smart positioning disabled: alternate left/right
+      this.alternatingPosition = !this.alternatingPosition;
+      position = this.alternatingPosition ? "left" : "right";
     }
 
     // Extract the actual filename from WordPress URL and remove dimension suffix

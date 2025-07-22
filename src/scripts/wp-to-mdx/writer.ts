@@ -1,20 +1,27 @@
+import { promises as fs } from "fs";
+import { join } from "path";
+
+import { CONVERSION_DEFAULTS } from "./config";
+import { ErrorFactory, ConversionErrorCollector } from "./errors";
+import { HttpImageDownloader } from "./image-downloader";
 import { logger } from "./logger";
+import { SecuritySanitizer } from "./security";
 import type {
   AstroBlogPost,
   WordPressAttachment,
   ConversionConfig,
   ConversionError,
+  ImageDownloader,
 } from "./types";
-import axios from "axios";
-import { promises as fs } from "fs";
-import { join, dirname } from "path";
 
 export class FileWriter {
   private config: ConversionConfig;
-  private errors: ConversionError[] = [];
+  private errorCollector = new ConversionErrorCollector();
+  private imageDownloader: ImageDownloader;
 
-  constructor(config: ConversionConfig) {
+  constructor(config: ConversionConfig, imageDownloader?: ImageDownloader) {
     this.config = config;
+    this.imageDownloader = imageDownloader || new HttpImageDownloader();
   }
 
   /**
@@ -53,14 +60,12 @@ export class FileWriter {
 
       logger.info(`Successfully wrote post: ${post.title} to ${postDir}`);
     } catch (error) {
-      const conversionError: ConversionError = {
-        type: "write",
-        message: `Failed to write post: ${error}`,
-        postId: post.id,
-        postTitle: post.title,
-      };
-      this.errors.push(conversionError);
-      logger.error(`Failed to write post ${post.title}: ${error}`);
+      const conversionError = ErrorFactory.createWriteError(
+        `Failed to write post: ${error}`,
+        post.id,
+        post.title
+      );
+      this.errorCollector.addError(conversionError);
       throw error;
     }
   }
@@ -163,18 +168,19 @@ export class FileWriter {
   }
 
   /**
-   * Escape string for YAML
+   * Escape string for YAML using security sanitizer
    */
   private yamlEscape(str: string): string {
-    if (!str) return '""';
+    if (!str) {return '""';}
+
+    const sanitized = SecuritySanitizer.sanitizeYAMLValue(str);
 
     // Check if string contains special YAML characters
-    if (str.match(/[:"'|\>@`{}[\]&*#?|-]/)) {
-      // Escape quotes and wrap in quotes
-      return `"${str.replace(/"/g, '\\"')}"`;
+    if (sanitized.match(/[:"'|\>@`{}[\]&*#?|-]/)) {
+      return `"${sanitized}"`;
     }
 
-    return str;
+    return sanitized;
   }
 
   /**
@@ -207,17 +213,15 @@ export class FileWriter {
       }
     });
 
-    // Download each image
+    // Download each image using the image downloader service
     const downloadPromises = Array.from(imageUrls).map(url =>
-      this.downloadSingleImage(url, imagesDir).catch(error => {
-        const conversionError: ConversionError = {
-          type: "download",
-          message: `Failed to download image ${url}: ${error}`,
-          postId: post.id,
-          postTitle: post.title,
-        };
-        this.errors.push(conversionError);
-        logger.warn(`Failed to download image ${url}: ${error}`);
+      this.imageDownloader.download(url, imagesDir).catch(error => {
+        const conversionError = ErrorFactory.createDownloadError(
+          `Failed to download image ${url}: ${error}`,
+          post.id,
+          post.title
+        );
+        this.errorCollector.addError(conversionError);
       })
     );
 
@@ -226,83 +230,10 @@ export class FileWriter {
   }
 
   /**
-   * Download a single image
-   */
-  private async downloadSingleImage(
-    url: string,
-    imagesDir: string
-  ): Promise<void> {
-    try {
-      const filename = this.extractFilenameFromUrl(url);
-      const filePath = join(imagesDir, filename);
-
-      // Check if file already exists
-      try {
-        await fs.access(filePath);
-        logger.debug(`Image already exists: ${filename}`);
-        return;
-      } catch {
-        // File doesn't exist, proceed with download
-      }
-
-      logger.debug(`Downloading image: ${url}`);
-
-      const response = await axios.get(url, {
-        responseType: "arraybuffer",
-        timeout: 30000, // 30 second timeout
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (compatible; WordPress-to-Astro-Converter/1.0)",
-        },
-      });
-
-      if (!this.config.dryRun) {
-        await fs.writeFile(filePath, Buffer.from(response.data));
-      }
-
-      logger.debug(`Successfully downloaded: ${filename}`);
-
-      // Small delay to avoid overwhelming the server
-      await this.delay(100);
-    } catch (error) {
-      throw new Error(`Download failed for ${url}: ${error}`);
-    }
-  }
-
-  /**
-   * Extract filename from URL
-   */
-  private extractFilenameFromUrl(url: string): string {
-    try {
-      const urlObj = new URL(url);
-      const pathname = urlObj.pathname;
-      const filename = pathname.split("/").pop() || "unknown";
-
-      // Ensure filename has an extension
-      if (!filename.includes(".")) {
-        return filename + ".jpg";
-      }
-
-      return filename;
-    } catch {
-      return `image-${Date.now()}.jpg`;
-    }
-  }
-
-  /**
    * Check if URL is an image
    */
   private isImageUrl(url: string): boolean {
-    const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"];
-    const urlLower = url.toLowerCase();
-    return imageExtensions.some(ext => urlLower.includes(ext));
-  }
-
-  /**
-   * Delay execution
-   */
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return SecuritySanitizer.validateImageExtension(url);
   }
 
   /**
@@ -314,8 +245,14 @@ export class FileWriter {
       /https?:\/\/[^\s"']+\/wp-content\/uploads\/[^\s"')]+\.(jpg|jpeg|png|gif|webp|svg)/gi;
 
     return content.replace(imageRegex, match => {
-      const filename = this.extractFilenameFromUrl(match);
-      return `./images/${filename}`;
+      try {
+        const urlObj = new URL(match);
+        const filename = urlObj.pathname.split("/").pop() || "unknown.jpg";
+        const sanitizedFilename = SecuritySanitizer.sanitizeFilename(filename);
+        return `./images/${sanitizedFilename}`;
+      } catch {
+        return match; // Return original if URL parsing fails
+      }
     });
   }
 
@@ -338,14 +275,21 @@ export class FileWriter {
    * Get conversion errors
    */
   getErrors(): ConversionError[] {
-    return this.errors;
+    return this.errorCollector.getErrors();
+  }
+
+  /**
+   * Get error collector
+   */
+  getErrorCollector(): ConversionErrorCollector {
+    return this.errorCollector;
   }
 
   /**
    * Clear conversion errors
    */
   clearErrors(): void {
-    this.errors = [];
+    this.errorCollector.clear();
   }
 
   /**
