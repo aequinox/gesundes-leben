@@ -105,8 +105,9 @@ const variantClasses = {
         heading.querySelector("svg title");
 
       if (!hasAccessibleName) {
-        // eslint-disable-next-line no-console
-        console.warn("Heading lacks an accessible name:", heading);
+        import("@/utils/logger").then(({ logger }) => {
+          logger.warn("Heading lacks an accessible name:", heading);
+        });
       }
     });
   });

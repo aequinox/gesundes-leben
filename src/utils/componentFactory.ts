@@ -21,8 +21,8 @@
  * ```
  */
 import { validateProps, type PropValidationSchema } from "./propValidation";
-
 import type { SizeVariant, ColorVariant, ValidationResult } from "@/types";
+import { logger } from "@/utils/logger";
 
 // === Generic Component Interfaces ===
 
@@ -414,8 +414,7 @@ export function withValidation<T extends Record<string, unknown>>(
       const validation = factory.validate(props);
 
       if (!validation.isValid && import.meta.env.DEV) {
-        // eslint-disable-next-line no-console
-        console.warn(
+        logger.warn(
           `Invalid props for ${componentName} variant "${name}":`,
           validation.errors
         );
@@ -441,8 +440,7 @@ export function withPerformanceMonitoring<T extends Record<string, unknown>>(
       const end = performance.now();
 
       if (end - start > 5 && import.meta.env.DEV) {
-        // eslint-disable-next-line no-console
-        console.warn(
+        logger.warn(
           `Slow variant generation for ${componentName}.${name}: ${end - start}ms`
         );
       }
