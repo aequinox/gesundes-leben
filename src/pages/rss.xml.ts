@@ -1,7 +1,8 @@
+import rss from "@astrojs/rss";
+
 import { SITE } from "@/config";
 import { logger } from "@/utils/logger";
 import { processAllPosts } from "@/utils/posts";
-import rss from "@astrojs/rss";
 
 export async function GET() {
   // Temporary fix: Simplify RSS generation to avoid schema issues

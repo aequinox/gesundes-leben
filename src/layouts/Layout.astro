@@ -1,6 +1,6 @@
 ---
 import Breadcrumb from "@/components/Breadcrumb.astro";
-import Head from "@/components/partials/Head.astro";
+import { SEO } from "@/components/seo";
 import SizeIndicator from "@/components/SizeIndicator.astro";
 import { SITE } from "@/config";
 import "@/styles/global.css";
@@ -20,7 +20,7 @@ export interface Props {
 const {
   title = SITE.title,
   author = SITE.author,
-  profile = SITE.profile,
+  profile: _profile = SITE.profile,
   description = SITE.desc,
   ogImage = SITE.ogImage ? `/${SITE.ogImage}` : "/og.png",
   canonicalURL = new URL(Astro.url.pathname, Astro.url),
@@ -32,20 +32,18 @@ const {
 
 <!doctype html>
 <html lang=`${SITE.lang ?? "en"}` class={`${scrollSmooth && "scroll-smooth"}`}>
-  <Head
-    title={title}
-    author={author}
-    profile={profile}
-    description={description}
-    ogImage={ogImage}
-    canonicalURL={canonicalURL}
-    pubDatetime={pubDatetime}
-    modDatetime={modDatetime}
-    scrollSmooth={scrollSmooth}
-    pubDatetime={pubDatetime}
-    modDatetime={modDatetime}
-    scrollSmooth={scrollSmooth}
-  />
+  <head>
+    <SEO
+      title={title}
+      description={description}
+      canonicalURL={canonicalURL.toString()}
+      ogImage={ogImage}
+      pageType={pubDatetime ? "article" : "webpage"}
+      publishedTime={pubDatetime}
+      modifiedTime={modDatetime}
+      author={{ name: author }}
+    />
+  </head>
   <body data-pagefind-body class="px-2 lg:px-12" data-astro-prefetch>
     {Astro.url.pathname !== "/" && <Breadcrumb />}
     <div transition:animate="fade" transition:name="layout">

@@ -15,6 +15,7 @@
  */
 
 import { LOCALE, SITE } from "@/config";
+import { getI18nStrings } from "@/config/i18n";
 import { isNonEmptyString, isValidURL, type SEOMetadata } from "@/types";
 import { logger } from "@/utils/logger";
 
@@ -125,6 +126,12 @@ const resolveImageURL = (imagePath?: string): string => {
 
 const socialImageURL = resolveImageURL(ogImage);
 
+// Get i18n strings for current language
+const i18n = getI18nStrings(LOCALE.lang as "de" | "en");
+
+// All articles are health-related content
+const isArticle = pageType === "article";
+
 // Generate structured data based on page type
 const generateStructuredData = () => {
   const baseData = {
@@ -141,31 +148,65 @@ const generateStructuredData = () => {
 
   switch (pageType) {
     case "article":
+      // All articles are health-related content
       pageStructuredData = {
-        "@type": "Article",
+        "@type": ["Article", "HealthTopicContent"],
         headline: seoTitle,
-        articleSection: section || "Gesundheit",
-        wordCount: Math.max(100, seoDescription.length * 5), // Estimate
+        articleSection: section || i18n.seo.content.healthCategory,
+        wordCount: Math.max(100, seoDescription.length * 5),
+        genre: "Health and Wellness",
+        audience: {
+          "@type": "Audience",
+          audienceType: i18n.seo.medical.targetAudience,
+          geographicArea: {
+            "@type": "Country",
+            name: i18n.regions.germany,
+          },
+        },
         author: {
           "@type": "Person",
           name: author?.name || SITE.author,
           ...(author?.url && { url: author.url }),
+          expertise: i18n.seo.medical.expertiseLevel,
         },
         publisher: {
           "@type": "Organization",
           name: SITE.title,
+          url: SITE.website,
           logo: {
             "@type": "ImageObject",
             url: new URL("/logo.png", Astro.site).href,
+            width: 180,
+            height: 180,
           },
+          sameAs: [
+            "https://www.facebook.com/gesundesleben",
+            "https://www.instagram.com/gesundesleben",
+          ],
         },
         mainEntityOfPage: {
           "@type": "WebPage",
           "@id": resolvedCanonicalURL,
         },
+        isPartOf: {
+          "@type": "WebSite",
+          name: SITE.title,
+          url: SITE.website,
+          publisher: {
+            "@type": "Organization",
+            name: SITE.title,
+          },
+        },
         ...(publishedTime && { datePublished: publishedTime.toISOString() }),
         ...(modifiedTime && { dateModified: modifiedTime.toISOString() }),
         ...(tags.length > 0 && { keywords: tags.join(", ") }),
+        // Health-specific properties
+        medicalAudience: {
+          "@type": "MedicalAudience",
+          audienceType: "Patient",
+        },
+        // Add disclaimer for health content
+        disclaimer: i18n.seo.medical.disclaimerShort,
       };
       break;
 
@@ -177,6 +218,20 @@ const generateStructuredData = () => {
           name: SITE.title,
           description: seoDescription,
           url: SITE.website,
+          foundingLocation: {
+            "@type": "Country",
+            name: i18n.regions.germany,
+          },
+          areaServed: {
+            "@type": "Country",
+            name: i18n.regions.germany,
+          },
+          knowsLanguage: [
+            {
+              "@type": "Language",
+              name: "Deutsch",
+            },
+          ],
         },
       };
       break;
@@ -184,12 +239,22 @@ const generateStructuredData = () => {
     case "contactpage":
       pageStructuredData = {
         "@type": "ContactPage",
+        mainEntity: {
+          "@type": "Organization",
+          name: SITE.title,
+          url: SITE.website,
+        },
       };
       break;
 
     default:
       pageStructuredData = {
         "@type": "WebPage",
+        isPartOf: {
+          "@type": "WebSite",
+          name: SITE.title,
+          url: SITE.website,
+        },
         ...(section && { about: section }),
       };
   }
@@ -227,7 +292,7 @@ const generateBreadcrumbs = () => {
     {
       "@type": "ListItem",
       position: 1,
-      name: "Home",
+      name: i18n.seo.navigation.home,
       item: SITE.website,
     },
   ];
@@ -236,7 +301,8 @@ const generateBreadcrumbs = () => {
   pathSegments.forEach((segment, index) => {
     currentPath += `/${segment}`;
     const isLast = index === pathSegments.length - 1;
-    const segmentName = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ");
+    const segmentName =
+      segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ");
 
     if (isLast) {
       // Last item (current page) doesn't have an 'item' property according to Schema.org
@@ -351,16 +417,36 @@ const robotsContent = import.meta.env.PROD
 <meta name="twitter:image" content={socialImageURL} />
 <meta name="twitter:image:alt" content={`${seoTitle} - ${SITE.title}`} />
 
-<!-- Additional Meta Tags for Health Content -->
+<!-- Health Content Meta Tags (all articles are health-related) -->
 {
-  pageType === "article" && section === "Gesundheit" && (
+  isArticle && (
     <>
       <meta name="article:topic" content="Health and Wellness" />
-      <meta name="content-type" content="Health Information" />
-      <meta name="target-audience" content="General Public" />
+      <meta name="content-type" content={i18n.seo.medical.contentType} />
+      <meta name="target-audience" content={i18n.seo.medical.targetAudience} />
+      <meta
+        name="medical-disclaimer"
+        content={i18n.seo.medical.complianceNote}
+      />
+      <meta
+        name="health:category"
+        content={section || i18n.seo.content.healthCategory}
+      />
+      <meta name="dc.subject" content="Gesundheit, Ernährung, Wellness" />
+      <meta name="dc.type" content="Text.Article.HealthInformation" />
     </>
   )
 }
+
+<!-- Content Quality Indicators -->
+<meta name="content:quality" content={i18n.seo.meta.contentQuality} />
+<meta
+  name="content:freshness"
+  content={modifiedTime
+    ? i18n.seo.meta.freshness.updated
+    : i18n.seo.meta.freshness.original}
+/>
+<meta name="content:expertise" content="health-wellness" />
 
 <!-- Structured Data (JSON-LD) -->
 <script
@@ -382,6 +468,18 @@ const robotsContent = import.meta.env.PROD
 
 <!-- Performance and Security -->
 <meta name="referrer" content="strict-origin-when-cross-origin" />
+<meta
+  name="robots"
+  content={`${robotsContent}, max-snippet:-1, max-image-preview:large, max-video-preview:-1`}
+/>
+
+<!-- Rich Snippets Enhancement -->
+<meta name="news_keywords" content={seoKeywords.slice(0, 5).join(", ")} />
+<meta name="article:opinion" content="false" />
+
+<!-- Social Media Optimization -->
+<meta property="og:rich_attachment" content="true" />
+<meta name="twitter:widgets:csp" content="on" />
 
 <!-- Accessibility -->
 <meta name="color-scheme" content="light dark" />
@@ -418,6 +516,18 @@ const robotsContent = import.meta.env.PROD
 <!-- DNS Prefetch for External Resources -->
 <link rel="dns-prefetch" href="//www.google-analytics.com" />
 <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+<link rel="dns-prefetch" href="//www.googletagmanager.com" />
+<link rel="dns-prefetch" href="//connect.facebook.net" />
+
+<!-- Resource Hints for Performance -->
+<link
+  rel="preload"
+  href="/fonts/Poppins-400.woff2"
+  as="font"
+  type="font/woff2"
+  crossorigin
+/>
+<link rel="modulepreload" href="/src/scripts/search.js" />
 
 <style>
   /* Ensure proper font loading and prevent layout shift */

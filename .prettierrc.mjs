@@ -12,7 +12,6 @@ export default {
   plugins: [
     "prettier-plugin-astro",
     "prettier-plugin-tailwindcss",
-    "@trivago/prettier-plugin-sort-imports",
     "prettier-plugin-astro-organize-imports", // MUST come last
   ],
   astroOrganizeImportsMode: "All",

@@ -25,7 +25,14 @@
 import { logger } from "./logger";
 
 import type { ButtonVariant } from "@/components/types/button";
-import { isDefined, isNonEmptyString, isValidURL, type ValidationResult, type SizeVariant, type ColorVariant } from "@/types";
+import {
+  isDefined,
+  isNonEmptyString,
+  isValidURL,
+  type ValidationResult,
+  type SizeVariant,
+  type ColorVariant,
+} from "@/types";
 
 // === Core Validation Types ===
 
