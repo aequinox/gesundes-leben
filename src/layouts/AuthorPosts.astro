@@ -65,7 +65,7 @@ const authorBio = authorEntry?.data?.bio || "";
     {currentPage}
     {totalPages}
     prevUrl={`/author/${author}${
-      currentPage - 1 !== 1 ? "/" + (currentPage - 1) : ""
+      currentPage - 1 !== 1 ? `/${currentPage - 1}` : ""
     }/`}
     nextUrl={`/author/${author}/${currentPage + 1}/`}
   />

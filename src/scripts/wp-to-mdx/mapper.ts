@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
-
 import {
   CONVERSION_DEFAULTS,
   DEFAULT_CATEGORY_MAPPING,
@@ -15,8 +13,8 @@ import type {
   AuthorMapping,
   ConversionConfig,
 } from "./types";
-
 import { CATEGORIES, GROUPS } from "@/utils/types";
+import { v4 as uuidv4 } from "uuid";
 
 export class SchemaMapper {
   private config: ConversionConfig;
@@ -182,9 +180,15 @@ export class SchemaMapper {
     // Check custom WordPress taxonomy "beitragsart"
     const categories = wpPost.categories.map(cat => cat.toLowerCase());
 
-    if (categories.includes("pro")) {return "pro";}
-    if (categories.includes("kontra")) {return "kontra";}
-    if (categories.includes("fragezeichen")) {return "fragezeichen";}
+    if (categories.includes("pro")) {
+      return "pro";
+    }
+    if (categories.includes("kontra")) {
+      return "kontra";
+    }
+    if (categories.includes("fragezeichen")) {
+      return "fragezeichen";
+    }
 
     // Analyze content sentiment or topic
     const title = wpPost.title.toLowerCase();
@@ -310,7 +314,9 @@ export class SchemaMapper {
     if (focusKeywords) {
       focusKeywords.split(",").forEach((keyword: string) => {
         const clean = keyword.trim();
-        if (clean) {keywords.add(clean);}
+        if (clean) {
+          keywords.add(clean);
+        }
       });
     }
 
@@ -343,7 +349,9 @@ export class SchemaMapper {
       wpPost.customFields["_featured_post"] === "1" ||
       wpPost.customFields["is_featured"] === "true";
 
-    if (isFeatured) {return true;}
+    if (isFeatured) {
+      return true;
+    }
 
     // Feature recent high-quality posts (heuristic)
     const isRecent =
@@ -392,13 +400,24 @@ export class SchemaMapper {
     const errors: string[] = [];
 
     // Required fields validation
-    if (!post.title.trim()) {errors.push("Title is required");}
-    if (!post.description.trim()) {errors.push("Description is required");}
-    if (!post.author.trim()) {errors.push("Author is required");}
-    if (!post.pubDatetime) {errors.push("Publication date is required");}
-    if (!post.categories.length)
-      {errors.push("At least one category is required");}
-    if (!post.heroImage?.src) {errors.push("Hero image is required");}
+    if (!post.title.trim()) {
+      errors.push("Title is required");
+    }
+    if (!post.description.trim()) {
+      errors.push("Description is required");
+    }
+    if (!post.author.trim()) {
+      errors.push("Author is required");
+    }
+    if (!post.pubDatetime) {
+      errors.push("Publication date is required");
+    }
+    if (!post.categories.length) {
+      errors.push("At least one category is required");
+    }
+    if (!post.heroImage?.src) {
+      errors.push("Hero image is required");
+    }
 
     // Categories validation
     const validCategories = post.categories.filter(cat =>

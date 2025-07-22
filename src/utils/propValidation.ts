@@ -25,8 +25,7 @@
 import { logger } from "./logger";
 
 import type { ButtonVariant } from "@/components/types/button";
-import type { ValidationResult, SizeVariant, ColorVariant } from "@/types";
-import { isDefined, isNonEmptyString, isValidURL } from "@/types";
+import { isDefined, isNonEmptyString, isValidURL, type ValidationResult, type SizeVariant, type ColorVariant } from "@/types";
 
 // === Core Validation Types ===
 
@@ -195,7 +194,7 @@ export function validateProps<T extends Record<string, any>>(
       JSON.stringify({
         errors: allErrors,
         warnings: allWarnings,
-        props: props,
+        props,
       })
     );
   }
@@ -459,7 +458,7 @@ export function measureValidation<T extends Record<string, any>>(
       "Slow prop validation for",
       componentName,
       ":",
-      duration.toFixed(2) + "ms"
+      `${duration.toFixed(2)}ms`
     );
   }
 

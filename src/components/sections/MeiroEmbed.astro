@@ -97,12 +97,13 @@ const resizerScriptUrl =
           if (typeof iFrameResizeFunc === "function") {
             iFrameResizeFunc(
               {
-                checkOrigin: checkOrigin,
+                checkOrigin,
                 heightCalculationMethod: heightMethod,
               },
               `#${iframeId}`
             );
           } else {
+            // eslint-disable-next-line no-console
             console.warn("iFrameResize function not available");
           }
         };

@@ -277,7 +277,7 @@ export const createHealthBlogMocks = () => {
   // Mock pagefind search integration
   const mockPagefind = {
     init: vi.fn(),
-    search: vi.fn().mockImplementation((query: string) => {
+    search: vi.fn().mockImplementation((_query: string) => {
       return Promise.resolve({
         results: [
           {

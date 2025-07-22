@@ -10,16 +10,15 @@
  *
  * const tracker = new ErrorTracker();
  * tracker.reportError('ComponentName', new Error('Something went wrong'));
- * 
+ *
  * // Create error boundary wrapper
  * const SafeComponent = createErrorBoundary(RiskyComponent, {
  *   fallback: 'Component failed to load'
  * });
  * ```
  */
-
-import { logger } from '@/utils/logger';
-import type { ErrorBoundaryContext } from '@/types';
+import type { ErrorBoundaryContext } from "@/types";
+import { logger } from "@/utils/logger";
 
 export interface ErrorInfo {
   componentName: string;
@@ -48,7 +47,10 @@ export interface ErrorBoundaryConfig {
 
 export interface ErrorRecoveryStrategy {
   canRecover: (error: Error) => boolean;
-  recover: (error: Error, context: ErrorBoundaryContext) => Promise<void> | void;
+  recover: (
+    error: Error,
+    context: ErrorBoundaryContext
+  ) => Promise<void> | void;
   description: string;
 }
 
@@ -71,34 +73,44 @@ export class ErrorTracker {
    * Setup global error handlers for comprehensive error tracking
    */
   private setupGlobalErrorHandlers(): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") {
+      return;
+    }
 
     // Global JavaScript errors
-    window.addEventListener('error', (event) => {
-      this.reportError('Global', event.error || new Error(event.message), {
+    window.addEventListener("error", event => {
+      this.reportError("Global", event.error || new Error(event.message), {
         filename: event.filename,
         lineno: event.lineno,
-        colno: event.colno
+        colno: event.colno,
       });
     });
 
     // Unhandled promise rejections
-    window.addEventListener('unhandledrejection', (event) => {
-      this.reportError('Promise', new Error(String(event.reason)), {
-        promise: 'unhandled-rejection'
+    window.addEventListener("unhandledrejection", event => {
+      this.reportError("Promise", new Error(String(event.reason)), {
+        promise: "unhandled-rejection",
       });
     });
 
     // Resource loading errors
-    window.addEventListener('error', (event) => {
-      if (event.target && event.target !== window) {
-        const target = event.target as HTMLElement;
-        this.reportError('Resource', new Error(`Failed to load ${target.tagName}`), {
-          resource: target.outerHTML,
-          type: 'resource-load-error'
-        });
-      }
-    }, true);
+    window.addEventListener(
+      "error",
+      event => {
+        if (event.target && event.target !== window) {
+          const target = event.target as HTMLElement;
+          this.reportError(
+            "Resource",
+            new Error(`Failed to load ${target.tagName}`),
+            {
+              resource: target.outerHTML,
+              type: "resource-load-error",
+            }
+          );
+        }
+      },
+      true
+    );
   }
 
   /**
@@ -107,39 +119,39 @@ export class ErrorTracker {
   private registerDefaultRecoveryStrategies(): void {
     // Network error recovery
     this.addRecoveryStrategy({
-      canRecover: (error) => 
-        error.message.includes('fetch') || 
-        error.message.includes('network') || 
-        error.message.includes('NetworkError'),
+      canRecover: error =>
+        error.message.includes("fetch") ||
+        error.message.includes("network") ||
+        error.message.includes("NetworkError"),
       recover: async () => {
-        logger.info('Attempting network error recovery with retry...');
+        logger.info("Attempting network error recovery with retry...");
         await new Promise(resolve => setTimeout(resolve, 1000));
       },
-      description: 'Network connectivity retry'
+      description: "Network connectivity retry",
     });
 
     // Chunk loading error recovery (common in SPAs)
     this.addRecoveryStrategy({
-      canRecover: (error) => 
-        error.message.includes('Loading chunk') || 
-        error.message.includes('ChunkLoadError'),
+      canRecover: error =>
+        error.message.includes("Loading chunk") ||
+        error.message.includes("ChunkLoadError"),
       recover: () => {
-        logger.info('Chunk load error detected, reloading page...');
+        logger.info("Chunk load error detected, reloading page...");
         window.location.reload();
       },
-      description: 'Chunk loading error page reload'
+      description: "Chunk loading error page reload",
     });
 
     // Memory pressure recovery
     this.addRecoveryStrategy({
-      canRecover: (error) => 
-        error.message.includes('out of memory') || 
-        error.name === 'QuotaExceededError',
+      canRecover: error =>
+        error.message.includes("out of memory") ||
+        error.name === "QuotaExceededError",
       recover: () => {
-        logger.warn('Memory pressure detected, clearing caches...');
+        logger.warn("Memory pressure detected, clearing caches...");
         this.clearCaches();
       },
-      description: 'Memory pressure cache clearing'
+      description: "Memory pressure cache clearing",
     });
   }
 
@@ -149,25 +161,26 @@ export class ErrorTracker {
   private clearCaches(): void {
     try {
       // Clear localStorage if getting full
-      if (typeof localStorage !== 'undefined') {
+      if (typeof localStorage !== "undefined") {
         const usage = JSON.stringify(localStorage).length;
-        if (usage > 5000000) { // ~5MB
+        if (usage > 5000000) {
+          // ~5MB
           localStorage.clear();
-          logger.info('LocalStorage cleared due to memory pressure');
+          logger.info("LocalStorage cleared due to memory pressure");
         }
       }
 
       // Clear sessionStorage
-      if (typeof sessionStorage !== 'undefined') {
+      if (typeof sessionStorage !== "undefined") {
         sessionStorage.clear();
       }
 
       // Request garbage collection if available
-      if ('gc' in window && typeof window.gc === 'function') {
+      if ("gc" in window && typeof window.gc === "function") {
         window.gc();
       }
     } catch (error) {
-      logger.warn('Failed to clear caches:', error);
+      logger.warn("Failed to clear caches:", error);
     }
   }
 
@@ -175,8 +188,8 @@ export class ErrorTracker {
    * Report an error with comprehensive context
    */
   public reportError(
-    componentName: string, 
-    error: Error, 
+    componentName: string,
+    error: Error,
     additionalContext?: Record<string, unknown>
   ): void {
     this.errorCount++;
@@ -185,10 +198,11 @@ export class ErrorTracker {
       componentName,
       error,
       timestamp: new Date(),
-      url: typeof window !== 'undefined' ? window.location.href : 'unknown',
-      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
+      url: typeof window !== "undefined" ? window.location.href : "unknown",
+      userAgent:
+        typeof navigator !== "undefined" ? navigator.userAgent : "unknown",
       sessionId: this.getSessionId(),
-      additionalContext
+      additionalContext,
     };
 
     // Add to history
@@ -199,20 +213,20 @@ export class ErrorTracker {
 
     // Log the error
     logger.error(
-      `[${componentName}] Error #${this.errorCount}:`, 
-      error.message, 
+      `[${componentName}] Error #${this.errorCount}:`,
+      error.message,
       {
         stack: error.stack,
-        context: additionalContext
+        context: additionalContext,
       }
     );
 
     // Attempt recovery
     this.attemptRecovery(error, {
       error,
-      errorInfo: { componentStack: error.stack || 'unknown' },
+      errorInfo: { componentStack: error.stack || "unknown" },
       retry: () => this.retryOperation(componentName, error),
-      reset: () => this.resetComponent(componentName)
+      reset: () => this.resetComponent(componentName),
     });
 
     // Report to external services in production
@@ -225,12 +239,14 @@ export class ErrorTracker {
    * Get or create a session ID for error tracking
    */
   private getSessionId(): string {
-    if (typeof sessionStorage === 'undefined') return 'unknown';
+    if (typeof sessionStorage === "undefined") {
+      return "unknown";
+    }
 
-    let sessionId = sessionStorage.getItem('error-tracker-session');
+    let sessionId = sessionStorage.getItem("error-tracker-session");
     if (!sessionId) {
       sessionId = `session-${Date.now()}-${Math.random().toString(36).substring(2)}`;
-      sessionStorage.setItem('error-tracker-session', sessionId);
+      sessionStorage.setItem("error-tracker-session", sessionId);
     }
     return sessionId;
   }
@@ -238,7 +254,10 @@ export class ErrorTracker {
   /**
    * Attempt to recover from an error using registered strategies
    */
-  private async attemptRecovery(error: Error, _context: ErrorBoundaryContext): Promise<void> {
+  private async attemptRecovery(
+    error: Error,
+    _context: ErrorBoundaryContext
+  ): Promise<void> {
     for (const strategy of this.recoveryStrategies) {
       if (strategy.canRecover(error)) {
         try {
@@ -246,7 +265,10 @@ export class ErrorTracker {
           await strategy.recover(error, _context);
           return;
         } catch (recoveryError) {
-          logger.warn(`Recovery strategy failed: ${strategy.description}`, recoveryError);
+          logger.warn(
+            `Recovery strategy failed: ${strategy.description}`,
+            recoveryError
+          );
         }
       }
     }
@@ -274,12 +296,14 @@ export class ErrorTracker {
    */
   private resetComponent(componentName: string): void {
     logger.info(`Resetting component: ${componentName}`);
-    
+
     // Dispatch custom event for component reset
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('component-reset', {
-        detail: { componentName }
-      }));
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("component-reset", {
+          detail: { componentName },
+        })
+      );
     }
   }
 
@@ -291,11 +315,11 @@ export class ErrorTracker {
     // - Sentry: Sentry.captureException(errorInfo.error, { extra: errorInfo });
     // - LogRocket: LogRocket.captureException(errorInfo.error);
     // - Bugsnag: Bugsnag.notify(errorInfo.error, errorInfo);
-    
-    logger.debug('Would send to error tracking service:', {
+
+    logger.debug("Would send to error tracking service:", {
       component: errorInfo.componentName,
       message: errorInfo.error.message,
-      timestamp: errorInfo.timestamp.toISOString()
+      timestamp: errorInfo.timestamp.toISOString(),
     });
   }
 
@@ -309,23 +333,29 @@ export class ErrorTracker {
     commonErrorTypes: Record<string, number>;
   } {
     const recentErrors = this.errorHistory.slice(-10);
-    
-    const errorsByComponent = this.errorHistory.reduce((acc, error) => {
-      acc[error.componentName] = (acc[error.componentName] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
 
-    const commonErrorTypes = this.errorHistory.reduce((acc, error) => {
-      const errorType = error.error.name || 'UnknownError';
-      acc[errorType] = (acc[errorType] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const errorsByComponent = this.errorHistory.reduce(
+      (acc, error) => {
+        acc[error.componentName] = (acc[error.componentName] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+
+    const commonErrorTypes = this.errorHistory.reduce(
+      (acc, error) => {
+        const errorType = error.error.name || "UnknownError";
+        acc[errorType] = (acc[errorType] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     return {
       totalErrors: this.errorCount,
       recentErrors,
       errorsByComponent,
-      commonErrorTypes
+      commonErrorTypes,
     };
   }
 
@@ -351,31 +381,31 @@ export function createErrorBoundary<T extends Record<string, unknown>>(
     try {
       return Component(props);
     } catch (error) {
-      const errorInstance = error instanceof Error ? error : new Error(String(error));
-      
-      tracker.reportError(
-        Component.name || 'Anonymous',
-        errorInstance,
-        { props: props as Record<string, unknown> }
-      );
+      const errorInstance =
+        error instanceof Error ? error : new Error(String(error));
+
+      tracker.reportError(Component.name || "Anonymous", errorInstance, {
+        props: props as Record<string, unknown>,
+      });
 
       if (config.onError) {
         const errorInfo: ErrorInfo = {
-          componentName: Component.name || 'Anonymous',
+          componentName: Component.name || "Anonymous",
           error: errorInstance,
           timestamp: new Date(),
-          url: typeof window !== 'undefined' ? window.location.href : 'unknown',
-          userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
-          additionalContext: { props: props as Record<string, unknown> }
+          url: typeof window !== "undefined" ? window.location.href : "unknown",
+          userAgent:
+            typeof navigator !== "undefined" ? navigator.userAgent : "unknown",
+          additionalContext: { props: props as Record<string, unknown> },
         };
         config.onError(errorInfo);
       }
 
       // Return fallback
-      if (typeof config.fallback === 'function') {
+      if (typeof config.fallback === "function") {
         return config.fallback();
       }
-      return config.fallback || 'Component failed to render';
+      return config.fallback || "Component failed to render";
     }
   };
 }
@@ -397,7 +427,7 @@ export function validateProps<T extends Record<string, unknown>>(
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 }
 
@@ -409,11 +439,14 @@ export const errorTracker = new ErrorTracker();
 /**
  * Global error reporting function
  */
-export function reportComponentError(componentName: string, error: Error): void {
+export function reportComponentError(
+  componentName: string,
+  error: Error
+): void {
   errorTracker.reportError(componentName, error);
 }
 
 // Make error reporting available globally
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.reportComponentError = reportComponentError;
 }

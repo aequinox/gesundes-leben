@@ -4,7 +4,7 @@ import { extractUniqueTags } from "../tags";
 import type { Post } from "../types";
 
 // Mock the slugify function
-const slugify = vi.fn((str: string) => str.toLowerCase().replace(/\s+/g, "-"));
+const _slugify = vi.fn((str: string) => str.toLowerCase().replace(/\s+/g, "-"));
 
 describe("extractUniqueTags", () => {
   test("extracts unique tags from posts", () => {

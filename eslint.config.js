@@ -40,7 +40,7 @@ export default [
       "@typescript-eslint/no-var-requires": "error",
       "@typescript-eslint/consistent-type-imports": [
         "error",
-        { prefer: "type-imports" }
+        { prefer: "type-imports" },
       ],
 
       // Import rules
@@ -77,7 +77,7 @@ export default [
     },
   },
   {
-    files: ["**/*.test.ts", "**/*.spec.ts"],
+    files: ["**/*.test.ts", "**/*.spec.ts", "tests/**/*"],
     languageOptions: {
       globals: {
         ...globals.browser,

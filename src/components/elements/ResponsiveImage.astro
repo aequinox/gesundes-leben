@@ -179,7 +179,7 @@ const getSrcUrl = (source: string | ImageMetadata): string => {
 
   {/* Responsive Picture element */}
   <Picture
-    src={src as any}
+    src={src as ImageMetadata}
     alt={alt}
     width={width}
     height={height}
@@ -256,6 +256,7 @@ const getSrcUrl = (source: string | ImageMetadata): string => {
 
       // Handle image load error
       const handleError = () => {
+        // eslint-disable-next-line no-console
         console.warn(`Failed to load image: ${img.src}`);
         img.alt = `${img.alt} (Failed to load)`;
 

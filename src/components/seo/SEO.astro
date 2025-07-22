@@ -1,0 +1,427 @@
+---
+/**
+ * @file SEO.astro
+ * @description Professional SEO component with comprehensive meta tag management
+ *
+ * Features:
+ * - Complete meta tag coverage (title, description, keywords)
+ * - Open Graph and Twitter Card optimization
+ * - Structured data (JSON-LD) for health/wellness content
+ * - German language and localization support
+ * - Canonical URL management
+ * - Performance-optimized server-side rendering
+ * - Accessibility compliance
+ * - Error handling and validation
+ */
+
+import { LOCALE, SITE } from "@/config";
+import { isNonEmptyString, isValidURL, type SEOMetadata } from "@/types";
+import { logger } from "@/utils/logger";
+
+export interface Props extends SEOMetadata {
+  /** Page type for structured data (article, webpage, etc.) */
+  pageType?: "article" | "webpage" | "aboutpage" | "contactpage";
+  /** Publication date for articles */
+  publishedTime?: Date;
+  /** Last modified date */
+  modifiedTime?: Date;
+  /** Article author information */
+  author?: {
+    name: string;
+    url?: string;
+  };
+  /** Article section/category */
+  section?: string;
+  /** Article tags */
+  tags?: string[];
+  /** Custom structured data to merge */
+  customStructuredData?: Record<string, unknown>;
+}
+
+const {
+  title,
+  description,
+  keywords = [],
+  canonicalURL,
+  ogImage,
+  twitterCard = "summary_large_image",
+  structuredData,
+  pageType = "webpage",
+  publishedTime,
+  modifiedTime,
+  author,
+  section,
+  tags = [],
+  customStructuredData = {},
+} = Astro.props;
+
+// Validate and sanitize inputs
+const sanitizeText = (text: string): string => {
+  return text
+    .replace(/<[^>]*>/g, "") // Strip HTML tags
+    .replace(/[<>'"&]/g, match => {
+      const entities: Record<string, string> = {
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#x27;",
+        "&": "&amp;",
+      };
+      return entities[match] || match;
+    })
+    .trim();
+};
+
+// Process and validate props
+const seoTitle = sanitizeText(title || SITE.title);
+const seoDescription = sanitizeText(description || SITE.desc);
+const seoKeywords = Array.isArray(keywords)
+  ? keywords.filter(k => isNonEmptyString(k))
+  : [];
+
+// Validate SEO best practices
+if (seoTitle.length > 60) {
+  logger.warn(
+    `SEO: Title exceeds 60 characters (${seoTitle.length}): "${seoTitle}"`
+  );
+}
+
+if (seoDescription.length > 160) {
+  logger.warn(
+    `SEO: Description exceeds 160 characters (${seoDescription.length})`
+  );
+}
+
+if (seoDescription.length < 120) {
+  logger.info(
+    "SEO: Description could be longer for better SEO (recommended: 120-160 chars)"
+  );
+}
+
+// Generate URLs
+const currentURL = new URL(Astro.url.pathname, Astro.site);
+const resolvedCanonicalURL =
+  canonicalURL && isValidURL(canonicalURL) ? canonicalURL : currentURL.href;
+
+// Handle Open Graph image
+const resolveImageURL = (imagePath?: string): string => {
+  if (!imagePath) {
+    return new URL(SITE.ogImage || "/og-default.jpg", Astro.site).href;
+  }
+
+  try {
+    // If already absolute URL, return as is
+    if (isValidURL(imagePath)) {
+      return imagePath;
+    }
+
+    // Resolve relative URLs
+    return new URL(imagePath, Astro.site).href;
+  } catch {
+    logger.warn(`SEO: Invalid image URL: ${imagePath}, using default`);
+    return new URL(SITE.ogImage || "/og-default.jpg", Astro.site).href;
+  }
+};
+
+const socialImageURL = resolveImageURL(ogImage);
+
+// Generate structured data based on page type
+const generateStructuredData = () => {
+  const baseData = {
+    "@context": "https://schema.org",
+    "@language": LOCALE.lang,
+    name: seoTitle,
+    description: seoDescription,
+    url: resolvedCanonicalURL,
+    image: socialImageURL,
+    inLanguage: LOCALE.langTag[0],
+  };
+
+  let pageStructuredData: Record<string, unknown> = {};
+
+  switch (pageType) {
+    case "article":
+      pageStructuredData = {
+        "@type": "Article",
+        headline: seoTitle,
+        articleSection: section || "Gesundheit",
+        wordCount: Math.max(100, seoDescription.length * 5), // Estimate
+        author: {
+          "@type": "Person",
+          name: author?.name || SITE.author,
+          ...(author?.url && { url: author.url }),
+        },
+        publisher: {
+          "@type": "Organization",
+          name: SITE.title,
+          logo: {
+            "@type": "ImageObject",
+            url: new URL("/logo.png", Astro.site).href,
+          },
+        },
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": resolvedCanonicalURL,
+        },
+        ...(publishedTime && { datePublished: publishedTime.toISOString() }),
+        ...(modifiedTime && { dateModified: modifiedTime.toISOString() }),
+        ...(tags.length > 0 && { keywords: tags.join(", ") }),
+      };
+      break;
+
+    case "aboutpage":
+      pageStructuredData = {
+        "@type": "AboutPage",
+        mainEntity: {
+          "@type": "Organization",
+          name: SITE.title,
+          description: seoDescription,
+          url: SITE.website,
+        },
+      };
+      break;
+
+    case "contactpage":
+      pageStructuredData = {
+        "@type": "ContactPage",
+      };
+      break;
+
+    default:
+      pageStructuredData = {
+        "@type": "WebPage",
+        ...(section && { about: section }),
+      };
+  }
+
+  // Merge with custom structured data and provided structured data
+  const finalStructuredData = {
+    ...baseData,
+    ...pageStructuredData,
+    ...structuredData,
+    ...customStructuredData,
+  };
+
+  return finalStructuredData;
+};
+
+const jsonLD = generateStructuredData();
+
+// Define breadcrumb item interface
+interface BreadcrumbItem {
+  "@type": "ListItem";
+  position: number;
+  name: string;
+  item?: string;
+}
+
+// Generate breadcrumb structured data for nested pages
+const generateBreadcrumbs = () => {
+  const pathSegments = Astro.url.pathname.split("/").filter(Boolean);
+
+  if (pathSegments.length <= 1) {
+    return null;
+  }
+
+  const breadcrumbItems: BreadcrumbItem[] = [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: SITE.website,
+    },
+  ];
+
+  let currentPath = "";
+  pathSegments.forEach((segment, index) => {
+    currentPath += `/${segment}`;
+    const isLast = index === pathSegments.length - 1;
+    const segmentName = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ");
+
+    if (isLast) {
+      // Last item (current page) doesn't have an 'item' property according to Schema.org
+      breadcrumbItems.push({
+        "@type": "ListItem",
+        position: index + 2,
+        name: segmentName,
+      });
+    } else {
+      // Intermediate items have an 'item' property with the URL
+      breadcrumbItems.push({
+        "@type": "ListItem",
+        position: index + 2,
+        name: segmentName,
+        item: new URL(currentPath, Astro.site).href,
+      });
+    }
+  });
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: breadcrumbItems,
+  };
+};
+
+const breadcrumbData = generateBreadcrumbs();
+
+// Validate Twitter card type
+const validTwitterCardTypes = [
+  "summary",
+  "summary_large_image",
+  "app",
+  "player",
+];
+const finalTwitterCard = validTwitterCardTypes.includes(twitterCard)
+  ? twitterCard
+  : "summary_large_image";
+
+// Generate robots meta content
+const robotsContent = import.meta.env.PROD
+  ? "index, follow"
+  : "noindex, nofollow";
+---
+
+<!-- Essential Meta Tags -->
+<title>{seoTitle}</title>
+<meta name="description" content={seoDescription} />
+<meta name="robots" content={robotsContent} />
+<link rel="canonical" href={resolvedCanonicalURL} />
+
+<!-- Language and Locale -->
+<meta name="language" content={LOCALE.lang} />
+<meta property="og:locale" content={LOCALE.langTag[0]} />
+
+<!-- Keywords (if provided) -->
+{
+  seoKeywords.length > 0 && (
+    <meta name="keywords" content={seoKeywords.join(", ")} />
+  )
+}
+
+<!-- Author and Publisher -->
+<meta name="author" content={author?.name || SITE.author} />
+<meta name="publisher" content={SITE.title} />
+
+<!-- Open Graph Meta Tags -->
+<meta
+  property="og:type"
+  content={pageType === "article" ? "article" : "website"}
+/>
+<meta property="og:site_name" content={SITE.title} />
+<meta property="og:title" content={seoTitle} />
+<meta property="og:description" content={seoDescription} />
+<meta property="og:url" content={resolvedCanonicalURL} />
+<meta property="og:image" content={socialImageURL} />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={`${seoTitle} - ${SITE.title}`} />
+
+<!-- Article-specific Open Graph tags -->
+{
+  pageType === "article" && (
+    <>
+      {publishedTime && (
+        <meta
+          property="article:published_time"
+          content={publishedTime.toISOString()}
+        />
+      )}
+      {modifiedTime && (
+        <meta
+          property="article:modified_time"
+          content={modifiedTime.toISOString()}
+        />
+      )}
+      {author && <meta property="article:author" content={author.name} />}
+      {section && <meta property="article:section" content={section} />}
+      {tags.map(tag => (
+        <meta property="article:tag" content={tag} />
+      ))}
+    </>
+  )
+}
+
+<!-- Twitter Card Meta Tags -->
+<meta name="twitter:card" content={finalTwitterCard} />
+<meta name="twitter:site" content={SITE.title} />
+<meta name="twitter:title" content={seoTitle} />
+<meta name="twitter:description" content={seoDescription} />
+<meta name="twitter:image" content={socialImageURL} />
+<meta name="twitter:image:alt" content={`${seoTitle} - ${SITE.title}`} />
+
+<!-- Additional Meta Tags for Health Content -->
+{
+  pageType === "article" && section === "Gesundheit" && (
+    <>
+      <meta name="article:topic" content="Health and Wellness" />
+      <meta name="content-type" content="Health Information" />
+      <meta name="target-audience" content="General Public" />
+    </>
+  )
+}
+
+<!-- Structured Data (JSON-LD) -->
+<script
+  type="application/ld+json"
+  is:inline
+  set:html={JSON.stringify(jsonLD)}
+/>
+
+<!-- Breadcrumb Structured Data -->
+{
+  breadcrumbData && (
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify(breadcrumbData)}
+    />
+  )
+}
+
+<!-- Performance and Security -->
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+
+<!-- Accessibility -->
+<meta name="color-scheme" content="light dark" />
+<meta
+  name="theme-color"
+  content="#3b82f6"
+  media="(prefers-color-scheme: light)"
+/>
+<meta
+  name="theme-color"
+  content="#1e40af"
+  media="(prefers-color-scheme: dark)"
+/>
+
+<!-- Mobile Optimization -->
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="format-detection" content="telephone=no" />
+
+<!-- Additional SEO Enhancement -->
+<meta name="rating" content="General" />
+<meta name="distribution" content="Global" />
+<meta name="revisit-after" content="7 days" />
+
+<!-- Preconnect for Performance -->
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+<!-- DNS Prefetch for External Resources -->
+<link rel="dns-prefetch" href="//www.google-analytics.com" />
+<link rel="dns-prefetch" href="//fonts.googleapis.com" />
+
+<style>
+  /* Ensure proper font loading and prevent layout shift */
+  html {
+    font-display: swap;
+  }
+</style>

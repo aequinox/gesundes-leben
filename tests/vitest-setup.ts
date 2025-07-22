@@ -203,7 +203,9 @@ export const createMockGermanContent = () => ({
 process.env.NODE_ENV = 'test';
 
 // Configure console for test environment
+ 
 const originalConsoleError = console.error;
+ 
 console.error = (...args) => {
   // Suppress specific warnings that are expected in tests
   const message = args[0];

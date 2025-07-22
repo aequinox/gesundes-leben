@@ -5,7 +5,6 @@ import {
   extractUniqueTags,
   filterPostsByTag,
   getTagCounts,
-  type TagInfo,
 } from "../tags";
 import type { Post } from "../types";
 

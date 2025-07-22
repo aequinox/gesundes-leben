@@ -1,16 +1,14 @@
 /**
  * Image downloading service with retry capabilities and validation
  */
-import { promises as fs } from "fs";
-import { join } from "path";
-
-import axios from "axios";
-
 import { CONVERSION_DEFAULTS } from "./config";
 import { RetryHandler } from "./errors";
 import { logger } from "./logger";
 import { SecuritySanitizer } from "./security";
 import type { ImageDownloader } from "./types";
+import axios from "axios";
+import { promises as fs } from "fs";
+import { join } from "path";
 
 export class HttpImageDownloader implements ImageDownloader {
   private downloadedUrls = new Set<string>();

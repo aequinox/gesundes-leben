@@ -30,9 +30,10 @@ beforeAll(() => {
 
 // Mock file system operations for Astro content collections
 vi.mock('node:fs', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('node:fs')>();
+  const actual = await importOriginal();
+  const typedActual = actual as any;
   return {
-    ...actual,
+    ...typedActual,
     readFileSync: vi.fn().mockImplementation((path: string) => {
       // Mock reading of markdown files for integration tests
       if (path.includes('.mdx') || path.includes('.md')) {

@@ -28,7 +28,7 @@ describe("Slugs Utilities - 100% Coverage", () => {
       expect(typeof result4).toBe("string");
 
       // Test with trim disabled
-      const result5 = slugify("  " + testString + "  ", { trim: false });
+      const result5 = slugify(`  ${testString}  `, { trim: false });
       expect(typeof result5).toBe("string");
     });
 
@@ -148,7 +148,7 @@ describe("Slugs Utilities - 100% Coverage", () => {
 
     it("should test performance with large strings", () => {
       // Test with very long string
-      const longString = "A".repeat(1000) + " " + "B".repeat(1000);
+      const longString = `${"A".repeat(1000)} ${"B".repeat(1000)}`;
 
       const start = performance.now();
       const result = slugify(longString);

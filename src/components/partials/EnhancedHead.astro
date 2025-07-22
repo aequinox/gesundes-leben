@@ -1,0 +1,254 @@
+---
+/**
+ * @file EnhancedHead.astro
+ * @description Enhanced head component with professional SEO integration
+ * 
+ * This component replaces the basic Head.astro with comprehensive SEO capabilities
+ * while maintaining backward compatibility with existing usage patterns.
+ */
+
+import "@/styles/global.css";
+import { Font } from "astro:assets";
+import { ClientRouter } from "astro:transitions";
+
+import SEO, { type Props as SEOProps } from "@/components/seo/SEO.astro";
+import { SITE } from "@/config";
+
+const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
+
+// Legacy interface for backward compatibility
+export interface Props {
+  title?: string;
+  author?: string;
+  profile?: string;
+  description?: string;
+  ogImage?: string;
+  canonicalURL?: string | URL;
+  pubDatetime?: Date;
+  modDatetime?: Date | null;
+  scrollSmooth?: boolean;
+  
+  // New enhanced SEO properties
+  keywords?: string[];
+  pageType?: SEOProps['pageType'];
+  section?: string;
+  tags?: string[];
+  twitterCard?: 'summary' | 'summary_large_image';
+  customStructuredData?: Record<string, unknown>;
+}
+
+const {
+  title = SITE.title,
+  author = SITE.author,
+  profile = SITE.profile,
+  description = SITE.desc,
+  ogImage = SITE.ogImage ? `/${SITE.ogImage}` : "/og.png",
+  canonicalURL = new URL(Astro.url.pathname, Astro.url),
+  pubDatetime,
+  modDatetime,
+  scrollSmooth = false,
+  // Enhanced SEO props
+  keywords = [],
+  pageType,
+  section,
+  tags = [],
+  twitterCard = 'summary_large_image',
+  customStructuredData = {},
+} = Astro.props;
+
+// Determine page type automatically if not provided
+const autoDetectedPageType = (): SEOProps['pageType'] => {
+  if (pageType) {
+    return pageType;
+  }
+  
+  const pathname = Astro.url.pathname;
+  
+  if (pathname.includes('/posts/') || pathname.includes('/artikel/')) {
+    return 'article';
+  }
+  if (pathname.includes('/about') || pathname.includes('/ueber')) {
+    return 'aboutpage';
+  }
+  if (pathname.includes('/contact') || pathname.includes('/kontakt')) {
+    return 'contactpage';
+  }
+  
+  return 'webpage';
+};
+
+const finalPageType = autoDetectedPageType();
+
+// Prepare SEO props
+const seoProps: SEOProps = {
+  title,
+  description,
+  keywords: Array.isArray(keywords) ? keywords : [],
+  canonicalURL: typeof canonicalURL === 'string' ? canonicalURL : canonicalURL.href,
+  ogImage,
+  twitterCard,
+  pageType: finalPageType,
+  publishedTime: pubDatetime || undefined,
+  modifiedTime: modDatetime || undefined,
+  author: author ? { name: author, url: profile } : undefined,
+  section,
+  tags,
+  customStructuredData,
+};
+
+// Enhanced structured data for articles
+if (finalPageType === 'article' && pubDatetime) {
+  const articleStructuredData = {
+    '@type': 'HealthTopicContent' as const,
+    healthCondition: section === 'Ernährung' ? 'Nutrition' : 'GeneralHealth',
+    audience: {
+      '@type': 'MedicalAudience',
+      audienceType: 'Patient',
+    },
+  };
+  
+  seoProps.customStructuredData = {
+    ...customStructuredData,
+    ...articleStructuredData,
+  };
+}
+---
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="generator" content={Astro.generator} />
+
+  <!-- Enhanced SEO Component -->
+  <SEO {...seoProps} />
+
+  <!-- Additional site-specific meta tags -->
+  <link rel="sitemap" href="/sitemap-index.xml" />
+  
+  <!-- Enable RSS feed auto-discovery -->
+  <link
+    rel="alternate"
+    type="application/rss+xml"
+    title={SITE.title}
+    href={new URL("rss.xml", Astro.site)}
+  />
+
+  <!-- Google Site Verification -->
+  {
+    googleSiteVerification && (
+      <meta name="google-site-verification" content={googleSiteVerification} />
+    )
+  }
+
+  <!-- Additional Performance Optimizations -->
+  <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin />
+  
+  <!-- Theme and Appearance -->
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
+
+  <!-- Progressive Web App -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content={SITE.title} />
+
+  <!-- Icons for different platforms -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+  <!-- Security Headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+  
+  <!-- Astro Components -->
+  <ClientRouter />
+  
+  <!-- Font Loading Strategy -->
+  <Font cssVariable="--font-body" />
+  
+  <!-- Theme Toggle Script -->
+  <script is:inline src="/toggle-theme.js"></script>
+  
+  <!-- Smooth Scrolling -->
+  {scrollSmooth && (
+    <style is:inline>
+      html {
+        scroll-behavior: smooth;
+      }
+      
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  )}
+
+  <!-- Critical CSS for above-the-fold content -->
+  <style is:inline>
+    /* Prevent layout shift during font loading */
+    html {
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      html {
+        color-scheme: dark;
+      }
+    }
+    
+    /* Reduce motion for accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+
+<!--
+Usage Examples:
+
+1. Basic page (backward compatible):
+<EnhancedHead 
+  title="Page Title"
+  description="Page description"
+/>
+
+2. Blog article with enhanced SEO:
+<EnhancedHead 
+  title={post.title}
+  description={post.description}
+  author={post.author}
+  pubDatetime={post.pubDatetime}
+  modDatetime={post.modDatetime}
+  keywords={post.tags}
+  tags={post.tags}
+  section={post.category}
+  ogImage={post.heroImage}
+  pageType="article"
+/>
+
+3. About page with custom structured data:
+<EnhancedHead 
+  title="Über uns"
+  description="Learn about our mission"
+  pageType="aboutpage"
+  customStructuredData={{
+    foundingDate: "2023-01-01",
+    founders: [{ name: "Kai Renner" }]
+  }}
+/>
+-->

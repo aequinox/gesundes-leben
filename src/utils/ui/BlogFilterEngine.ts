@@ -168,9 +168,9 @@ const applyFilters = (): void => {
   });
 
   state.visiblePostsCount = visibleCount;
-  state.isFiltering = !!(
+  state.isFiltering = Boolean(
     state.selectedGroup ||
-    (state.selectedCategory && state.selectedCategory !== "Alle")
+      (state.selectedCategory && state.selectedCategory !== "Alle")
   );
 
   updateFilterCount(visibleCount);

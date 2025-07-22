@@ -1,8 +1,4 @@
 #!/usr/bin/env node
-import { resolve } from "path";
-
-import { Command } from "commander";
-
 import { CONVERSION_DEFAULTS } from "./config";
 import { ConversionErrorCollector, ErrorHandler } from "./errors";
 import { HttpImageDownloader, MockImageDownloader } from "./image-downloader";
@@ -13,6 +9,8 @@ import { ContentTranslator } from "./translator";
 import type { ConversionConfig, ConversionResult } from "./types";
 import { ContentValidator } from "./validator";
 import { FileWriter } from "./writer";
+import { Command } from "commander";
+import { resolve } from "path";
 
 class WordPressToAstroConverter {
   private parser = new WordPressParser();

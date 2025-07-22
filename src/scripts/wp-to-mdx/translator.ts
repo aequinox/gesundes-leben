@@ -1,7 +1,3 @@
-import axios from "axios";
-import TurndownService from "turndown";
-import { gfm } from "turndown-plugin-gfm";
-
 import { CONVERSION_DEFAULTS } from "./config";
 import { logger } from "./logger";
 import { ContentProcessorPipeline } from "./processors";
@@ -11,6 +7,9 @@ import type {
   ProcessingContext,
   ImageDimensions,
 } from "./types";
+import axios from "axios";
+import TurndownService from "turndown";
+import { gfm } from "turndown-plugin-gfm";
 
 export class ContentTranslator {
   private turndownService: TurndownService;
@@ -178,9 +177,15 @@ export class ContentTranslator {
         // Create a mock element for processing
         const mockImg = {
           getAttribute: (attr: string) => {
-            if (attr === "src") {return originalSrc;}
-            if (attr === "alt") {return alt;}
-            if (attr === "title") {return caption;}
+            if (attr === "src") {
+              return originalSrc;
+            }
+            if (attr === "alt") {
+              return alt;
+            }
+            if (attr === "title") {
+              return caption;
+            }
             return null;
           },
         } as Element;

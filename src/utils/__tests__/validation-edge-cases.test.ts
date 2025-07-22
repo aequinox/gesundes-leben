@@ -112,16 +112,16 @@ describe("Validation Edge Cases - Coverage Completion", () => {
 
     it("should handle boundary conditions", () => {
       // Test exact length limits
-      const exactLengthEmail = "a".repeat(58) + "@b.co"; // Total 64 chars
+      const exactLengthEmail = `${"a".repeat(58)}@b.co`; // Total 64 chars
       expect(isValidEmail(exactLengthEmail, { maxLength: 64 })).toBe(true);
       expect(isValidEmail(exactLengthEmail, { maxLength: 62 })).toBe(false);
 
       // Test exact local part limit (65 chars to exceed 64 limit)
-      const longLocalPart = "a".repeat(65) + "@example.com";
+      const longLocalPart = `${"a".repeat(65)}@example.com`;
       expect(isValidEmail(longLocalPart)).toBe(false);
 
       // Test exact domain part limit (254 chars to exceed 253 limit)
-      const longDomain = "user@" + "a".repeat(250) + ".com";
+      const longDomain = `user@${"a".repeat(250)}.com`;
       expect(isValidEmail(longDomain)).toBe(false);
     });
   });
@@ -131,7 +131,7 @@ describe("Validation Edge Cases - Coverage Completion", () => {
       const internationalEmail = "用户@例子.测试";
 
       // With international allowed (should use EMAIL_REGEX)
-      const resultInternational = isValidEmail(internationalEmail, {
+      const _resultInternational = isValidEmail(internationalEmail, {
         allowInternational: true,
       });
 
@@ -154,7 +154,7 @@ describe("Validation Edge Cases - Coverage Completion", () => {
         "user@domain", // Missing TLD
       ];
 
-      basicInvalidEmails.forEach((email, index) => {
+      basicInvalidEmails.forEach((email, _index) => {
         const result = isValidEmail(email);
         expect(result).toBe(false);
       });

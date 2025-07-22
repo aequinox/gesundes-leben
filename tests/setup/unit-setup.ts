@@ -55,11 +55,11 @@ global.URL = class MockURL {
   get pathname() { return this.href.split('/').slice(3).join('/').split('?')[0] || '/'; }
   get search() { 
     const parts = this.href.split('?');
-    return parts.length > 1 ? '?' + parts[1].split('#')[0] : '';
+    return parts.length > 1 ? `?${  parts[1].split('#')[0]}` : '';
   }
   get hash() {
     const parts = this.href.split('#');
-    return parts.length > 1 ? '#' + parts[1] : '';
+    return parts.length > 1 ? `#${  parts[1]}` : '';
   }
 } as any;
 

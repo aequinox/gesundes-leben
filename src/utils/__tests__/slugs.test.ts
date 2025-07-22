@@ -2,7 +2,7 @@
  * @file slugs.test.ts
  * @description Comprehensive tests for slug utility functions
  */
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 
 import { slugify, getPostSlug } from "../slugs";
 import type { Post } from "../types";
@@ -241,7 +241,7 @@ describe("Slug Utilities", () => {
       });
 
       it("should handle very long titles", () => {
-        const longTitle = "2024-01-01-" + "Very Long Title Word ".repeat(5);
+        const longTitle = `2024-01-01-${"Very Long Title Word ".repeat(5)}`;
         const post = createMockPost(longTitle);
         const result = getPostSlug(post);
         expect(result).toContain("very-long-title-word");

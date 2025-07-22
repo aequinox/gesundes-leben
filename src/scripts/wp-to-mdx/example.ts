@@ -2,14 +2,13 @@
  * Example usage of the improved WordPress to MDX converter
  */
 import { MockImageDownloader } from "./image-downloader";
+import { WordPressToAstroConverter } from "./index";
 import {
   ContentProcessorPipeline,
   ShortcodeProcessor,
   GermanContentProcessor,
 } from "./processors";
 import type { ConversionConfig } from "./types";
-
-import { WordPressToAstroConverter } from "./index";
 
 // Example 1: Basic usage with defaults
 async function basicExample() {

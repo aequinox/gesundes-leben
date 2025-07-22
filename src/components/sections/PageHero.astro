@@ -39,7 +39,7 @@ const {
 }: Props = Astro.props;
 
 // Determine if we're using an image or gradient background
-const hasImage = !!image;
+const hasImage = Boolean(image);
 const gradientStyle = `bg-gradient-to-tr from-${fromColor} via-${fromColor} via-50% to-${toColor}`;
 const backgroundStyle = hasImage ? "" : gradientStyle;
 ---

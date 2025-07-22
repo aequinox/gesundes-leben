@@ -56,7 +56,7 @@ describe("Complete Validation Coverage", () => {
       },
     ];
 
-    errorCasingObjects.forEach((obj, index) => {
+    errorCasingObjects.forEach((obj, _index) => {
       const result = isValidEmail(obj as any);
       expect(result).toBe(false);
     });
@@ -64,7 +64,7 @@ describe("Complete Validation Coverage", () => {
     // Test domain validation scenarios for lines 206-209
     const domainTests = [
       "user@", // Empty domain - triggers length 0
-      "user@" + "a".repeat(254), // Domain too long - triggers length > 253
+      `user@${"a".repeat(254)}`, // Domain too long - triggers length > 253
     ];
 
     domainTests.forEach(email => {
@@ -108,7 +108,7 @@ describe("Complete Validation Coverage", () => {
       "user@inv_alid.com", // Invalid characters in label
       "user@-invalid.com", // Leading hyphen in label
       "user@invalid-.com", // Trailing hyphen in label
-      "user@" + "a".repeat(64) + ".com", // Label too long (over 63 chars)
+      `user@${"a".repeat(64)}.com`, // Label too long (over 63 chars)
       "user@.com", // Empty label
     ];
 

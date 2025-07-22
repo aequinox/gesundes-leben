@@ -85,17 +85,17 @@ describe("isValidEmail", () => {
     });
 
     it("should respect maximum length constraint", () => {
-      const longEmail = "a".repeat(250) + "@example.com";
+      const longEmail = `${"a".repeat(250)}@example.com`;
       expect(isValidEmail(longEmail)).toBe(false);
     });
 
     it("should validate local part length constraints", () => {
-      const longLocalPart = "a".repeat(65) + "@example.com";
+      const longLocalPart = `${"a".repeat(65)}@example.com`;
       expect(isValidEmail(longLocalPart)).toBe(false);
     });
 
     it("should validate domain part length constraints", () => {
-      const longDomain = "user@" + "a".repeat(250) + ".com";
+      const longDomain = `user@${"a".repeat(250)}.com`;
       expect(isValidEmail(longDomain)).toBe(false);
     });
   });

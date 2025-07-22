@@ -11,7 +11,6 @@ import type { CollectionEntry } from "astro:content";
 import Layout from "./Layout.astro";
 
 import Hr from "@/components/elements/Hr.astro";
-
 // import Footer from "@/components/sections/Footer.astro";
 // import GlossaryCard from "@/components/sections/GlossaryCard.astro";
 // import Header from "@/components/sections/Header.astro";
@@ -74,7 +73,7 @@ const pageTitle = propTitle ? propTitle : t("glossary.all");
       currentPage={currentPage}
       totalPages={totalPages}
       prevUrl={currentPage > 1
-        ? `/glossary${currentPage - 1 !== 1 ? "/" + (currentPage - 1) : ""}/`
+        ? `/glossary${currentPage - 1 !== 1 ? `/${currentPage - 1}` : ""}/`
         : ""}
       nextUrl={currentPage < totalPages ? `/glossary/${currentPage + 1}/` : ""}
     />

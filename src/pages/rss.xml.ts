@@ -19,7 +19,8 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    // eslint-disable-next-line no-console\n    console.error('RSS generation failed:', error);
+    // eslint-disable-next-line no-console
+    console.error("RSS generation failed:", error);
     // Return minimal RSS feed as fallback
     return rss({
       title: SITE.title,

@@ -1,7 +1,3 @@
-import { readFileSync } from "fs";
-
-import { parseString } from "xml2js";
-
 import { ErrorFactory, ConversionErrorCollector } from "./errors";
 import { logger } from "./logger";
 import { SecuritySanitizer } from "./security";
@@ -17,6 +13,8 @@ import type {
   WordPressXMLCategory,
   WordPressXMLPostMeta,
 } from "./types";
+import { readFileSync } from "fs";
+import { parseString } from "xml2js";
 
 export class WordPressParser {
   private xmlData: WordPressXMLRoot;
@@ -178,7 +176,9 @@ export class WordPressParser {
     const authors: WordPressAuthor[] = [];
     const wpAuthors = channel["wp:author"];
 
-    if (!wpAuthors) {return authors;}
+    if (!wpAuthors) {
+      return authors;
+    }
 
     const authorList = Array.isArray(wpAuthors) ? wpAuthors : [wpAuthors];
 
@@ -200,7 +200,9 @@ export class WordPressParser {
     const categories: WordPressCategory[] = [];
     const wpCategories = channel["wp:category"];
 
-    if (!wpCategories) {return categories;}
+    if (!wpCategories) {
+      return categories;
+    }
 
     const categoryList = Array.isArray(wpCategories)
       ? wpCategories
@@ -221,7 +223,9 @@ export class WordPressParser {
   }
 
   private extractPostCategories(item: any): string[] {
-    if (!item.category) {return [];}
+    if (!item.category) {
+      return [];
+    }
 
     const categories = Array.isArray(item.category)
       ? item.category
@@ -233,7 +237,9 @@ export class WordPressParser {
   }
 
   private extractPostTags(item: any): string[] {
-    if (!item.category) {return [];}
+    if (!item.category) {
+      return [];
+    }
 
     const categories = Array.isArray(item.category)
       ? item.category
@@ -247,7 +253,9 @@ export class WordPressParser {
   private extractCustomFields(item: any): Record<string, any> {
     const customFields: Record<string, any> = {};
 
-    if (!item["wp:postmeta"]) {return customFields;}
+    if (!item["wp:postmeta"]) {
+      return customFields;
+    }
 
     const postMeta = Array.isArray(item["wp:postmeta"])
       ? item["wp:postmeta"]

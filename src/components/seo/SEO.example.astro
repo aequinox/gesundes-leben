@@ -1,0 +1,167 @@
+---
+/**
+ * @file SEO.example.astro
+ * @description Usage examples for the SEO component
+ *
+ * This file demonstrates how to use the SEO component in various contexts
+ * such as blog posts, pages, and different content types.
+ */
+
+import SEO, { type Props as SEOProps } from "./SEO.astro";
+
+// Example 1: Basic webpage SEO
+const basicWebpageProps: SEOProps = {
+  title: "Über uns - Gesundes Leben",
+  description:
+    "Erfahren Sie mehr über unsere Mission, gesunde Ernährung und Wellness für alle zugänglich zu machen.",
+  keywords: ["über uns", "gesunde ernährung", "wellness", "mission"],
+  canonicalURL: "https://gesundes-leben.vision/ueber-uns",
+  pageType: "aboutpage",
+};
+
+// Example 2: Blog article SEO with full metadata
+const articleProps: SEOProps = {
+  title: "Die 10 besten Superfoods für mehr Energie",
+  description:
+    "Entdecken Sie kraftvolle Superfoods, die Ihre Energie natürlich steigern. Wissenschaftlich fundierte Tipps für mehr Vitalität im Alltag.",
+  keywords: ["superfoods", "energie", "ernährung", "vitalität", "gesundheit"],
+  canonicalURL: "https://gesundes-leben.vision/posts/superfoods-energie",
+  ogImage: "/images/superfoods-hero.jpg",
+  twitterCard: "summary_large_image",
+  pageType: "article",
+  publishedTime: new Date("2024-01-15"),
+  modifiedTime: new Date("2024-01-20"),
+  author: {
+    name: "Dr. Sarah Mueller",
+    url: "https://gesundes-leben.vision/autoren/sarah-mueller",
+  },
+  section: "Ernährung",
+  tags: ["Superfoods", "Energie", "Natürliche Gesundheit", "Ernährungstipps"],
+  customStructuredData: {
+    // Additional health-specific structured data
+    medicalAudience: {
+      "@type": "MedicalAudience",
+      audienceType: "Patient",
+    },
+    about: {
+      "@type": "Thing",
+      name: "Superfood Nutrition",
+    },
+  },
+};
+
+// Example 3: Contact page SEO
+const contactProps: SEOProps = {
+  title: "Kontakt - Gesundes Leben",
+  description:
+    "Nehmen Sie Kontakt mit uns auf. Wir freuen uns auf Ihre Fragen zu gesunder Ernährung und Wellness.",
+  keywords: ["kontakt", "gesunde ernährung beratung", "wellness fragen"],
+  pageType: "contactpage",
+};
+
+// Example 4: Category/listing page SEO
+const categoryProps: SEOProps = {
+  title: "Ernährung - Alle Artikel über gesunde Ernährung",
+  description:
+    "Umfassende Artikel und Tipps zu gesunder Ernährung, Superfoods, Diäten und Ernährungswissenschaft.",
+  keywords: [
+    "ernährung",
+    "gesunde ernährung",
+    "ernährungstipps",
+    "diät",
+    "superfoods",
+  ],
+  canonicalURL: "https://gesundes-leben.vision/kategorie/ernaehrung",
+  pageType: "webpage",
+  section: "Ernährung",
+};
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <!-- Example 1: Basic About Page -->
+    <SEO {...basicWebpageProps} />
+
+    <!-- Additional page-specific meta tags can be added here -->
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="Gesundes Leben RSS"
+      href="/rss.xml"
+    />
+  </head>
+  <body>
+    <h1>SEO Component Examples</h1>
+    <p>
+      This page demonstrates SEO component usage. Check the source to see
+      generated meta tags.
+    </p>
+
+    <!-- Different SEO configurations for different page types -->
+    <section>
+      <h2>Article Page SEO</h2>
+      <p>For blog articles, use rich metadata with structured data:</p>
+      <pre><code>{JSON.stringify(articleProps, null, 2)}</code></pre>
+    </section>
+
+    <section>
+      <h2>Contact Page SEO</h2>
+      <p>Contact pages need specific structured data:</p>
+      <pre><code>{JSON.stringify(contactProps, null, 2)}</code></pre>
+    </section>
+
+    <section>
+      <h2>Category Page SEO</h2>
+      <p>Category pages should focus on topic clustering:</p>
+      <pre><code>{JSON.stringify(categoryProps, null, 2)}</code></pre>
+    </section>
+  </body>
+</html>
+
+<!-- 
+Usage in actual Astro pages:
+
+// In a blog post layout (e.g., src/layouts/BlogPost.astro):
+---
+const { frontmatter } = Astro.props;
+const { title, description, pubDatetime, modDatetime, author, tags, ogImage } = frontmatter;
+---
+<html lang="de">
+<head>
+  <SEO
+    title={title}
+    description={description}
+    keywords={tags}
+    pageType="article"
+    publishedTime={pubDatetime}
+    modifiedTime={modDatetime}
+    author={{ name: author }}
+    section="Gesundheit"
+    tags={tags}
+    ogImage={ogImage?.src}
+    twitterCard="summary_large_image"
+  />
+</head>
+<body>
+  Page content
+</body>
+</html>
+
+// In a regular page (e.g., src/pages/about.astro):
+---
+---
+<html lang="de">
+  <head>
+    <SEO
+      title="Über uns - Gesundes Leben"
+      description="Erfahren Sie mehr über unsere Mission"
+      pageType="aboutpage"
+      keywords={["über uns", "mission", "gesunde ernährung"]}
+    />
+  </head>
+  <body>
+    Page content
+  </body>
+</html>
+-->

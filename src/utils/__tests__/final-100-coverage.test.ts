@@ -55,7 +55,7 @@ describe("Final 100% Coverage Push", () => {
         const emptyDomainResult = isValidEmail("user@");
         expect(emptyDomainResult).toBe(false);
 
-        const longDomainResult = isValidEmail("user@" + "x".repeat(255));
+        const longDomainResult = isValidEmail(`user@${"x".repeat(255)}`);
         expect(longDomainResult).toBe(false);
 
         // Insufficient labels for lines 236-237
@@ -131,7 +131,7 @@ describe("Final 100% Coverage Push", () => {
   });
 
   describe("Setup Matchers Direct Coverage", () => {
-    it("should execute custom matcher logic directly", () => {
+    it("should execute custom matcher logic directly", async () => {
       // Test toBeAccessible logic with successful path
       const successElement = {
         querySelectorAll: (selector: string) => {
@@ -154,7 +154,7 @@ describe("Final 100% Coverage Push", () => {
 
       // Simulate the matcher logic from lines 114-120
       try {
-        const { a11yHelpers } = require("../../tests/setup");
+        const { a11yHelpers } = await import("../../tests/setup");
         a11yHelpers.checkAriaLabels(successElement);
         a11yHelpers.checkHeadingHierarchy(successElement);
 
@@ -188,7 +188,7 @@ describe("Final 100% Coverage Push", () => {
           hasValidStructure
             ? "Element has valid markup structure"
             : "Element appears to be empty or malformed",
-        pass: !!hasValidStructure,
+        pass: Boolean(hasValidStructure),
       };
 
       expect(markupResult.pass).toBe(true);
@@ -208,7 +208,7 @@ describe("Final 100% Coverage Push", () => {
           hasInvalidStructure
             ? "Element has valid markup structure"
             : "Element appears to be empty or malformed",
-        pass: !!hasInvalidStructure,
+        pass: Boolean(hasInvalidStructure),
       };
 
       expect(invalidResult.pass).toBe(false);
@@ -241,7 +241,7 @@ describe("Final 100% Coverage Push", () => {
         // Domain validation edge cases
         "user@a",
         "user@a.b",
-        "user@" + "a".repeat(255),
+        `user@${"a".repeat(255)}`,
         "user@domain..com",
         "user@.domain.com",
         "user@domain.com.",
@@ -249,7 +249,7 @@ describe("Final 100% Coverage Push", () => {
         "user@domain-.com",
 
         // Local part edge cases
-        "a".repeat(65) + "@domain.com",
+        `${"a".repeat(65)}@domain.com`,
         "user..name@domain.com",
         ".user@domain.com",
         "user.@domain.com",

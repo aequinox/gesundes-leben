@@ -128,8 +128,12 @@ export class ConversionErrorCollector {
       lines.push("-".repeat(40));
       summary.criticalErrors.forEach(error => {
         lines.push(`[${error.type.toUpperCase()}] ${error.message}`);
-        if (error.postTitle) {lines.push(`  Post: ${error.postTitle}`);}
-        if (error.postId) {lines.push(`  ID: ${error.postId}`);}
+        if (error.postTitle) {
+          lines.push(`  Post: ${error.postTitle}`);
+        }
+        if (error.postId) {
+          lines.push(`  ID: ${error.postId}`);
+        }
         lines.push("");
       });
     }

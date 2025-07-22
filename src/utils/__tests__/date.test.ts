@@ -1,4 +1,4 @@
-import { vi, describe, beforeEach, afterEach, it, expect } from "vitest";
+import { describe, beforeEach, afterEach, it, expect } from "vitest";
 
 import { createSafeDate, formatDate, clearDateFormatterCache } from "../date";
 
@@ -51,7 +51,7 @@ describe("date utilities", () => {
 
     it("should format Date object", () => {
       // Mock Intl.DateTimeFormat to return predictable results
-      Intl.DateTimeFormat = function (locale: any, options: any) {
+      Intl.DateTimeFormat = function (_locale: any, _options: any) {
         return {
           format: (date: Date) => {
             const year = date.getFullYear();

@@ -102,7 +102,9 @@ export class SecuritySanitizer {
    * Sanitize text content for YAML frontmatter
    */
   static sanitizeYAMLValue(value: string): string {
-    if (!value) {return "";}
+    if (!value) {
+      return "";
+    }
 
     // Escape YAML special characters
     let sanitized = value
@@ -152,7 +154,9 @@ export class SecuritySanitizer {
    * Validate slug format
    */
   static validateSlug(slug: string): boolean {
-    if (!slug) {return false;}
+    if (!slug) {
+      return false;
+    }
 
     // Slug should only contain lowercase letters, numbers, and hyphens
     const slugPattern = /^[a-z0-9-]+$/;
@@ -163,7 +167,9 @@ export class SecuritySanitizer {
    * Sanitize and validate email addresses
    */
   static sanitizeEmail(email: string): string {
-    if (!email) {return "";}
+    if (!email) {
+      return "";
+    }
 
     // Basic email validation and sanitization
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -181,7 +187,9 @@ export class SecuritySanitizer {
    * Sanitize author name
    */
   static sanitizeAuthorName(name: string): string {
-    if (!name) {return "";}
+    if (!name) {
+      return "";
+    }
 
     // Remove HTML tags and excessive whitespace
     let sanitized = name
@@ -230,7 +238,9 @@ export class SecuritySanitizer {
    * Comprehensive content sanitization for WordPress imports
    */
   static sanitizeWordPressContent(content: string): string {
-    if (!content) {return "";}
+    if (!content) {
+      return "";
+    }
 
     let sanitized = content;
 

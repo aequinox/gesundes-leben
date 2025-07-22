@@ -414,6 +414,7 @@ export function withValidation<T extends Record<string, unknown>>(
       const validation = factory.validate(props);
 
       if (!validation.isValid && import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
         console.warn(
           `Invalid props for ${componentName} variant "${name}":`,
           validation.errors
@@ -440,6 +441,7 @@ export function withPerformanceMonitoring<T extends Record<string, unknown>>(
       const end = performance.now();
 
       if (end - start > 5 && import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
         console.warn(
           `Slow variant generation for ${componentName}.${name}: ${end - start}ms`
         );

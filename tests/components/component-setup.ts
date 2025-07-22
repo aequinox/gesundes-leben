@@ -28,7 +28,7 @@ beforeAll(() => {
   
   // Enhance DOM with additional properties for component testing
   Object.defineProperty(window, 'getComputedStyle', {
-    value: (element: Element) => ({
+    value: (_element: Element) => ({
       getPropertyValue: (prop: string) => {
         // Mock common CSS properties for component tests
         const mockStyles: Record<string, string> = {
@@ -220,6 +220,7 @@ export const componentTestHelpers = {
         const hasHighContrast = warning.classList.contains('high-contrast') ||
                                warning.getAttribute('data-contrast') === 'high';
         if (!hasHighContrast) {
+           
           console.warn('Health warning may not have sufficient contrast');
         }
       });
@@ -253,6 +254,7 @@ export const componentTestHelpers = {
       const hasTimers = component._timers && component._timers.length > 0;
       
       if (hasListeners || hasTimers) {
+         
         console.warn('Potential memory leak detected in component cleanup');
       }
     }

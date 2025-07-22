@@ -70,7 +70,7 @@ describe("Validation Error Paths - 100% Coverage", () => {
       expect(result1).toBe(false);
 
       // Test domain that's too long to trigger line 206-209
-      const longDomain = "user@" + "a".repeat(254) + ".com";
+      const longDomain = `user@${"a".repeat(254)}.com`;
       const result2 = isValidEmail(longDomain);
       expect(result2).toBe(false);
 
@@ -128,7 +128,7 @@ describe("Validation Error Paths - 100% Coverage", () => {
         },
       ];
 
-      errorScenarios.forEach(({ input, description }) => {
+      errorScenarios.forEach(({ input, description: _description }) => {
         const result = isValidEmail(input as any);
         expect(result).toBe(false);
       });
@@ -136,7 +136,7 @@ describe("Validation Error Paths - 100% Coverage", () => {
       // Domain validation scenarios
       const domainScenarios = [
         "user@", // Empty domain
-        "user@" + "x".repeat(254), // Domain too long
+        `user@${"x".repeat(254)}`, // Domain too long
         "user@single", // Single label
         "user@domain.c", // TLD too short with default minDomainLength
       ];

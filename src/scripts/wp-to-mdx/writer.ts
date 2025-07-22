@@ -1,6 +1,3 @@
-import { promises as fs } from "fs";
-import { join } from "path";
-
 import { CONVERSION_DEFAULTS } from "./config";
 import { ErrorFactory, ConversionErrorCollector } from "./errors";
 import { HttpImageDownloader } from "./image-downloader";
@@ -13,6 +10,8 @@ import type {
   ConversionError,
   ImageDownloader,
 } from "./types";
+import { promises as fs } from "fs";
+import { join } from "path";
 
 export class FileWriter {
   private config: ConversionConfig;
@@ -171,7 +170,9 @@ export class FileWriter {
    * Escape string for YAML using security sanitizer
    */
   private yamlEscape(str: string): string {
-    if (!str) {return '""';}
+    if (!str) {
+      return '""';
+    }
 
     const sanitized = SecuritySanitizer.sanitizeYAMLValue(str);
 

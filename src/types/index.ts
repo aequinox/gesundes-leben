@@ -367,7 +367,10 @@ export const hasRequiredProps = <T extends Record<string, unknown>>(
   if (typeof obj !== "object" || obj === null) {
     return false;
   }
-  return keys.every(key => key in obj && isDefined((obj as Record<string, unknown>)[key as string]));
+  return keys.every(
+    key =>
+      key in obj && isDefined((obj as Record<string, unknown>)[key as string])
+  );
 };
 
 // === Constants ===

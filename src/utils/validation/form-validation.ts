@@ -17,9 +17,8 @@
  * const result = await emailValidator.validate('user@example.com');
  * ```
  */
-
-import { logger } from '@/utils/logger';
-import type { ValidationResult, FormFieldConfig } from '@/types';
+import type { ValidationResult, FormFieldConfig } from "@/types";
+import { logger } from "@/utils/logger";
 
 export interface ValidationContext {
   field: string;
@@ -29,10 +28,12 @@ export interface ValidationContext {
 }
 
 export interface ValidatorRule {
-  validate: (context: ValidationContext) => Promise<ValidationResult> | ValidationResult;
+  validate: (
+    context: ValidationContext
+  ) => Promise<ValidationResult> | ValidationResult;
   message: string | ((context: ValidationContext) => string);
   code: string;
-  severity: 'error' | 'warning' | 'info';
+  severity: "error" | "warning" | "info";
 }
 
 export interface FormValidationSchema {
@@ -53,7 +54,7 @@ export class FormValidator {
   private schema: FormValidationSchema;
   private locale: string;
 
-  constructor(schema: FormValidationSchema, locale = 'en') {
+  constructor(schema: FormValidationSchema, locale = "en") {
     this.schema = schema;
     this.locale = locale;
   }
@@ -61,17 +62,23 @@ export class FormValidator {
   /**
    * Validate entire form data against schema
    */
-  public async validateForm(formData: Record<string, unknown>): Promise<FormValidationResult> {
+  public async validateForm(
+    formData: Record<string, unknown>
+  ): Promise<FormValidationResult> {
     const result: FormValidationResult = {
       isValid: true,
       errors: {},
       warnings: {},
-      fieldResults: {}
+      fieldResults: {},
     };
 
     // Validate each field
-    for (const [fieldName, rules] of Object.entries(this.schema)) {
-      const fieldResult = await this.validateField(fieldName, formData[fieldName], formData);
+    for (const [fieldName, _rules] of Object.entries(this.schema)) {
+      const fieldResult = await this.validateField(
+        fieldName,
+        formData[fieldName],
+        formData
+      );
       result.fieldResults[fieldName] = fieldResult;
 
       if (!fieldResult.isValid) {
@@ -91,8 +98,8 @@ export class FormValidator {
    * Validate a single field
    */
   public async validateField(
-    fieldName: string, 
-    value: unknown, 
+    fieldName: string,
+    value: unknown,
     formData?: Record<string, unknown>
   ): Promise<ValidationResult> {
     const rules = this.schema[fieldName] || [];
@@ -100,13 +107,13 @@ export class FormValidator {
       field: fieldName,
       value,
       formData,
-      locale: this.locale
+      locale: this.locale,
     };
 
     const result: ValidationResult = {
       isValid: true,
       errors: [],
-      warnings: []
+      warnings: [],
     };
 
     // Run all validation rules
@@ -115,14 +122,15 @@ export class FormValidator {
         const ruleResult = await Promise.resolve(rule.validate(context));
 
         if (!ruleResult.isValid) {
-          const message = typeof rule.message === 'function' 
-            ? rule.message(context)
-            : rule.message;
+          const message =
+            typeof rule.message === "function"
+              ? rule.message(context)
+              : rule.message;
 
-          if (rule.severity === 'error') {
+          if (rule.severity === "error") {
             result.isValid = false;
             result.errors.push(message);
-          } else if (rule.severity === 'warning') {
+          } else if (rule.severity === "warning") {
             result.warnings = result.warnings || [];
             result.warnings.push(message);
           }
@@ -130,7 +138,7 @@ export class FormValidator {
       } catch (error) {
         logger.error(`Validation rule error for field ${fieldName}:`, error);
         result.isValid = false;
-        result.errors.push('Validation error occurred');
+        result.errors.push("Validation error occurred");
       }
     }
 
@@ -169,37 +177,39 @@ export class ValidationRule {
   /**
    * Required field validation
    */
-  static required(message = 'This field is required'): ValidatorRule {
+  static required(message = "This field is required"): ValidatorRule {
     return {
-      code: 'required',
-      severity: 'error',
+      code: "required",
+      severity: "error",
       message,
       validate: ({ value }) => ({
-        isValid: value !== null && value !== undefined && String(value).trim() !== '',
-        errors: []
-      })
+        isValid:
+          value !== null && value !== undefined && String(value).trim() !== "",
+        errors: [],
+      }),
     };
   }
 
   /**
    * Email validation with RFC compliance
    */
-  static email(message = 'Please enter a valid email address'): ValidatorRule {
+  static email(message = "Please enter a valid email address"): ValidatorRule {
     return {
-      code: 'email',
-      severity: 'error',
+      code: "email",
+      severity: "error",
       message,
       validate: ({ value }) => {
-        if (!value || typeof value !== 'string') {
+        if (!value || typeof value !== "string") {
           return { isValid: false, errors: [] };
         }
 
-        const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+        const emailRegex =
+          /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
         return {
           isValid: emailRegex.test(value),
-          errors: []
+          errors: [],
         };
-      }
+      },
     };
   }
 
@@ -208,16 +218,16 @@ export class ValidationRule {
    */
   static minLength(min: number, message?: string): ValidatorRule {
     return {
-      code: 'minLength',
-      severity: 'error',
+      code: "minLength",
+      severity: "error",
       message: message || `Must be at least ${min} characters`,
       validate: ({ value }) => {
-        const str = String(value || '');
+        const str = String(value || "");
         return {
           isValid: str.length >= min,
-          errors: []
+          errors: [],
         };
-      }
+      },
     };
   }
 
@@ -226,36 +236,36 @@ export class ValidationRule {
    */
   static maxLength(max: number, message?: string): ValidatorRule {
     return {
-      code: 'maxLength',
-      severity: 'error',
+      code: "maxLength",
+      severity: "error",
       message: message || `Must be no more than ${max} characters`,
       validate: ({ value }) => {
-        const str = String(value || '');
+        const str = String(value || "");
         return {
           isValid: str.length <= max,
-          errors: []
+          errors: [],
         };
-      }
+      },
     };
   }
 
   /**
    * Pattern validation with regex
    */
-  static pattern(regex: RegExp, message = 'Invalid format'): ValidatorRule {
+  static pattern(regex: RegExp, message = "Invalid format"): ValidatorRule {
     return {
-      code: 'pattern',
-      severity: 'error',
+      code: "pattern",
+      severity: "error",
       message,
       validate: ({ value }) => {
-        if (!value || typeof value !== 'string') {
+        if (!value || typeof value !== "string") {
           return { isValid: false, errors: [] };
         }
         return {
           isValid: regex.test(value),
-          errors: []
+          errors: [],
         };
-      }
+      },
     };
   }
 
@@ -264,8 +274,8 @@ export class ValidationRule {
    */
   static range(min: number, max: number, message?: string): ValidatorRule {
     return {
-      code: 'range',
-      severity: 'error',
+      code: "range",
+      severity: "error",
       message: message || `Must be between ${min} and ${max}`,
       validate: ({ value }) => {
         const num = Number(value);
@@ -274,22 +284,24 @@ export class ValidationRule {
         }
         return {
           isValid: num >= min && num <= max,
-          errors: []
+          errors: [],
         };
-      }
+      },
     };
   }
 
   /**
    * Password strength validation
    */
-  static passwordStrength(message = 'Password must contain uppercase, lowercase, number, and special character'): ValidatorRule {
+  static passwordStrength(
+    message = "Password must contain uppercase, lowercase, number, and special character"
+  ): ValidatorRule {
     return {
-      code: 'passwordStrength',
-      severity: 'error',
+      code: "passwordStrength",
+      severity: "error",
       message,
       validate: ({ value }) => {
-        if (!value || typeof value !== 'string') {
+        if (!value || typeof value !== "string") {
           return { isValid: false, errors: [] };
         }
 
@@ -301,22 +313,22 @@ export class ValidationRule {
 
         return {
           isValid: hasUpper && hasLower && hasNumber && hasSpecial && minLength,
-          errors: []
+          errors: [],
         };
-      }
+      },
     };
   }
 
   /**
    * URL validation
    */
-  static url(message = 'Please enter a valid URL'): ValidatorRule {
+  static url(message = "Please enter a valid URL"): ValidatorRule {
     return {
-      code: 'url',
-      severity: 'error',
+      code: "url",
+      severity: "error",
       message,
       validate: ({ value }) => {
-        if (!value || typeof value !== 'string') {
+        if (!value || typeof value !== "string") {
           return { isValid: false, errors: [] };
         }
 
@@ -326,42 +338,42 @@ export class ValidationRule {
         } catch {
           return { isValid: false, errors: [] };
         }
-      }
+      },
     };
   }
 
   /**
    * Phone number validation (international format)
    */
-  static phone(message = 'Please enter a valid phone number'): ValidatorRule {
+  static phone(message = "Please enter a valid phone number"): ValidatorRule {
     return {
-      code: 'phone',
-      severity: 'error',
+      code: "phone",
+      severity: "error",
       message,
       validate: ({ value }) => {
-        if (!value || typeof value !== 'string') {
+        if (!value || typeof value !== "string") {
           return { isValid: false, errors: [] };
         }
 
         // Basic international phone number format
         const phoneRegex = /^\+?[1-9]\d{1,14}$/;
-        const cleanedPhone = value.replace(/[\s\-\(\)]/g, '');
-        
+        const cleanedPhone = value.replace(/[\s\-\(\)]/g, "");
+
         return {
           isValid: phoneRegex.test(cleanedPhone),
-          errors: []
+          errors: [],
         };
-      }
+      },
     };
   }
 
   /**
    * Date validation
    */
-  static date(message = 'Please enter a valid date'): ValidatorRule {
+  static date(message = "Please enter a valid date"): ValidatorRule {
     return {
-      code: 'date',
-      severity: 'error',
+      code: "date",
+      severity: "error",
       message,
       validate: ({ value }) => {
         if (!value) {
@@ -371,9 +383,9 @@ export class ValidationRule {
         const date = new Date(String(value));
         return {
           isValid: !isNaN(date.getTime()),
-          errors: []
+          errors: [],
         };
-      }
+      },
     };
   }
 
@@ -382,23 +394,23 @@ export class ValidationRule {
    */
   static requiredIf(
     condition: (formData: Record<string, unknown>) => boolean,
-    message = 'This field is required'
+    message = "This field is required"
   ): ValidatorRule {
     return {
-      code: 'requiredIf',
-      severity: 'error',
+      code: "requiredIf",
+      severity: "error",
       message,
       validate: ({ value, formData }) => {
         if (!condition(formData || {})) {
           return { isValid: true, errors: [] };
         }
 
-        return ValidationRule.required().validate({ 
-          field: '', 
-          value, 
-          formData 
+        return ValidationRule.required().validate({
+          field: "",
+          value,
+          formData,
         });
-      }
+      },
     };
   }
 
@@ -407,21 +419,21 @@ export class ValidationRule {
    */
   static async(
     asyncValidator: (value: unknown) => Promise<boolean>,
-    message = 'Validation failed'
+    message = "Validation failed"
   ): ValidatorRule {
     return {
-      code: 'async',
-      severity: 'error',
+      code: "async",
+      severity: "error",
       message,
       validate: async ({ value }) => {
         try {
           const isValid = await asyncValidator(value);
           return { isValid, errors: [] };
         } catch (error) {
-          logger.error('Async validation error:', error);
+          logger.error("Async validation error:", error);
           return { isValid: false, errors: [] };
         }
-      }
+      },
     };
   }
 
@@ -430,26 +442,26 @@ export class ValidationRule {
    */
   static custom(
     validator: (context: ValidationContext) => boolean | ValidationResult,
-    message = 'Validation failed'
+    message = "Validation failed"
   ): ValidatorRule {
     return {
-      code: 'custom',
-      severity: 'error',
+      code: "custom",
+      severity: "error",
       message,
-      validate: (context) => {
+      validate: context => {
         try {
           const result = validator(context);
-          
-          if (typeof result === 'boolean') {
+
+          if (typeof result === "boolean") {
             return { isValid: result, errors: [] };
           }
-          
+
           return result;
         } catch (error) {
-          logger.error('Custom validation error:', error);
+          logger.error("Custom validation error:", error);
           return { isValid: false, errors: [] };
         }
-      }
+      },
     };
   }
 }
@@ -464,15 +476,15 @@ export function createFieldValidator(config: FormFieldConfig): ValidatorRule[] {
     rules.push(ValidationRule.required());
   }
 
-  if (config.type === 'email') {
+  if (config.type === "email") {
     rules.push(ValidationRule.email());
   }
 
-  if (config.type === 'url') {
+  if (config.type === "url") {
     rules.push(ValidationRule.url());
   }
 
-  if (config.type === 'tel') {
+  if (config.type === "tel") {
     rules.push(ValidationRule.phone());
   }
 
@@ -508,7 +520,7 @@ export function createFieldValidator(config: FormFieldConfig): ValidatorRule[] {
  */
 export function createFormValidator(
   fields: FormFieldConfig[],
-  locale = 'en'
+  locale = "en"
 ): FormValidator {
   const schema: FormValidationSchema = {};
 
@@ -523,22 +535,20 @@ export function createFormValidator(
  * Utility function to sanitize form input
  */
 export function sanitizeInput(value: unknown): string {
-  if (typeof value !== 'string') {
-    return String(value || '');
+  if (typeof value !== "string") {
+    return String(value || "");
   }
 
-  return value
-    .trim()
-    .replace(/[<>\"'&]/g, (match) => {
-      const entityMap: Record<string, string> = {
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;',
-        '&': '&amp;'
-      };
-      return entityMap[match] || match;
-    });
+  return value.trim().replace(/[<>\"'&]/g, match => {
+    const entityMap: Record<string, string> = {
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+      "&": "&amp;",
+    };
+    return entityMap[match] || match;
+  });
 }
 
 /**
@@ -548,20 +558,28 @@ export function createDebouncedValidator(
   validator: FormValidator,
   delay = 300
 ): {
-  validateField: (fieldName: string, value: unknown, formData?: Record<string, unknown>) => Promise<ValidationResult>;
+  validateField: (
+    fieldName: string,
+    value: unknown,
+    formData?: Record<string, unknown>
+  ) => Promise<ValidationResult>;
   cancel: () => void;
 } {
   let timeoutId: number | undefined;
 
   return {
     validateField: (fieldName, value, formData) => {
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         if (timeoutId) {
           clearTimeout(timeoutId);
         }
 
         timeoutId = window.setTimeout(async () => {
-          const result = await validator.validateField(fieldName, value, formData);
+          const result = await validator.validateField(
+            fieldName,
+            value,
+            formData
+          );
           resolve(result);
         }, delay);
       });
@@ -570,6 +588,6 @@ export function createDebouncedValidator(
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
-    }
+    },
   };
 }
