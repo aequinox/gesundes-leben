@@ -1,4 +1,6 @@
 ---
+import { ClientRouter } from "astro:transitions";
+
 import Breadcrumb from "@/components/Breadcrumb.astro";
 import { SEO } from "@/components/seo";
 import SizeIndicator from "@/components/SizeIndicator.astro";
@@ -13,14 +15,14 @@ export interface Props {
   ogImage?: string;
   canonicalURL?: string;
   pubDatetime?: Date;
-  modDatetime?: Date | null | undefined;
+  modDatetime?: Date | undefined;
   scrollSmooth?: boolean;
 }
 
 const {
   title = SITE.title,
   author = SITE.author,
-  profile: _profile = SITE.profile,
+  // profile = SITE.profile,
   description = SITE.desc,
   ogImage = SITE.ogImage ? `/${SITE.ogImage}` : "/og.png",
   canonicalURL = new URL(Astro.url.pathname, Astro.url),
@@ -43,6 +45,8 @@ const {
       modifiedTime={modDatetime}
       author={{ name: author }}
     />
+    <ClientRouter />
+    <script is:inline src="/toggle-theme.js"></script>
   </head>
   <body data-pagefind-body class="px-2 lg:px-12" data-astro-prefetch>
     {Astro.url.pathname !== "/" && <Breadcrumb />}
