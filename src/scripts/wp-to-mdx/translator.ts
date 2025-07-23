@@ -6,6 +6,7 @@ import type {
   ProcessingOptions,
   ProcessingContext,
   ImageDimensions,
+  VisionatiConfig,
 } from "./types";
 import axios from "axios";
 import TurndownService from "turndown";
@@ -22,7 +23,8 @@ export class ContentTranslator {
 
   constructor(
     positioningConfig?: any,
-    processorPipeline?: ContentProcessorPipeline
+    processorPipeline?: ContentProcessorPipeline,
+    visionatiConfig?: VisionatiConfig
   ) {
     this.positioningConfig = {
       enableSmartPositioning: true,
@@ -34,7 +36,8 @@ export class ContentTranslator {
     };
 
     this.processorPipeline =
-      processorPipeline || ContentProcessorPipeline.createDefault();
+      processorPipeline ||
+      ContentProcessorPipeline.createDefault(visionatiConfig);
     this.turndownService = new TurndownService({
       headingStyle: "atx",
       codeBlockStyle: "fenced",

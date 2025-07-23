@@ -6,10 +6,15 @@ import { logger } from "./logger";
 import { SchemaMapper } from "./mapper";
 import { WordPressParser } from "./parser";
 import { ContentTranslator } from "./translator";
-import type { ConversionConfig, ConversionResult } from "./types";
+import type {
+  ConversionConfig,
+  ConversionResult,
+  VisionatiConfig,
+} from "./types";
 import { ContentValidator } from "./validator";
 import { FileWriter } from "./writer";
 import { Command } from "commander";
+import { config as loadEnv } from "dotenv";
 import { resolve } from "path";
 
 class WordPressToAstroConverter {
@@ -23,7 +28,40 @@ class WordPressToAstroConverter {
 
   async convert(config: ConversionConfig): Promise<ConversionResult> {
     this.config = config;
-    this.translator = new ContentTranslator(config.smartImagePositioning);
+
+    // Load environment variables for Visionati API key
+    loadEnv();
+
+    // Create Visionati config if enabled
+    const visionatiConfig: VisionatiConfig | undefined = config.visionati
+      ?.enabled
+      ? {
+          apiKey: process.env.VISIONATI_API_KEY || "",
+          enableVisionati: config.visionati.enabled,
+          useCache: config.visionati.useCache ?? true,
+          cacheFile:
+            config.visionati.cacheFile ||
+            CONVERSION_DEFAULTS.VISIONATI_DEFAULTS.CACHE_FILE,
+          language:
+            config.visionati.language ||
+            CONVERSION_DEFAULTS.VISIONATI_DEFAULTS.LANGUAGE,
+          maxAltTextLength:
+            config.visionati.maxAltTextLength ||
+            CONVERSION_DEFAULTS.VISIONATI_DEFAULTS.MAX_ALT_TEXT_LENGTH,
+          backend:
+            config.visionati.backend ||
+            CONVERSION_DEFAULTS.VISIONATI_DEFAULTS.BACKEND,
+          role:
+            config.visionati.role ||
+            CONVERSION_DEFAULTS.VISIONATI_DEFAULTS.ROLE,
+        }
+      : undefined;
+
+    this.translator = new ContentTranslator(
+      config.smartImagePositioning,
+      undefined,
+      visionatiConfig
+    );
     this.mapper = new SchemaMapper(config);
 
     // Create image downloader based on dry run setting
@@ -345,6 +383,59 @@ class WordPressToAstroConverter {
   }
 }
 
+// Utility functions
+async function showVisionatiStats(cacheFile: string): Promise<void> {
+  try {
+    const { VisionatiCacheManager } = await import("./visionati-cache");
+    const cacheManager = new VisionatiCacheManager(cacheFile);
+    const cache = await cacheManager.load();
+    const stats = cacheManager.getStats(cache);
+    const size = await cacheManager.getCacheSize();
+    const topPatterns = cacheManager.getTopImagePatterns(cache, 5);
+
+    logger.info("\n📊 Visionati Cache Statistics");
+    logger.info("=====================================");
+    logger.info(`Cache file: ${cacheFile}`);
+    logger.info(`Cache size: ${size.toFixed(2)} MB`);
+    logger.info(`Total entries: ${stats.totalEntries}`);
+    logger.info(`Total credits used: ${stats.totalCreditsUsed}`);
+    logger.info(
+      `Estimated cost saved: ${stats.totalEntries * CONVERSION_DEFAULTS.VISIONATI_DEFAULTS.CREDITS_PER_IMAGE} credits`
+    );
+
+    if (topPatterns.length > 0) {
+      logger.info("\n🔥 Top Image Patterns:");
+      topPatterns.forEach((pattern, index) => {
+        logger.info(
+          `${index + 1}. ${pattern.pattern} (${pattern.count} occurrences)`
+        );
+        pattern.examples.forEach(example => logger.info(`   - ${example}`));
+      });
+    }
+
+    // Show recent entries
+    const recentEntries = Object.entries(cache)
+      .sort(
+        ([, a], [, b]) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      )
+      .slice(0, 5);
+
+    if (recentEntries.length > 0) {
+      logger.info("\n🕒 Recent Analyses:");
+      recentEntries.forEach(([url, entry]) => {
+        const date = new Date(entry.timestamp).toLocaleDateString();
+        logger.info(`${date}: ${entry.generatedFilename || "no filename"}`);
+        if (entry.generatedAltText) {
+          logger.info(`   Alt: "${entry.generatedAltText}"`);
+        }
+      });
+    }
+  } catch (error) {
+    logger.error(`Failed to show Visionati stats: ${error}`);
+  }
+}
+
 // CLI setup
 const program = new Command();
 
@@ -398,6 +489,43 @@ program
     "Aspect ratio difference to consider square",
     "0.1"
   )
+  .option("--enable-visionati", "Enable Visionati AI image analysis", false)
+  .option("--no-visionati-cache", "Disable Visionati cache usage")
+  .option(
+    "--visionati-cache-file <file>",
+    "Custom Visionati cache file path",
+    CONVERSION_DEFAULTS.VISIONATI_DEFAULTS.CACHE_FILE
+  )
+  .option(
+    "--visionati-language <lang>",
+    "Language for Visionati descriptions",
+    CONVERSION_DEFAULTS.VISIONATI_DEFAULTS.LANGUAGE
+  )
+  .option(
+    "--visionati-max-alt-length <length>",
+    "Maximum length for generated alt text",
+    CONVERSION_DEFAULTS.VISIONATI_DEFAULTS.MAX_ALT_TEXT_LENGTH.toString()
+  )
+  .option(
+    "--visionati-backend <backend>",
+    "Visionati AI backend to use",
+    CONVERSION_DEFAULTS.VISIONATI_DEFAULTS.BACKEND
+  )
+  .option(
+    "--visionati-role <role>",
+    "Visionati analysis role/persona",
+    CONVERSION_DEFAULTS.VISIONATI_DEFAULTS.ROLE
+  )
+  .option(
+    "--visionati-prompt-type <type>",
+    "Prompt type for health content (DEFAULT|MEDICAL|NUTRITION|WELLNESS|SCIENTIFIC)",
+    "DEFAULT"
+  )
+  .option(
+    "--visionati-custom-prompt <prompt>",
+    "Custom prompt to override default health prompts"
+  )
+  .option("--visionati-stats", "Show Visionati cache statistics", false)
   .action(async options => {
     try {
       const config: ConversionConfig = {
@@ -426,7 +554,47 @@ program
           landscapeThreshold: parseFloat(options.landscapeThreshold),
           squareThreshold: parseFloat(options.squareThreshold),
         },
+        visionati: options.enableVisionati
+          ? {
+              enabled: true,
+              useCache: options.visionatiCache !== false,
+              cacheFile: options.visionatiCacheFile,
+              language: options.visionatiLanguage,
+              maxAltTextLength: parseInt(options.visionatiMaxAltLength),
+              backend: options.visionatiBackend,
+              role: options.visionatiRole,
+              promptType: options.visionatiPromptType,
+              customPrompt: options.visionatiCustomPrompt,
+            }
+          : undefined,
       };
+
+      // Handle special operations
+      if (options.visionatiStats) {
+        await showVisionatiStats(options.visionatiCacheFile);
+        return;
+      }
+
+      // Validate Visionati setup if enabled
+      if (options.enableVisionati) {
+        loadEnv();
+        if (!process.env.VISIONATI_API_KEY) {
+          logger.error(
+            "Visionati API key not found. Please set VISIONATI_API_KEY in your .env file."
+          );
+          process.exit(1);
+        }
+        logger.info("✅ Visionati AI image analysis enabled");
+        logger.info(`   Language: ${options.visionatiLanguage}`);
+        logger.info(
+          `   Cache: ${options.visionatiCache !== false ? "enabled" : "disabled"}`
+        );
+        logger.info(
+          `   Max alt text length: ${options.visionatiMaxAltLength} characters`
+        );
+        logger.info(`   Prompt type: ${options.visionatiPromptType}`);
+        logger.info(`   Role: ${options.visionatiRole}`);
+      }
 
       const converter = new WordPressToAstroConverter();
       const result = await converter.convert(config);

@@ -67,6 +67,70 @@ export const CONVERSION_DEFAULTS = {
     "Laborwerte",
   ],
 
+  // Visionati AI defaults
+  VISIONATI_DEFAULTS: {
+    CACHE_FILE: "src/scripts/wp-to-mdx/visionati-cache.json",
+    LANGUAGE: "de",
+    MAX_ALT_TEXT_LENGTH: 125,
+    BACKEND: "auto",
+    ROLE: "Inspector",
+    API_TIMEOUT: 30000,
+    CREDITS_PER_IMAGE: 2,
+  },
+
+  // Visionati custom prompts for German health content
+  VISIONATI_PROMPTS: {
+    DEFAULT: `Analysiere dieses Bild für einen deutschen Gesundheitsblog. Erstelle:
+
+1. ALTTEXT: Eine barrierefreie deutsche Bildbeschreibung (80-125 Zeichen) für Screenreader - präzise, informativ, ohne überflüssige Wörter wie "Bild von" oder "Foto zeigt"
+
+2. DATEINAME: Einen SEO-optimierten deutschen Dateinamen mit Gesundheitsbegriffen (ohne Dateiendung) - verwende Bindestriche zwischen Wörtern, nur Kleinbuchstaben
+
+Verwende relevante Fachbegriffe: Gesundheit, Ernährung, Vitamine, Mineralien, Mikronährstoffe, Immunsystem, Darm, Mikrobiom, Probiotika, Antioxidantien, Omega-3, Vitamin D, Magnesium, Zink, Eisen, B-Vitamine, Naturheilkunde, Wellness, Prävention, Therapie, Diagnose, Laborwerte.
+
+Format: ALTTEXT: [description] @ DATEINAME: [filename]`,
+
+    MEDICAL: `Analysiere dieses medizinische Bild für einen deutschen Gesundheitsblog mit wissenschaftlichem Fokus. Erstelle:
+
+1. ALTTEXT: Eine fachlich präzise deutsche Bildbeschreibung (80-125 Zeichen) für Screenreader - verwende medizinische Terminologie korrekt
+
+2. DATEINAME: Einen wissenschaftlich fundierten deutschen Dateinamen mit medizinischen Begriffen (ohne Dateiendung)
+
+Fokus auf: Diagnose, Therapie, Laborwerte, medizinische Verfahren, Krankheitsbilder, Symptome, Behandlungsmethoden, klinische Studien.
+
+Format: ALTTEXT: [description] @ DATEINAME: [filename]`,
+
+    NUTRITION: `Analysiere dieses Ernährungsbild für einen deutschen Gesundheitsblog. Erstelle:
+
+1. ALTTEXT: Eine appetitlich-informative deutsche Bildbeschreibung (80-125 Zeichen) für Screenreader
+
+2. DATEINAME: Einen ernährungsfokussierten deutschen Dateinamen (ohne Dateiendung)
+
+Fokus auf: Ernährung, Lebensmittel, Vitamine, Mineralien, Mikronährstoffe, Omega-3, Vitamin D, B-Vitamine, gesunde Rezepte, Nährstoffgehalt, Superfoods.
+
+Format: ALTTEXT: [description] @ DATEINAME: [filename]`,
+
+    WELLNESS: `Analysiere dieses Wellness-Bild für einen deutschen Gesundheitsblog. Erstelle:
+
+1. ALTTEXT: Eine entspannend-motivierende deutsche Bildbeschreibung (80-125 Zeichen) für Screenreader
+
+2. DATEINAME: Einen wellness-orientierten deutschen Dateinamen (ohne Dateiendung)
+
+Fokus auf: Wellness, Entspannung, Stressabbau, Meditation, Yoga, Achtsamkeit, Work-Life-Balance, mentale Gesundheit, Prävention.
+
+Format: ALTTEXT: [description] @ DATEINAME: [filename]`,
+
+    SCIENTIFIC: `Analysiere dieses wissenschaftliche Bild für einen deutschen Gesundheitsblog mit Forschungsfokus. Erstelle:
+
+1. ALTTEXT: Eine wissenschaftlich präzise deutsche Bildbeschreibung (80-125 Zeichen) für Screenreader
+
+2. DATEINAME: Einen forschungsbasierten deutschen Dateinamen (ohne Dateiendung)
+
+Fokus auf: Studien, Forschung, Mikrobiom, Probiotika, Antioxidantien, biochemische Prozesse, evidenzbasierte Medizin, klinische Forschung.
+
+Format: ALTTEXT: [description] @ DATEINAME: [filename]`,
+  },
+
   // Content sentiment keywords
   KONTRA_KEYWORDS: [
     "gefahr",

@@ -126,6 +126,11 @@ export interface WordPressAttachment {
   caption?: string;
   description?: string;
   mimeType: string;
+  // AI-generated metadata from Visionati
+  aiGeneratedAlt?: string;
+  aiGeneratedFilename?: string;
+  aiTags?: string[];
+  visionatiAnalysis?: VisionatiCacheEntry;
 }
 
 export interface WordPressAuthor {
@@ -170,6 +175,16 @@ export interface ConversionConfig {
     portraitThreshold: number;
     landscapeThreshold: number;
     smallImageThreshold: number;
+  };
+  // Visionati AI image analysis configuration
+  visionati?: {
+    enabled: boolean;
+    useCache: boolean;
+    cacheFile?: string;
+    language?: string;
+    maxAltTextLength?: number;
+    backend?: string;
+    role?: string;
   };
 }
 
@@ -236,4 +251,80 @@ export interface ProcessingOptions {
   extractReferences: boolean;
   generateDescriptions: boolean;
   handleShortcodes: boolean;
+}
+
+// Visionati API Integration Types
+
+export interface VisionatiRequest {
+  url: string;
+  backend?: string;
+  feature?: string;
+  role?: string;
+  lang?: string;
+  prompt?: string;
+}
+
+export interface VisionatiResponse {
+  success: boolean;
+  data?: {
+    tags?: string[];
+    colors?: string[];
+    description?: string;
+    text?: string;
+    nsfw?: boolean;
+  };
+  error?: string;
+  credits_used?: number;
+}
+
+export interface VisionatiCacheEntry {
+  timestamp: string;
+  imageUrl: string;
+  imageHash?: string;
+  fileSize?: number;
+  visionatiResponse: VisionatiResponse;
+  generatedFilename?: string;
+  generatedAltText?: string;
+  apiCreditsUsed: number;
+}
+
+export interface VisionatiCache {
+  [imageUrl: string]: VisionatiCacheEntry;
+}
+
+export interface VisionatiConfig {
+  apiKey: string;
+  enableVisionati: boolean;
+  useCache: boolean;
+  cacheFile: string;
+  language: string;
+  maxAltTextLength: number;
+  backend?: string;
+  role?: string;
+  promptType?: "DEFAULT" | "MEDICAL" | "NUTRITION" | "WELLNESS" | "SCIENTIFIC";
+  customPrompt?: string;
+}
+
+export interface VisionatiStats {
+  totalEntries: number;
+  totalCreditsUsed: number;
+  cacheHits: number;
+  cacheMisses: number;
+  costSavings: number;
+}
+
+export interface ImageAnalysisResult {
+  originalFilename: string;
+  generatedFilename: string;
+  generatedAltText: string;
+  tags: string[];
+  fromCache: boolean;
+  creditsUsed: number;
+}
+
+export interface VisionatiParsedResponse {
+  altText: string;
+  filename: string;
+  success: boolean;
+  error?: string;
 }

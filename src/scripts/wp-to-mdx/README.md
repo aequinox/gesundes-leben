@@ -65,6 +65,19 @@ Options:
   --filter-date-to <date>    Only convert posts until date (YYYY-MM-DD)
   --author-mapping <file>    JSON file with custom author mapping
   --category-mapping <file>  JSON file with custom category mapping
+
+Visionati AI Integration:
+  --enable-visionati                Enable AI image analysis for German alt text & filenames
+  --no-visionati-cache             Disable Visionati cache usage
+  --visionati-cache-file <file>    Custom cache file path
+  --visionati-language <lang>      Language for descriptions (default: "de")
+  --visionati-max-alt-length <n>   Maximum alt text length (default: 125)
+  --visionati-backend <backend>    AI backend to use (default: "auto")
+  --visionati-role <role>          Analysis role/persona (default: "Inspector")
+  --visionati-prompt-type <type>   Health content prompt (DEFAULT|MEDICAL|NUTRITION|WELLNESS|SCIENTIFIC)
+  --visionati-custom-prompt <text> Custom prompt to override defaults
+  --visionati-stats                Show cache statistics
+
   -h, --help                 Display help
 ```
 
@@ -93,6 +106,112 @@ bun run wp-convert -i export.xml -o custom/blog/directory
 ```bash
 bun run wp-convert -i export.xml --no-download-images --dry-run
 ```
+
+### Enable AI Image Analysis
+
+```bash
+# Basic Visionati integration with German optimization
+bun run wp-convert -i export.xml --enable-visionati
+
+# Custom configuration with health-specific prompts
+bun run wp-convert -i export.xml --enable-visionati \
+  --visionati-language de \
+  --visionati-max-alt-length 100 \
+  --visionati-prompt-type NUTRITION \
+  --visionati-role "Inspector"
+
+# Medical content with precise terminology
+bun run wp-convert -i export.xml --enable-visionati \
+  --visionati-prompt-type MEDICAL
+
+# Scientific research content
+bun run wp-convert -i export.xml --enable-visionati \
+  --visionati-prompt-type SCIENTIFIC
+
+# Dry run with AI analysis preview
+bun run wp-convert -i export.xml --enable-visionati --dry-run
+```
+
+### Visionati Cache Management
+
+```bash
+# View cache statistics
+bun run wp-convert --visionati-stats
+
+# Use custom cache file
+bun run wp-convert -i export.xml --enable-visionati \
+  --visionati-cache-file ./my-custom-cache.json
+
+# Disable cache (always use API)
+bun run wp-convert -i export.xml --enable-visionati --no-visionati-cache
+```
+
+## 🧠 AI-Powered Image Enhancement with Visionati
+
+The converter now includes **Visionati AI integration** for automatic German image optimization, perfect for your health blog content.
+
+### Features
+
+- **🇩🇪 German Alt Text Generation**: Creates accessibility-compliant German descriptions (80-125 characters)
+- **🏥 Health-Focused Content**: Optimized for medical and nutrition terminology
+- **📝 Semantic Filenames**: Generates meaningful German filenames based on image content
+- **💾 Persistent Caching**: Never pay twice for the same image analysis
+- **⚡ Performance**: Batch processing with intelligent retry mechanisms
+
+### Setup
+
+1. **Get API Key**: Register at [api.visionati.com](https://api.visionati.com)
+2. **Add to Environment**: Set `VISIONATI_API_KEY` in your `.env` file
+3. **Enable Feature**: Use `--enable-visionati` flag
+
+```bash
+# Add to your .env file
+VISIONATI_API_KEY=your_api_key_here
+```
+
+### How It Works
+
+1. **Custom Health Prompts**: Sends German health-specific prompts to Visionati API requesting both alt text and filenames
+2. **AI Content Generation**: Visionati returns structured German content optimized for your health blog
+3. **Intelligent Parsing**: Extracts alt text and filenames from AI response with fallback mechanisms
+4. **Cache Storage**: Results saved to `visionati-cache.json` for reuse
+5. **Content Enhancement**: Updates MDX files with AI-generated German alt text and semantic filenames
+
+### Prompt Types
+
+- **DEFAULT**: General health blog content with comprehensive medical vocabulary
+- **MEDICAL**: Clinical and diagnostic content with precise medical terminology
+- **NUTRITION**: Food, vitamins, and nutrition-focused descriptions
+- **WELLNESS**: Lifestyle, mental health, and wellness content
+- **SCIENTIFIC**: Research-based content with scientific terminology
+
+### Example Transformations
+
+**Before**:
+
+```markdown
+![](./images/image-123.jpg)
+```
+
+**After** (with Visionati):
+
+```markdown
+![Infografik zeigt Vitamin D Mangel Symptome bei Erwachsenen.](./images/vitamin-d-mangel-symptome.jpg)
+```
+
+### Cost Management
+
+- **Smart Caching**: Analyzed images cached permanently to avoid duplicate API calls
+- **Credit Tracking**: Monitor API usage with `--visionati-stats`
+- **Batch Processing**: Efficient processing to minimize costs
+- **Dry Run Support**: Preview changes without using API credits
+
+### Quality Standards
+
+- **WCAG Compliance**: Alt text optimized for screen readers (125 character limit)
+- **German Health Vocabulary**: Uses medical and nutrition terminology correctly
+- **Semantic Filenames**: Health-focused keyword extraction for meaningful file names
+- **Accessibility First**: Follows modern alt text best practices
 
 ## Content Mapping
 
