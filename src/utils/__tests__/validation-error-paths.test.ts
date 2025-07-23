@@ -2,7 +2,7 @@
  * @file validation-error-paths.test.ts
  * @description Targeted tests to hit the exact uncovered error handling paths in validation.ts
  */
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 describe("Validation Error Paths - 100% Coverage", () => {
   let originalLogger: any;

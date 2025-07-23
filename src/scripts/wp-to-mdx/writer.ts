@@ -1,17 +1,18 @@
+import { promises as fs } from "fs";
+import { join } from "path";
+
 import { CONVERSION_DEFAULTS } from "./config";
-import { ErrorFactory, ConversionErrorCollector } from "./errors";
+import { ConversionErrorCollector, ErrorFactory } from "./errors";
 import { HttpImageDownloader } from "./image-downloader";
 import { logger } from "./logger";
 import { SecuritySanitizer } from "./security";
 import type {
   AstroBlogPost,
-  WordPressAttachment,
   ConversionConfig,
   ConversionError,
   ImageDownloader,
+  WordPressAttachment,
 } from "./types";
-import { promises as fs } from "fs";
-import { join } from "path";
 
 export class FileWriter {
   private config: ConversionConfig;

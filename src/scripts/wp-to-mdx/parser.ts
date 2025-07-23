@@ -1,20 +1,21 @@
-import { ErrorFactory, ConversionErrorCollector } from "./errors";
+import { readFileSync } from "fs";
+import { parseString } from "xml2js";
+
+import { ConversionErrorCollector, ErrorFactory } from "./errors";
 import { logger } from "./logger";
 import { SecuritySanitizer } from "./security";
 import type {
-  WordPressPost,
   WordPressAttachment,
   WordPressAuthor,
   WordPressCategory,
   WordPressExport,
-  WordPressXMLRoot,
-  WordPressXMLItem,
-  WordPressXMLChannel,
+  WordPressPost,
   WordPressXMLCategory,
+  WordPressXMLChannel,
+  WordPressXMLItem,
   WordPressXMLPostMeta,
+  WordPressXMLRoot,
 } from "./types";
-import { readFileSync } from "fs";
-import { parseString } from "xml2js";
 
 export class WordPressParser {
   private xmlData: WordPressXMLRoot;

@@ -1,11 +1,12 @@
+import { beforeEach, describe, expect, it } from "vitest";
+
 import {
-  filterPosts,
   extractUniqueTags,
+  filterPosts,
   filterPostsByTag,
   getTagCounts,
 } from "../tags";
 import type { Post } from "../types";
-import { describe, expect, it, beforeEach } from "vitest";
 
 // Mock data for testing
 const createMockPost = (overrides: any = {}): any => ({

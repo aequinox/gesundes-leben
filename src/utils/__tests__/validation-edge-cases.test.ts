@@ -2,8 +2,9 @@
  * @file validation-edge-cases.test.ts
  * @description Edge case tests specifically targeting uncovered lines in validation.ts
  */
+import { describe, expect, it } from "vitest";
+
 import { isValidEmail } from "../validation";
-import { describe, it, expect } from "vitest";
 
 describe("Validation Edge Cases - Coverage Completion", () => {
   describe("Error handling coverage", () => {

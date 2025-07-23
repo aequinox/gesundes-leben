@@ -2,14 +2,15 @@
  * @file validation.test.ts
  * @description Comprehensive test suite for email validation utilities
  */
+import { describe, expect, it } from "vitest";
+
 import {
-  isValidEmail,
-  isSimpleValidEmail,
-  validateEmails,
   extractEmailDomain,
+  isSimpleValidEmail,
+  isValidEmail,
   normalizeEmail,
+  validateEmails,
 } from "../validation";
-import { describe, it, expect } from "vitest";
 
 describe("isValidEmail", () => {
   describe("valid emails", () => {

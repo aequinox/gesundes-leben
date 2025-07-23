@@ -10,9 +10,10 @@
  * - Schema markup validation
  * - Core Web Vitals assessment
  */
+import type { CollectionEntry } from "astro:content";
+
 import { germanSEOOptimizer } from "./german-seo-optimization";
 import { seoPerformanceOptimizer } from "./performance-optimization";
-import type { CollectionEntry } from "astro:content";
 
 export interface SEOAuditResult {
   /** Overall SEO score (0-100) */

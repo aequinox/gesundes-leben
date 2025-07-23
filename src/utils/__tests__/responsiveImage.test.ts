@@ -2,7 +2,7 @@
  * @file responsiveImage.test.ts
  * @description Tests for ResponsiveImage component utilities and logic
  */
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("ResponsiveImage Component Logic", () => {
   describe("getSrcUrl utility", () => {

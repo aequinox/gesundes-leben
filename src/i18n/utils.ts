@@ -1,5 +1,6 @@
-import { ui, defaultLang, type Languages, type TranslationKey } from "./ui";
 import { logger } from "@/utils/logger";
+
+import { type Languages, type TranslationKey, defaultLang, ui } from "./ui";
 
 /**
  * Type for supported languages in the application

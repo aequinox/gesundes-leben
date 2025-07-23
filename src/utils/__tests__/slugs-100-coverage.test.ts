@@ -2,8 +2,9 @@
  * @file slugs-100-coverage.test.ts
  * @description Tests to achieve 100% coverage for slugs.ts
  */
+import { describe, expect, it } from "vitest";
+
 import { slugify } from "../slugs";
-import { describe, it, expect } from "vitest";
 
 describe("Slugs Utilities - 100% Coverage", () => {
   describe("Slugify edge cases", () => {

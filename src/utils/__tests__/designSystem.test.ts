@@ -2,23 +2,24 @@
  * @file designSystem.test.ts
  * @description Comprehensive tests for design system utilities
  */
+import { describe, expect, it } from "vitest";
+
 import {
-  cn,
-  responsive,
-  createSizeVariants,
-  createColorVariants,
-  focusStyles,
-  shadowStyles,
+  DESIGN_TOKENS,
   animationStyles,
   buttonBaseClasses,
-  inputBaseClasses,
   cardBaseClasses,
-  linkBaseClasses,
-  screenReaderStyles,
+  cn,
+  createColorVariants,
+  createSizeVariants,
+  focusStyles,
   iconStyles,
-  DESIGN_TOKENS,
+  inputBaseClasses,
+  linkBaseClasses,
+  responsive,
+  screenReaderStyles,
+  shadowStyles,
 } from "../ui/designSystem";
-import { describe, it, expect } from "vitest";
 
 describe("Design System Utilities", () => {
   describe("cn (class name utility)", () => {

@@ -30,11 +30,12 @@
  */
 
 import type { ImageMetadata as AstroImageMetadata } from "astro";
+
 import { Picture } from "astro:assets";
 
-import type { ImageMetadata, MediaComponentProps } from "../types/base";
-
 import { cn } from "@/utils/ui/designSystem";
+
+import type { ImageMetadata, MediaComponentProps } from "../types/base";
 
 export interface Props extends MediaComponentProps {
   /** Image sizes attribute for responsive loading */

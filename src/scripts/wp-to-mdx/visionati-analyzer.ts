@@ -1,24 +1,25 @@
 /**
  * Visionati AI image analysis service with persistent caching
  */
+import axios from "axios";
+import { createHash } from "crypto";
+import { promises as fs } from "fs";
+import { join } from "path";
+
 import { CONVERSION_DEFAULTS } from "./config";
 import { RetryHandler } from "./errors";
 import { logger } from "./logger";
 import { SecuritySanitizer } from "./security";
 import type {
-  VisionatiRequest,
-  VisionatiResponse,
+  ImageAnalysisResult,
   VisionatiCache,
   VisionatiCacheEntry,
   VisionatiConfig,
-  VisionatiStats,
-  ImageAnalysisResult,
   VisionatiParsedResponse,
+  VisionatiRequest,
+  VisionatiResponse,
+  VisionatiStats,
 } from "./types";
-import axios from "axios";
-import { createHash } from "crypto";
-import { promises as fs } from "fs";
-import { join } from "path";
 
 export class VisionatiImageAnalyzer {
   private cache: VisionatiCache = {};

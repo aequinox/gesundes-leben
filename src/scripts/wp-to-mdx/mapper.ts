@@ -1,20 +1,21 @@
+import slugify from "slugify";
+import { v4 as uuidv4 } from "uuid";
+
 import { CATEGORIES, GROUPS } from "../../utils/types";
 import {
   CONVERSION_DEFAULTS,
-  DEFAULT_CATEGORY_MAPPING,
   DEFAULT_AUTHOR_MAPPING,
+  DEFAULT_CATEGORY_MAPPING,
 } from "./config";
 import { ConversionErrorCollector } from "./errors";
 import { logger } from "./logger";
 import type {
-  WordPressPost,
   AstroBlogPost,
-  CategoryMapping,
   AuthorMapping,
+  CategoryMapping,
   ConversionConfig,
+  WordPressPost,
 } from "./types";
-import slugify from "slugify";
-import { v4 as uuidv4 } from "uuid";
 
 export class SchemaMapper {
   private config: ConversionConfig;

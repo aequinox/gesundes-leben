@@ -17,10 +17,10 @@
 import { Icon } from "astro-icon/components";
 import { render, type CollectionEntry } from "astro:content";
 
-import Modal from "./Modal.astro";
-
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { slugify } from "@/utils/slugs";
+
+import Modal from "./Modal.astro";
 
 export interface Props {
   /** The glossary entry to display */

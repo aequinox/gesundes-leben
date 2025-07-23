@@ -13,7 +13,7 @@
  * }, 'Failed to load data');
  * ```
  */
-import { createError, isAppError, formatErrorMessage } from "./errors";
+import { createError, formatErrorMessage, isAppError } from "./errors";
 import { logger } from "./logger";
 
 /**

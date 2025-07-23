@@ -17,7 +17,7 @@
  * const result = await emailValidator.validate('user@example.com');
  * ```
  */
-import type { ValidationResult, FormFieldConfig } from "@/types";
+import type { FormFieldConfig, ValidationResult } from "@/types";
 import { logger } from "@/utils/logger";
 
 export interface ValidationContext {

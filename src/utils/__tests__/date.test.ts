@@ -1,6 +1,8 @@
-import { createSafeDate, formatDate, clearDateFormatterCache } from "../date";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
 import { LOCALE } from "@/config";
-import { describe, beforeEach, afterEach, it, expect } from "vitest";
+
+import { clearDateFormatterCache, createSafeDate, formatDate } from "../date";
 
 describe("date utilities", () => {
   const testDate = new Date("2025-01-15");

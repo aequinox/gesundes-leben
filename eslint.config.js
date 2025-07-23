@@ -43,7 +43,7 @@ export default [
         { prefer: "type-imports" },
       ],
 
-      // Import rules
+      // Import rules - matches Prettier @trivago/prettier-plugin-sort-imports
       "import/order": [
         "error",
         {
@@ -56,7 +56,36 @@ export default [
             "index",
           ],
           "newlines-between": "always",
+          pathGroups: [
+            {
+              pattern: "react",
+              group: "external",
+              position: "before",
+            },
+            {
+              pattern: "next/**",
+              group: "external",
+              position: "before",
+            },
+            {
+              pattern: "astro",
+              group: "external",
+              position: "before",
+            },
+            {
+              pattern: "astro/**",
+              group: "external",
+              position: "before",
+            },
+            {
+              pattern: "@/**",
+              group: "internal",
+              position: "before",
+            },
+          ],
+          pathGroupsExcludedImportTypes: ["react", "next", "astro"],
           alphabetize: { order: "asc", caseInsensitive: true },
+          distinctGroup: true,
         },
       ],
       "import/newline-after-import": "error",

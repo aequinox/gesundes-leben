@@ -1,4 +1,4 @@
-import type { Root, Image } from "mdast";
+import type { Image, Root } from "mdast";
 import { visit } from "unist-util-visit";
 
 /** Remark context with Astro frontmatter */

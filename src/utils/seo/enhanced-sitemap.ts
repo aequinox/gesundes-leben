@@ -10,8 +10,9 @@
  * - News sitemap generation
  * - Image sitemap integration
  */
-import { SITE } from "@/config";
 import type { CollectionEntry } from "astro:content";
+
+import { SITE } from "@/config";
 
 export interface SitemapEntry {
   url: string;

@@ -1,12 +1,13 @@
 /**
  * Tests for Visionati Image Analyzer
  */
+import { promises as fs } from "fs";
+import { join } from "path";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { CONVERSION_DEFAULTS } from "../config";
 import type { VisionatiConfig } from "../types";
 import { VisionatiImageAnalyzer } from "../visionati-analyzer";
-import { promises as fs } from "fs";
-import { join } from "path";
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
 // Mock axios for API calls
 vi.mock("axios");

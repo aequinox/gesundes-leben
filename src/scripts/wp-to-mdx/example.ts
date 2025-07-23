@@ -5,8 +5,8 @@ import { MockImageDownloader } from "./image-downloader";
 import { WordPressToAstroConverter } from "./index";
 import {
   ContentProcessorPipeline,
-  ShortcodeProcessor,
   GermanContentProcessor,
+  ShortcodeProcessor,
 } from "./processors";
 import type { ConversionConfig } from "./types";
 

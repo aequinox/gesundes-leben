@@ -1,14 +1,15 @@
 /**
  * Visionati cache management utilities
  */
+import { promises as fs } from "fs";
+import { join } from "path";
+
 import { logger } from "./logger";
 import type {
   VisionatiCache,
   VisionatiCacheEntry,
   VisionatiStats,
 } from "./types";
-import { promises as fs } from "fs";
-import { join } from "path";
 
 export class VisionatiCacheManager {
   private cache: VisionatiCache = {};

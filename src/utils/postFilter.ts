@@ -1,5 +1,6 @@
-import type { Post } from "./types";
 import { SITE } from "@/config";
+
+import type { Post } from "./types";
 
 const postFilter = ({ data }: Post) => {
   const isPublishTimePassed =
