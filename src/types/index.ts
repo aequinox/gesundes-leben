@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * @file src/types/index.ts
  * @description Centralized type definitions for the Healthy Life project

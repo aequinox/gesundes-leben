@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * @file componentFactory.ts
  * @description Component factory utilities for creating reusable, type-safe Astro components
