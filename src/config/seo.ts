@@ -241,6 +241,8 @@ export function getRobotPolicies(): RobotPolicy[] {
     return [
       {
         ...seoConfig.robots.environmentSpecific.development,
+        userAgent: seoConfig.robots.environmentSpecific.development
+          .userAgent as string,
         sitemap: seoConfig.sitemap.baseUrls,
       },
     ];
