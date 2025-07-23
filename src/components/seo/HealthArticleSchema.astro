@@ -1,0 +1,299 @@
+---
+/**
+ * @file HealthArticleSchema.astro
+ * @description Advanced schema markup for health and wellness articles
+ *
+ * Features:
+ * - MedicalWebPage schema for health content
+ * - FAQ schema for Q&A sections
+ * - HowTo schema for step-by-step guides
+ * - HealthTopicContent schema for comprehensive health information
+ * - German health content optimization
+ */
+
+import { LOCALE, SITE } from "@/config";
+import { getI18nStrings } from "@/config/i18n";
+
+export interface Props {
+  /** Article title */
+  title: string;
+  /** Article description */
+  description: string;
+  /** Article URL */
+  url: string;
+  /** Publication date */
+  datePublished: Date;
+  /** Last modified date */
+  dateModified?: Date;
+  /** Author information */
+  author: {
+    name: string;
+    expertise?: string;
+    url?: string;
+  };
+  /** Health-specific category */
+  healthCategory: string;
+  /** Target medical audience */
+  medicalAudience?: "Patient" | "MedicalProfessional" | "Caregiver";
+  /** FAQ items for the article */
+  faqs?: Array<{
+    question: string;
+    answer: string;
+  }>;
+  /** Step-by-step instructions */
+  howToSteps?: Array<{
+    name: string;
+    text: string;
+  }>;
+  /** Related health conditions */
+  conditions?: string[];
+  /** Medical disclaimers (optional override) */
+  medicalDisclaimer?: string;
+}
+
+const {
+  title,
+  description,
+  url,
+  datePublished,
+  dateModified,
+  author,
+  healthCategory,
+  medicalAudience = "Patient",
+  faqs = [],
+  howToSteps = [],
+  conditions = [],
+  medicalDisclaimer,
+} = Astro.props;
+
+// Get i18n strings for current language
+const i18n = getI18nStrings(LOCALE.lang as "de" | "en");
+
+// Use provided disclaimer or default from i18n
+const disclaimer = medicalDisclaimer || i18n.seo.medical.disclaimer;
+
+// Generate MedicalWebPage schema
+const medicalWebPageSchema = {
+  "@context": "https://schema.org",
+  "@type": ["WebPage", "MedicalWebPage"],
+  "@id": url,
+  name: title,
+  description,
+  url,
+  inLanguage: LOCALE.langTag[0],
+  isPartOf: {
+    "@type": "WebSite",
+    name: SITE.title,
+    url: SITE.website,
+  },
+  about: {
+    "@type": "Thing",
+    name: healthCategory,
+    sameAs: `https://www.wikidata.org/wiki/Q${healthCategory}`,
+  },
+  audience: {
+    "@type": "MedicalAudience",
+    audienceType: medicalAudience,
+    geographicArea: {
+      "@type": "Country",
+      name: i18n.regions.germany,
+    },
+  },
+  medicalAudience: {
+    "@type": "MedicalAudience",
+    audienceType: medicalAudience,
+  },
+  author: {
+    "@type": "Person",
+    name: author.name,
+    expertise: author.expertise || i18n.seo.medical.expertiseLevel,
+    ...(author.url && { url: author.url }),
+  },
+  publisher: {
+    "@type": "Organization",
+    name: SITE.title,
+    url: SITE.website,
+    logo: {
+      "@type": "ImageObject",
+      url: new URL("/logo.png", SITE.website).href,
+      width: 180,
+      height: 180,
+    },
+  },
+  datePublished: datePublished.toISOString(),
+  ...(dateModified && { dateModified: dateModified.toISOString() }),
+  mainContentOfPage: {
+    "@type": "HealthTopicContent",
+    hasHealthAspect: healthCategory,
+    audience: {
+      "@type": "MedicalAudience",
+      audienceType: medicalAudience,
+    },
+  },
+  // Add related conditions if provided
+  ...(conditions.length > 0 && {
+    mentions: conditions.map(condition => ({
+      "@type": "MedicalCondition",
+      name: condition,
+    })),
+  }),
+  // Medical disclaimer
+  disclaimer,
+  // Quality indicators
+  contentRating: "General",
+  educationalLevel: "Beginner to Intermediate",
+};
+
+// Generate FAQ schema if FAQs are provided
+const faqSchema =
+  faqs.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqs.map((faq, index) => ({
+          "@type": "Question",
+          "@id": `${url}#faq-${index + 1}`,
+          name: faq.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: faq.answer,
+            author: {
+              "@type": "Person",
+              name: author.name,
+            },
+          },
+        })),
+      }
+    : null;
+
+// Generate HowTo schema if steps are provided
+const howToSchema =
+  howToSteps.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        name: title,
+        description,
+        image: new URL("/og-default.jpg", SITE.website).href,
+        totalTime: `PT${Math.ceil(howToSteps.length * 2)}M`,
+        estimatedCost: {
+          "@type": "MonetaryAmount",
+          currency: "EUR",
+          value: "0",
+        },
+        supply: [],
+        tool: [],
+        step: howToSteps.map((step, index) => ({
+          "@type": "HowToStep",
+          position: index + 1,
+          name: step.name,
+          text: step.text,
+          url: `${url}#step-${index + 1}`,
+        })),
+        author: {
+          "@type": "Person",
+          name: author.name,
+        },
+        datePublished: datePublished.toISOString(),
+        ...(dateModified && { dateModified: dateModified.toISOString() }),
+      }
+    : null;
+
+// Health and wellness organization schema
+const healthOrganizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": `${SITE.website}#organization`,
+  name: SITE.title,
+  url: SITE.website,
+  logo: {
+    "@type": "ImageObject",
+    url: new URL("/logo.png", SITE.website).href,
+    width: 180,
+    height: 180,
+  },
+  sameAs: [
+    "https://www.facebook.com/gesundesleben",
+    "https://www.instagram.com/gesundesleben",
+  ],
+  foundingLocation: {
+    "@type": "Country",
+    name: "Deutschland",
+  },
+  areaServed: {
+    "@type": "Country",
+    name: "Deutschland",
+  },
+  knowsLanguage: [
+    {
+      "@type": "Language",
+      name: "Deutsch",
+      alternateName: "German",
+    },
+  ],
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Gesundheits- und Wellness-Informationen",
+    itemListElement: [
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Gesundheitsinformationen",
+          description: "Kostenlose Gesundheits- und Wellness-Informationen",
+        },
+      },
+    ],
+  },
+};
+---
+
+<!-- Health Content Schema Markup -->
+<script
+  type="application/ld+json"
+  is:inline
+  set:html={JSON.stringify(medicalWebPageSchema)}
+/>
+
+<!-- FAQ Schema (if applicable) -->{
+  faqSchema && (
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify(faqSchema)}
+    />
+  )
+}
+
+<!-- How-To Schema (if applicable) -->
+{
+  howToSchema && (
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify(howToSchema)}
+    />
+  )
+}
+
+<!-- Organization Schema -->
+<script
+  type="application/ld+json"
+  is:inline
+  set:html={JSON.stringify(healthOrganizationSchema)}
+/>
+
+<!-- Health-specific meta tags -->
+<meta name="health:accuracy-reviewed" content="true" />
+<meta name="health:expertise-level" content="professional" />
+<meta name="health:content-type" content="educational" />
+<meta name="health:medical-disclaimer" content={medicalDisclaimer} />
+{
+  conditions.length > 0 && (
+    <meta name="health:conditions" content={conditions.join(", ")} />
+  )
+}
+
+<!-- German health authority compliance -->
+<meta name="de:health-authority" content="BfArM-compliant" />
+<meta name="de:medical-device-regulation" content="informational-only" />

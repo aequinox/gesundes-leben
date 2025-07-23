@@ -79,19 +79,19 @@ export const SITE: SiteConfig = {
   website: "https://gesundes-leben.vision/",
   author: "kai-renner",
   profile: "https://satnaing.dev/",
-  desc: "A minimal, responsive and SEO-friendly Astro blog theme.",
+  desc: "Dein vertrauenswürdiger Ratgeber für Gesundheit, Ernährung und Wellness. Entdecke evidenzbasierte Artikel, praktische Tipps und Expertenwissen für ein gesünderes Leben.",
   title: "Gesundes Leben",
-  ogImage: "astropaper-og.jpg",
+  ogImage: "gesundes-leben-og.jpg",
   lightAndDarkMode: true,
-  postPerIndex: 4,
-  postPerPage: 4,
+  postPerIndex: 6, // Optimized for better user engagement
+  postPerPage: 12, // SEO-friendly pagination
   scheduledPostMargin: 15 * 60 * 1000, // 15 minutes
   showSearch: true,
   showArchives: true,
-  showBackButton: true, // show back button in post detail
+  showBackButton: true,
   dynamicOgImage: true,
-  lang: "de", // html lang code. Set this empty and default will be "en"
-  timezone: "Europe/Berlin", // Default global timezone (IANA format) https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  lang: "de",
+  timezone: "Europe/Berlin",
 } as const;
 
 export const LOCALE: Readonly<LocaleConfig> = {

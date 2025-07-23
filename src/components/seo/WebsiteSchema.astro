@@ -1,0 +1,375 @@
+---
+/**
+ * @file WebsiteSchema.astro
+ * @description Comprehensive website schema markup for site-level SEO
+ *
+ * Features:
+ * - Website and WebSite schema markup
+ * - SearchAction for site search functionality
+ * - German health content site optimization
+ * - Comprehensive organization information
+ * - Enhanced social media integration
+ * - Local business markup for German market
+ */
+
+import { LOCALE, SITE } from "@/config";
+import { getI18nStrings } from "@/config/i18n";
+
+export interface Props {
+  /** Search functionality URL template */
+  searchUrl?: string;
+  /** Site logo URL override */
+  logoUrl?: string;
+  /** Additional same-as URLs */
+  socialUrls?: string[];
+  /** Site founding year */
+  foundingYear?: number;
+  /** Site description override */
+  description?: string;
+}
+
+const {
+  searchUrl = "/search?q={search_term_string}",
+  logoUrl,
+  socialUrls = [],
+  foundingYear = 2024,
+  description = SITE.desc,
+} = Astro.props;
+
+// Get i18n strings for current language
+const i18n = getI18nStrings(LOCALE.lang as "de" | "en");
+
+// Comprehensive Website schema
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${SITE.website}#website`,
+  name: SITE.title,
+  alternateName: "Gesundes Leben Blog",
+  description,
+  url: SITE.website,
+  inLanguage: LOCALE.langTag[0],
+  isAccessibleForFree: true,
+  isFamilyFriendly: true,
+  audience: {
+    "@type": "Audience",
+    audienceType: "General Public",
+    geographicArea: [
+      {
+        "@type": "Country",
+        name: i18n.regions.germany,
+      },
+      {
+        "@type": "Country",
+        name: "Österreich",
+      },
+      {
+        "@type": "Country",
+        name: "Schweiz",
+      },
+    ],
+  },
+  publisher: {
+    "@type": "Organization",
+    "@id": `${SITE.website}#organization`,
+    name: SITE.title,
+    url: SITE.website,
+    logo: {
+      "@type": "ImageObject",
+      url: logoUrl || new URL("/logo.png", SITE.website).href,
+      width: 180,
+      height: 180,
+      caption: `${SITE.title} Logo`,
+    },
+    foundingDate: `${foundingYear}-01-01`,
+    foundingLocation: {
+      "@type": "Country",
+      name: i18n.regions.germany,
+    },
+    areaServed: [
+      {
+        "@type": "Country",
+        name: i18n.regions.germany,
+      },
+      {
+        "@type": "Country",
+        name: "Österreich",
+      },
+      {
+        "@type": "Country",
+        name: "Schweiz",
+      },
+    ],
+    knowsLanguage: [
+      {
+        "@type": "Language",
+        name: "Deutsch",
+        alternateName: "German",
+      },
+    ],
+    sameAs: [
+      "https://www.facebook.com/gesundesleben",
+      "https://www.instagram.com/gesundesleben",
+      "https://twitter.com/gesundesleben",
+      "https://www.youtube.com/c/gesundesleben",
+      ...socialUrls,
+    ].filter(Boolean),
+  },
+  author: {
+    "@type": "Person",
+    "@id": `${SITE.website}#author`,
+    name: SITE.author,
+    url: SITE.profile,
+    sameAs: [SITE.profile, ...socialUrls].filter(Boolean),
+  },
+  // Enhanced search functionality
+  potentialAction: [
+    {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${SITE.website}${searchUrl}`,
+        actionPlatform: [
+          "http://schema.org/DesktopWebPlatform",
+          "http://schema.org/MobileWebPlatform",
+          "http://schema.org/IOSPlatform",
+          "http://schema.org/AndroidPlatform",
+        ],
+      },
+      "query-input": {
+        "@type": "PropertyValueSpecification",
+        valueRequired: true,
+        valueName: "search_term_string",
+        description: "Suche nach Gesundheits- und Wellness-Themen",
+      },
+    },
+    {
+      "@type": "ReadAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${SITE.website}/rss.xml`,
+        actionPlatform: [
+          "http://schema.org/DesktopWebPlatform",
+          "http://schema.org/MobileWebPlatform",
+        ],
+      },
+    },
+  ],
+  // Content categorization
+  mainContentOfPage: {
+    "@type": "CollectionPage",
+    about: [
+      {
+        "@type": "Thing",
+        name: "Gesundheit",
+        sameAs: "https://www.wikidata.org/wiki/Q12136",
+      },
+      {
+        "@type": "Thing",
+        name: "Ernährung",
+        sameAs: "https://www.wikidata.org/wiki/Q2095",
+      },
+      {
+        "@type": "Thing",
+        name: "Wellness",
+        sameAs: "https://www.wikidata.org/wiki/Q204364",
+      },
+      {
+        "@type": "Thing",
+        name: "Lifestyle",
+        sameAs: "https://www.wikidata.org/wiki/Q16513678",
+      },
+    ],
+  },
+  // RSS feed
+  relatedLink: [
+    {
+      "@type": "SiteNavigationElement",
+      name: "RSS Feed",
+      url: `${SITE.website}/rss.xml`,
+    },
+    {
+      "@type": "SiteNavigationElement",
+      name: "Sitemap",
+      url: `${SITE.website}/sitemap-index.xml`,
+    },
+  ],
+  // Quality indicators
+  contentRating: "General",
+  educationalLevel: "Beginner to Advanced",
+  accessibilityAPI: ["ARIA"],
+  accessibilityControl: [
+    "fullKeyboardControl",
+    "fullMouseControl",
+    "fullTouchControl",
+  ],
+  accessibilityFeature: [
+    "alternativeText",
+    "longDescription",
+    "structuralNavigation",
+  ],
+  accessibilityHazard: "none",
+  usageInfo: "Free to read, educational content about health and wellness",
+};
+
+// Enhanced organization schema for health content site
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": `${SITE.website}#organization`,
+  name: SITE.title,
+  legalName: SITE.title,
+  url: SITE.website,
+  logo: {
+    "@type": "ImageObject",
+    url: logoUrl || new URL("/logo.png", SITE.website).href,
+    width: 180,
+    height: 180,
+    caption: `${SITE.title} Logo`,
+  },
+  image: logoUrl || new URL("/logo.png", SITE.website).href,
+  description,
+  foundingDate: `${foundingYear}-01-01`,
+  foundingLocation: {
+    "@type": "Country",
+    name: i18n.regions.germany,
+  },
+  areaServed: [
+    {
+      "@type": "Country",
+      name: i18n.regions.germany,
+    },
+    {
+      "@type": "Country",
+      name: "Österreich",
+    },
+    {
+      "@type": "Country",
+      name: "Schweiz",
+    },
+  ],
+  knowsLanguage: [
+    {
+      "@type": "Language",
+      name: "Deutsch",
+      alternateName: "German",
+    },
+  ],
+  sameAs: [
+    "https://www.facebook.com/gesundesleben",
+    "https://www.instagram.com/gesundesleben",
+    "https://twitter.com/gesundesleben",
+    "https://www.youtube.com/c/gesundesleben",
+    ...socialUrls,
+  ].filter(Boolean),
+  // Service offerings
+  makesOffer: [
+    {
+      "@type": "Offer",
+      name: i18n.seo.organization.serviceOffering,
+      description: i18n.seo.organization.serviceDescription,
+      price: "0",
+      priceCurrency: "EUR",
+      availability: "https://schema.org/InStock",
+      validFrom: `${foundingYear}-01-01`,
+    },
+  ],
+  // Contact information
+  contactPoint: [
+    {
+      "@type": "ContactPoint",
+      contactType: "customer service",
+      availableLanguage: "German",
+      areaServed: ["DE", "AT", "CH"],
+    },
+  ],
+  // Verification and trust signals
+  hasCredential: {
+    "@type": "EducationalOccupationalCredential",
+    credentialCategory: "Health Information Provider",
+    recognizedBy: {
+      "@type": "Organization",
+      name: "Gesundheits- und Wellness-Community",
+    },
+  },
+};
+
+// Medical organization aspects for health content
+const medicalOrganizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "MedicalOrganization",
+  "@id": `${SITE.website}#medical-organization`,
+  name: SITE.title,
+  url: SITE.website,
+  medicalSpecialty: [
+    {
+      "@type": "MedicalSpecialty",
+      name: "Präventivmedizin",
+    },
+    {
+      "@type": "MedicalSpecialty",
+      name: "Ernährungsmedizin",
+    },
+    {
+      "@type": "MedicalSpecialty",
+      name: "Lifestyle-Medizin",
+    },
+  ],
+  areaServed: [
+    {
+      "@type": "Country",
+      name: i18n.regions.germany,
+    },
+  ],
+  audience: {
+    "@type": "MedicalAudience",
+    audienceType: "Patient",
+    geographicArea: {
+      "@type": "Country",
+      name: i18n.regions.germany,
+    },
+  },
+  isAcceptingNewPatients: false,
+  medicalAudience: [
+    {
+      "@type": "MedicalAudience",
+      audienceType: "Patient",
+    },
+  ],
+};
+---
+
+<!-- Primary Website Schema -->
+<script
+  type="application/ld+json"
+  is:inline
+  set:html={JSON.stringify(websiteSchema)}
+/>
+
+<!-- Organization Schema -->
+<script
+  type="application/ld+json"
+  is:inline
+  set:html={JSON.stringify(organizationSchema)}
+/>
+
+<!-- Medical Organization Schema for Health Content -->
+<script
+  type="application/ld+json"
+  is:inline
+  set:html={JSON.stringify(medicalOrganizationSchema)}
+/>
+
+<!-- Site-level meta enhancements -->
+<meta name="site:type" content="health-information" />
+<meta name="site:category" content="Gesundheit und Wellness" />
+<meta name="site:audience" content="German-speaking health enthusiasts" />
+<meta name="site:founding-year" content={foundingYear.toString()} />
+<meta name="site:content-language" content="de-DE" />
+<meta name="site:geographical-coverage" content="DACH region" />
+
+<!-- Trust and authority signals -->
+<meta name="site:content-quality" content="editorial-reviewed" />
+<meta name="site:expertise-level" content="professional" />
+<meta name="site:health-authority-compliance" content="BfArM-informational" />
+<meta name="site:medical-disclaimer-available" content="true" />

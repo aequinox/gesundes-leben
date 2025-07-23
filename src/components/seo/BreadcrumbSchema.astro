@@ -1,0 +1,165 @@
+---
+/**
+ * @file BreadcrumbSchema.astro
+ * @description Enhanced breadcrumb navigation with comprehensive schema markup
+ *
+ * Features:
+ * - BreadcrumbList structured data
+ * - German navigation labels
+ * - Category-aware breadcrumbs
+ * - Health content categorization
+ * - Accessibility optimization
+ * - SEO-friendly URL structure
+ */
+
+import { SITE } from "@/config";
+import { getI18nStrings, getNavigationTranslation } from "@/config/i18n";
+
+export interface BreadcrumbItem {
+  name: string;
+  url?: string;
+  position: number;
+}
+
+export interface Props {
+  /** Current page title */
+  currentPage: string;
+  /** Category for content categorization */
+  category?: string;
+  /** Custom breadcrumb items */
+  items?: BreadcrumbItem[];
+  /** Whether this is a health article */
+  isHealthContent?: boolean;
+}
+
+const {
+  currentPage,
+  category,
+  items = [],
+  isHealthContent = false,
+} = Astro.props;
+
+// Get i18n strings for current language
+const i18n = getI18nStrings("de");
+
+// Generate breadcrumbs from URL path
+const generateBreadcrumbs = (): BreadcrumbItem[] => {
+  if (items.length > 0) {
+    return items;
+  }
+
+  const pathSegments = Astro.url.pathname.split("/").filter(Boolean);
+  const breadcrumbs: BreadcrumbItem[] = [
+    {
+      name: i18n.seo.navigation.home,
+      url: SITE.website,
+      position: 1,
+    },
+  ];
+
+  let currentPath = "";
+  pathSegments.forEach((segment, index) => {
+    currentPath += `/${segment}`;
+    const isLast = index === pathSegments.length - 1;
+
+    let segmentName = segment
+      .split("-")
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+
+    // Apply translations using i18n utility
+    segmentName = getNavigationTranslation(segment, "de");
+
+    breadcrumbs.push({
+      name: isLast ? currentPage : segmentName,
+      url: isLast ? undefined : new URL(currentPath, SITE.website).href,
+      position: index + 2,
+    });
+  });
+
+  return breadcrumbs;
+};
+
+const breadcrumbItems = generateBreadcrumbs();
+
+// Generate structured data
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  name: "Navigation",
+  description: `Navigationspfad für ${currentPage}`,
+  itemListElement: breadcrumbItems.map(item => ({
+    "@type": "ListItem",
+    position: item.position,
+    name: item.name,
+    ...(item.url && {
+      item: {
+        "@type": "WebPage",
+        "@id": item.url,
+        name: item.name,
+        url: item.url,
+      },
+    }),
+  })),
+};
+
+// Enhanced breadcrumb schema with health categorization
+const enhancedBreadcrumbSchema = isHealthContent
+  ? {
+      ...breadcrumbSchema,
+      potentialAction: {
+        "@type": "ReadAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${SITE.website}/search?q={search_term_string}`,
+          actionPlatform: [
+            "http://schema.org/DesktopWebPlatform",
+            "http://schema.org/MobileWebPlatform",
+          ],
+        },
+      },
+      mainEntity: {
+        "@type": "HealthTopicContent",
+        hasHealthAspect: category || "Gesundheit",
+        audience: {
+          "@type": "MedicalAudience",
+          audienceType: "Patient",
+        },
+      },
+    }
+  : breadcrumbSchema;
+---
+
+<!-- Breadcrumb Structured Data -->
+<script
+  type="application/ld+json"
+  is:inline
+  set:html={JSON.stringify(enhancedBreadcrumbSchema)}
+/>
+
+<!-- Additional navigation context for health content -->{
+  isHealthContent && (
+    <>
+      <meta
+        name="health:navigation-context"
+        content={category || "Gesundheit"}
+      />
+      <meta name="content:breadcrumb-health" content="true" />
+      <meta name="navigation:health-category" content={category || "general"} />
+    </>
+  )
+}
+
+<!-- Navigation hints for crawlers -->
+<meta
+  name="navigation:breadcrumb-count"
+  content={breadcrumbItems.length.toString()}
+/>
+<meta
+  name="navigation:depth"
+  content={(breadcrumbItems.length - 1).toString()}
+/>
+
+<!-- Accessibility enhancements -->
+<meta name="accessibility:navigation-context" content="breadcrumb" />
+<meta name="accessibility:navigation-language" content="de-DE" />

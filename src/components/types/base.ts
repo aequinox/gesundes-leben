@@ -235,7 +235,7 @@ export interface TypographyComponentProps extends BaseComponentProps {
 /**
  * Utility type for extracting HTML attributes for specific elements
  */
-export type HTMLProps = Record<string, any> & BaseComponentProps;
+export type HTMLProps = Record<string, unknown> & BaseComponentProps;
 
 /**
  * Props for components that can render as different HTML elements

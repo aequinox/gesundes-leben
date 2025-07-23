@@ -6,6 +6,7 @@ import ArticleProgressBar from "@/components/partials/ArticleProgressBar.astro";
 import ArticleSidebar from "@/components/partials/ArticleSidebar.astro";
 import Footer from "@/components/sections/Footer.astro";
 import Header from "@/components/sections/Header.astro";
+import { BreadcrumbSchema, HealthArticleSchema } from "@/components/seo";
 import { SITE } from "@/config";
 import Layout from "@/layouts/Layout.astro";
 import { getAuthorEntry } from "@/utils/authors";
@@ -72,9 +73,33 @@ const layoutProps: LayoutProps = {
   ogImage: ogUrl,
   scrollSmooth: true,
 };
+
+// All articles are health-related content
+const primaryCategory = categories?.[0] || "Gesundheit";
 ---
 
 <Layout {...layoutProps}>
+  <!-- Enhanced SEO Schema Markup -->
+  <BreadcrumbSchema
+    currentPage={title}
+    category={primaryCategory}
+    isHealthContent={true}
+  />
+
+  <HealthArticleSchema
+    title={title}
+    description={description}
+    url={new URL(Astro.url.pathname, Astro.url.origin).href}
+    datePublished={pubDatetime}
+    dateModified={modDatetime}
+    author={{
+      name: authorEntry?.data.name || SITE.author,
+      expertise: "Health and Wellness Writing",
+    }}
+    healthCategory={primaryCategory}
+    medicalAudience="Patient"
+  />
+
   <ArticleProgressBar />
 
   <Header />

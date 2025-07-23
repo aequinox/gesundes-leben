@@ -1,4 +1,9 @@
 import { SITE } from "./src/config";
+import {
+  getRobotPolicies,
+  getSitemapConfig,
+  seoConfig,
+} from "./src/config/seo";
 import { rehypePlugins } from "./src/plugins/rehypePlugins";
 import { remarkPlugins } from "./src/plugins/remarkPlugins";
 import mdx from "@astrojs/mdx";
@@ -6,6 +11,7 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import icon from "astro-icon";
 import pagefind from "astro-pagefind";
+import robotsTxt from "astro-robots-txt";
 import { defineConfig } from "astro/config";
 
 // import { defineConfig, fontProviders } from "astro/config";
@@ -14,8 +20,17 @@ import { defineConfig } from "astro/config";
 export default defineConfig({
   site: SITE.website,
   integrations: [
+    robotsTxt({
+      sitemap: seoConfig.sitemap.baseUrls,
+      policy: getRobotPolicies(),
+    }),
     sitemap({
-      filter: page => SITE.showArchives || !page.endsWith("/archives"),
+      ...getSitemapConfig(),
+      filter: page => {
+        // Combine existing filter with new SEO config
+        const showArchives = SITE.showArchives || !page.endsWith("/archives");
+        return showArchives && getSitemapConfig().filter(page);
+      },
     }),
     pagefind(),
     mdx(),
