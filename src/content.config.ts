@@ -1,8 +1,7 @@
-import { glob } from "astro/loaders";
-import { defineCollection, reference, z } from "astro:content";
-
 import { SITE } from "@/config";
 import { CATEGORIES, GROUPS } from "@/utils/types";
+import { glob } from "astro/loaders";
+import { defineCollection, reference, z } from "astro:content";
 
 export const BLOG_PATH = "src/data/blog";
 

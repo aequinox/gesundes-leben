@@ -1,5 +1,4 @@
 import type { Post } from "./types";
-
 import { SITE } from "@/config";
 
 const postFilter = ({ data }: Post) => {

@@ -1,11 +1,10 @@
 // import { replaceRelativeLinks } from "./remark-img-links";
-import type { RemarkPlugins } from "astro";
-import remarkCollapse from "remark-collapse";
-import remarkToc from "remark-toc";
-
 import { remarkHashtag } from "./remark-hashtag";
 import { remarkReadingTime } from "./remark-reading-time";
 import remarkSectionize from "./sectionize";
+import type { RemarkPlugins } from "astro";
+import remarkCollapse from "remark-collapse";
+import remarkToc from "remark-toc";
 
 export const remarkPlugins: RemarkPlugins = [
   remarkReadingTime,

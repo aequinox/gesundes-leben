@@ -2,9 +2,8 @@
  * @file date-100-coverage.test.ts
  * @description Tests to achieve 100% coverage for date.ts
  */
-import { describe, it, expect, beforeEach } from "vitest";
-
 import { clearDateFormatterCache, formatDate, createSafeDate } from "../date";
+import { describe, it, expect, beforeEach } from "vitest";
 
 describe("Date Utilities - 100% Coverage", () => {
   beforeEach(() => {

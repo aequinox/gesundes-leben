@@ -1,8 +1,7 @@
+import { slugify } from "../../utils/slugs";
 import type { Root, RootContent, Link, Text, Html } from "mdast";
 import type { Plugin } from "unified";
 import { visit } from "unist-util-visit";
-
-import { slugify } from "../../utils/slugs";
 
 /**
  * Configuration options for the hashtag plugin

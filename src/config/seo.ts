@@ -236,10 +236,17 @@ export function getRobotPolicies(): RobotPolicy[] {
   const isDevelopment = import.meta.env.DEV;
   const basePolicy = seoConfig.robots.policies;
 
-  if (isDevelopment) {
+  if (
+    isDevelopment &&
+    seoConfig.robots.environmentSpecific.development.userAgent
+  ) {
+    const devPolicy = seoConfig.robots.environmentSpecific.development;
     return [
       {
-        ...seoConfig.robots.environmentSpecific.development,
+        userAgent: devPolicy.userAgent!,
+        allow: devPolicy.allow,
+        disallow: devPolicy.disallow,
+        crawlDelay: devPolicy.crawlDelay,
         sitemap: seoConfig.sitemap.baseUrls,
       },
     ];

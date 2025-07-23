@@ -1,7 +1,6 @@
-import { getCollection, getEntry } from "astro:content";
-
 import { logger } from "./logger";
 import type { Author } from "./types";
+import { getCollection, getEntry } from "astro:content";
 
 /**
  * Retrieves an author entry by slug or author reference with error handling

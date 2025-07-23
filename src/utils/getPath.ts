@@ -1,5 +1,4 @@
 import { slugify } from "./slugs";
-
 import { BLOG_PATH } from "@/content.config";
 
 /**

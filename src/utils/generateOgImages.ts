@@ -1,8 +1,7 @@
-import { Resvg } from "@resvg/resvg-js";
-
 import postOgImage from "./og-templates/post";
 import siteOgImage from "./og-templates/site";
 import type { Post } from "./types";
+import { Resvg } from "@resvg/resvg-js";
 
 function svgBufferToPngBuffer(svg: string) {
   const resvg = new Resvg(svg);

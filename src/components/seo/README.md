@@ -19,20 +19,20 @@ A professional, comprehensive SEO component for Astro applications with advanced
 
 ```astro
 ---
-import SEO from '@/components/seo/SEO.astro';
+import SEO from "@/components/seo/SEO.astro";
 ---
 
 <html lang="de">
-<head>
-  <SEO
-    title="Your Page Title"
-    description="Your page description"
-    keywords={['keyword1', 'keyword2', 'keyword3']}
-  />
-</head>
-<body>
-  <!-- Your content -->
-</body>
+  <head>
+    <SEO
+      title="Your Page Title"
+      description="Your page description"
+      keywords={["keyword1", "keyword2", "keyword3"]}
+    />
+  </head>
+  <body>
+    <!-- Your content -->
+  </body>
 </html>
 ```
 
@@ -40,35 +40,35 @@ import SEO from '@/components/seo/SEO.astro';
 
 ```astro
 ---
-import SEO from '@/components/seo/SEO.astro';
+import SEO from "@/components/seo/SEO.astro";
 
 const post = {
-  title: 'Die 10 besten Superfoods für mehr Energie',
-  description: 'Entdecken Sie kraftvolle Superfoods...',
-  publishedTime: new Date('2024-01-15'),
-  author: { name: 'Dr. Sarah Mueller' },
-  tags: ['Superfoods', 'Energie', 'Gesundheit']
+  title: "Die 10 besten Superfoods für mehr Energie",
+  description: "Entdecken Sie kraftvolle Superfoods...",
+  publishedTime: new Date("2024-01-15"),
+  author: { name: "Dr. Sarah Mueller" },
+  tags: ["Superfoods", "Energie", "Gesundheit"],
 };
 ---
 
 <html lang="de">
-<head>
-  <SEO
-    title={post.title}
-    description={post.description}
-    pageType="article"
-    publishedTime={post.publishedTime}
-    author={post.author}
-    section="Ernährung"
-    tags={post.tags}
-    keywords={post.tags.map(tag => tag.toLowerCase())}
-    ogImage="/images/superfoods-hero.jpg"
-    twitterCard="summary_large_image"
-  />
-</head>
-<body>
-  <!-- Article content -->
-</body>
+  <head>
+    <SEO
+      title={post.title}
+      description={post.description}
+      pageType="article"
+      publishedTime={post.publishedTime}
+      author={post.author}
+      section="Ernährung"
+      tags={post.tags}
+      keywords={post.tags.map(tag => tag.toLowerCase())}
+      ogImage="/images/superfoods-hero.jpg"
+      twitterCard="summary_large_image"
+    />
+  </head>
+  <body>
+    <!-- Article content -->
+  </body>
 </html>
 ```
 
@@ -79,7 +79,7 @@ const post = {
 ```typescript
 interface SEOProps extends SEOMetadata {
   /** Page type for structured data */
-  pageType?: 'article' | 'webpage' | 'aboutpage' | 'contactpage';
+  pageType?: "article" | "webpage" | "aboutpage" | "contactpage";
   /** Publication date for articles */
   publishedTime?: Date;
   /** Last modified date */
@@ -103,7 +103,7 @@ interface SEOMetadata {
   keywords?: string[];
   canonicalURL?: string;
   ogImage?: string;
-  twitterCard?: 'summary' | 'summary_large_image';
+  twitterCard?: "summary" | "summary_large_image";
   structuredData?: Record<string, unknown>;
 }
 ```
@@ -118,6 +118,7 @@ interface SEOMetadata {
 ## 📊 Generated Meta Tags
 
 ### Basic Meta Tags
+
 ```html
 <title>Your Page Title</title>
 <meta name="description" content="Your page description" />
@@ -127,6 +128,7 @@ interface SEOMetadata {
 ```
 
 ### Open Graph Tags
+
 ```html
 <meta property="og:type" content="article" />
 <meta property="og:site_name" content="Gesundes Leben" />
@@ -138,6 +140,7 @@ interface SEOMetadata {
 ```
 
 ### Twitter Card Tags
+
 ```html
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Your Page Title" />
@@ -146,22 +149,23 @@ interface SEOMetadata {
 ```
 
 ### Structured Data (JSON-LD)
+
 ```html
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": "Your Article Title",
-  "description": "Article description",
-  "author": {
-    "@type": "Person",
-    "name": "Author Name"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "Gesundes Leben"
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Your Article Title",
+    "description": "Article description",
+    "author": {
+      "@type": "Person",
+      "name": "Author Name"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Gesundes Leben"
+    }
   }
-}
 </script>
 ```
 
@@ -170,6 +174,7 @@ interface SEOMetadata {
 The SEO component includes specialized optimization for health and wellness content:
 
 ### Health-Specific Structured Data
+
 ```javascript
 // Automatically added for health articles
 {
@@ -183,6 +188,7 @@ The SEO component includes specialized optimization for health and wellness cont
 ```
 
 ### German Health Keywords
+
 - Optimized keyword processing for German health terms
 - Automatic umlauts and special character handling
 - Health-specific meta tag suggestions
@@ -190,12 +196,14 @@ The SEO component includes specialized optimization for health and wellness cont
 ## 🌍 Localization Features
 
 ### German Language Support
+
 - Primary language: `de-DE`
 - Proper locale tags for search engines
 - German-optimized structured data
 - Cultural context awareness
 
 ### Multi-Language Ready
+
 The component is prepared for future multilingual expansion:
 
 ```astro
@@ -205,8 +213,8 @@ The component is prepared for future multilingual expansion:
   customStructuredData={{
     inLanguage: "de-DE",
     audience: {
-      geographicArea: "Deutschland"
-    }
+      geographicArea: "Deutschland",
+    },
   }}
 />
 ```
@@ -214,7 +222,9 @@ The component is prepared for future multilingual expansion:
 ## 🔍 SEO Best Practices
 
 ### Automated Validations
+
 The component automatically validates:
+
 - Title length (warns if > 60 characters)
 - Description length (warns if > 160 characters)
 - Image URL validity
@@ -222,12 +232,14 @@ The component automatically validates:
 - Required field presence
 
 ### Performance Optimization
+
 - Server-side rendering only (no client-side JavaScript)
 - Efficient image URL resolution
 - Lazy loading support
 - Core Web Vitals optimization
 
 ### Accessibility Features
+
 - Proper semantic markup
 - Screen reader compatibility
 - Color scheme support
@@ -236,6 +248,7 @@ The component automatically validates:
 ## 🧪 Testing
 
 ### Running Tests
+
 ```bash
 # Run SEO component tests
 bun run test src/components/seo/__tests__/SEO.test.ts
@@ -245,7 +258,9 @@ bun run test:coverage src/components/seo/
 ```
 
 ### Test Coverage
+
 The test suite covers:
+
 - ✅ Basic meta tag rendering
 - ✅ Open Graph tag generation
 - ✅ Twitter Card functionality
@@ -258,6 +273,7 @@ The test suite covers:
 ## 🚨 Error Handling
 
 ### Input Validation
+
 ```typescript
 // Automatic HTML sanitization
 const sanitizedTitle = sanitizeText(title);
@@ -267,11 +283,12 @@ const imageURL = isValidURL(ogImage) ? ogImage : fallbackImage;
 
 // Length validation with warnings
 if (description.length > 160) {
-  logger.warn('SEO: Description too long for optimal SEO');
+  logger.warn("SEO: Description too long for optimal SEO");
 }
 ```
 
 ### Graceful Degradation
+
 - Invalid URLs → Use fallback images
 - Missing data → Use site defaults
 - Malformed structured data → Skip problematic sections
@@ -280,19 +297,23 @@ if (description.length > 160) {
 ## 📈 Monitoring & Analytics
 
 ### SEO Metrics
+
 The component logs important SEO metrics:
+
 - Title and description lengths
 - Image loading status
 - Structured data validation
 - Canonical URL resolution
 
 ### Debug Mode
+
 Enable debug logging in development:
+
 ```astro
 ---
 // Development only logging
 if (import.meta.env.DEV) {
-  logger.debug('SEO component props:', Astro.props);
+  logger.debug("SEO component props:", Astro.props);
 }
 ---
 ```
@@ -300,18 +321,17 @@ if (import.meta.env.DEV) {
 ## 🔄 Migration Guide
 
 ### From Basic Head Component
+
 Replace your existing Head component:
 
 **Before:**
+
 ```astro
-<Head
-  title={title}
-  description={description}
-  ogImage={ogImage}
-/>
+<Head title={title} description={description} ogImage={ogImage} />
 ```
 
 **After:**
+
 ```astro
 <SEO
   title={title}
@@ -324,30 +344,33 @@ Replace your existing Head component:
 ```
 
 ### Backward Compatibility
+
 The Enhanced Head component maintains full backward compatibility with existing usage patterns while adding new SEO capabilities.
 
 ## 🛠️ Advanced Usage
 
 ### Custom Structured Data
+
 ```astro
 <SEO
   title="Health Article"
   description="Article description"
   customStructuredData={{
     "@type": "MedicalWebPage",
-    "medicalAudience": {
+    medicalAudience: {
       "@type": "MedicalAudience",
-      "audienceType": "Patient"
+      audienceType: "Patient",
     },
-    "about": {
+    about: {
       "@type": "MedicalCondition",
-      "name": "Nutrition"
-    }
+      name: "Nutrition",
+    },
   }}
 />
 ```
 
 ### E-E-A-T Optimization
+
 For health content, the component supports Google's E-E-A-T guidelines:
 
 ```astro
@@ -355,17 +378,17 @@ For health content, the component supports Google's E-E-A-T guidelines:
   title="Nutrition Guide by Dr. Smith"
   author={{
     name: "Dr. Sarah Smith",
-    url: "https://example.com/authors/dr-smith"
+    url: "https://example.com/authors/dr-smith",
   }}
   customStructuredData={{
     "@type": "MedicalWebPage",
-    "reviewedBy": {
+    reviewedBy: {
       "@type": "Person",
-      "name": "Dr. Sarah Smith",
-      "jobTitle": "Nutritionist",
-      "affiliation": "Medical University"
+      name: "Dr. Sarah Smith",
+      jobTitle: "Nutritionist",
+      affiliation: "Medical University",
     },
-    "dateReviewed": "2024-01-15"
+    dateReviewed: "2024-01-15",
   }}
 />
 ```
@@ -373,11 +396,13 @@ For health content, the component supports Google's E-E-A-T guidelines:
 ## 🤝 Contributing
 
 ### Development Setup
+
 1. Install dependencies: `bun install`
 2. Run tests: `bun run test`
 3. Build project: `bun run build`
 
 ### Code Standards
+
 - TypeScript strict mode
 - Comprehensive error handling
 - Test coverage > 90%

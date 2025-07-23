@@ -5,9 +5,8 @@
  * Tests cover all SEO functionality including meta tags, structured data,
  * Open Graph, Twitter Cards, and accessibility compliance.
  */
-import { describe, it, expect, beforeEach, vi } from "vitest";
-
 import type { SEOMetadata } from "@/types";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 
 // Mock Astro globals
 const mockAstro = {

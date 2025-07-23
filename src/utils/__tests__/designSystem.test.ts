@@ -2,8 +2,6 @@
  * @file designSystem.test.ts
  * @description Comprehensive tests for design system utilities
  */
-import { describe, it, expect } from "vitest";
-
 import {
   cn,
   responsive,
@@ -20,6 +18,7 @@ import {
   iconStyles,
   DESIGN_TOKENS,
 } from "../ui/designSystem";
+import { describe, it, expect } from "vitest";
 
 describe("Design System Utilities", () => {
   describe("cn (class name utility)", () => {
