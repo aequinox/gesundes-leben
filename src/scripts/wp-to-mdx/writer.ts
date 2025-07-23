@@ -97,9 +97,10 @@ export class FileWriter {
     lines.push(`description: ${this.yamlEscape(post.description)}`);
 
     // Keywords array
-    if (post.keywords.length > 0) {
+    const keywords = post.keywords || [];
+    if (keywords.length > 0) {
       lines.push(`keywords:`);
-      post.keywords.forEach(keyword => {
+      keywords.forEach(keyword => {
         lines.push(`  - ${this.yamlEscape(keyword)}`);
       });
     } else {
@@ -108,7 +109,8 @@ export class FileWriter {
 
     // Categories array
     lines.push(`categories:`);
-    post.categories.forEach(category => {
+    const categories = post.categories || [];
+    categories.forEach(category => {
       lines.push(`  - ${category}`);
     });
 
@@ -154,9 +156,10 @@ export class FileWriter {
     }
 
     // References array
-    if (post.references.length > 0) {
+    const references = post.references || [];
+    if (references.length > 0) {
       lines.push(`references:`);
-      post.references.forEach(ref => {
+      references.forEach(ref => {
         lines.push(`  - ${this.yamlEscape(ref)}`);
       });
     } else {

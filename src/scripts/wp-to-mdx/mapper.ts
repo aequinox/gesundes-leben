@@ -306,12 +306,13 @@ export class SchemaMapper {
   private extractKeywords(wpPost: WordPressPost, mdxContent: string): string[] {
     const keywords = new Set<string>();
 
-    // Add WordPress tags as keywords
-    wpPost.tags.forEach(tag => keywords.add(tag));
+    // Add WordPress tags as keywords - handle undefined tags array
+    const tags = wpPost.tags || [];
+    tags.forEach(tag => keywords.add(tag));
 
     // Add RankMath focus keywords if available
     const focusKeywords = wpPost.customFields["rank_math_focus_keyword"];
-    if (focusKeywords) {
+    if (focusKeywords && typeof focusKeywords === "string") {
       focusKeywords.split(",").forEach((keyword: string) => {
         const clean = keyword.trim();
         if (clean) {
@@ -366,7 +367,7 @@ export class SchemaMapper {
   /**
    * Generate canonical URL
    */
-  private generateCanonicalURL(wpPost: WordPressPost): string | undefined {
+  private generateCanonicalURL(_wpPost: WordPressPost): string | undefined {
     // If we're migrating from WordPress, we might want to preserve the original URL
     // or set up redirects. For now, we'll omit this to use Astro's default behavior.
     return undefined;
@@ -375,7 +376,7 @@ export class SchemaMapper {
   /**
    * Extract scientific references from content
    */
-  private extractReferences(wpPost: WordPressPost): string[] {
+  private extractReferences(_wpPost: WordPressPost): string[] {
     // This is a placeholder - you could implement citation extraction
     // from the WordPress content if you have a specific format
     return [];
