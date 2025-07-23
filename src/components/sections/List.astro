@@ -133,9 +133,7 @@ const preparedLists = listsToRender.map(list => {
 
 // Determine container layout
 const containerClass =
-  lists && lists.length > 0
-    ? "grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
-    : "";
+  lists && lists.length > 0 ? "grid grid-cols-1 gap-4 lg:grid-cols-2" : "";
 ---
 
 {
@@ -198,7 +196,7 @@ const containerClass =
                                   (subSubitem, subSubIndex) => (
                                     <li
                                       data-subsubindex={subSubIndex}
-                                      class="sub-subitem animate-fadeInSubitem mb-1 pl-5 text-[0.9em] text-foreground/90 opacity-0 delay-100 before:absolute before:top-[0.65em] before:left-0 before:h-1 before:w-1 before:rounded-full before:bg-green-400 before:content-['']"
+                                      class="sub-subitem animate-fadeInSubitem mb-1 pl-5 text-sm text-foreground/90 opacity-0 delay-100 before:absolute before:top-[0.65em] before:left-0 before:h-1 before:w-1 before:rounded-full before:bg-green-400 before:content-['']"
                                     >
                                       {subSubitem.intro && (
                                         <strong class="font-semibold">
