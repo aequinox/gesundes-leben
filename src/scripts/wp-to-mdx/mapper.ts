@@ -1,11 +1,11 @@
+import { CATEGORIES, GROUPS } from "../../utils/types";
 import {
   CONVERSION_DEFAULTS,
   DEFAULT_CATEGORY_MAPPING,
   DEFAULT_AUTHOR_MAPPING,
 } from "./config";
-import { ErrorFactory, ConversionErrorCollector } from "./errors";
+import { ConversionErrorCollector } from "./errors";
 import { logger } from "./logger";
-import { SecuritySanitizer } from "./security";
 import type {
   WordPressPost,
   AstroBlogPost,
@@ -13,7 +13,7 @@ import type {
   AuthorMapping,
   ConversionConfig,
 } from "./types";
-import { CATEGORIES, GROUPS } from "@/utils/types";
+import slugify from "slugify";
 import { v4 as uuidv4 } from "uuid";
 
 export class SchemaMapper {
@@ -78,8 +78,14 @@ export class SchemaMapper {
    * Create category mapping with defaults and user overrides
    */
   private createCategoryMapping(): CategoryMapping {
+    // Convert readonly arrays to mutable arrays
+    const mutableDefaults: CategoryMapping = {};
+    for (const [key, value] of Object.entries(DEFAULT_CATEGORY_MAPPING)) {
+      mutableDefaults[key] = [...value];
+    }
+
     return {
-      ...DEFAULT_CATEGORY_MAPPING,
+      ...mutableDefaults,
       ...this.config.categoryMapping,
     };
   }
@@ -133,16 +139,19 @@ export class SchemaMapper {
   private mapCategories(wpCategories: string[]): string[] {
     const astroCategories = new Set<string>();
 
-    for (const wpCategory of wpCategories) {
+    // Handle undefined or null categories array
+    const categories = wpCategories || [];
+
+    for (const wpCategory of categories) {
       const normalized = wpCategory.toLowerCase().trim();
       const mapped = this.categoryMapping[normalized];
 
-      if (mapped) {
+      if (mapped && Array.isArray(mapped)) {
         mapped.forEach(cat => astroCategories.add(cat));
       } else {
         // Try to find partial matches
         const partialMatch = this.findPartialCategoryMatch(normalized);
-        if (partialMatch) {
+        if (partialMatch && Array.isArray(partialMatch)) {
           partialMatch.forEach(cat => astroCategories.add(cat));
         } else {
           // Default fallback
@@ -177,8 +186,8 @@ export class SchemaMapper {
   private determineGroup(
     wpPost: WordPressPost
   ): "pro" | "kontra" | "fragezeichen" {
-    // Check custom WordPress taxonomy "beitragsart"
-    const categories = wpPost.categories.map(cat => cat.toLowerCase());
+    // Check custom WordPress taxonomy "beitragsart" - handle undefined categories
+    const categories = (wpPost.categories || []).map(cat => cat.toLowerCase());
 
     if (categories.includes("pro")) {
       return "pro";
@@ -192,7 +201,6 @@ export class SchemaMapper {
 
     // Analyze content sentiment or topic
     const title = wpPost.title.toLowerCase();
-    const content = wpPost.content.toLowerCase();
 
     // Use keywords from configuration
     const kontraKeywords = CONVERSION_DEFAULTS.KONTRA_KEYWORDS;
@@ -216,7 +224,7 @@ export class SchemaMapper {
   /**
    * Check if text contains any of the given keywords
    */
-  private containsKeywords(text: string, keywords: string[]): boolean {
+  private containsKeywords(text: string, keywords: readonly string[]): boolean {
     return keywords.some(keyword => text.includes(keyword));
   }
 
@@ -224,7 +232,10 @@ export class SchemaMapper {
    * Clean and normalize tags
    */
   private cleanTags(tags: string[]): string[] {
-    return tags
+    // Handle undefined or null tags array
+    const tagsArray = tags || [];
+
+    return tagsArray
       .map(tag => tag.trim())
       .filter(tag => tag.length > 0)
       .filter(tag => tag.length < 50) // Remove overly long tags
