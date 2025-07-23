@@ -1,3 +1,7 @@
+# env
+.env
+.env.production
+
 # build output
 dist/
 
@@ -36,3 +40,4 @@ tests/performance/baseline-*.json
 # test coverage and reports
 coverage/
 html/
+tsconfig.tsbuildinfo
