@@ -1,9 +1,9 @@
 /**
  * Image downloading service with retry capabilities and validation
  */
-import axios from "axios";
 import { promises as fs } from "fs";
 import { join } from "path";
+import axios from "axios";
 
 import { CONVERSION_DEFAULTS } from "./config";
 import { RetryHandler } from "./errors";

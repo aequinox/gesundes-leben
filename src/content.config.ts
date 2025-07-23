@@ -1,4 +1,5 @@
 import { glob } from "astro/loaders";
+
 import { defineCollection, reference, z } from "astro:content";
 
 import { SITE } from "@/config";

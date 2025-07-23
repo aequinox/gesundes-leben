@@ -24,7 +24,7 @@
 import type { ColorVariant, SizeVariant, ValidationResult } from "@/types";
 import { logger } from "@/utils/logger";
 
-import { type PropValidationSchema, validateProps } from "./propValidation";
+import { validateProps, type PropValidationSchema } from "./propValidation";
 
 // === Generic Component Interfaces ===
 

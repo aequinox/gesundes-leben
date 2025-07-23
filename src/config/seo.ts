@@ -9,6 +9,7 @@
  * - German health content compliance
  */
 import { SITE } from "../config";
+
 import type { SupportedLanguage } from "./i18n";
 
 /**

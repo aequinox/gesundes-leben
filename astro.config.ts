@@ -1,11 +1,10 @@
+import mdx from "@astrojs/mdx";
+import sitemap from "@astrojs/sitemap";
+import tailwindcss from "@tailwindcss/vite";
 import icon from "astro-icon";
 import pagefind from "astro-pagefind";
 import robotsTxt from "astro-robots-txt";
 import { defineConfig } from "astro/config";
-
-import mdx from "@astrojs/mdx";
-import sitemap from "@astrojs/sitemap";
-import tailwindcss from "@tailwindcss/vite";
 
 import { SITE } from "./src/config";
 import {

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
+import { resolve } from "path";
 import { Command } from "commander";
 import { config as loadEnv } from "dotenv";
-import { resolve } from "path";
 
 import { CONVERSION_DEFAULTS } from "./config";
 import { ConversionErrorCollector, ErrorHandler } from "./errors";

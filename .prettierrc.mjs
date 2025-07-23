@@ -12,16 +12,10 @@ export default {
   plugins: [
     "prettier-plugin-astro",
     "prettier-plugin-tailwindcss",
-    "@trivago/prettier-plugin-sort-imports",
     "prettier-plugin-astro-organize-imports", // MUST come last
   ],
   astroOrganizeImportsMode: "All",
   tailwindStylesheet: "./src/styles/global.css",
-  // Import sorting configuration to match ESLint import/order
-  importOrder: ["^(react|next|astro)", "^@?\\w", "^@/(.*)$", "^[./]"],
-  importOrderSeparation: true,
-  importOrderSortSpecifiers: true,
-  importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],
   overrides: [
     {
       files: "*.astro",
