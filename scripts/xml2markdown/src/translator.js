@@ -3,6 +3,41 @@ import { gfm } from 'turndown-plugin-gfm';
 import { ConversionError } from './errors.js';
 
 /**
+ * Generate a valid JavaScript variable name from an image filename
+ * @param {string} filename - Image filename
+ * @returns {string} Valid variable name
+ */
+function generateImageVariableName(filename) {
+  // Remove extension and clean up the filename
+  const baseName = filename.replace(/\.[^/.]+$/, '');
+  
+  // Convert to camelCase and ensure it starts with a letter
+  let varName = baseName
+    .replace(/[^a-zA-Z0-9]/g, ' ') // Replace non-alphanumeric with spaces
+    .split(' ')
+    .filter(word => word.length > 0)
+    .map((word, index) => {
+      if (index === 0) {
+        return word.toLowerCase();
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join('');
+  
+  // Ensure it starts with a letter (prepend 'img' if it starts with a number)
+  if (/^[0-9]/.test(varName)) {
+    varName = 'img' + varName.charAt(0).toUpperCase() + varName.slice(1);
+  }
+  
+  // Fallback if empty
+  if (!varName) {
+    varName = 'blogImage';
+  }
+  
+  return varName;
+}
+
+/**
  * @typedef {Object} TurndownService
  * @property {function} addRule - Add a custom rule for HTML to Markdown conversion
  * @property {function} use - Use a turndown plugin
@@ -68,16 +103,67 @@ function initTurndownService() {
     },
   });
 
-  // preserve <figure> when it contains a <figcaption>
+  // convert <figure> with images to Astro <Image> components
   turndownService.addRule('figure', {
     filter: 'figure',
     replacement: (content, node) => {
-      if (node.querySelector('figcaption')) {
-        // extra newlines are necessary for markdown and HTML to render correctly together
+      const img = node.querySelector('img');
+      const figcaption = node.querySelector('figcaption');
+      
+      if (img) {
+        // Extract image details
+        const src = img.getAttribute('src') || '';
+        const alt = img.getAttribute('alt') || '';
+        
+        // Generate image variable name from filename
+        const filename = src.split('/').pop() || 'image';
+        const imageVar = generateImageVariableName(filename);
+        
+        // Store image import for later use (will be added to frontmatter or imports)
+        if (!turndownService._imageImports) {
+          turndownService._imageImports = [];
+        }
+        turndownService._imageImports.push({
+          variable: imageVar,
+          path: src.includes('images/') ? `./${src}` : `./images/${src.split('/').pop()}`,
+          filename: filename
+        });
+        
+        // Generate Astro Image component
+        let imageComponent = `<Image\n  src={${imageVar}}\n  alt="${alt.replace(/"/g, '&quot;')}"`;
+        
+        // Determine position from figure classes or default to center
+        let position = 'center';
+        const figureClass = node.getAttribute('class') || '';
+        
+        if (figureClass.includes('align-right') || figureClass.includes('float-right')) {
+          position = 'right';
+        } else if (figureClass.includes('align-left') || figureClass.includes('float-left')) {
+          position = 'left';
+        } else if (figureClass.includes('align-center') || figureClass.includes('center')) {
+          position = 'center';
+        }
+        
+        // Check for WordPress alignment classes as well
+        if (figureClass.includes('alignright')) {
+          position = 'right';
+        } else if (figureClass.includes('alignleft')) {
+          position = 'left';
+        } else if (figureClass.includes('aligncenter')) {
+          position = 'center';
+        }
+        
+        imageComponent += `\n  position="${position}"`;
+        
+        imageComponent += '\n/>';
+        
+        return '\n\n' + imageComponent + '\n\n';
+      } else if (figcaption) {
+        // Preserve figures without images but with captions
         const result = '\n\n<figure>\n\n' + content + '\n\n</figure>\n\n';
         return result.replace('\n\n\n\n', '\n\n'); // collapse quadruple newlines
       } else {
-        // does not contain <figcaption>, do not preserve
+        // does not contain image or figcaption, do not preserve
         return content;
       }
     },
@@ -114,7 +200,7 @@ function initTurndownService() {
  * @param {TurndownService} turndownService - Configured TurndownService instance
  * @param {Object} config - Configuration options
  * @param {boolean} [config.saveScrapedImages] - Whether to update image paths for scraped images
- * @returns {string} Post content in Markdown format
+ * @returns {{content: string, imageImports: Array}} Post content and image imports
  * @throws {ConversionError} When content conversion fails
  */
 function getPostContent(postData, turndownService, config) {
@@ -150,13 +236,20 @@ function getPostContent(postData, turndownService, config) {
       '$1data-wetm-language="$2" '
     );
 
+    // Clear any previous image imports
+    turndownService._imageImports = [];
+    
     // use turndown to convert HTML to Markdown
     content = turndownService.turndown(content);
 
     // clean up extra spaces in list items
     content = content.replace(/(-|\d+\.) +/g, '$1 ');
 
-    return content;
+    // Return both content and image imports
+    return {
+      content: content,
+      imageImports: turndownService._imageImports || []
+    };
   } catch (error) {
     if (error instanceof ConversionError) {
       throw error;

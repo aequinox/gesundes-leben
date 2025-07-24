@@ -10,6 +10,7 @@ A WordPress XML export converter adapted for the Healthy Life blog. Converts Wor
 - **Intelligent Content Processing**: Extracts keywords, determines group classification
 - **Image Management**: Downloads and organizes post images
 - **Robust Date Handling**: Multiple date format parsing with fallbacks
+- **Astro Image Components**: Converts HTML `<figure>` elements to Astro `<Image>` components with imports
 
 ## Prerequisites
 
@@ -120,7 +121,19 @@ draft: false
 featured: false
 ---
 
+import Image from "@/components/elements/Image.astro";
+import teabagPlasticHeader from "./images/Teabag-Plastic-Header.jpg";
+import healthBenefits from "./images/health-benefits.png";
+
 # Your converted blog content here...
+
+<Image
+  src={teabagPlasticHeader}
+  alt="Eine weiße Tasse mit einem Totenkopfsymbol, die eine dampfende Flüssigkeit enthält"
+  position="right"
+/>
+
+More content with properly converted images...
 ```
 
 ## Frontmatter Fields
@@ -173,6 +186,56 @@ src/data/blog/
 │       └── content-image.png
 └── 2024-01-16-nutrition-basics.mdx
 ```
+
+## Image Conversion
+
+The converter automatically transforms HTML `<figure>` elements into Astro `<Image>` components:
+
+### Input (WordPress HTML)
+```html
+<figure class="alignright">
+  <img src="images/Teabag-Plastic-Header.jpg" alt="Eine weiße Tasse mit einem Totenkopfsymbol...">
+  <figcaption>
+    Bild von KI-generiert
+  </figcaption>
+</figure>
+```
+
+### Output (Astro MDX)
+```javascript
+---
+// frontmatter here
+---
+
+import Image from "@/components/elements/Image.astro";
+import teabagPlasticHeader from "./images/Teabag-Plastic-Header.jpg";
+
+// In the content:
+<Image
+  src={teabagPlasticHeader}
+  alt="Eine weiße Tasse mit einem Totenkopfsymbol..."
+  position="right"
+/>
+```
+
+### Position Detection
+
+The converter automatically detects image positioning from WordPress CSS classes:
+
+| WordPress Class | Position Output | Description |
+|----------------|-----------------|-------------|
+| `alignright` | `position="right"` | Right-aligned image |
+| `alignleft` | `position="left"` | Left-aligned image |
+| `aligncenter` | `position="center"` | Center-aligned image |
+| Custom classes | `position="center"` | Default fallback |
+
+### Variable Name Generation
+
+Image filenames are converted to camelCase JavaScript variables:
+
+- `Teabag-Plastic-Header.jpg` → `teabagPlasticHeader`
+- `health-benefits-2024.png` → `healthBenefits2024`
+- `vitamin-d3_supplement.webp` → `vitaminD3Supplement`
 
 ## Troubleshooting
 

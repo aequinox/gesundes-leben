@@ -182,7 +182,21 @@ function loadMarkdownFilePromise(post) {
     }
   });
 
-  output += `---\n\n${post.content}\n`;
+  output += '---\n';
+  
+  // Add Image component import if we have images (after YAML frontmatter)
+  if (post.imageImports && post.imageImports.length > 0) {
+    output += '\n';
+    output += 'import Image from "@/components/elements/Image.astro";\n';
+    
+    // Add individual image imports
+    post.imageImports.forEach(imageImport => {
+      output += `import ${imageImport.variable} from "${imageImport.path}";\n`;
+    });
+    output += '\n';
+  }
+
+  output += `\n${post.content}\n`;
   return output;
 }
 

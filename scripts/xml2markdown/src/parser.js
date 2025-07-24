@@ -171,18 +171,22 @@ function collectPosts(channelData, postTypes, config) {
   postTypes.forEach(postType => {
     const postsForType = getItemsOfType(channelData, postType)
       .filter(postData => postData.status[0] !== 'trash' && postData.status[0] !== 'draft')
-      .map(postData => ({
-        data: postData,
-        meta: {
-          id: getPostId(postData),
-          slug: getPostSlug(postData),
-          coverImageId: getPostCoverImageId(postData),
-          coverImage: undefined,
-          type: postType,
-          imageUrls: [],
-        },
-        content: translator.getPostContent(postData, turndownService, config),
-      }));
+      .map(postData => {
+        const contentResult = translator.getPostContent(postData, turndownService, config);
+        return {
+          data: postData,
+          meta: {
+            id: getPostId(postData),
+            slug: getPostSlug(postData),
+            coverImageId: getPostCoverImageId(postData),
+            coverImage: undefined,
+            type: postType,
+            imageUrls: [],
+          },
+          content: contentResult.content,
+          imageImports: contentResult.imageImports,
+        };
+      });
 
     if (postTypes.length > 1) {
       logger.info(`${postsForType.length} "${postType}" posts found.`);
