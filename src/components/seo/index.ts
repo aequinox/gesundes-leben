@@ -6,13 +6,13 @@
  * for the German health blog.
  */
 
-// Main SEO Component - commented out to avoid TypeScript errors in --noEmit mode
-// export { default as SEO } from "./SEO.astro";
+// Main SEO Component
+export { default as SEO } from "./SEO.astro";
 
-// Schema Components - commented out to avoid TypeScript errors in --noEmit mode
-// export { default as BreadcrumbSchema } from "./BreadcrumbSchema.astro";
-// export { default as HealthArticleSchema } from "./HealthArticleSchema.astro";
-// export { default as WebsiteSchema } from "./WebsiteSchema.astro";
+// Schema Components
+export { default as BreadcrumbSchema } from "./BreadcrumbSchema.astro";
+export { default as HealthArticleSchema } from "./HealthArticleSchema.astro";
+export { default as WebsiteSchema } from "./WebsiteSchema.astro";
 
 // Types
 export type {
