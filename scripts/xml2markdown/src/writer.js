@@ -281,6 +281,12 @@ function getPostPath(post, config) {
     dt = luxon.DateTime.fromISO(post.frontmatter.date);
   }
 
+  // If date is invalid, use current date as fallback
+  if (!dt.isValid) {
+    console.warn(`Invalid date for post ${post.meta.slug}: ${post.frontmatter.date}. Using current date as fallback.`);
+    dt = luxon.DateTime.now();
+  }
+
   // start with base output dir
   const pathSegments = [config.output];
 

@@ -11,6 +11,7 @@ import { ConversionError } from './errors.js';
 import author from './frontmatter/author.js';
 import categories from './frontmatter/categories.js';
 import coverImage from './frontmatter/coverImage.js';
+import date from './frontmatter/date.js';
 import draft from './frontmatter/draft.js';
 import excerpt from './frontmatter/excerpt.js';
 import featured from './frontmatter/featured.js';
@@ -31,6 +32,7 @@ const frontmatterGetters = {
   author,
   categories,
   coverImage,
+  date,
   draft,
   excerpt,
   featured,

@@ -1,151 +1,235 @@
-# wordpress-export-to-markdown
+# XML to Markdown Blog Converter
 
-Converts a WordPress export file into Markdown files that are compatible with static site generators ([Eleventy](https://www.11ty.dev/), [Gatsby](https://www.gatsbyjs.com/), [Hugo](https://gohugo.io/), etc.).
+A WordPress XML export converter adapted for the Healthy Life blog. Converts WordPress posts into Astro-compatible MDX files with proper YAML frontmatter.
 
-Each post is saved as a separate Markdown file with frontmatter. Images are downloaded and saved.
+## Features
 
-![wordpress-export-to-markdown running in a terminal](https://user-images.githubusercontent.com/1245573/72686026-3aa04280-3abe-11ea-92c1-d756a24657dd.gif)
+- **Complete ES Module Support**: Modern JavaScript with import/export
+- **German Content Localization**: Category mapping and language-specific handling
+- **Blog Schema Compliance**: Generates frontmatter matching `src/content.config.ts`
+- **Intelligent Content Processing**: Extracts keywords, determines group classification
+- **Image Management**: Downloads and organizes post images
+- **Robust Date Handling**: Multiple date format parsing with fallbacks
+
+## Prerequisites
+
+- Bun runtime
+- WordPress XML export file(s) in the `xml/` directory
+
+## Installation
+
+```bash
+cd scripts/xml2markdown
+bun install
+```
 
 ## Quick Start
 
-You'll need:
+Place your WordPress XML export files in the `xml/` directory, then run:
 
-- [Node.js](https://nodejs.org/) installed
-- Your [WordPress export file](https://wordpress.org/support/article/tools-export-screen/) (be sure to export "All content").
-
-To make things easier, you can rename your WordPress export file to `export.xml` and drop it into the same directory that you run this script from.
-
-You can run this script immediately in your terminal with `npx`:
-
-```
-npx wordpress-export-to-markdown
+```bash
+bun run index.js
 ```
 
-Or you can clone this repo, then from within the repo's directory, install and run:
+The converter will process all XML files and generate MDX files in `../../src/data/blog/`.
 
-```
-npm install && node index.js
-```
+## Usage
 
-Either way, the script will start a wizard to configure your options. Answer the questions and off you go!
+### Basic Conversion
 
-## Command Line
+Convert all XML files in the `xml/` directory:
 
-Options can also be configured via the command line. The wizard will skip asking about any such options. For example, the following will give you [Jekyll](https://jekyllrb.com/)-style output in terms of folder structure and filenames.
-
-Using `npx`:
-
-```
-npx wordpress-export-to-markdown --post-folders=false --prefix-date=true
+```bash
+bun run index.js
 ```
 
-Using a locally cloned repo:
+### Convert Specific File
+
+```bash
+bun run index.js --input xml/your-export-file.xml
+```
+
+### Configuration Options
+
+The converter accepts several command-line options:
+
+```bash
+# Include all post types (not just 'post')
+bun run index.js --other-types
+
+# Download attached images
+bun run index.js --save-attached-images
+
+# Download images from post content
+bun run index.js --save-scraped-images
+
+# Organize posts in year folders
+bun run index.js --year-folders
+
+# Organize posts in month folders (requires year-folders)
+bun run index.js --month-folders
+
+# Create individual folders for each post
+bun run index.js --post-folders
+
+# Add date prefix to filenames
+bun run index.js --prefix-date
+
+# Custom output directory
+bun run index.js --output ../custom-output-dir
+```
+
+### Full Example
+
+```bash
+bun run index.js \
+  --input xml/gesundheitblog.xml \
+  --output ../../src/data/blog \
+  --save-attached-images \
+  --year-folders \
+  --prefix-date
+```
+
+## Output Structure
+
+The converter generates MDX files with this structure:
+
+```markdown
+---
+id: "12345"
+title: "Effective Tips for Managing Anger"
+author: "healthy-life-author"
+pubDatetime: "2024-01-15T10:30:00.000Z"
+modDatetime: "2024-01-16T08:20:00.000Z"
+description: "Learn practical strategies for anger management..."
+keywords: 
+  - anger management
+  - mental health
+  - wellness
+categories: 
+  - Gesundheit
+  - Wellness
+group: "pro"
+tags: 
+  - tips
+  - psychology
+heroImage:
+  src: "./images/anger-management-hero.jpg"
+  alt: "Person practicing mindfulness meditation"
+draft: false
+featured: false
+---
+
+# Your converted blog content here...
+```
+
+## Frontmatter Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | WordPress post ID |
+| `title` | string | Post title |
+| `author` | string | Author identifier (defaults to "healthy-life-author") |
+| `pubDatetime` | string | Publication date in ISO format |
+| `modDatetime` | string | Last modified date in ISO format |
+| `description` | string | Post excerpt or generated description |
+| `keywords` | array | Extracted keywords (max 10) |
+| `categories` | array | Mapped German categories |
+| `group` | string | Classification: "pro", "kontra", or "fragezeiten" |
+| `tags` | array | WordPress tags |
+| `heroImage` | object | Featured image with `src` and `alt` |
+| `draft` | boolean | Draft status |
+| `featured` | boolean | Featured status |
+
+## Category Mapping
+
+WordPress categories are intelligently mapped to German blog categories:
+
+- Nutrition → Ernährung
+- Health → Gesundheit  
+- Wellness → Wellness
+- Mental Health → Mentale Gesundheit
+- Fitness → Fitness
+- Immune System → Immunsystem
+- Prevention → Prävention
+- Natural Remedies → Naturheilkunde
+
+## Group Classification
+
+Posts are automatically classified into groups:
+
+- **"pro"**: Positive health content, tips, benefits
+- **"kontra"**: Warnings, risks, things to avoid
+- **"fragezeiten"**: Q&A content, FAQ-style posts
+
+## File Organization
 
 ```
-node index.js --post-folders=false --prefix-date=true
+src/data/blog/
+├── 2024-01-15-effective-anger-management/
+│   ├── index.mdx
+│   └── images/
+│       ├── hero-image.jpg
+│       └── content-image.png
+└── 2024-01-16-nutrition-basics.mdx
 ```
 
-The wizard will still ask you about any options not specified on the command line. To skip the wizard entirely and use default values for unspecified options, add `--wizard=false`.
+## Troubleshooting
 
-## Options
+### Common Issues
 
-These are the questions asked by the wizard. Command line arguments, along with their default values, are also being provided here if you want to use them.
+**Invalid DateTime errors**: The converter now handles multiple date formats and uses fallbacks. Check console warnings for problematic dates.
 
-### Path to WordPress export file?
+**Missing categories**: Unmapped WordPress categories will be logged. Add new mappings to `src/frontmatter/categories.js`.
 
-**Command line:** `--input=export.xml`
+**Image download failures**: Network issues or invalid URLs. Check console output for failed downloads.
 
-The path to your WordPress export file. To make things easier, you can rename your WordPress export file to `export.xml` and drop it into the same directory that you run this script from.
+**ES Module errors**: Ensure you're using Bun and all files are properly converted to ES modules.
 
-### Path to output folder?
+### Debugging
 
-**Command line:** `--output=output`
+Enable verbose logging by checking the console output during conversion. The converter provides detailed information about:
 
-The path to the output directory where Markdown and image files will be saved. If it does not exist, it will be created.
+- Posts processed
+- Categories mapped
+- Images downloaded
+- Date parsing issues
+- File creation status
 
-### Create year folders?
+## Development
 
-**Command line:** `--year-folders=false`
+### Project Structure
 
-Whether or not to organize output files into folders by year.
+```
+scripts/xml2markdown/
+├── src/
+│   ├── frontmatter/        # Frontmatter field generators
+│   │   ├── utils/          # Utility functions
+│   │   ├── author.js
+│   │   ├── categories.js
+│   │   ├── keywords.js     # New: keyword extraction
+│   │   ├── group.js        # New: group classification
+│   │   ├── heroImage.js    # New: hero image handling
+│   │   └── ...
+│   ├── parser.js           # XML parsing logic
+│   ├── writer.js          # File writing and formatting
+│   ├── settings.js        # Configuration
+│   └── translator.js      # HTML to Markdown conversion
+├── index.js               # Main entry point
+└── package.json           # ES module configuration
+```
 
-### Create month folders?
+### Adding New Frontmatter Fields
 
-**Command line:** `--month-folders=false`
+1. Create a new generator in `src/frontmatter/`
+2. Add the field to `frontmatter_fields` in `settings.js`
+3. Import and add to the getters object in `parser.js`
 
-Whether or not to organize output files into folders by month. You'll probably want to combine this with `--year-folders` to organize files by year then month.
+### Customizing Category Mapping
 
-### Create a folder for each post?
+Edit the `CATEGORY_MAP` in `src/frontmatter/categories.js` to add new WordPress to German category mappings.
 
-**Command line:** `--post-folders=true`
+## Version History
 
-Whether or not to save files and images into post folders.
-
-If `true`, the post slug is used for the folder name and the post's Markdown file is named `index.md`. Each post folder will have its own `/images` folder.
-
-    /first-post
-        /images
-            potato.png
-        index.md
-    /second-post
-        /images
-            carrot.jpg
-            celery.jpg
-        index.md
-
-If `false`, the post slug is used to name the post's Markdown file. These files will be side-by-side and images will go into a shared `/images` folder.
-
-    /images
-        carrot.jpg
-        celery.jpg
-        potato.png
-    first-post.md
-    second-post.md
-
-Either way, this can be combined with with `--year-folders` and `--month-folders`, in which case the above output will be organized under the appropriate year and month folders.
-
-### Prefix post folders/files with date?
-
-**Command line:** `--prefix-date=false`
-
-Whether or not to prepend the post date to the post slug when naming a post's folder or file.
-
-If `--post-folders` is `true`, this affects the folder.
-
-    /2019-10-14-first-post
-        index.md
-    /2019-10-23-second-post
-        index.md
-
-If `--post-folders` is `false`, this affects the file.
-
-    2019-10-14-first-post.md
-    2019-10-23-second-post.md
-
-### Save images attached to posts?
-
-**Command line:** `--save-attached-images=true`
-
-Whether or not to download and save images attached to posts. Generally speaking, these are images that were uploaded by using **Add Media** or **Set Featured Image** in WordPress. Images are saved into `/images`.
-
-### Save images scraped from post body content?
-
-**Command line:** `--save-scraped-images=true`
-
-Whether or not to download and save images scraped from `<img>` tags in post body content. Images are saved into `/images`. The `<img>` tags are updated to point to where the images are saved.
-
-### Include custom post types and pages?
-
-**Command line:** `--include-other-types=false`
-
-Some WordPress sites make use of a `"page"` post type and/or custom post types. Set this to `true` to include these post types in the output. Posts will be organized into post type folders.
-
-## Customizing Frontmatter and Other Advanced Settings
-
-You can edit [settings.js](https://github.com/lonekorean/wordpress-export-to-markdown/blob/master/src/settings.js) to configure advanced settings beyond the options above. This includes things like customizing frontmatter, date formatting, throttling image downloads, and more.
-
-You'll need to run the script locally (not using `npx`) to edit these advanced settings.
-
-## Contributing
-
-Please read the [contribution guidelines](https://github.com/lonekorean/wordpress-export-to-markdown/blob/master/CONTRIBUTING.md).
+- **v2.0.0**: Complete ES module conversion, enhanced German localization
+- **v1.0.0**: Initial adaptation from WordPress exporter

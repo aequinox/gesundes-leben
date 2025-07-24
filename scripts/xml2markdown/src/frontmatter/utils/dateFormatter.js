@@ -12,12 +12,29 @@ import * as settings from '../../settings.js';
  */
 function formatDate(dateStr, fieldName) {
   try {
-    const dateTime = luxon.DateTime.fromRFC2822(dateStr, {
+    // Try RFC2822 format first (WordPress default)
+    let dateTime = luxon.DateTime.fromRFC2822(dateStr, {
       zone: settings.custom_date_timezone,
     });
 
+    // If RFC2822 fails, try ISO format
     if (!dateTime.isValid) {
-      throw new ConversionError(`Invalid ${fieldName} format: ${dateTime.invalidReason}`);
+      dateTime = luxon.DateTime.fromISO(dateStr, {
+        zone: settings.custom_date_timezone,
+      });
+    }
+
+    // If both fail, try parsing as SQL datetime
+    if (!dateTime.isValid) {
+      dateTime = luxon.DateTime.fromSQL(dateStr, {
+        zone: settings.custom_date_timezone,
+      });
+    }
+
+    // If all parsing attempts fail, use current date as fallback
+    if (!dateTime.isValid) {
+      console.warn(`Invalid ${fieldName} format: ${dateStr}. Using current date as fallback.`);
+      dateTime = luxon.DateTime.now();
     }
 
     if (settings.custom_date_formatting) {

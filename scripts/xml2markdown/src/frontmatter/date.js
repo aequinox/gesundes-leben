@@ -1,6 +1,6 @@
-const luxon = require('luxon');
-const { ConversionError } = require('../errors');
-const settings = require('../settings');
+import * as luxon from 'luxon';
+import { ConversionError } from '../errors.js';
+import * as settings from '../settings.js';
 
 /**
  * Get formatted post date
@@ -10,7 +10,7 @@ const settings = require('../settings');
  * @returns {string} Formatted date string
  * @throws {ConversionError} When date parsing fails
  */
-module.exports = post => {
+export default post => {
   if (!post.data.pubDate || !post.data.pubDate[0]) {
     throw new ConversionError('Post publication date is missing');
   }

@@ -1,4 +1,4 @@
-const { ConversionError } = require('../errors');
+import { ConversionError } from '../errors.js';
 import { formatDate } from './utils/dateFormatter.js';
 
 /**
