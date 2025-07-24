@@ -15,6 +15,14 @@ export const XmlConverterConfigSchema = z.object({
   saveAttachedImages: z.boolean().default(true),
   saveScrapedImages: z.boolean().default(true),
   includeOtherTypes: z.boolean().default(false),
+  // Visionati AI configuration
+  generateAltTexts: z.boolean().default(false),
+  visionatiApiKey: z.string().optional(),
+  visionatiBackend: z.enum(['claude', 'gpt4', 'gemini']).default('claude'),
+  visionatiLanguage: z.string().default('de'),
+  visionatiPrompt: z.string().optional(),
+  visionatiTimeout: z.number().min(5000).max(120000).default(30000),
+  visionatiMaxConcurrent: z.number().min(1).max(20).default(5),
 });
 
 /**

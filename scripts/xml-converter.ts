@@ -39,6 +39,12 @@ program
   .option('--save-attached-images', 'Download attached images', true)
   .option('--save-scraped-images', 'Download images from post content', true)
   .option('--include-other-types', 'Include custom post types and pages')
+  .option('--generate-alt-texts', 'Generate AI-powered German alt texts and filenames')
+  .option('--visionati-api-key <key>', 'Visionati API key (or use VISIONATI_API_KEY env var)')
+  .option('--visionati-backend <backend>', 'AI backend: claude, gpt4, gemini', 'claude')
+  .option('--visionati-language <lang>', 'Response language', 'de')
+  .option('--visionati-prompt <prompt>', 'Custom prompt for image analysis')
+  .option('--visionati-max-concurrent <num>', 'Max concurrent API requests', '5')
   .option('--dry-run', 'Show what would be converted without actually converting')
   .option('-v, --verbose', 'Enable verbose logging')
   .option('-q, --quiet', 'Suppress non-error output')
@@ -80,6 +86,15 @@ program
       cliLogger.info('📁 Preparing output directory...');
       await ensureOutputDirectory(outputPath);
 
+      // Get Visionati API key from options or environment
+      const visionatiApiKey = options.visionatiApiKey || process.env.VISIONATI_API_KEY;
+      
+      // Validate Visionati configuration
+      if (options.generateAltTexts && !visionatiApiKey) {
+        cliLogger.error('❌ AI alt text generation requires --visionati-api-key or VISIONATI_API_KEY environment variable');
+        process.exit(1);
+      }
+
       // Build configuration
       const config: Partial<XmlConverterConfig> = {
         input: inputPath,
@@ -91,6 +106,13 @@ program
         saveAttachedImages: options.saveAttachedImages,
         saveScrapedImages: options.saveScrapedImages,
         includeOtherTypes: options.includeOtherTypes,
+        // Visionati AI configuration
+        generateAltTexts: options.generateAltTexts,
+        visionatiApiKey,
+        visionatiBackend: options.visionatiBackend as 'claude' | 'gpt4' | 'gemini',
+        visionatiLanguage: options.visionatiLanguage,
+        visionatiPrompt: options.visionatiPrompt,
+        visionatiMaxConcurrent: parseInt(options.visionatiMaxConcurrent) || 5
       };
 
       // Show configuration in verbose mode
@@ -111,6 +133,13 @@ program
         cliLogger.info(`  • Download images: ${config.saveAttachedImages ? '✅' : '❌'}`);
         cliLogger.info(`  • Process content images: ${config.saveScrapedImages ? '✅' : '❌'}`);
         cliLogger.info(`  • Include other types: ${config.includeOtherTypes ? '✅' : '❌'}`);
+        cliLogger.info(`  • AI alt text generation: ${config.generateAltTexts ? '✅' : '❌'}`);
+        if (config.generateAltTexts) {
+          cliLogger.info(`    - Backend: ${config.visionatiBackend}`);
+          cliLogger.info(`    - Language: ${config.visionatiLanguage}`);
+          cliLogger.info(`    - Max concurrent: ${config.visionatiMaxConcurrent}`);
+          cliLogger.info(`    - API key: ${visionatiApiKey ? '✅ Configured' : '❌ Missing'}`);
+        }
         process.exit(0);
       }
 
@@ -172,14 +201,28 @@ Examples:
   # With year/month organization and date prefixes
   $ bun xml-converter -i export.xml --year-folders --month-folders --prefix-date
 
+  # AI-powered German alt texts and filenames
+  $ bun xml-converter -i export.xml --generate-alt-texts --visionati-api-key "Token your-key"
+
+  # AI generation with custom settings
+  $ bun xml-converter -i export.xml --generate-alt-texts \\
+    --visionati-backend claude --visionati-language de \\
+    --visionati-max-concurrent 3
+
   # Dry run to see what would happen
-  $ bun xml-converter -i export.xml --dry-run
+  $ bun xml-converter -i export.xml --dry-run --generate-alt-texts
 
   # Verbose output for debugging
   $ bun xml-converter -i export.xml -v
 
   # Process custom post types and pages
   $ bun xml-converter -i export.xml --include-other-types
+
+Environment Variables:
+  VISIONATI_API_KEY    Visionati API key (alternative to --visionati-api-key)
+
+For health blog optimization, the AI generates German medical terminology and
+SEO-friendly filenames optimized for wellness content.
 
 For more information, visit: https://github.com/your-org/healthy-life-blog
 `);

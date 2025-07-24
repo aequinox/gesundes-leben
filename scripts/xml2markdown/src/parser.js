@@ -169,7 +169,7 @@ function collectPosts(channelData, postTypes, config) {
       .filter(postData => postData.status[0] !== 'trash' && postData.status[0] !== 'draft')
       .map(postData => {
         const contentResult = translator.getPostContent(postData, turndownService, config);
-        return {
+        const post = {
           data: postData,
           meta: {
             id: getPostId(postData),
@@ -180,8 +180,10 @@ function collectPosts(channelData, postTypes, config) {
             imageUrls: [],
           },
           content: contentResult.content,
-          imageImports: contentResult.imageImports,
+          imageImports: contentResult.imageImports || [],
         };
+
+        return post;
       });
 
     if (postTypes.length > 1) {
@@ -286,6 +288,56 @@ function collectScrapedImages(channelData, postTypes) {
 }
 
 /**
+ * Generate variable name for image imports (matches translator.js logic)
+ * @param {string} filename - Image filename
+ * @returns {string} Variable name for import
+ */
+function generateImageVariableName(filename) {
+  // Remove extension and clean up the filename
+  const baseName = filename.replace(/\.[^/.]+$/, '');
+  
+  // Convert to camelCase and ensure it starts with a letter
+  let varName = baseName
+    .replace(/[^a-zA-Z0-9]/g, ' ') // Replace non-alphanumeric with spaces
+    .split(' ')
+    .filter(word => word.length > 0)
+    .map((word, index) => {
+      if (index === 0) {
+        return word.toLowerCase();
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join('');
+  
+  // Ensure it starts with a letter (prepend 'img' if it starts with a number)
+  if (/^[0-9]/.test(varName)) {
+    varName = 'img' + varName.charAt(0).toUpperCase() + varName.slice(1);
+  }
+  
+  // Fallback if empty
+  if (!varName) {
+    varName = 'blogImage';
+  }
+  
+  return varName;
+}
+
+/**
+ * Update hero image metadata for post (no longer adds to imports since heroImage uses string paths)
+ * @param {Post} post - Post object
+ * @param {string} imageUrl - Image URL
+ */
+function updateHeroImageMetadata(post, imageUrl) {
+  if (!post.meta.coverImage) return;
+  
+  // Just update the coverImage filename if we have AI-enhanced metadata
+  if (post.meta.aiImageMetadata && post.meta.aiImageMetadata.has(imageUrl)) {
+    const aiMetadata = post.meta.aiImageMetadata.get(imageUrl);
+    post.meta.coverImage = aiMetadata.filename; // Use AI-enhanced filename
+  }
+}
+
+/**
  * Merge images into posts
  * @param {Image[]} images - Array of images
  * @param {Post[]} posts - Array of posts
@@ -304,6 +356,9 @@ function mergeImagesIntoPosts(images, posts) {
       if (image.id === post.meta.coverImageId) {
         shouldAttach = true;
         post.meta.coverImage = shared.getFilenameFromUrl(image.url);
+        
+        // Update hero image metadata (no import needed since heroImage uses string paths)
+        updateHeroImageMetadata(post, image.url);
       }
 
       if (shouldAttach && !post.meta.imageUrls.includes(image.url)) {

@@ -13,6 +13,13 @@ export interface PostMeta {
   coverImage?: string;
   type: string;
   imageUrls: string[];
+  /** AI-enhanced image metadata map (URL -> metadata) */
+  aiImageMetadata?: Map<string, {
+    altText: string;
+    filename: string;
+    aiEnhanced: boolean;
+    creditsUsed: number;
+  }>;
 }
 
 /**
@@ -86,6 +93,14 @@ export interface Image {
   id: string;
   postId: string;
   url: string;
+  /** AI-generated alt text */
+  altText?: string;
+  /** AI-generated SEO filename */
+  aiFilename?: string;
+  /** Original filename */
+  originalFilename?: string;
+  /** Credits used for AI generation */
+  creditsUsed?: number;
 }
 
 /**
@@ -101,6 +116,14 @@ export interface XmlConverterConfig {
   saveAttachedImages?: boolean;
   saveScrapedImages?: boolean;
   includeOtherTypes?: boolean;
+  // Visionati AI features
+  generateAltTexts?: boolean;
+  visionatiApiKey?: string;
+  visionatiBackend?: 'claude' | 'gpt4' | 'gemini';
+  visionatiLanguage?: string;
+  visionatiPrompt?: string;
+  visionatiTimeout?: number;
+  visionatiMaxConcurrent?: number;
 }
 
 /**

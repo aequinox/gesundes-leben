@@ -10,6 +10,43 @@ import { Buffer } from 'buffer';
 import * as shared from './shared.js';
 import * as settings from './settings.js';
 import { XmlConversionError } from './errors.js';
+import { ImageProcessor } from './image-processor.js';
+import { xmlLogger } from './logger.js';
+
+/**
+ * Generate variable name for image imports (matches translator.js logic)
+ * @param {string} filename - Image filename
+ * @returns {string} Variable name for import
+ */
+function generateImageVariableName(filename) {
+  // Remove extension and clean up the filename
+  const baseName = filename.replace(/\.[^/.]+$/, '');
+  
+  // Convert to camelCase and ensure it starts with a letter
+  let varName = baseName
+    .replace(/[^a-zA-Z0-9]/g, ' ') // Replace non-alphanumeric with spaces
+    .split(' ')
+    .filter(word => word.length > 0)
+    .map((word, index) => {
+      if (index === 0) {
+        return word.toLowerCase();
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join('');
+  
+  // Ensure it starts with a letter (prepend 'img' if it starts with a number)
+  if (/^[0-9]/.test(varName)) {
+    varName = 'img' + varName.charAt(0).toUpperCase() + varName.slice(1);
+  }
+  
+  // Fallback if empty
+  if (!varName) {
+    varName = 'blogImage';
+  }
+  
+  return varName;
+}
 
 /**
  * @typedef {Object} Payload
@@ -27,8 +64,18 @@ import { XmlConversionError } from './errors.js';
  * @throws {ConversionError} When file writing fails
  */
 async function writeFilesPromise(posts, config) {
+  // Process images FIRST if AI enhancement is enabled
+  if (config.generateAltTexts) {
+    await writeImageFilesPromise(posts, config);
+  }
+  
+  // Now write markdown files with updated metadata
   await writeMarkdownFilesPromise(posts, config);
-  await writeImageFilesPromise(posts, config);
+  
+  // Process remaining images if AI was not enabled
+  if (!config.generateAltTexts) {
+    await writeImageFilesPromise(posts, config);
+  }
 }
 
 /**
@@ -201,84 +248,211 @@ function loadMarkdownFilePromise(post) {
 }
 
 /**
- * Write image files for posts
+ * Write image files for posts with AI enhancement
  * @param {import('./parser').Post[]} posts - Array of posts to write
  * @param {Object} config - Configuration options
  * @returns {Promise<void>}
  */
 async function writeImageFilesPromise(posts, config) {
-  // collect image data from all posts into a single flattened array of payloads
+  // Initialize enhanced image processor
+  const imageProcessor = new ImageProcessor(config);
+  
+  // Collect all unique image URLs from posts
+  const imageUrlsMap = new Map();
   let skipCount = 0;
-  let delay = 0;
-  const payloads = posts.flatMap(post => {
+  
+  posts.forEach(post => {
     const postPath = getPostPath(post, config);
     const imagesDir = path.join(path.dirname(postPath), 'images');
-    return post.meta.imageUrls.flatMap(imageUrl => {
-      const filename = shared.getFilenameFromUrl(imageUrl);
-      const destinationPath = path.join(imagesDir, filename);
-      if (checkFile(destinationPath)) {
-        // already exists, don't need to save again
-        skipCount++;
-        return [];
-      } else {
-        const payload = {
-          item: imageUrl,
-          name: filename,
-          destinationPath,
-          delay,
-        };
-        delay += settings.image_file_request_delay;
-        return [payload];
+    
+    post.meta.imageUrls.forEach(imageUrl => {
+      if (!imageUrlsMap.has(imageUrl)) {
+        const filename = shared.getFilenameFromUrl(imageUrl);
+        const destinationPath = path.join(imagesDir, filename);
+        
+        if (checkFile(destinationPath)) {
+          skipCount++;
+        } else {
+          imageUrlsMap.set(imageUrl, {
+            postPath,
+            imagesDir,
+            originalFilename: filename
+          });
+        }
       }
     });
   });
 
-  const remainingCount = payloads.length;
+  const imageUrls = Array.from(imageUrlsMap.keys());
+  const remainingCount = imageUrls.length;
+
   if (remainingCount + skipCount === 0) {
-    console.log('\nNo images to download and save...');
-  } else {
-    console.log(
-      `\nDownloading and saving ${remainingCount} images (${skipCount} already exist)...`
-    );
-    await processPayloadsPromise(payloads, loadImageFilePromise);
+    xmlLogger.info('📷 No images to download and save...');
+    return;
+  }
+
+  xmlLogger.info(`📥 Processing ${remainingCount} images (${skipCount} already exist)...`);
+
+  // Process images by post to maintain directory organization
+  const processedByPost = new Map();
+  
+  // Group URLs by post directory
+  imageUrls.forEach(url => {
+    const info = imageUrlsMap.get(url);
+    if (!processedByPost.has(info.imagesDir)) {
+      processedByPost.set(info.imagesDir, []);
+    }
+    processedByPost.get(info.imagesDir).push(url);
+  });
+
+  // Process each post's images
+  for (const [imagesDir, urls] of processedByPost) {
+    try {
+      const processedImages = await imageProcessor.processImages(urls, imagesDir);
+      
+      // Save processed images to disk
+      await Promise.all(
+        processedImages.map(async (processedImage) => {
+          if (processedImage.data && processedImage.data.length > 0) {
+            try {
+              await fs.promises.writeFile(processedImage.destinationPath, processedImage.data);
+              xmlLogger.debug(`💾 Saved: ${processedImage.finalFilename}`);
+            } catch (error) {
+              xmlLogger.error(`❌ Failed to save ${processedImage.finalFilename}:`, error);
+            }
+          }
+        })
+      );
+      
+      // Update post metadata with AI-enhanced information
+      await updatePostsWithImageMetadata(posts, processedImages, imagesDir);
+      
+    } catch (error) {
+      xmlLogger.error(`❌ Failed to process images for directory ${imagesDir}:`, error);
+    }
+  }
+
+  // Log final statistics
+  const stats = imageProcessor.getStats();
+  xmlLogger.info(`✅ Image processing complete - ${stats.processedCount} processed, ${stats.aiEnhancedCount} AI-enhanced`);
+  if (stats.totalCreditsUsed > 0) {
+    xmlLogger.info(`💳 Visionati credits used: ${stats.totalCreditsUsed}`);
   }
 }
 
 /**
- * Load image data from URL
- * @param {string} imageUrl - URL to load image from
- * @returns {Promise<Buffer>} Image data
- * @throws {ConversionError} When image loading fails
+ * Update posts with AI-enhanced image metadata
+ * @param {import('./parser').Post[]} posts - Array of posts to update
+ * @param {Array} processedImages - Array of processed images with AI metadata
+ * @param {string} imagesDir - Images directory path
+ * @returns {Promise<void>}
  */
-async function loadImageFilePromise(imageUrl) {
-  // only encode the URL if it doesn't already have encoded characters
-  const url = /%[\da-f]{2}/i.test(imageUrl) ? imageUrl : encodeURI(imageUrl);
+async function updatePostsWithImageMetadata(posts, processedImages, imagesDir) {
+  // Import heroImage generator to re-generate after AI processing
+  const { default: heroImageGenerator } = await import('./frontmatter/heroImage.js');
+  
+  // Create lookup map for processed images
+  const imageMap = new Map();
+  processedImages.forEach(img => {
+    imageMap.set(img.originalUrl, img);
+  });
 
-  const config = {
-    method: 'get',
-    url,
-    headers: {
-      'User-Agent': 'wordpress-export-to-markdown',
-    },
-    responseType: 'arraybuffer',
-  };
-
-  if (!settings.strict_ssl) {
-    // custom agents to disable SSL errors (adding both http and https, just in case)
-    config.httpAgent = new http.Agent({ rejectUnauthorized: false });
-    config.httpsAgent = new https.Agent({ rejectUnauthorized: false });
-  }
-
-  try {
-    const response = await axios(config);
-    return Buffer.from(response.data, 'binary');
-  } catch (error) {
-    if (error.response) {
-      // request was made, but server responded with an error status code
-      throw new XmlConversionError(`HTTP ${error.response.status} error downloading image`, { status: error.response.status });
+  // Update posts that contain these images
+  posts.forEach(post => {
+    // Find posts that have images in this directory by checking if any image paths match
+    const postHasImagesInDir = post.meta.imageUrls.some(url => {
+      const processedImage = imageMap.get(url);
+      return processedImage && path.dirname(processedImage.destinationPath) === imagesDir;
+    });
+    
+    // Only update posts that match this images directory
+    if (postHasImagesInDir) {
+      let heroImageUpdated = false;
+      
+      post.meta.imageUrls.forEach((imageUrl, index) => {
+        const processedImage = imageMap.get(imageUrl);
+        if (processedImage) {
+          // Store AI-enhanced metadata for use in content generation
+          if (!post.meta.aiImageMetadata) {
+            post.meta.aiImageMetadata = new Map();
+          }
+          
+          post.meta.aiImageMetadata.set(imageUrl, {
+            altText: processedImage.altText,
+            filename: processedImage.finalFilename,
+            aiEnhanced: processedImage.aiEnhanced,
+            creditsUsed: processedImage.creditsUsed
+          });
+          
+          // Update imageImports array with AI-enhanced filenames
+          if (post.imageImports && processedImage.aiEnhanced) {
+            // Log for debugging
+            xmlLogger.debug(`🔍 Looking for imports matching: ${processedImage.originalFilename}`);
+            
+            post.imageImports.forEach(imageImport => {
+              // Check if this import matches the original filename
+              const originalFilename = processedImage.originalFilename || processedImage.originalUrl.split('/').pop();
+              
+              // More flexible matching to handle different path formats
+              const importFilename = imageImport.filename || imageImport.path.split('/').pop();
+              const matches = importFilename === originalFilename || 
+                            imageImport.path.includes(originalFilename) || 
+                            (importFilename && originalFilename && 
+                             importFilename.toLowerCase() === originalFilename.toLowerCase());
+              
+              if (matches) {
+                // Save old variable name for content replacement
+                const oldVariable = imageImport.variable;
+                // Update to use AI-enhanced filename
+                const oldPath = imageImport.path;
+                imageImport.path = `./images/${processedImage.finalFilename}`;
+                imageImport.filename = processedImage.finalFilename;
+                // Regenerate variable name for new filename
+                const newVariable = generateImageVariableName(processedImage.finalFilename);
+                imageImport.variable = newVariable;
+                
+                // Update variable references in post content
+                if (post.content && oldVariable !== newVariable) {
+                  // Replace variable references in content (e.g., src={oldVariable} -> src={newVariable})
+                  const variableRegex = new RegExp(`\\b${oldVariable}\\b`, 'g');
+                  const replacementCount = (post.content.match(variableRegex) || []).length;
+                  post.content = post.content.replace(variableRegex, newVariable);
+                  xmlLogger.info(`📝 Updated content variables (${replacementCount} occurrences):`, {
+                    oldVariable,
+                    newVariable,
+                    originalFile: originalFilename,
+                    aiFile: processedImage.finalFilename
+                  });
+                }
+                
+                xmlLogger.debug(`Updated image import: ${oldPath} → ${imageImport.path}`);
+              }
+            });
+          }
+          
+          // Check if this is the hero image and update cover image filename
+          if (post.meta.coverImage && (
+            imageUrl.endsWith(post.meta.coverImage) || 
+            imageUrl.includes(post.meta.coverImage)
+          )) {
+            post.meta.coverImage = processedImage.finalFilename;
+            heroImageUpdated = true;
+          }
+        }
+      });
+      
+      // Re-generate heroImage frontmatter after AI processing if hero image was updated
+      if (heroImageUpdated && post.frontmatter) {
+        const newHeroImage = heroImageGenerator(post);
+        post.frontmatter.heroImage = newHeroImage;
+        xmlLogger.info(`✨ Updated heroImage for ${post.meta.slug}:`, {
+          oldFilename: 'Depositphotos_97583692.jpg',
+          newFilename: post.meta.coverImage,
+          heroImage: newHeroImage
+        });
+      }
     }
-    throw new XmlConversionError('Failed to download image', { originalError: error });
-  }
+  });
 }
 
 /**
@@ -288,16 +462,19 @@ async function loadImageFilePromise(imageUrl) {
  * @returns {string} Destination path
  */
 function getPostPath(post, config) {
+  // Use pubDatetime field instead of date (matches FRONTMATTER_FIELDS config)
+  const dateValue = post.frontmatter.pubDatetime || post.frontmatter.date;
+  
   let dt;
   if (settings.custom_date_formatting) {
-    dt = luxon.DateTime.fromFormat(post.frontmatter.date, settings.custom_date_formatting);
+    dt = luxon.DateTime.fromFormat(dateValue, settings.custom_date_formatting);
   } else {
-    dt = luxon.DateTime.fromISO(post.frontmatter.date);
+    dt = luxon.DateTime.fromISO(dateValue);
   }
 
   // If date is invalid, use current date as fallback
   if (!dt.isValid) {
-    console.warn(`Invalid date for post ${post.meta.slug}: ${post.frontmatter.date}. Using current date as fallback.`);
+    console.warn(`Invalid date for post ${post.meta.slug}: ${dateValue}. Using current date as fallback.`);
     dt = luxon.DateTime.now();
   }
 
