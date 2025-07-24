@@ -9,7 +9,7 @@ import { resolve } from 'path';
 
 import { Command } from 'commander';
 
-import { logger } from '../src/utils/logger.js';
+import { logger, type LogLevelName } from '../src/utils/logger.js';
 
 import { convertXmlToMdxWithErrorHandling, validateXmlFile, ensureOutputDirectory } from './xml2markdown/src/converter.js';
 import type { XmlConverterConfig } from './xml2markdown/src/types.js';
@@ -17,7 +17,7 @@ import type { XmlConverterConfig } from './xml2markdown/src/types.js';
 // Configure logger for CLI
 const cliLogger = logger.configure({
   component: 'xml-cli',
-  minLevel: 'INFO' as const,
+  minLevel: 'INFO' as LogLevelName,
   timestampFormat: 'time'
 });
 
@@ -47,9 +47,9 @@ program
     try {
       // Configure logging based on options
       if (options.verbose) {
-        cliLogger.configure({ minLevel: 'DEBUG' as const });
+        cliLogger.configure({ minLevel: 'DEBUG' as LogLevelName });
       } else if (options.quiet) {
-        cliLogger.configure({ minLevel: 'ERROR' as const });
+        cliLogger.configure({ minLevel: 'ERROR' as LogLevelName });
       }
 
       cliLogger.info('🚀 XML to MDX Converter v2.0.0');
