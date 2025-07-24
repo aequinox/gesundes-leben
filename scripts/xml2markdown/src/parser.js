@@ -61,10 +61,11 @@ const frontmatterGetters = {
 
 /**
  * @typedef {Object} Post
- * @property {Object} data - Raw post data
+ * @property {import('./types.js').WordPressPostData} data - Raw post data
  * @property {PostMeta} meta - Post metadata
  * @property {string} content - Post content in markdown
- * @property {!Object} frontmatter - Post frontmatter (required)
+ * @property {import('./types.js').ImageImport[]} imageImports - Array of image imports for MDX
+ * @property {Record<string, unknown>} frontmatter - Post frontmatter (required)
  */
 
 /**

@@ -31,7 +31,7 @@ export interface Post {
   data: WordPressPostData;
   meta: PostMeta;
   content: string;
-  imageImports?: ImageImport[];
+  imageImports: ImageImport[];
   frontmatter: Record<string, unknown>;
 }
 

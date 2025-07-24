@@ -9,7 +9,7 @@ import { resolve } from 'path';
 
 import { Command } from 'commander';
 
-import { logger } from '@/utils/logger';
+import { logger } from '../src/utils/logger.js';
 
 import { convertXmlToMdxWithErrorHandling, validateXmlFile, ensureOutputDirectory } from './xml2markdown/src/converter.js';
 import type { XmlConverterConfig } from './xml2markdown/src/types.js';
