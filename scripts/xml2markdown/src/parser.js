@@ -5,7 +5,7 @@ import * as shared from './shared.js';
 import * as settings from './settings.js';
 import * as translator from './translator.js';
 import logger from './logger.js';
-import { ConversionError } from './errors.js';
+import { XmlConversionError, XmlValidationError } from './errors.js';
 
 // Import all frontmatter getters manually since require-directory doesn't work with ES modules
 import author from './frontmatter/author.js';
@@ -113,7 +113,7 @@ async function parseFilePromise(config) {
 
     return posts;
   } catch (error) {
-    throw new ConversionError('Failed to parse WordPress export file', error);
+    throw new XmlConversionError('Failed to parse WordPress export file', { originalError: error });
   }
 }
 
@@ -330,7 +330,7 @@ function populateFrontmatter(posts) {
 
       const frontmatterGetter = frontmatterGetters[key];
       if (!frontmatterGetter) {
-        throw new ConversionError(`Could not find a frontmatter getter named "${key}".`);
+        throw new XmlValidationError(`Could not find a frontmatter getter named "${key}"`, { field: key });
       }
 
       frontmatter[alias || key] = frontmatterGetter(post);

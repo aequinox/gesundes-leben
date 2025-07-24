@@ -1,5 +1,5 @@
 import * as luxon from 'luxon';
-import { ConversionError } from '../../errors.js';
+import { XmlConversionError } from '../../errors.js';
 import * as settings from '../../settings.js';
 
 /**
@@ -45,10 +45,10 @@ function formatDate(dateStr, fieldName) {
       return dateTime.toISODate();
     }
   } catch (error) {
-    if (error instanceof ConversionError) {
+    if (error instanceof XmlConversionError) {
       throw error;
     }
-    throw new ConversionError(`Failed to process ${fieldName}`, error);
+    throw new XmlConversionError(`Failed to process ${fieldName}`, { field: fieldName, originalError: error });
   }
 }
 

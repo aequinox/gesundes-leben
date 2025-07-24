@@ -1,94 +1,83 @@
-# XML to Markdown Blog Converter
+# WordPress XML to MDX Converter for Healthy Life Blog
 
-A WordPress XML export converter adapted for the Healthy Life blog. Converts WordPress posts into Astro-compatible MDX files with proper YAML frontmatter.
+A modern, TypeScript-enabled converter that transforms WordPress XML exports into Astro-compatible MDX files for the Healthy Life blog. Features comprehensive error handling, logging integration, and optimized performance for Bun runtime.
 
-## Features
+## ✨ Features
 
-- **Complete ES Module Support**: Modern JavaScript with import/export
-- **German Content Localization**: Category mapping and language-specific handling
-- **Blog Schema Compliance**: Generates frontmatter matching `src/content.config.ts`
-- **Intelligent Content Processing**: Extracts keywords, determines group classification
-- **Image Management**: Downloads and organizes post images
-- **Robust Date Handling**: Multiple date format parsing with fallbacks
-- **Astro Image Components**: Converts HTML `<figure>` elements to Astro `<Image>` components with imports
+- **🔄 WordPress XML Parsing**: Converts WordPress export files to MDX format
+- **🎯 Astro Integration**: Generates MDX files compatible with Astro content collections
+- **🖼️ Image Processing**: Downloads and processes attached and embedded images
+- **📁 Flexible Organization**: Supports year/month folders and custom naming schemes
+- **🔧 TypeScript Support**: Full type safety with comprehensive interfaces
+- **📊 Advanced Logging**: Integrated with project's centralized logging system
+- **⚡ Bun Optimized**: Optimized for Bun runtime with modern JavaScript features
+- **🛡️ Error Handling**: Robust error handling with detailed context
+- **🌐 German Localization**: Supports German content and categories
 
-## Prerequisites
+## 🚀 Installation
 
-- Bun runtime
-- WordPress XML export file(s) in the `xml/` directory
-
-## Installation
+The converter is included in the main Healthy Life project and requires no separate installation.
 
 ```bash
-cd scripts/xml2markdown
+# Install project dependencies
 bun install
 ```
 
-## Quick Start
+## 📖 Usage
 
-Place your WordPress XML export files in the `xml/` directory, then run:
+### Quick Start
 
 ```bash
-bun run index.js
+# Basic conversion
+bun run xml-convert -i export.xml
+
+# Convert with year/month organization
+bun run xml-convert -i export.xml --year-folders --month-folders
+
+# Dry run to preview changes
+bun run xml-convert -i export.xml --dry-run
 ```
 
-The converter will process all XML files and generate MDX files in `../../src/data/blog/`.
+### Command Line Options
 
-## Usage
+| Option | Description | Default |
+|--------|-------------|---------|
+| `-i, --input <file>` | Input WordPress XML file path | Required |
+| `-o, --output <dir>` | Output directory path | `./src/data/blog` |
+| `--year-folders` | Organize posts into year folders | `false` |
+| `--month-folders` | Organize into month folders (requires --year-folders) | `false` |
+| `--post-folders` | Create individual folders for each post | `false` |
+| `--prefix-date` | Add date prefix to filenames/folders | `false` |
+| `--save-attached-images` | Download attached images | `true` |
+| `--save-scraped-images` | Download images from post content | `true` |
+| `--include-other-types` | Include custom post types and pages | `false` |
+| `--dry-run` | Preview without making changes | `false` |
+| `-v, --verbose` | Enable verbose logging | `false` |
+| `-q, --quiet` | Suppress non-error output | `false` |
 
-### Basic Conversion
-
-Convert all XML files in the `xml/` directory:
-
-```bash
-bun run index.js
-```
-
-### Convert Specific File
-
-```bash
-bun run index.js --input xml/your-export-file.xml
-```
-
-### Configuration Options
-
-The converter accepts several command-line options:
+### Advanced Examples
 
 ```bash
-# Include all post types (not just 'post')
-bun run index.js --other-types
-
-# Download attached images
-bun run index.js --save-attached-images
-
-# Download images from post content
-bun run index.js --save-scraped-images
-
-# Organize posts in year folders
-bun run index.js --year-folders
-
-# Organize posts in month folders (requires year-folders)
-bun run index.js --month-folders
-
-# Create individual folders for each post
-bun run index.js --post-folders
-
-# Add date prefix to filenames
-bun run index.js --prefix-date
-
-# Custom output directory
-bun run index.js --output ../custom-output-dir
-```
-
-### Full Example
-
-```bash
-bun run index.js \
-  --input xml/gesundheitblog.xml \
-  --output ../../src/data/blog \
-  --save-attached-images \
+# Full conversion with organization and images
+bun run xml-convert \
+  -i wordpress-export.xml \
+  -o ./src/data/blog \
   --year-folders \
-  --prefix-date
+  --month-folders \
+  --prefix-date \
+  --post-folders
+
+# Quick conversion without images
+bun run xml-convert \
+  -i export.xml \
+  --no-save-attached-images \
+  --no-save-scraped-images
+
+# Include all content types with verbose logging
+bun run xml-convert \
+  -i export.xml \
+  --include-other-types \
+  --verbose
 ```
 
 ## Output Structure

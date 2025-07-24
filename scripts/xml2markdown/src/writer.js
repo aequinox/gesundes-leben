@@ -9,7 +9,7 @@ import { Buffer } from 'buffer';
 
 import * as shared from './shared.js';
 import * as settings from './settings.js';
-import { ConversionError } from './errors.js';
+import { XmlConversionError } from './errors.js';
 
 /**
  * @typedef {Object} Payload
@@ -83,7 +83,7 @@ async function writeFile(destinationPath, data) {
     await fs.promises.mkdir(path.dirname(destinationPath), { recursive: true });
     await fs.promises.writeFile(destinationPath, data);
   } catch (error) {
-    throw new ConversionError(`Failed to write file: ${destinationPath}`, error);
+    throw new XmlConversionError(`Failed to write file: ${destinationPath}`, { destinationPath, originalError: error });
   }
 }
 
@@ -275,9 +275,9 @@ async function loadImageFilePromise(imageUrl) {
   } catch (error) {
     if (error.response) {
       // request was made, but server responded with an error status code
-      throw new ConversionError(`HTTP ${error.response.status} error downloading image`);
+      throw new XmlConversionError(`HTTP ${error.response.status} error downloading image`, { status: error.response.status });
     }
-    throw new ConversionError('Failed to download image', error);
+    throw new XmlConversionError('Failed to download image', { originalError: error });
   }
 }
 

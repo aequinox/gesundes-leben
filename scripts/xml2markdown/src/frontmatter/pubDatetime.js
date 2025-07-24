@@ -1,4 +1,4 @@
-import { ConversionError } from '../errors.js';
+import { XmlValidationError } from '../errors.js';
 import { formatDate } from './utils/dateFormatter.js';
 
 /**
@@ -10,7 +10,7 @@ import { formatDate } from './utils/dateFormatter.js';
  */
 export default post => {
   if (!post.data.pubDate || !post.data.pubDate[0]) {
-    throw new ConversionError('Post publication date is missing');
+    throw new XmlValidationError('Post publication date is missing', { field: 'pubDate' });
   }
 
   return formatDate(post.data.pubDate[0], 'publication date');

@@ -1,5 +1,5 @@
 import * as luxon from 'luxon';
-import { ConversionError } from '../errors.js';
+import { XmlConversionError, XmlValidationError } from '../errors.js';
 import * as settings from '../settings.js';
 
 /**
@@ -12,7 +12,7 @@ import * as settings from '../settings.js';
  */
 export default post => {
   if (!post.data.pubDate || !post.data.pubDate[0]) {
-    throw new ConversionError('Post publication date is missing');
+    throw new XmlValidationError('Post publication date is missing', { field: 'pubDate' });
   }
 
   try {
@@ -21,7 +21,7 @@ export default post => {
     });
 
     if (!dateTime.isValid) {
-      throw new ConversionError(`Invalid date format: ${dateTime.invalidReason}`);
+      throw new XmlValidationError(`Invalid date format: ${dateTime.invalidReason}`, { field: 'pubDate', value: post.data.pubDate[0] });
     }
 
     if (settings.custom_date_formatting) {
@@ -35,6 +35,6 @@ export default post => {
     if (error instanceof ConversionError) {
       throw error;
     }
-    throw new ConversionError('Failed to process post date', error);
+    throw new XmlConversionError('Failed to process post date', { originalError: error });
   }
 };

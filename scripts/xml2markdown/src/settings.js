@@ -10,30 +10,14 @@
  * @property {boolean} strict_ssl - Whether to enforce strict SSL
  */
 
+import { FRONTMATTER_FIELDS, BLOG_CATEGORIES } from './config.js';
+
 /**
  * Fields to include in frontmatter for Healthy Life blog
- * Look in /src/frontmatter to see available fields
- * Order is preserved to match blog content schema
- * If a field has an empty value, it will not be included
- * You can rename a field by providing an alias after a ':'
- * For example, 'date:created' will include 'date' in frontmatter, but renamed to 'created'
+ * Now imported from centralized configuration
  * @type {string[]}
  */
-export const frontmatter_fields = [
-  'id',
-  'title',
-  'author',
-  'pubDatetime',
-  'modDatetime',
-  'excerpt:description',
-  'keywords',
-  'categories',
-  'group',
-  'tags',
-  'heroImage',
-  'draft',
-  'featured',
-];
+export const frontmatter_fields = FRONTMATTER_FIELDS;
 
 /**
  * Time in ms to wait between requesting image files

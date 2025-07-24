@@ -1,6 +1,6 @@
 import TurndownService from 'turndown';
 import { gfm } from 'turndown-plugin-gfm';
-import { ConversionError } from './errors.js';
+import { XmlConversionError } from './errors.js';
 
 /**
  * Generate a valid JavaScript variable name from an image filename
@@ -206,7 +206,7 @@ function initTurndownService() {
 function getPostContent(postData, turndownService, config) {
   try {
     if (!postData.encoded || !postData.encoded[0]) {
-      throw new ConversionError('Post content is missing');
+      throw new XmlConversionError('Post content is missing');
     }
 
     let content = postData.encoded[0];
@@ -254,7 +254,7 @@ function getPostContent(postData, turndownService, config) {
     if (error instanceof ConversionError) {
       throw error;
     }
-    throw new ConversionError('Failed to convert post content to Markdown', error);
+    throw new XmlConversionError('Failed to convert post content to Markdown', { originalError: error });
   }
 }
 

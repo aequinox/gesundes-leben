@@ -1,16 +1,41 @@
+import { ContentProcessingError, ValidationError, ConfigurationError } from '../../../src/utils/errors.js';
+
 /**
- * Custom error class for application-specific errors
- * @extends Error
+ * XML to MDX conversion error
+ * Extends the project's ContentProcessingError for consistency
  */
-export class ConversionError extends Error {
-  /**
-   * Create a ConversionError
-   * @param {string} message - Error message
-   * @param {*} [details] - Additional error details
-   */
-  constructor(message, details) {
-    super(message);
-    this.name = 'ConversionError';
-    this.details = details;
+export class XmlConversionError extends ContentProcessingError {
+  constructor(message, context) {
+    super(`XML Conversion: ${message}`, {
+      ...context,
+      module: 'xml2markdown'
+    });
   }
 }
+
+/**
+ * Configuration validation error for XML converter
+ */
+export class XmlConfigurationError extends ConfigurationError {
+  constructor(message, context) {
+    super(`XML Converter Config: ${message}`, {
+      ...context,
+      module: 'xml2markdown'
+    });
+  }
+}
+
+/**
+ * Input validation error for XML converter
+ */
+export class XmlValidationError extends ValidationError {
+  constructor(message, context) {
+    super(`XML Validation: ${message}`, {
+      ...context,
+      module: 'xml2markdown'
+    });
+  }
+}
+
+// Legacy export for backward compatibility
+export const ConversionError = XmlConversionError;
