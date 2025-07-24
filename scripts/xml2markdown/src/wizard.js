@@ -1,10 +1,12 @@
-const camelcase = require('camelcase');
-const commander = require('commander');
-const fs = require('fs');
-const inquirer = require('inquirer');
-const path = require('path');
-const { ConversionError } = require('./errors');
+import camelcase from 'camelcase';
+import { Command } from 'commander';
+import fs from 'fs';
+import inquirer from 'inquirer';
+import path from 'path';
+import { ConversionError } from './errors.js';
 
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 const pkgJson = require('../package.json');
 
 /**
@@ -190,7 +192,8 @@ function replaceAliases(argv) {
  */
 function parseCommandLine(argv) {
   // setup for help output
-  commander
+  const program = new Command();
+  program
     .name('node index.js')
     .version('v' + pkgJson.version, '-v, --version', 'Display version number')
     .helpOption('-h, --help', "See the thing you're looking at right now")
@@ -208,10 +211,10 @@ function parseCommandLine(argv) {
       input.isProvided = true;
       return input.coerce(value);
     };
-    commander.option(flag, input.description, coerce, input.default);
+    program.option(flag, input.description, coerce, input.default);
   });
 
-  return commander.parse(argv);
+  return program.parse(argv);
 }
 
 /**
@@ -249,4 +252,4 @@ function validateFile(value) {
   return isValid ? true : 'Unable to find file: ' + path.resolve(value);
 }
 
-module.exports = { getConfig };
+export { getConfig };

@@ -1,6 +1,6 @@
-const luxon = require('luxon');
-const { ConversionError } = require('../../errors');
-const settings = require('../../settings');
+import * as luxon from 'luxon';
+import { ConversionError } from '../../errors.js';
+import * as settings from '../../settings.js';
 
 /**
  * Format a date from RFC2822 format according to settings
@@ -35,4 +35,4 @@ function formatDate(dateStr, fieldName) {
   }
 }
 
-module.exports = { formatDate };
+export { formatDate };

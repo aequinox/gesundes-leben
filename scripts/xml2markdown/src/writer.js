@@ -1,15 +1,15 @@
-const axios = require('axios');
-const chalk = require('chalk');
-const fs = require('fs');
-const http = require('http');
-const https = require('https');
-const luxon = require('luxon');
-const path = require('path');
-const Buffer = require('buffer').Buffer;
+import axios from 'axios';
+import chalk from 'chalk';
+import fs from 'fs';
+import http from 'http';
+import https from 'https';
+import * as luxon from 'luxon';
+import path from 'path';
+import { Buffer } from 'buffer';
 
-const shared = require('./shared');
-const settings = require('./settings');
-const { ConversionError } = require('./errors');
+import * as shared from './shared.js';
+import * as settings from './settings.js';
+import { ConversionError } from './errors.js';
 
 /**
  * @typedef {Object} Payload
@@ -125,7 +125,7 @@ async function writeMarkdownFilesPromise(posts, config) {
 }
 
 /**
- * Load markdown content for a post
+ * Load markdown content for a post with proper YAML formatting for Healthy Life blog
  * @param {import('./parser').Post} post - Post to load content for
  * @returns {Promise<string>} Markdown content
  */
@@ -134,16 +134,46 @@ function loadMarkdownFilePromise(post) {
 
   Object.entries(post.frontmatter).forEach(([key, value]) => {
     let outputValue;
+    
+    if (value === undefined || value === null) {
+      return; // Skip undefined/null values
+    }
+    
     if (Array.isArray(value)) {
       if (value.length > 0) {
-        // array of one or more strings
-        outputValue = value.reduce((list, item) => `${list}\n  - "${item}"`, '');
+        // array of one or more strings - format as YAML array
+        outputValue = value.reduce((list, item) => {
+          const cleanItem = (item || '').toString().replace(/"/g, '\\"');
+          return `${list}\n  - ${cleanItem}`;
+        }, '');
       }
+    } else if (typeof value === 'object' && value !== null) {
+      // Handle objects like heroImage: { src: "...", alt: "..." }
+      if (key === 'heroImage') {
+        outputValue = `\n  src: ${value.src || ''}\n  alt: ${(value.alt || '').replace(/"/g, '\\"')}`;
+      } else {
+        // Generic object handling
+        outputValue = '\n' + Object.entries(value)
+          .map(([objKey, objValue]) => {
+            const cleanValue = (objValue || '').toString().replace(/"/g, '\\"');
+            return `  ${objKey}: ${cleanValue}`;
+          })
+          .join('\n');
+      }
+    } else if (typeof value === 'boolean') {
+      // Handle boolean values
+      outputValue = value.toString();
     } else {
-      // single string value
-      const escapedValue = (value || '').replace(/"/g, '\\"');
+      // single string/number value
+      const escapedValue = (value || '').toString().replace(/"/g, '\\"');
       if (escapedValue.length > 0) {
-        outputValue = `"${escapedValue}"`;
+        // Don't quote boolean-like strings, numbers, or certain special values
+        if (value === true || value === false || !isNaN(Number(value)) || 
+            ['true', 'false'].includes(escapedValue.toLowerCase())) {
+          outputValue = escapedValue;
+        } else {
+          outputValue = `"${escapedValue}"`;
+        }
       }
     }
 
@@ -292,4 +322,4 @@ function checkFile(path) {
   return fs.existsSync(path);
 }
 
-module.exports = { writeFilesPromise };
+export { writeFilesPromise };

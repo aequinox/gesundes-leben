@@ -1,4 +1,4 @@
-const { ConversionError } = require('./errors');
+import { ConversionError } from './errors.js';
 
 /**
  * Extract filename from URL
@@ -27,4 +27,4 @@ function getFilenameFromUrl(url) {
   }
 }
 
-module.exports = { getFilenameFromUrl };
+export { getFilenameFromUrl };

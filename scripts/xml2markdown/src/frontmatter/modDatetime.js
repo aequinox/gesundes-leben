@@ -1,5 +1,5 @@
 const { ConversionError } = require('../errors');
-const { formatDate } = require('./utils/dateFormatter');
+import { formatDate } from './utils/dateFormatter.js';
 
 /**
  * Get post modification date/time
@@ -9,7 +9,7 @@ const { formatDate } = require('./utils/dateFormatter');
  * @returns {string} Formatted modification date
  * @throws {ConversionError} When date parsing fails
  */
-module.exports = post => {
+export default post => {
   if (!post.data.pubDate || !post.data.pubDate[0]) {
     throw new ConversionError('Post modification date is missing');
   }

@@ -1,17 +1,51 @@
-const fs = require('fs');
-const requireDirectory = require('require-directory');
-const xml2js = require('xml2js');
+import fs from 'fs';
+import * as xml2js from 'xml2js';
 
-const shared = require('./shared');
-const settings = require('./settings');
-const translator = require('./translator');
-const logger = require('./logger');
-const { ConversionError } = require('./errors');
+import * as shared from './shared.js';
+import * as settings from './settings.js';
+import * as translator from './translator.js';
+import logger from './logger.js';
+import { ConversionError } from './errors.js';
 
-// dynamically requires all frontmatter getters
-const frontmatterGetters = requireDirectory(module, './frontmatter', {
-  recurse: false,
-});
+// Import all frontmatter getters manually since require-directory doesn't work with ES modules
+import author from './frontmatter/author.js';
+import categories from './frontmatter/categories.js';
+import coverImage from './frontmatter/coverImage.js';
+import draft from './frontmatter/draft.js';
+import excerpt from './frontmatter/excerpt.js';
+import featured from './frontmatter/featured.js';
+import group from './frontmatter/group.js';
+import heroImage from './frontmatter/heroImage.js';
+import id from './frontmatter/id.js';
+import keywords from './frontmatter/keywords.js';
+import modDatetime from './frontmatter/modDatetime.js';
+import pubDatetime from './frontmatter/pubDatetime.js';
+import slug from './frontmatter/slug.js';
+import tags from './frontmatter/tags.js';
+import taxonomy from './frontmatter/taxonomy.js';
+import title from './frontmatter/title.js';
+import type from './frontmatter/type.js';
+
+// Create frontmatter getters object manually
+const frontmatterGetters = {
+  author,
+  categories,
+  coverImage,
+  draft,
+  excerpt,
+  featured,
+  group,
+  heroImage,
+  id,
+  keywords,
+  modDatetime,
+  pubDatetime,
+  slug,
+  tags,
+  taxonomy,
+  title,
+  type,
+};
 
 /**
  * @typedef {Object} PostMeta
@@ -299,4 +333,4 @@ function populateFrontmatter(posts) {
   });
 }
 
-module.exports = { parseFilePromise };
+export { parseFilePromise };

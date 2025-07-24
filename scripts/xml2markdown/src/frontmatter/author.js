@@ -1,4 +1,4 @@
-const { ConversionError } = require('../errors');
+import { ConversionError } from '../errors.js';
 
 /**
  * Get the author slug from the post creator
@@ -8,7 +8,7 @@ const { ConversionError } = require('../errors');
  * @returns {string} Author slug
  * @throws {ConversionError} When creator data is missing
  */
-module.exports = post => {
+export default post => {
   if (!post.data.creator || !post.data.creator[0]) {
     throw new ConversionError('Post creator data is missing');
   }

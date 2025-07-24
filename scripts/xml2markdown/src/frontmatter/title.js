@@ -1,4 +1,4 @@
-const { ConversionError } = require('../errors');
+import { ConversionError } from '../errors.js';
 
 /**
  * Get post title
@@ -9,7 +9,7 @@ const { ConversionError } = require('../errors');
  * @returns {string} Post title
  * @throws {ConversionError} When title is missing
  */
-module.exports = post => {
+export default post => {
   if (!post.data.title || !post.data.title[0]) {
     throw new ConversionError('Post title is missing');
   }

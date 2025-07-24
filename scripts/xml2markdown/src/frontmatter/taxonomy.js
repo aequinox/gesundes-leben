@@ -1,4 +1,4 @@
-const { ConversionError } = require('../errors');
+import { ConversionError } from '../errors.js';
 
 /**
  * Get array of decoded taxonomy terms
@@ -8,7 +8,7 @@ const { ConversionError } = require('../errors');
  * @param {import('../parser').Post} post - Post object
  * @returns {string[]} Array of taxonomy terms
  */
-module.exports = post => {
+export default post => {
   if (!post.data.category) {
     return [];
   }

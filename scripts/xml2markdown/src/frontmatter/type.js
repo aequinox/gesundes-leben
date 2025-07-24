@@ -1,4 +1,4 @@
-const { ConversionError } = require('../errors');
+import { ConversionError } from '../errors.js';
 
 /**
  * Get post type
@@ -9,7 +9,7 @@ const { ConversionError } = require('../errors');
  * @returns {string} Post type
  * @throws {ConversionError} When post type is missing
  */
-module.exports = post => {
+export default post => {
   if (!post.data.post_type || !post.data.post_type[0]) {
     throw new ConversionError('Post type is missing');
   }

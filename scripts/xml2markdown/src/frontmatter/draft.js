@@ -1,4 +1,4 @@
-const { ConversionError } = require('../errors');
+import { ConversionError } from '../errors.js';
 
 /**
  * Get post draft status
@@ -8,7 +8,7 @@ const { ConversionError } = require('../errors');
  * @returns {boolean} Whether the post is a draft
  * @throws {ConversionError} When post status is missing
  */
-module.exports = post => {
+export default post => {
   if (!post.data.status || !post.data.status[0]) {
     throw new ConversionError('Post status is missing');
   }

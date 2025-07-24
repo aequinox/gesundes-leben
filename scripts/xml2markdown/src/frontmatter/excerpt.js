@@ -1,4 +1,4 @@
-const { ConversionError } = require('../errors');
+import { ConversionError } from '../errors.js';
 
 /**
  * Get post excerpt with collapsed newlines
@@ -8,7 +8,7 @@ const { ConversionError } = require('../errors');
  * @returns {string} Post excerpt with normalized whitespace
  * @throws {ConversionError} When post excerpt is missing
  */
-module.exports = post => {
+export default post => {
   if (!post.data.encoded || !post.data.encoded[1]) {
     throw new ConversionError('Post excerpt is missing');
   }

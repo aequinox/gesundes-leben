@@ -10,7 +10,7 @@
 */
 
 // get whatever
-module.exports = post => {
+export default post => {
   console.log(
     '\nBEGIN POST DATA DUMP ===========================================================\n'
   );

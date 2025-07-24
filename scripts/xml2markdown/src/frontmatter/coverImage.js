@@ -5,6 +5,6 @@
  * @param {import('../parser').Post} post - Post object
  * @returns {string|undefined} Cover image filename if exists
  */
-module.exports = post => {
+export default post => {
   return post.meta.coverImage;
 };

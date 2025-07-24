@@ -11,27 +11,28 @@
  */
 
 /**
- * Fields to include in frontmatter
+ * Fields to include in frontmatter for Healthy Life blog
  * Look in /src/frontmatter to see available fields
- * Order is preserved
+ * Order is preserved to match blog content schema
  * If a field has an empty value, it will not be included
  * You can rename a field by providing an alias after a ':'
  * For example, 'date:created' will include 'date' in frontmatter, but renamed to 'created'
  * @type {string[]}
  */
-exports.frontmatter_fields = [
+export const frontmatter_fields = [
   'id',
   'title',
   'author',
-  'date',
   'pubDatetime',
   'modDatetime',
-  'slug',
   'excerpt:description',
+  'keywords',
   'categories',
-  'taxonomy:group',
+  'group',
   'tags',
-  'coverImage:heroImage',
+  'heroImage',
+  'draft',
+  'featured',
 ];
 
 /**
@@ -39,21 +40,21 @@ exports.frontmatter_fields = [
  * Increase this if you see timeouts or server errors
  * @type {number}
  */
-exports.image_file_request_delay = 500;
+export const image_file_request_delay = 500;
 
 /**
  * Time in ms to wait between saving Markdown files
  * Increase this if your file system becomes overloaded
  * @type {number}
  */
-exports.markdown_file_write_delay = 25;
+export const markdown_file_write_delay = 25;
 
 /**
  * Enable this to include time with post dates
  * For example, "2020-12-25" would become "2020-12-25T11:20:35.000Z"
  * @type {boolean}
  */
-exports.include_time_with_date = true;
+export const include_time_with_date = true;
 
 /**
  * Override post date formatting with a custom formatting string
@@ -62,7 +63,7 @@ exports.include_time_with_date = true;
  * If set, this takes precedence over include_time_with_date
  * @type {string}
  */
-exports.custom_date_formatting = '';
+export const custom_date_formatting = '';
 
 /**
  * Specify the timezone used for post dates
@@ -70,14 +71,15 @@ exports.custom_date_formatting = '';
  * https://moment.github.io/luxon/#/zones?id=specifying-a-zone
  * @type {string}
  */
-exports.custom_date_timezone = 'utc';
+export const custom_date_timezone = 'utc';
 
 /**
- * Categories to be excluded from post frontmatter
+ * Categories to be excluded from post frontmatter for Healthy Life blog
  * This does not filter out posts themselves, just the categories listed in their frontmatter
+ * WordPress default categories that should be filtered out
  * @type {string[]}
  */
-exports.filter_categories = ['uncategorized'];
+export const filter_categories = ['uncategorized', 'Uncategorized', 'Unkategorisiert'];
 
 /**
  * Whether to enforce strict SSL when downloading images
@@ -85,4 +87,4 @@ exports.filter_categories = ['uncategorized'];
  * You can disable it if you're getting a "self-signed certificate" error
  * @type {boolean}
  */
-exports.strict_ssl = true;
+export const strict_ssl = true;

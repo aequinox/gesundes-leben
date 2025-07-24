@@ -1,4 +1,4 @@
-const { ConversionError } = require('../errors');
+import { ConversionError } from '../errors.js';
 
 /**
  * Get post featured status
@@ -7,7 +7,7 @@ const { ConversionError } = require('../errors');
  * @param {import('../parser').Post} post - Post object
  * @returns {boolean} Whether the post is featured
  */
-module.exports = post => {
+export default post => {
   // If is_sticky property doesn't exist, post is not featured
   if (!post.data.is_sticky) {
     return false;

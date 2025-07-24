@@ -12,13 +12,13 @@
  * @license MIT
  */
 
-const path = require('path');
-const { argv } = require('process');
-const { getConfig } = require('./src/wizard');
-const { parseFilePromise } = require('./src/parser');
-const { writeFilesPromise } = require('./src/writer');
-const logger = require('./src/logger');
-const { ConversionError } = require('./src/errors');
+import path from 'path';
+import { argv } from 'process';
+import { getConfig } from './src/wizard.js';
+import { parseFilePromise } from './src/parser.js';
+import { writeFilesPromise } from './src/writer.js';
+import logger from './src/logger.js';
+import { ConversionError } from './src/errors.js';
 
 /**
  * Main execution function that orchestrates the conversion process

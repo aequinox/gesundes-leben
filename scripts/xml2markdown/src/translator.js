@@ -1,6 +1,6 @@
-const turndown = require('turndown');
-const turndownPluginGfm = require('turndown-plugin-gfm');
-const { ConversionError } = require('./errors');
+import TurndownService from 'turndown';
+import { gfm } from 'turndown-plugin-gfm';
+import { ConversionError } from './errors.js';
 
 /**
  * @typedef {Object} TurndownService
@@ -14,13 +14,13 @@ const { ConversionError } = require('./errors');
  * @returns {TurndownService} Configured TurndownService instance
  */
 function initTurndownService() {
-  const turndownService = new turndown({
+  const turndownService = new TurndownService({
     headingStyle: 'atx',
     bulletListMarker: '-',
     codeBlockStyle: 'fenced',
   });
 
-  turndownService.use(turndownPluginGfm.tables);
+  turndownService.use(gfm);
 
   // preserve embedded tweets
   turndownService.addRule('tweet', {
@@ -165,7 +165,7 @@ function getPostContent(postData, turndownService, config) {
   }
 }
 
-module.exports = {
+export {
   initTurndownService,
   getPostContent,
 };

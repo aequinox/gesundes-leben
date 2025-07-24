@@ -1,4 +1,4 @@
-const { v4: uuidv4 } = require('uuid');
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Generate a unique identifier for the post
@@ -7,7 +7,7 @@ const { v4: uuidv4 } = require('uuid');
  * @param {import('../parser').Post} post - Post object (unused)
  * @returns {string} Unique identifier
  */
-module.exports = () => {
+export default () => {
   return uuidv4();
 };
 

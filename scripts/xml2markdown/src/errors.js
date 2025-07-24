@@ -2,7 +2,7 @@
  * Custom error class for application-specific errors
  * @extends Error
  */
-class ConversionError extends Error {
+export class ConversionError extends Error {
   /**
    * Create a ConversionError
    * @param {string} message - Error message
@@ -14,5 +14,3 @@ class ConversionError extends Error {
     this.details = details;
   }
 }
-
-module.exports = { ConversionError };

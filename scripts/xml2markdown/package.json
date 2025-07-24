@@ -2,7 +2,8 @@
   "name": "wordpress-export-to-markdown",
   "version": "2.4.0",
   "description": "Converts a WordPress export XML file into Markdown files.",
-  "main": "main.ts",
+  "main": "index.js",
+  "type": "module",
   "repository": "https://github.com/lonekorean/wordpress-export-to-markdown.git",
   "keywords": [
     "blog",
@@ -30,7 +31,6 @@
     "commander": "^5.1.0",
     "inquirer": "^7.3.3",
     "luxon": "^3.5.0",
-    "require-directory": "^2.1.1",
     "turndown": "^7.2.0",
     "turndown-plugin-gfm": "^1.0.2",
     "uuid": "^10.0.0",

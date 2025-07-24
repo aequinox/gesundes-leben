@@ -1,4 +1,4 @@
-const { ConversionError } = require('../errors');
+import { ConversionError } from '../errors.js';
 
 /**
  * Get post slug from meta
@@ -8,7 +8,7 @@ const { ConversionError } = require('../errors');
  * @returns {string} Post slug
  * @throws {ConversionError} When slug is missing
  */
-module.exports = post => {
+export default post => {
   if (!post.meta.slug) {
     throw new ConversionError('Post slug is missing');
   }
