@@ -221,7 +221,7 @@ export class PerformanceMonitor {
       const navigation = performance.getEntriesByType(
         "navigation"
       )[0] as PerformanceNavigationTiming;
-      return navigation?.responseStart - navigation?.requestStart ?? 0;
+      return (navigation?.responseStart ?? 0) - (navigation?.requestStart ?? 0);
     } catch (error) {
       logger.warn("Failed to get TTFB:", error);
       return 0;

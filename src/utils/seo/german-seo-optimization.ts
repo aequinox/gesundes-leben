@@ -465,10 +465,7 @@ export class GermanSEOOptimizer {
     }
 
     // Health compliance for German market
-    if (
-      this.config.healthCompliance &&
-      data.categories.includes("Gesundheit")
-    ) {
+    if (this.config.healthCompliance && data.categories.includes("Ernährung")) {
       const hasDisclaimer =
         data.description.includes("medizinische beratung") ||
         (content && content.includes("medizinische beratung"));

@@ -48,7 +48,7 @@ Object.defineProperty(window, 'scrollTo', {
 });
 
 // Mock requestAnimationFrame
-global.requestAnimationFrame = vi.fn(cb => setTimeout(cb, 16));
+global.requestAnimationFrame = vi.fn(cb => setTimeout(cb, 16) as unknown as number);
 global.cancelAnimationFrame = vi.fn();
 
 // Performance API mock for health blog performance testing
@@ -239,7 +239,7 @@ beforeEach(() => {
   
   // Reset window location
   delete (window as unknown as { location?: Location }).location;
-  window.location = {
+  (window as any).location = {
     href: 'http://localhost:3000/',
     origin: 'http://localhost:3000',
     pathname: '/',

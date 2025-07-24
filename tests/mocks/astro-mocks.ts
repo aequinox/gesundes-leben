@@ -42,7 +42,7 @@ export const createAstroContentMocks = () => {
         references: ['nutrition-study-2024', 'vitamin-research-2023']
       },
       rendered: {
-        Content: () => '<p>Mock content</p>',
+        // Content: () => '<p>Mock content</p>', // Not part of RenderedContent interface
         headings: [
           { depth: 1, slug: 'introduction', text: 'Einführung' },
           { depth: 2, slug: 'vitamins', text: 'Vitamine' }
@@ -77,7 +77,7 @@ export const createAstroContentMocks = () => {
         references: ['mindfulness-study-2024']
       },
       rendered: {
-        Content: () => '<p>Mock wellness content</p>',
+        // Content: () => '<p>Mock wellness content</p>', // Not part of RenderedContent interface
         headings: [
           { depth: 1, slug: 'mindfulness', text: 'Achtsamkeit' },
           { depth: 2, slug: 'techniques', text: 'Techniken' }
@@ -99,7 +99,7 @@ export const createAstroContentMocks = () => {
         bio: 'Ernährungswissenschaftler mit 15 Jahren Erfahrung',
       },
       rendered: {
-        Content: () => '<p>Mock author bio</p>',
+        // Content: () => '<p>Mock author bio</p>', // Not part of RenderedContent interface
         headings: [],
         remarkPluginFrontmatter: {}
       }
@@ -119,7 +119,7 @@ export const createAstroContentMocks = () => {
         modDatetime: new Date('2024-01-02')
       },
       rendered: {
-        Content: () => '<p>Mock glossary definition</p>',
+        // Content: () => '<p>Mock glossary definition</p>', // Not part of RenderedContent interface
         headings: [],
         remarkPluginFrontmatter: {}
       }
@@ -206,7 +206,7 @@ export const createAstroImageMock = () => {
       ...props
     };
 
-    const sources = picture.formats.map(format => 
+    const sources = picture.formats.map((format: string) => 
       `<source srcset="${picture.src}" type="image/${format}" />`
     ).join('');
 
