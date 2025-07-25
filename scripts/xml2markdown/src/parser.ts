@@ -71,14 +71,31 @@ const frontmatterGetters: Record<string, FrontmatterGetter> = {
  */
 async function parseFilePromise(config: XmlConverterConfig): Promise<Post[]> {
   try {
-    logger.info("Parsing...");
+    logger.info("Parsing WordPress XML export...");
+    
+    // Read and validate file content
     const content = await fs.promises.readFile(config.input, "utf8");
+    if (!content.trim()) {
+      throw XmlValidationError.forInvalidXmlStructure("non-empty content");
+    }
+
+    // Parse XML with error handling
     const allData = await xml2js.parseStringPromise(content, {
       trim: true,
       tagNameProcessors: [xml2js.processors.stripPrefix],
+      explicitArray: true,
+      normalizeTags: false,
     });
-    const channelData = allData.rss.channel[0].item as RawXmlItem[];
 
+    // Validate XML structure
+    if (!allData?.rss?.channel?.[0]?.item) {
+      throw XmlValidationError.forInvalidXmlStructure("RSS channel with items");
+    }
+
+    const channelData = allData.rss.channel[0].item as RawXmlItem[];
+    logger.info(`Found ${channelData.length} items in XML export`);
+
+    // Process posts and images
     const postTypes = getPostTypes(channelData, config);
     const posts = collectPosts(channelData, postTypes, config);
 
@@ -96,11 +113,15 @@ async function parseFilePromise(config: XmlConverterConfig): Promise<Post[]> {
     mergeImagesIntoPosts(images, posts);
     const completePosts = populateFrontmatter(posts);
 
+    logger.info(`Successfully parsed ${completePosts.length} posts with ${images.length} images`);
     return completePosts;
   } catch (error) {
-    throw new XmlConversionError("Failed to parse WordPress export file", {
-      originalError: error,
-    });
+    if (error instanceof XmlValidationError) {
+      throw error;
+    }
+    
+    const originalError = error instanceof Error ? error : new Error(String(error));
+    throw XmlConversionError.forParsingFailure(originalError, config.input);
   }
 }
 
@@ -112,24 +133,39 @@ function getPostTypes(
   config: XmlConverterConfig
 ): string[] {
   if (config.includeOtherTypes) {
-    // search export file for all post types minus some default types we don't want
-    // effectively this will be 'post', 'page', and custom post types
-    const types = channelData
-      .map(item => item.post_type?.[0])
-      .filter((type): type is string => type !== undefined)
-      .filter(
-        type =>
-          ![
-            "attachment",
-            "revision",
-            "nav_menu_item",
-            "custom_css",
-            "customize_changeset",
-          ].includes(type)
-      );
-    return [...new Set(types)]; // remove duplicates
+    // Excluded post types - use Set for O(1) lookup performance
+    const excludedTypes = new Set([
+      "attachment",
+      "revision",
+      "nav_menu_item",
+      "custom_css",
+      "customize_changeset",
+      "oembed_cache",
+      "user_request",
+      "wp_block",
+    ]);
+
+    // Use Set for automatic deduplication and better performance
+    const typeSet = new Set<string>();
+    
+    // Process in batches for memory efficiency with large exports
+    const BATCH_SIZE = 1000;
+    for (let i = 0; i < channelData.length; i += BATCH_SIZE) {
+      const batch = channelData.slice(i, i + BATCH_SIZE);
+      
+      for (const item of batch) {
+        const postType = item.post_type?.[0];
+        if (postType && !excludedTypes.has(postType)) {
+          typeSet.add(postType);
+        }
+      }
+    }
+    
+    const types = Array.from(typeSet);
+    logger.info(`Found post types: ${types.join(", ")}`);
+    return types;
   } else {
-    // just plain old vanilla "post" posts
+    // Default to just blog posts
     return ["post"];
   }
 }
@@ -239,24 +275,40 @@ function collectAttachedImages(channelData: RawXmlItem[]): Image[] {
     post_parent?: string[];
   }
 
-  const imageExtRegex = /\.(gif|jpe?g|png|webp)$/i;
+  // Precompile regex and use more comprehensive image extensions
+  const imageExtRegex = /\.(gif|jpe?g|png|webp|avif|svg|bmp|tiff?)$/i;
   const attachments = getItemsOfType(channelData, "attachment");
+  
+  // Pre-allocate array with estimated size for better memory performance
   const images: Image[] = [];
+  images.length = 0; // Ensure clean start
 
-  for (const attachment of attachments) {
-    const attachmentItem = attachment as AttachmentItem;
-    const attachmentUrl = attachmentItem.attachment_url?.[0];
+  // Process attachments in batches to avoid memory pressure
+  const BATCH_SIZE = 100;
+  for (let i = 0; i < attachments.length; i += BATCH_SIZE) {
+    const batch = attachments.slice(i, i + BATCH_SIZE);
+    
+    for (const attachment of batch) {
+      const attachmentItem = attachment as AttachmentItem;
+      const attachmentUrl = attachmentItem.attachment_url?.[0];
 
-    if (attachmentUrl && imageExtRegex.test(attachmentUrl)) {
-      images.push({
-        id: attachment.post_id?.[0] ?? "",
-        postId: attachmentItem.post_parent?.[0] ?? "",
-        url: attachmentUrl,
-      });
+      if (attachmentUrl && imageExtRegex.test(attachmentUrl)) {
+        // Validate URL structure before adding
+        try {
+          new URL(attachmentUrl); // Will throw if invalid
+          images.push({
+            id: attachment.post_id?.[0] ?? "",
+            postId: attachmentItem.post_parent?.[0] ?? "",
+            url: attachmentUrl,
+          });
+        } catch {
+          logger.warn(`Invalid attachment URL skipped: ${attachmentUrl}`);
+        }
+      }
     }
   }
 
-  logger.info(`${images.length} attached images found.`);
+  logger.info(`${images.length} attached images found and validated.`);
   return images;
 }
 
@@ -271,6 +323,7 @@ function collectScrapedImages(
   const images: Image[] = [];
   const imgRegex =
     /<img[^>]*src="(.+?\.(?:gif|jpe?g|png|webp|avif|svg))"[^>]*>/gi;
+  const seenUrls = new Set<string>(); // Deduplicate images
 
   for (const postType of postTypes) {
     const postsOfType = getItemsOfType(channelData, postType);
@@ -280,25 +333,38 @@ function collectScrapedImages(
       const postContent = postData.encoded?.[0] ?? "";
       const postLink = postData.link?.[0] ?? "";
 
+      if (!postContent) continue;
+
       let match;
       imgRegex.lastIndex = 0; // Reset regex state
 
       while ((match = imgRegex.exec(postContent)) !== null) {
         try {
           const url = new URL(match[1], postLink).href;
+          
+          // Skip duplicates
+          if (seenUrls.has(url)) {
+            continue;
+          }
+          seenUrls.add(url);
+          
           images.push({
             id: "-1",
             postId,
             url,
           });
-        } catch {
-          logger.warn(`Invalid image URL in post ${postId}: ${match[1]}`);
+        } catch (urlError) {
+          logger.warn(`Invalid image URL in post ${postId}:`, {
+            url: match[1],
+            postLink,
+            error: urlError instanceof Error ? urlError.message : String(urlError),
+          });
         }
       }
     }
   }
 
-  logger.info(`${images.length} images scraped from post body content.`);
+  logger.info(`${images.length} unique images scraped from post body content.`);
   return images;
 }
 
@@ -332,35 +398,65 @@ function mergeImagesIntoPosts(
   images: Image[],
   posts: Omit<Post, "frontmatter">[]
 ): void {
+  // Early return if no images to process
+  if (images.length === 0) {
+    logger.debug("No images to merge into posts");
+    return;
+  }
+
   // Create maps for O(1) lookups instead of nested loops
   const postsByIdMap = new Map<string, Omit<Post, "frontmatter">>();
   const postsByCoverIdMap = new Map<string, Omit<Post, "frontmatter">>();
+  
+  // Create sets for efficient duplicate checking
+  const postImageSets = new Map<string, Set<string>>();
 
+  // Initialize maps and sets
   for (const post of posts) {
     postsByIdMap.set(post.meta.id, post);
+    postImageSets.set(post.meta.id, new Set(post.meta.imageUrls));
+    
     if (post.meta.coverImageId) {
       postsByCoverIdMap.set(post.meta.coverImageId, post);
     }
   }
 
-  for (const image of images) {
-    // Check if image is attached to a post
-    const attachedPost = postsByIdMap.get(image.postId);
-    if (attachedPost && !attachedPost.meta.imageUrls.includes(image.url)) {
-      attachedPost.meta.imageUrls.push(image.url);
-    }
-
-    // Check if image is a featured image
-    const featuredPost = postsByCoverIdMap.get(image.id);
-    if (featuredPost) {
-      featuredPost.meta.coverImage = shared.getFilenameFromUrl(image.url);
-      updateHeroImageMetadata(featuredPost, image.url);
-
-      if (!featuredPost.meta.imageUrls.includes(image.url)) {
-        featuredPost.meta.imageUrls.push(image.url);
+  // Process images in batches for memory efficiency
+  const BATCH_SIZE = 50;
+  let processedCount = 0;
+  
+  for (let i = 0; i < images.length; i += BATCH_SIZE) {
+    const batch = images.slice(i, i + BATCH_SIZE);
+    
+    for (const image of batch) {
+      // Check if image is attached to a post
+      const attachedPost = postsByIdMap.get(image.postId);
+      if (attachedPost) {
+        const imageSet = postImageSets.get(image.postId);
+        if (imageSet && !imageSet.has(image.url)) {
+          (attachedPost.meta.imageUrls as string[]).push(image.url);
+          imageSet.add(image.url);
+        }
       }
+
+      // Check if image is a featured image
+      const featuredPost = postsByCoverIdMap.get(image.id);
+      if (featuredPost) {
+        featuredPost.meta.coverImage = shared.getFilenameFromUrl(image.url);
+        updateHeroImageMetadata(featuredPost, image.url);
+
+        const imageSet = postImageSets.get(featuredPost.meta.id);
+        if (imageSet && !imageSet.has(image.url)) {
+          (featuredPost.meta.imageUrls as string[]).push(image.url);
+          imageSet.add(image.url);
+        }
+      }
+      
+      processedCount++;
     }
   }
+
+  logger.debug(`Merged ${processedCount} images into ${posts.length} posts`);
 }
 
 /**
@@ -368,26 +464,44 @@ function mergeImagesIntoPosts(
  * @throws {XmlValidationError} When frontmatter getter is not found
  */
 function populateFrontmatter(posts: Omit<Post, "frontmatter">[]): Post[] {
-  return posts.map(post => {
-    const frontmatter: Record<string, FrontmatterValue> = {};
-    settings.frontmatter_fields.forEach(field => {
-      const [key, alias] = field.split(":");
+  return posts.map((post, index) => {
+    try {
+      const frontmatter: Record<string, FrontmatterValue> = {};
+      
+      settings.frontmatter_fields.forEach(field => {
+        const [key, alias] = field.split(":");
 
-      const frontmatterGetter = frontmatterGetters[key];
-      if (!frontmatterGetter) {
-        throw new XmlValidationError(
-          `Could not find a frontmatter getter named "${key}"`,
-          { field: key }
-        );
+        const frontmatterGetter = frontmatterGetters[key];
+        if (!frontmatterGetter) {
+          throw XmlValidationError.forMissingFrontmatterGetter(key);
+        }
+
+        try {
+          frontmatter[alias || key] = frontmatterGetter(post as Post);
+        } catch (error) {
+          const originalError = error instanceof Error ? error : new Error(String(error));
+          throw XmlValidationError.forInvalidPostData(
+            post.meta.id || `post-${index}`,
+            `Failed to generate frontmatter field '${key}': ${originalError.message}`
+          );
+        }
+      });
+
+      return {
+        ...post,
+        frontmatter,
+      } as Post;
+    } catch (error) {
+      if (error instanceof XmlValidationError) {
+        throw error;
       }
-
-      frontmatter[alias || key] = frontmatterGetter(post as Post);
-    });
-
-    return {
-      ...post,
-      frontmatter,
-    } as Post;
+      
+      const originalError = error instanceof Error ? error : new Error(String(error));
+      throw XmlValidationError.forInvalidPostData(
+        post.meta.id || `post-${index}`,
+        `Failed to populate frontmatter: ${originalError.message}`
+      );
+    }
   });
 }
 

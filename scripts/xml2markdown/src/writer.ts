@@ -221,9 +221,8 @@ async function loadMarkdownFilePromise(post: Post): Promise<string> {
       if (escapedValue.length > 0) {
         // Don't quote boolean-like strings, numbers, or certain special values
         if (
-          value === true ||
-          value === false ||
-          !isNaN(Number(value)) ||
+          typeof value === 'boolean' ||
+          (typeof value === 'number' && !isNaN(value)) ||
           ["true", "false"].includes(escapedValue.toLowerCase())
         ) {
           outputValue = escapedValue;

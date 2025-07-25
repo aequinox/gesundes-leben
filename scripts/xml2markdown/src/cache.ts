@@ -5,49 +5,71 @@ import { xmlLogger } from "./logger.js";
 
 /**
  * Cache entry for Visionati API results
+ * Immutable cache entry containing AI-generated metadata
  */
 export interface CacheEntry {
-  altText: string;
-  filename: string;
-  creditsUsed: number;
-  timestamp: string;
-  configHash: string;
+  /** AI-generated alt text for the image */
+  readonly altText: string;
+  /** AI-generated SEO-optimized filename */
+  readonly filename: string;
+  /** Number of AI credits used for generation */
+  readonly creditsUsed: number;
+  /** ISO timestamp when entry was created */
+  readonly timestamp: string;
+  /** Hash of configuration used for generation */
+  readonly configHash: string;
 }
 
 /**
  * Cache data structure
+ * Root cache file format with version and entries
  */
 export interface CacheData {
-  version: string;
-  configHash: string;
+  /** Cache format version for compatibility checking */
+  readonly version: string;
+  /** Global configuration hash */
+  readonly configHash: string;
+  /** Map of image URLs to cached results */
   entries: Record<string, CacheEntry>;
 }
 
 /**
  * Cache configuration options
+ * Controls cache behavior and persistence settings
  */
 export interface CacheConfig {
-  enabled?: boolean;
-  cacheFile?: string;
-  ttlDays?: number;
+  /** Enable/disable caching functionality (default: true) */
+  readonly enabled?: boolean;
+  /** Path to cache file (default: .visionati-cache.json) */
+  readonly cacheFile?: string;
+  /** Cache entry TTL in days (default: 30) */
+  readonly ttlDays?: number;
 }
 
 /**
  * Visionati configuration interface for cache hashing
+ * Subset of configuration that affects AI generation results
  */
 interface VisionatiConfig {
-  backend?: string;
-  language?: string;
-  prompt?: string;
+  /** AI backend service (claude, gpt4, gemini) */
+  readonly backend?: string;
+  /** Target language for generated text */
+  readonly language?: string;
+  /** Custom prompt for AI generation */
+  readonly prompt?: string;
 }
 
 /**
  * Visionati API result interface
+ * Result structure returned by AI image processing
  */
 interface VisionatiResult {
-  description: string;
-  filename: string;
-  creditsUsed: number;
+  /** Generated image description/alt text */
+  readonly description: string;
+  /** Generated SEO-optimized filename */
+  readonly filename: string;
+  /** Number of AI credits consumed */
+  readonly creditsUsed: number;
 }
 
 /**
@@ -55,21 +77,17 @@ interface VisionatiResult {
  * Stores processed image metadata to avoid redundant API calls
  */
 export class CacheService {
-  private data: CacheData | null;
-  private isDirty: boolean;
-  private enabled: boolean;
-  private cacheFile: string;
-  private ttlDays: number;
-  private version: string;
+  private data: CacheData | null = null;
+  private isDirty = false;
+  private readonly enabled: boolean;
+  private readonly cacheFile: string;
+  private readonly ttlDays: number;
+  private readonly version = "1.0" as const;
 
   constructor(config: CacheConfig) {
     this.enabled = config.enabled !== false;
-    this.cacheFile = config.cacheFile || ".visionati-cache.json";
-    this.ttlDays = config.ttlDays || 30;
-    this.version = "1.0";
-    this.data = null;
-    this.isDirty = false;
-    // configHash will be set during load/initialization
+    this.cacheFile = config.cacheFile ?? ".visionati-cache.json";
+    this.ttlDays = config.ttlDays ?? 30;
 
     if (this.enabled) {
       this.load();
@@ -78,13 +96,14 @@ export class CacheService {
 
   /**
    * Generate hash of configuration to detect changes
+   * Only includes configuration that affects AI generation results
    */
   generateConfigHash(config: VisionatiConfig): string {
     const relevantConfig = {
-      backend: config.backend,
-      language: config.language,
-      prompt: config.prompt,
-    };
+      backend: config.backend ?? "claude",
+      language: config.language ?? "en",
+      prompt: config.prompt ?? "",
+    } as const;
 
     return crypto
       .createHash("sha256")
@@ -93,34 +112,50 @@ export class CacheService {
   }
 
   /**
-   * Load cache from disk
+   * Load cache from disk with optimized parsing and validation
    */
   load(): void {
     try {
       if (fs.existsSync(this.cacheFile)) {
         const content = fs.readFileSync(this.cacheFile, "utf8");
+        
+        // Validate JSON structure before parsing
+        if (!content.trim() || !content.startsWith("{")) {
+          xmlLogger.warn("⚠️ Cache file appears corrupted, reinitializing");
+          this.initializeCache();
+          return;
+        }
+
         this.data = JSON.parse(content);
 
+        // Validate data structure
+        if (!this.data || typeof this.data !== "object" || !this.data.entries) {
+          xmlLogger.warn("⚠️ Cache data structure invalid, reinitializing");
+          this.initializeCache();
+          return;
+        }
+
         // Check version compatibility
-        if (this.data && this.data.version !== this.version) {
+        if (this.data.version !== this.version) {
           xmlLogger.warn(
             `⚠️ Cache version mismatch (${this.data.version} vs ${this.version}), clearing cache`
           );
           this.clear();
-        } else if (this.data) {
-          xmlLogger.info(
-            `📋 Loaded Visionati cache with ${Object.keys(this.data.entries).length} entries`
-          );
-          // Prune old entries on load
+        } else {
+          const entryCount = Object.keys(this.data.entries).length;
+          xmlLogger.info(`📋 Loaded Visionati cache with ${entryCount} entries`);
+          
+          // Prune old entries on load for immediate cleanup
           this.prune();
         }
       } else {
         this.initializeCache();
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       xmlLogger.error(
         "❌ Failed to load cache, initializing new cache:",
-        error
+        errorMessage
       );
       this.initializeCache();
     }
@@ -140,7 +175,7 @@ export class CacheService {
   }
 
   /**
-   * Save cache to disk if dirty
+   * Save cache to disk if dirty with atomic write operation
    */
   save(): void {
     if (!this.enabled || !this.isDirty || !this.data) {
@@ -148,14 +183,36 @@ export class CacheService {
     }
 
     try {
+      // Validate data before saving
+      if (!this.data.entries || typeof this.data.entries !== "object") {
+        xmlLogger.warn("⚠️ Invalid cache data, skipping save");
+        return;
+      }
+
       const content = JSON.stringify(this.data, null, 2);
-      fs.writeFileSync(this.cacheFile, content, "utf8");
+      const tempFile = `${this.cacheFile}.tmp`;
+      
+      // Atomic write: write to temp file first, then rename
+      fs.writeFileSync(tempFile, content, "utf8");
+      fs.renameSync(tempFile, this.cacheFile);
+      
       this.isDirty = false;
       xmlLogger.debug(
         `💾 Saved cache with ${Object.keys(this.data.entries).length} entries`
       );
     } catch (error) {
-      xmlLogger.error("❌ Failed to save cache:", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      xmlLogger.error("❌ Failed to save cache:", errorMessage);
+      
+      // Clean up temp file if it exists
+      try {
+        const tempFile = `${this.cacheFile}.tmp`;
+        if (fs.existsSync(tempFile)) {
+          fs.unlinkSync(tempFile);
+        }
+      } catch {
+        // Ignore cleanup errors
+      }
     }
   }
 
@@ -234,8 +291,7 @@ export class CacheService {
   }
 
   /**
-   * Remove expired entries
-   * Optimized with batch processing and early termination
+   * Remove expired entries with optimized batch processing
    */
   prune(): void {
     if (!this.enabled || !this.data) {
@@ -244,30 +300,70 @@ export class CacheService {
 
     const ttlMs = this.ttlDays * 24 * 60 * 60 * 1000;
     const now = Date.now();
-    const validEntries: Record<string, CacheEntry> = {};
-    let prunedCount = 0;
+    const entries = Object.entries(this.data.entries);
+    
+    // Early return if no entries to process
+    if (entries.length === 0) {
+      return;
+    }
 
-    // Filter valid entries in a single pass
-    for (const [url, entry] of Object.entries(this.data.entries)) {
-      const entryAge = now - new Date(entry.timestamp).getTime();
-      if (entryAge <= ttlMs) {
-        validEntries[url] = entry;
-      } else {
-        prunedCount++;
+    const validEntries = {} as Record<string, CacheEntry>;
+    let prunedCount = 0;
+    let invalidTimestampCount = 0;
+
+    // Process entries in batches to handle large caches efficiently
+    const BATCH_SIZE = 100;
+    for (let i = 0; i < entries.length; i += BATCH_SIZE) {
+      const batch = entries.slice(i, i + BATCH_SIZE);
+      
+      for (const [url, entry] of batch) {
+        try {
+          const entryTime = new Date(entry.timestamp).getTime();
+          
+          // Check for invalid timestamps
+          if (isNaN(entryTime)) {
+            invalidTimestampCount++;
+            continue;
+          }
+          
+          const entryAge = now - entryTime;
+          if (entryAge <= ttlMs) {
+            validEntries[url] = entry;
+          } else {
+            prunedCount++;
+          }
+        } catch {
+          // Skip entries with invalid timestamp format
+          invalidTimestampCount++;
+        }
       }
     }
 
-    if (prunedCount > 0) {
-      this.data.entries = validEntries;
+    const totalRemoved = prunedCount + invalidTimestampCount;
+    if (totalRemoved > 0) {
+      this.data = {
+        ...this.data,
+        entries: validEntries,
+      };
       this.isDirty = true;
-      xmlLogger.info(`🧹 Pruned ${prunedCount} expired cache entries`);
+      
+      if (prunedCount > 0 && invalidTimestampCount > 0) {
+        xmlLogger.info(
+          `🧹 Pruned ${prunedCount} expired and ${invalidTimestampCount} invalid cache entries`
+        );
+      } else if (prunedCount > 0) {
+        xmlLogger.info(`🧹 Pruned ${prunedCount} expired cache entries`);
+      } else {
+        xmlLogger.info(`🧹 Removed ${invalidTimestampCount} invalid cache entries`);
+      }
+      
+      // Save immediately after pruning
       this.save();
     }
   }
 
   /**
-   * Get cache statistics
-   * Optimized with single-pass analysis and lazy file size calculation
+   * Get cache statistics with optimized single-pass analysis
    */
   getStats(): {
     enabled: boolean;
@@ -279,38 +375,68 @@ export class CacheService {
     cacheSizeBytes?: number;
     cacheSizeKB?: number;
     ttlDays?: number;
-    entries?: number;
-    hits?: number;
-    misses?: number;
-    size?: number;
+    averageCreditsPerEntry?: number;
+    oldestEntryAge?: number;
+    newestEntryAge?: number;
   } {
     if (!this.enabled || !this.data) {
       return {
         enabled: false,
-        entries: 0,
-        hits: 0,
-        misses: 0,
-        size: 0,
+        totalEntries: 0,
+        validEntries: 0,
+        expiredEntries: 0,
+        totalCreditsSaved: 0,
       };
     }
 
     const entries = Object.entries(this.data.entries);
+    
+    // Early return for empty cache
+    if (entries.length === 0) {
+      return {
+        enabled: true,
+        totalEntries: 0,
+        validEntries: 0,
+        expiredEntries: 0,
+        totalCreditsSaved: 0,
+        cacheFile: this.cacheFile,
+        cacheSizeBytes: 0,
+        cacheSizeKB: 0,
+        ttlDays: this.ttlDays,
+      };
+    }
+
     const now = Date.now();
     const ttlMs = this.ttlDays * 24 * 60 * 60 * 1000;
 
-    // Single pass through entries to calculate all stats
+    // Single pass analysis with comprehensive statistics
     let validCount = 0;
     let totalCredits = 0;
+    let oldestAge = 0;
+    let newestAge = Infinity;
 
     for (const [, entry] of entries) {
-      const age = now - new Date(entry.timestamp).getTime();
-      if (age <= ttlMs) {
-        validCount++;
+      try {
+        const entryTime = new Date(entry.timestamp).getTime();
+        if (!isNaN(entryTime)) {
+          const age = now - entryTime;
+          
+          if (age <= ttlMs) {
+            validCount++;
+          }
+          
+          // Track age extremes
+          oldestAge = Math.max(oldestAge, age);
+          newestAge = Math.min(newestAge, age);
+        }
+        
+        totalCredits += entry.creditsUsed || 0;
+      } catch {
+        // Skip invalid entries
       }
-      totalCredits += entry.creditsUsed;
     }
 
-    // Lazy file size calculation
+    // Lazy file size calculation with error handling
     let fileSize = 0;
     try {
       if (fs.existsSync(this.cacheFile)) {
@@ -318,7 +444,7 @@ export class CacheService {
         fileSize = stats.size;
       }
     } catch {
-      // Ignore error
+      // File size unavailable
     }
 
     return {
@@ -331,6 +457,9 @@ export class CacheService {
       cacheSizeBytes: fileSize,
       cacheSizeKB: Math.round((fileSize / 1024) * 10) / 10,
       ttlDays: this.ttlDays,
+      averageCreditsPerEntry: entries.length > 0 ? Math.round((totalCredits / entries.length) * 100) / 100 : 0,
+      oldestEntryAge: oldestAge > 0 ? Math.round(oldestAge / (24 * 60 * 60 * 1000) * 10) / 10 : 0,
+      newestEntryAge: newestAge < Infinity ? Math.round(newestAge / (24 * 60 * 60 * 1000) * 10) / 10 : 0,
     };
   }
 

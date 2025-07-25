@@ -25,15 +25,28 @@ interface AxiosConfig {
 }
 
 export interface ProcessedImage {
-  originalUrl: string;
-  originalFilename: string;
-  finalFilename: string;
-  altText: string;
-  destinationPath: string;
-  data: Buffer;
-  aiEnhanced: boolean;
-  creditsUsed: number;
-  error?: string;
+  /** Original image URL */
+  readonly originalUrl: string;
+  /** Original filename from URL */
+  readonly originalFilename: string;
+  /** Final processed filename (may be AI-enhanced) */
+  readonly finalFilename: string;
+  /** Alt text (may be AI-generated) */
+  readonly altText: string;
+  /** Full path where image was saved */
+  readonly destinationPath: string;
+  /** Image data buffer */
+  readonly data: Buffer;
+  /** Whether AI enhancement was used */
+  readonly aiEnhanced: boolean;
+  /** AI credits consumed for this image */
+  readonly creditsUsed: number;
+  /** Error message if processing failed */
+  readonly error?: string;
+  /** Processing duration in milliseconds */
+  readonly processingTimeMs?: number;
+  /** Image file size in bytes */
+  readonly fileSizeBytes?: number;
 }
 
 /**
@@ -47,6 +60,8 @@ export class ImageProcessor {
   private totalCreditsUsed: number;
   private processedCount: number;
   private aiEnhancedCount: number;
+  private readonly maxRetries = 3;
+  private readonly baseRetryDelayMs = 1000;
 
   constructor(config: XmlConverterConfig) {
     this.config = config;
@@ -126,8 +141,16 @@ export class ImageProcessor {
       return [];
     }
 
+    // Deduplicate URLs to avoid processing same image multiple times
+    const uniqueUrls = Array.from(new Set(imageUrls));
+    const duplicatesRemoved = imageUrls.length - uniqueUrls.length;
+    
+    if (duplicatesRemoved > 0) {
+      xmlLogger.info(`🔄 Removed ${duplicatesRemoved} duplicate image URLs`);
+    }
+
     xmlLogger.info(
-      `🚀 Processing ${imageUrls.length} images${this.visionatiService ? " with AI enhancement" : ""}`
+      `🚀 Processing ${uniqueUrls.length} unique images${this.visionatiService ? " with AI enhancement" : ""}`
     );
 
     // Ensure destination directory exists
@@ -135,17 +158,23 @@ export class ImageProcessor {
 
     const results: ProcessedImage[] = [];
     const batchSize = this.config.visionatiMaxConcurrent || 5;
+    const totalBatches = Math.ceil(uniqueUrls.length / batchSize);
+    let processedBatches = 0;
 
     // Process images in batches to control memory usage and API limits
-    for (let i = 0; i < imageUrls.length; i += batchSize) {
-      const batch = imageUrls.slice(i, i + batchSize);
+    for (let i = 0; i < uniqueUrls.length; i += batchSize) {
+      const batch = uniqueUrls.slice(i, i + batchSize);
+      processedBatches++;
+      
       xmlLogger.debug(
-        `📦 Processing batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(imageUrls.length / batchSize)}`
+        `📦 Processing batch ${processedBatches}/${totalBatches} (${batch.length} images)`
       );
 
-      const batchPromises = batch.map(url =>
-        this.processImage(url, destinationDir)
+      // Add retry logic with exponential backoff
+      const batchPromises = batch.map((url, index) =>
+        this.processImageWithRetry(url, destinationDir, index)
       );
+      
       const batchResults = await Promise.allSettled(batchPromises);
 
       batchResults.forEach((result, index) => {
@@ -183,10 +212,54 @@ export class ImageProcessor {
    * @param {string} destinationDir - Directory to save image
    * @returns {Promise<ProcessedImage>} Processed image result
    */
+  /**
+   * Process image with retry logic and comprehensive error handling
+   */
+  async processImageWithRetry(
+    imageUrl: string,
+    destinationDir: string,
+    _batchIndex: number = 0
+  ): Promise<ProcessedImage> {
+    let lastError: Error | null = null;
+    
+    for (let attempt = 0; attempt < this.maxRetries; attempt++) {
+      try {
+        if (attempt > 0) {
+          const delay = this.baseRetryDelayMs * Math.pow(2, attempt - 1);
+          xmlLogger.debug(`⏳ Retrying image processing after ${delay}ms delay: ${imageUrl}`);
+          await this.sleep(delay);
+        }
+        
+        return await this.processImage(imageUrl, destinationDir);
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        
+        if (attempt === this.maxRetries - 1) {
+          xmlLogger.error(
+            `❌ Failed to process image after ${this.maxRetries} attempts: ${imageUrl}`,
+            lastError.message
+          );
+        } else {
+          xmlLogger.warn(
+            `⚠️ Image processing attempt ${attempt + 1} failed: ${imageUrl} - ${lastError.message}`
+          );
+        }
+      }
+    }
+    
+    // Return error result if all retries failed
+    return this.createErrorResult(imageUrl, lastError?.message || "Unknown error");
+  }
+
+  /**
+   * Process single image with AI enhancement
+   */
   async processImage(
     imageUrl: string,
     destinationDir: string
   ): Promise<ProcessedImage> {
+    const startTime = Date.now();
+    
     try {
       xmlLogger.debug(`🔍 Processing image: ${imageUrl}`);
 
@@ -216,8 +289,9 @@ export class ImageProcessor {
 
       // Prepare final result
       const destinationPath = path.join(destinationDir, finalFilename);
+      const processingTime = Date.now() - startTime;
 
-      const result = {
+      const result: ProcessedImage = {
         originalUrl: imageUrl,
         originalFilename,
         finalFilename,
@@ -226,6 +300,8 @@ export class ImageProcessor {
         data: imageData,
         aiEnhanced: Boolean(aiMetadata) && !aiMetadata?.error,
         creditsUsed: aiMetadata?.creditsUsed || 0,
+        processingTimeMs: processingTime,
+        fileSizeBytes: imageData.length,
       };
 
       xmlLogger.debug(`✅ Processed: ${originalFilename} → ${finalFilename}`);
@@ -417,6 +493,38 @@ export class ImageProcessor {
         });
       }
     }
+  }
+
+  /**
+   * Sleep for specified milliseconds
+   * @param ms Milliseconds to sleep
+   */
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Create error result for failed image processing
+   * @param imageUrl Original image URL
+   * @param errorMessage Error description
+   */
+  private createErrorResult(imageUrl: string, errorMessage: string): ProcessedImage {
+    const originalFilename = shared.getFilenameFromUrl(imageUrl);
+    const finalFilename = this.sanitizeFilename(originalFilename);
+
+    return {
+      originalUrl: imageUrl,
+      originalFilename,
+      finalFilename,
+      altText: "Bild konnte nicht verarbeitet werden - Gesundheitsblog",
+      destinationPath: "",
+      data: Buffer.alloc(0),
+      aiEnhanced: false,
+      creditsUsed: 0,
+      error: errorMessage,
+      processingTimeMs: 0,
+      fileSizeBytes: 0,
+    };
   }
 
   /**

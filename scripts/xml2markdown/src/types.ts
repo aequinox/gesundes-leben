@@ -5,13 +5,20 @@
 
 /**
  * Post metadata extracted from WordPress XML
+ * Contains essential metadata for post processing and conversion
  */
 export interface PostMeta {
-  id: string;
-  slug: string;
-  coverImageId?: string;
+  /** Unique post identifier from WordPress */
+  readonly id: string;
+  /** URL-friendly post slug */
+  readonly slug: string;
+  /** WordPress featured image attachment ID */
+  readonly coverImageId?: string;
+  /** Processed cover image filename */
   coverImage?: string;
-  type: string;
+  /** WordPress post type (post, page, custom) */
+  readonly type: string;
+  /** Array of image URLs found in post content */
   imageUrls: string[];
   /** AI-enhanced image metadata map (URL -> metadata) */
   aiImageMetadata?: Map<
@@ -27,22 +34,32 @@ export interface PostMeta {
 
 /**
  * Image import information for MDX generation
+ * Defines how images should be imported in the generated MDX files
  */
 export interface ImageImport {
+  /** JavaScript variable name for the image import */
   variable: string;
+  /** Relative file path to the image */
   path: string;
+  /** Image filename with extension */
   filename: string;
 }
 
 /**
- * Post object with all processed data
+ * Complete post object with all processed data
+ * Represents a fully processed WordPress post ready for MDX generation
  */
 export interface Post {
-  data: WordPressPostData;
-  meta: PostMeta;
+  /** Raw WordPress post data from XML */
+  readonly data: WordPressPostData;
+  /** Processed post metadata */
+  readonly meta: PostMeta;
+  /** Converted markdown content */
   content: string;
+  /** Image imports for MDX file */
   imageImports: ImageImport[];
-  frontmatter: Record<string, unknown>;
+  /** Generated frontmatter for the post */
+  frontmatter: Record<string, FrontmatterValue>;
 }
 
 /**
@@ -131,58 +148,106 @@ export interface WordPressTag {
 
 /**
  * Image data for download and processing
+ * Represents an image attachment or embedded image from WordPress
  */
 export interface Image {
-  id: string;
-  postId: string;
-  url: string;
-  /** AI-generated alt text */
-  altText?: string;
-  /** AI-generated SEO filename */
-  aiFilename?: string;
-  /** Original filename */
-  originalFilename?: string;
-  /** Credits used for AI generation */
-  creditsUsed?: number;
+  /** WordPress attachment ID (or -1 for scraped images) */
+  readonly id: string;
+  /** ID of the post this image belongs to */
+  readonly postId: string;
+  /** Source URL of the image */
+  readonly url: string;
+  /** AI-generated alt text for accessibility */
+  readonly altText?: string;
+  /** AI-generated SEO-optimized filename */
+  readonly aiFilename?: string;
+  /** Original filename from WordPress */
+  readonly originalFilename?: string;
+  /** Number of AI credits used for processing */
+  readonly creditsUsed?: number;
 }
 
 /**
+ * Supported AI backends for image processing
+ */
+export type VisionatiBackend = "claude" | "gpt4" | "gemini";
+
+/**
  * Configuration options for the XML converter
+ * Defines all conversion settings and AI processing options
  */
 export interface XmlConverterConfig {
-  input: string;
-  output: string;
-  yearFolders?: boolean;
-  monthFolders?: boolean;
-  postFolders?: boolean;
-  prefixDate?: boolean;
-  saveAttachedImages?: boolean;
-  saveScrapedImages?: boolean;
-  includeOtherTypes?: boolean;
-  // Visionati AI features
-  generateAltTexts?: boolean;
-  visionatiApiKey?: string;
-  visionatiBackend?: "claude" | "gpt4" | "gemini";
-  visionatiLanguage?: string;
-  visionatiPrompt?: string;
-  visionatiTimeout?: number;
-  visionatiMaxConcurrent?: number;
-  // Visionati cache configuration
-  visionatiCacheEnabled?: boolean;
-  visionatiCacheFile?: string;
-  visionatiCacheTTL?: number;
+  /** Path to WordPress XML export file */
+  readonly input: string;
+  /** Output directory for generated MDX files */
+  readonly output: string;
+  
+  // File organization options
+  /** Create year-based folder structure (YYYY/) */
+  readonly yearFolders?: boolean;
+  /** Create month-based folder structure (YYYY/MM/) */
+  readonly monthFolders?: boolean;
+  /** Create individual post folders */
+  readonly postFolders?: boolean;
+  /** Prefix filenames with publication date */
+  readonly prefixDate?: boolean;
+  
+  // Image processing options
+  /** Download WordPress attachment images */
+  readonly saveAttachedImages?: boolean;
+  /** Extract and download images from post content */
+  readonly saveScrapedImages?: boolean;
+  
+  // Content filtering
+  /** Include custom post types beyond 'post' */
+  readonly includeOtherTypes?: boolean;
+  
+  // AI-powered features (Visionati)
+  /** Enable AI-generated alt texts and filenames */
+  readonly generateAltTexts?: boolean;
+  /** Visionati API key for AI processing */
+  readonly visionatiApiKey?: string;
+  /** AI backend to use for image processing */
+  readonly visionatiBackend?: VisionatiBackend;
+  /** Target language for generated text (ISO 639-1 code) */
+  readonly visionatiLanguage?: string;
+  /** Custom prompt for AI image processing */
+  readonly visionatiPrompt?: string;
+  /** Request timeout in milliseconds (default: 30000) */
+  readonly visionatiTimeout?: number;
+  /** Maximum concurrent AI requests (default: 3) */
+  readonly visionatiMaxConcurrent?: number;
+  
+  // Cache configuration
+  /** Enable persistent caching of AI results */
+  readonly visionatiCacheEnabled?: boolean;
+  /** Cache file path (default: .visionati-cache.json) */
+  readonly visionatiCacheFile?: string;
+  /** Cache TTL in days (default: 30) */
+  readonly visionatiCacheTTL?: number;
+}
+
+/**
+ * Error information from the conversion process
+ */
+export interface ConversionError {
+  /** Human-readable error message */
+  readonly message: string;
+  /** Additional error context for debugging */
+  readonly context?: Readonly<Record<string, unknown>>;
 }
 
 /**
  * Result of the conversion process
+ * Contains statistics and error information from the conversion
  */
 export interface ConversionResult {
-  postsProcessed: number;
-  imagesDownloaded: number;
-  errors: Array<{
-    message: string;
-    context?: Record<string, unknown>;
-  }>;
+  /** Number of posts successfully processed */
+  readonly postsProcessed: number;
+  /** Number of images successfully downloaded */
+  readonly imagesDownloaded: number;
+  /** Array of errors encountered during conversion */
+  readonly errors: readonly ConversionError[];
 }
 
 /**
@@ -232,34 +297,63 @@ export interface HeroImage {
 
 /**
  * Complete frontmatter structure for blog posts
+ * Defines the metadata structure for generated MDX files
  */
 export interface BlogFrontmatter {
-  id: string;
-  title: string;
-  author: string;
-  pubDatetime: string;
-  modDatetime: string;
-  description: string;
-  keywords: string[];
-  categories: BlogCategory[];
-  group: BlogGroup;
-  tags: string[];
-  heroImage: HeroImage;
-  draft: boolean;
-  featured: boolean;
+  /** Unique post identifier */
+  readonly id: string;
+  /** Post title */
+  readonly title: string;
+  /** Author identifier */
+  readonly author: string;
+  /** Publication date (ISO 8601) */
+  readonly pubDatetime: string;
+  /** Last modification date (ISO 8601) */
+  readonly modDatetime: string;
+  /** Post description/excerpt */
+  readonly description: string;
+  /** SEO keywords */
+  readonly keywords: readonly string[];
+  /** Content categories */
+  readonly categories: readonly BlogCategory[];
+  /** Post group classification */
+  readonly group: BlogGroup;
+  /** Content tags */
+  readonly tags: readonly string[];
+  /** Hero image configuration */
+  readonly heroImage: HeroImage;
+  /** Draft status */
+  readonly draft: boolean;
+  /** Featured status */
+  readonly featured: boolean;
 }
 
 /**
+ * Supported wizard option types
+ */
+export type WizardOptionType = "boolean" | "file" | "folder";
+
+/**
  * CLI wizard option configuration
+ * Defines interactive configuration options for the CLI wizard
  */
 export interface WizardOption {
-  name: string;
-  type: "boolean" | "file" | "folder";
-  description: string;
-  default: boolean | string;
-  aliases?: string[];
-  prompt?: string;
-  coerce?: (value: string) => boolean | string;
-  validate?: (value: string) => boolean | string;
+  /** Option name (used as key) */
+  readonly name: string;
+  /** Option data type */
+  readonly type: WizardOptionType;
+  /** Human-readable description */
+  readonly description: string;
+  /** Default value */
+  readonly default: boolean | string;
+  /** Alternative option names */
+  readonly aliases?: readonly string[];
+  /** Interactive prompt text */
+  readonly prompt?: string;
+  /** Value transformation function */
+  readonly coerce?: (value: string) => boolean | string;
+  /** Value validation function */
+  readonly validate?: (value: string) => boolean | string;
+  /** Whether option was provided by user */
   isProvided?: boolean;
 }

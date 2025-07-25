@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import fs from "fs";
-import { CacheService, type CacheConfig, type CacheEntry, type CacheData } from "./cache.js";
+import {
+  CacheService,
+  type CacheConfig,
+  type CacheEntry,
+  type CacheData,
+} from "./cache.js";
 import { mockFs, mockLogger } from "../test-utils/mocks.js";
 
 // Mock dependencies

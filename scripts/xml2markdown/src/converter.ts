@@ -6,10 +6,10 @@
 import { handleAsync } from "../../../src/utils/errors.js";
 
 import { validateConfig } from "./config.js";
-import { XmlConversionError } from "./errors.js";
+import { XmlConversionError, XmlConfigurationError } from "./errors.js";
 import { xmlLogger } from "./logger.js";
 import { parseFilePromise } from "./parser.js";
-import type { XmlConverterConfig, ConversionResult, Post } from "./types.js";
+import type { XmlConverterConfig, ConversionResult, ConversionError, Post } from "./types.js";
 import { writeFilesPromise } from "./writer.js";
 
 /**
@@ -36,13 +36,13 @@ export async function convertXmlToMdx(
   config: Partial<XmlConverterConfig>
 ): Promise<ConversionResult> {
   return handleAsync(async () => {
-    // Validate configuration
-    const validatedConfig = await validateConfig(config);
-
-    xmlLogger.info("🚀 Starting XML to MDX conversion...");
-    xmlLogger.debug("Configuration:", validatedConfig);
-
     try {
+      // Validate configuration
+      const validatedConfig = await validateConfig(config);
+
+      xmlLogger.info("🚀 Starting XML to MDX conversion...");
+      xmlLogger.debug("Configuration:", validatedConfig);
+
       // Parse WordPress XML file
       xmlLogger.info("📖 Parsing WordPress XML export...");
       const posts: Post[] = await parseFilePromise(validatedConfig);
@@ -53,11 +53,11 @@ export async function convertXmlToMdx(
       xmlLogger.info("💾 Writing MDX files and downloading images...");
       await writeFilesPromise(posts, validatedConfig);
 
-      // Calculate statistics efficiently
-      let imagesDownloaded = 0;
-      for (const post of posts) {
-        imagesDownloaded += post.imageImports?.length || 0;
-      }
+      // Calculate statistics efficiently using reduce for better performance
+      const imagesDownloaded = posts.reduce(
+        (total, post) => total + (post.imageImports?.length ?? 0),
+        0
+      );
 
       const result: ConversionResult = {
         postsProcessed: posts.length,
@@ -75,13 +75,20 @@ export async function convertXmlToMdx(
     } catch (error) {
       xmlLogger.error("❌ Conversion failed:", error);
 
-      if (error instanceof XmlConversionError) {
+      // Re-throw known error types
+      if (error instanceof XmlConversionError || error instanceof XmlConfigurationError) {
         throw error;
       }
 
-      throw new XmlConversionError("Unexpected error during conversion", {
-        originalError: error,
-      });
+      // Wrap unknown errors with context
+      const contextualError = error instanceof Error
+        ? XmlConversionError.forParsingFailure(error, config.input)
+        : new XmlConversionError("Unexpected error during conversion", {
+            originalError: error,
+            phase: "unknown",
+          });
+      
+      throw contextualError;
     }
   });
 }
@@ -96,7 +103,7 @@ export async function convertXmlToMdx(
 export async function convertXmlToMdxWithErrorHandling(
   config: Partial<XmlConverterConfig>
 ): Promise<ConversionResult> {
-  const errors: ConversionResult["errors"] = [];
+  const errors: ConversionError[] = [];
 
   try {
     const result = await convertXmlToMdx(config);
@@ -106,15 +113,29 @@ export async function convertXmlToMdxWithErrorHandling(
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    const context =
-      error instanceof XmlConversionError ? error.context : undefined;
+    
+    // Extract context from known error types
+    let context: Record<string, unknown> | undefined;
+    if (error instanceof XmlConversionError) {
+      context = error.xmlContext;
+    } else if (error instanceof XmlConfigurationError) {
+      context = {
+        field: error.field,
+        expected: error.expected,
+        actual: error.actual,
+      };
+    }
 
     errors.push({
       message: errorMessage,
       context,
-    });
+    } as ConversionError);
 
-    xmlLogger.error("💥 Conversion failed completely:", error);
+    xmlLogger.error("💥 Conversion failed completely:", {
+      error: errorMessage,
+      context,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
 
     return {
       postsProcessed: 0,
@@ -132,17 +153,35 @@ export async function convertXmlToMdxWithErrorHandling(
 export async function validateXmlFile(filePath: string): Promise<boolean> {
   try {
     const fs = await import("fs");
+    
+    // Check file accessibility
     await fs.promises.access(filePath, fs.constants.R_OK);
 
-    // Check if file has .xml extension
+    // Check file extension
     if (!filePath.toLowerCase().endsWith(".xml")) {
       xmlLogger.warn("⚠️ File does not have .xml extension:", filePath);
       return false;
     }
 
+    // Check file size (basic sanity check)
+    const stats = await fs.promises.stat(filePath);
+    if (stats.size === 0) {
+      xmlLogger.warn("⚠️ XML file is empty:", filePath);
+      return false;
+    }
+
+    // Large files might indicate issues
+    if (stats.size > 500 * 1024 * 1024) { // 500MB
+      xmlLogger.warn("⚠️ XML file is very large (>500MB):", filePath, `Size: ${Math.round(stats.size / 1024 / 1024)}MB`);
+    }
+
     return true;
   } catch (error) {
-    xmlLogger.error("❌ Cannot access XML file:", filePath, error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    xmlLogger.error("❌ Cannot access XML file:", {
+      filePath,
+      error: errorMessage,
+    });
     return false;
   }
 }
@@ -155,12 +194,20 @@ export async function validateXmlFile(filePath: string): Promise<boolean> {
 export async function ensureOutputDirectory(outputPath: string): Promise<void> {
   try {
     const fs = await import("fs");
-    await fs.promises.mkdir(outputPath, { recursive: true });
-    xmlLogger.debug("📁 Output directory ready:", outputPath);
+    const path = await import("path");
+    
+    // Resolve absolute path for consistency
+    const absolutePath = path.resolve(outputPath);
+    
+    // Create directory recursively
+    await fs.promises.mkdir(absolutePath, { recursive: true });
+    
+    // Verify directory is writable
+    await fs.promises.access(absolutePath, fs.constants.W_OK);
+    
+    xmlLogger.debug("📁 Output directory ready:", absolutePath);
   } catch (error) {
-    throw new XmlConversionError("Failed to create output directory", {
-      outputPath,
-      originalError: error,
-    });
+    const originalError = error instanceof Error ? error : new Error(String(error));
+    throw XmlConversionError.forFileWriting(outputPath, originalError);
   }
 }
