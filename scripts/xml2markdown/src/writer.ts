@@ -161,7 +161,8 @@ function loadMarkdownFilePromise(post: Post): string {
       // Handle objects like heroImage: { src: "...", alt: "..." }
       if (key === "heroImage") {
         const heroImage = value as { src?: string; alt?: string };
-        outputValue = `\n  src: ${heroImage.src ?? ""}\n  alt: ${(heroImage.alt ?? "").replace(/"/g, '\\"')}`;
+        const escapedAlt = (heroImage.alt ?? "").replace(/"/g, '\\"');
+        outputValue = `\n  src: ${heroImage.src ?? ""}\n  alt: "${escapedAlt}"`;
       } else {
         // Generic object handling
         outputValue = `\n${Object.entries(value)
