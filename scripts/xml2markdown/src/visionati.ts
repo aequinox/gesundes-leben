@@ -54,7 +54,7 @@ export class VisionatiService {
     cacheService: CacheService | null = null
   ) {
     // Ensure API key has proper Token prefix
-    let apiKey = config.apiKey;
+    let {apiKey} = config;
     if (apiKey && !apiKey.startsWith("Token ")) {
       apiKey = `Token ${apiKey}`;
     }

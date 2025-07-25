@@ -138,17 +138,16 @@ function initTurndownService(): ExtendedTurndownService {
 
       if (img) {
         // Extract image details
-        const src = img.getAttribute("src") || "";
-        const alt = img.getAttribute("alt") || "";
+        const src = img.getAttribute("src") ?? "";
+        const alt = img.getAttribute("alt") ?? "";
 
         // Generate image variable name from filename
-        const filename = src.split("/").pop() || "image";
+        const filename = src.split("/").pop() ?? "image";
         const imageVar = generateImageVariableName(filename);
 
         // Store image import for later use (will be added to frontmatter or imports)
         const extendedService = turndownService as ExtendedTurndownService;
-        if (!extendedService._imageImports) {
-          extendedService._imageImports = [];
+        extendedService._imageImports ??= [];
         }
         extendedService._imageImports.push({
           variable: imageVar,
@@ -163,7 +162,7 @@ function initTurndownService(): ExtendedTurndownService {
 
         // Determine position from figure classes or default to center
         let position = "center";
-        const figureClass = domNode.getAttribute("class") || "";
+        const figureClass = domNode.getAttribute("class") ?? "";
 
         if (
           figureClass.includes("align-right") ||
@@ -204,6 +203,7 @@ function initTurndownService(): ExtendedTurndownService {
         // does not contain image or figcaption, do not preserve
         return _content;
       }
+      
     },
   });
 
@@ -225,8 +225,8 @@ function initTurndownService(): ExtendedTurndownService {
     },
     replacement: (_content: string, node) => {
       const domNode = node as DOMNode;
-      const language = domNode.getAttribute("data-wetm-language") || "";
-      return `\n\n\`\`\`${language}\n${domNode.textContent || ""}\n\`\`\`\n\n`;
+      const language = domNode.getAttribute("data-wetm-language") ?? "";
+      return `\n\n\`\`\`${language}\n${domNode.textContent ?? ""}\n\`\`\`\n\n`;
     },
   });
 
@@ -243,7 +243,7 @@ function getPostContent(
   config: XmlConverterConfig
 ): { content: string; imageImports: ImageImport[] } {
   try {
-    if (!postData.encoded || !postData.encoded[0]) {
+    if (!postData.encoded?.[0]) {
       throw new XmlConversionError("Post content is missing");
     }
 
@@ -284,10 +284,10 @@ function getPostContent(
     content = content.replace(/(-|\d+\.) +/g, "$1 ");
 
     // Return both content and image imports
-    const extendedService = turndownService as ExtendedTurndownService;
+    const extendedService = turndownService;
     return {
       content,
-      imageImports: extendedService._imageImports || [],
+      imageImports: extendedService._imageImports ?? [],
     };
   } catch (error) {
     if (error instanceof XmlConversionError) {

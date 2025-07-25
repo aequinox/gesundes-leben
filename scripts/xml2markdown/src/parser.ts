@@ -63,45 +63,36 @@ const frontmatterGetters: Record<string, FrontmatterGetter> = {
 // Types are now imported from types.ts
 
 /**
- * Reads the WordPress export file and parses it into an array of post objects.
- *
- * @param config - Configuration options.
- * @returns A promise that resolves to an array of post objects.
- * @throws {XmlConversionError} When parsing or processing fails
+ * Get post ID from post data
  */
-async function parseFilePromise(config: XmlConverterConfig): Promise<Post[]> {
-  try {
-    logger.info("Parsing...");
-    const content = await fs.promises.readFile(config.input, "utf8");
-    const allData = await xml2js.parseStringPromise(content, {
-      trim: true,
-      tagNameProcessors: [xml2js.processors.stripPrefix],
-    });
-    const channelData = allData.rss.channel[0].item as RawXmlItem[];
+function getPostId(postData: RawXmlItem): string {
+  return postData.post_id?.[0] ?? "";
+}
 
-    const postTypes = getPostTypes(channelData, config);
-    const posts = collectPosts(channelData, postTypes, config);
+/**
+ * Get post slug from post data
+ */
+function getPostSlug(postData: RawXmlItem): string {
+  return decodeURIComponent(postData.post_name?.[0] ?? "");
+}
 
-    let images: Image[] = [];
-    if (config.saveAttachedImages || config.saveScrapedImages) {
-      const attachedImages = config.saveAttachedImages
-        ? collectAttachedImages(channelData)
-        : [];
-      const scrapedImages = config.saveScrapedImages
-        ? collectScrapedImages(channelData, postTypes)
-        : [];
-      images = [...attachedImages, ...scrapedImages];
-    }
-
-    mergeImagesIntoPosts(images, posts);
-    const completePosts = populateFrontmatter(posts);
-
-    return completePosts;
-  } catch (error) {
-    throw new XmlConversionError("Failed to parse WordPress export file", {
-      originalError: error,
-    });
+/**
+ * Get cover image ID from post data
+ */
+function getPostCoverImageId(postData: RawXmlItem): string | undefined {
+  if (postData.postmeta === undefined) {
+    return undefined;
   }
+
+  const postmeta = postData.postmeta?.find(
+    (meta: unknown) =>
+      (meta as { meta_key: string[]; meta_value: string[] }).meta_key[0] ===
+      "_thumbnail_id"
+  );
+  const metaId = postmeta
+    ? (postmeta as { meta_key: string[]; meta_value: string[] }).meta_value[0]
+    : undefined;
+  return metaId;
 }
 
 /**
@@ -114,31 +105,30 @@ function getPostTypes(
   if (config.includeOtherTypes) {
     // search export file for all post types minus some default types we don't want
     // effectively this will be 'post', 'page', and custom post types
-    const types = channelData
+    const postTypes = channelData
       .map(item => item.post_type?.[0])
-      .filter((type): type is string => type !== undefined)
+      .filter((postType): postType is string => postType !== undefined)
       .filter(
-        type =>
+        postType =>
           ![
             "attachment",
             "revision",
             "nav_menu_item",
             "custom_css",
             "customize_changeset",
-          ].includes(type)
+          ].includes(postType)
       );
-    return [...new Set(types)]; // remove duplicates
-  } else {
-    // just plain old vanilla "post" posts
-    return ["post"];
+    return [...new Set(postTypes)]; // remove duplicates
   }
+  // just plain old vanilla "post" posts
+  return ["post"];
 }
 
 /**
  * Filter channel data by post type
  */
-function getItemsOfType(channelData: RawXmlItem[], type: string): RawXmlItem[] {
-  return channelData.filter(item => item.post_type?.[0] === type);
+function getItemsOfType(channelData: RawXmlItem[], postType: string): RawXmlItem[] {
+  return channelData.filter(item => item.post_type?.[0] === postType);
 }
 
 /**
@@ -193,39 +183,6 @@ function collectPosts(
     logger.info(`${allPosts.length} posts found.`);
   }
   return allPosts;
-}
-
-/**
- * Get post ID from post data
- */
-function getPostId(postData: RawXmlItem): string {
-  return postData.post_id?.[0] ?? "";
-}
-
-/**
- * Get post slug from post data
- */
-function getPostSlug(postData: RawXmlItem): string {
-  return decodeURIComponent(postData.post_name?.[0] ?? "");
-}
-
-/**
- * Get cover image ID from post data
- */
-function getPostCoverImageId(postData: RawXmlItem): string | undefined {
-  if (postData.postmeta === undefined) {
-    return undefined;
-  }
-
-  const postmeta = postData.postmeta?.find(
-    (meta: unknown) =>
-      (meta as { meta_key: string[]; meta_value: string[] }).meta_key[0] ===
-      "_thumbnail_id"
-  );
-  const id = postmeta
-    ? (postmeta as { meta_key: string[]; meta_value: string[] }).meta_value[0]
-    : undefined;
-  return id;
 }
 
 /**
@@ -316,7 +273,7 @@ function updateHeroImageMetadata(
   }
 
   // Just update the coverImage filename if we have AI-enhanced metadata
-  if (post.meta.aiImageMetadata && post.meta.aiImageMetadata.has(imageUrl)) {
+  if (post.meta.aiImageMetadata?.has(imageUrl)) {
     const aiMetadata = post.meta.aiImageMetadata.get(imageUrl);
     if (aiMetadata) {
       post.meta.coverImage = aiMetadata.filename; // Use AI-enhanced filename
@@ -389,6 +346,48 @@ function populateFrontmatter(posts: Omit<Post, "frontmatter">[]): Post[] {
       frontmatter,
     } as Post;
   });
+}
+
+/**
+ * Reads the WordPress export file and parses it into an array of post objects.
+ *
+ * @param config - Configuration options.
+ * @returns A promise that resolves to an array of post objects.
+ * @throws {XmlConversionError} When parsing or processing fails
+ */
+async function parseFilePromise(config: XmlConverterConfig): Promise<Post[]> {
+  try {
+    logger.info("Parsing...");
+    const content = await fs.promises.readFile(config.input, "utf8");
+    const allData = await xml2js.parseStringPromise(content, {
+      trim: true,
+      tagNameProcessors: [xml2js.processors.stripPrefix],
+    });
+    const channelData = allData.rss.channel[0].item as RawXmlItem[];
+
+    const postTypes = getPostTypes(channelData, config);
+    const posts = collectPosts(channelData, postTypes, config);
+
+    let images: Image[] = [];
+    if (config.saveAttachedImages || config.saveScrapedImages) {
+      const attachedImages = config.saveAttachedImages
+        ? collectAttachedImages(channelData)
+        : [];
+      const scrapedImages = config.saveScrapedImages
+        ? collectScrapedImages(channelData, postTypes)
+        : [];
+      images = [...attachedImages, ...scrapedImages];
+    }
+
+    mergeImagesIntoPosts(images, posts);
+    const completePosts = populateFrontmatter(posts);
+
+    return completePosts;
+  } catch (error) {
+    throw new XmlConversionError("Failed to parse WordPress export file", {
+      originalError: error,
+    });
+  }
 }
 
 export { parseFilePromise };

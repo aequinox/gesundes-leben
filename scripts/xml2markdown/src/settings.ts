@@ -24,19 +24,19 @@ export const frontmatter_fields: string[] = [...FRONTMATTER_FIELDS];
  * Time in ms to wait between requesting image files
  * Increase this if you see timeouts or server errors
  */
-export const image_file_request_delay: number = 500;
+export const image_file_request_delay = 500;
 
 /**
  * Time in ms to wait between saving Markdown files
  * Increase this if your file system becomes overloaded
  */
-export const markdown_file_write_delay: number = 25;
+export const markdown_file_write_delay = 25;
 
 /**
  * Enable this to include time with post dates
  * For example, "2020-12-25" would become "2020-12-25T11:20:35.000Z"
  */
-export const include_time_with_date: boolean = true;
+export const include_time_with_date = true;
 
 /**
  * Override post date formatting with a custom formatting string
@@ -44,14 +44,14 @@ export const include_time_with_date: boolean = true;
  * Tokens are documented here: https://moment.github.io/luxon/#/parsing?id=table-of-tokens
  * If set, this takes precedence over include_time_with_date
  */
-export const custom_date_formatting: string = "";
+export const custom_date_formatting = "";
 
 /**
  * Specify the timezone used for post dates
  * See available zone values and examples here:
  * https://moment.github.io/luxon/#/zones?id=specifying-a-zone
  */
-export const custom_date_timezone: string = "utc";
+export const custom_date_timezone = "utc";
 
 /**
  * Categories to be excluded from post frontmatter for Healthy Life blog
@@ -69,4 +69,4 @@ export const filter_categories: string[] = [
  * Strict SSL is enabled as the safe default, but will not work with self-signed certificates
  * You can disable it if you're getting a "self-signed certificate" error
  */
-export const strict_ssl: boolean = true;
+export const strict_ssl = true;

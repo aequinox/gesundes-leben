@@ -85,41 +85,38 @@ const options: WizardOption[] = [
 ];
 
 /**
- * Get configuration from command line arguments or wizard
- * @param {string[]} argv - Command line arguments
- * @returns {Promise<XmlConverterConfig>} Configuration object
- * @throws {ConversionError} When configuration fails
+ * Coerce value to boolean
+ * @param {string} value - Value to coerce
+ * @returns {boolean} Coerced boolean value
  */
-async function getConfig(argv: string[]): Promise<XmlConverterConfig> {
+function coerceBoolean(value: string): boolean {
+  return !["false", "no", "0"].includes(value.toLowerCase());
+}
+
+/**
+ * Normalize file/folder path
+ * @param {string} value - Path to normalize
+ * @returns {string} Normalized path
+ */
+function coercePath(value: string): string {
+  return path.normalize(value);
+}
+
+/**
+ * Validate file exists
+ * @param {string} value - File path to validate
+ * @returns {boolean|string} True if valid, error message if invalid
+ */
+function validateFile(value: string): boolean | string {
+  let isValid: boolean;
   try {
-    extendOptionsData();
-    const unaliasedArgv = replaceAliases(argv);
-    const program = parseCommandLine(unaliasedArgv);
-
-    let answers: Record<string, unknown> = {};
-    if (program.wizard) {
-      logger.info("\nStarting wizard...");
-      const questions = options.map(option => ({
-        when: option.name !== "wizard" && !option.isProvided,
-        name: camelcase(option.name),
-        type: option.prompt,
-        message: `${option.description}?`,
-        default: option.default,
-        filter: option.coerce,
-        validate: option.validate,
-      }));
-      answers = (await inquirer.prompt(questions)) as Record<string, unknown>;
-    } else {
-      logger.info("\nSkipping wizard...");
-    }
-
-    return { ...program.opts(), ...answers } as unknown as XmlConverterConfig;
-  } catch (error) {
-    throw new ConversionError(
-      "Failed to get configuration",
-      error as Record<string, unknown>
-    );
+    isValid = fs.existsSync(value) && fs.statSync(value).isFile();
+  } catch (_ex) {
+    logger.error("Error validating file:", _ex);
+    isValid = false;
   }
+
+  return isValid ? true : `Unable to find file: ${path.resolve(value)}`;
 }
 
 /**
@@ -162,7 +159,7 @@ function replaceAliases(argv: string[]): string[] {
 
     // this loop does not short circuit because an alias can map to multiple options
     options.forEach(option => {
-      const aliases = option.aliases || [];
+      const aliases = option.aliases ?? [];
       aliases.forEach(alias => {
         if (arg.includes(`--${alias}`)) {
           replaced.push(arg.replace(`--${alias}`, `--${option.name}`));
@@ -216,38 +213,41 @@ function parseCommandLine(argv: string[]): {
 }
 
 /**
- * Coerce value to boolean
- * @param {string} value - Value to coerce
- * @returns {boolean} Coerced boolean value
+ * Get configuration from command line arguments or wizard
+ * @param {string[]} argv - Command line arguments
+ * @returns {Promise<XmlConverterConfig>} Configuration object
+ * @throws {ConversionError} When configuration fails
  */
-function coerceBoolean(value: string): boolean {
-  return !["false", "no", "0"].includes(value.toLowerCase());
-}
-
-/**
- * Normalize file/folder path
- * @param {string} value - Path to normalize
- * @returns {string} Normalized path
- */
-function coercePath(value: string): string {
-  return path.normalize(value);
-}
-
-/**
- * Validate file exists
- * @param {string} value - File path to validate
- * @returns {boolean|string} True if valid, error message if invalid
- */
-function validateFile(value: string): boolean | string {
-  let isValid: boolean;
+async function getConfig(argv: string[]): Promise<XmlConverterConfig> {
   try {
-    isValid = fs.existsSync(value) && fs.statSync(value).isFile();
-  } catch (_ex) {
-    logger.error("Error validating file:", _ex);
-    isValid = false;
-  }
+    extendOptionsData();
+    const unaliasedArgv = replaceAliases(argv);
+    const program = parseCommandLine(unaliasedArgv);
 
-  return isValid ? true : `Unable to find file: ${path.resolve(value)}`;
+    let answers: Record<string, unknown> = {};
+    if (program.wizard) {
+      logger.info("\nStarting wizard...");
+      const questions = options.map(option => ({
+        when: option.name !== "wizard" && !option.isProvided,
+        name: camelcase(option.name),
+        type: option.prompt,
+        message: `${option.description}?`,
+        default: option.default,
+        filter: option.coerce,
+        validate: option.validate,
+      }));
+      answers = (await inquirer.prompt(questions)) as Record<string, unknown>;
+    } else {
+      logger.info("\nSkipping wizard...");
+    }
+
+    return { ...program.opts(), ...answers } as unknown as XmlConverterConfig;
+  } catch (error) {
+    throw new ConversionError(
+      "Failed to get configuration",
+      error as Record<string, unknown>
+    );
+  }
 }
 
 export { getConfig };

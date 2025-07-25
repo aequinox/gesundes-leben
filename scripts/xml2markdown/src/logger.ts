@@ -11,7 +11,7 @@ const xmlLogger = projectLogger.configure({
   component: "xml2markdown",
   minLevel: LogLevelName.DEBUG, // Enhanced logging for development
   timestampFormat: "time",
-}) as typeof projectLogger;
+});
 
 /**
  * Enhanced logger interface with structured logging support
@@ -53,13 +53,22 @@ const logger: Logger = {
   
   logPerformance: (operation: string, durationMs: number, metadata = {}) => {
     const durationSeconds = Math.round(durationMs / 10) / 100; // 2 decimal places
-    const emoji = durationMs < 1000 ? '⚡' : durationMs < 5000 ? '⏱️' : '🐌';
+    let emoji = '⚡';
+    let performance = 'fast';
+    
+    if (durationMs >= 5000) {
+      emoji = '🐌';
+      performance = 'slow';
+    } else if (durationMs >= 1000) {
+      emoji = '⏱️';
+      performance = 'normal';
+    }
     
     xmlLogger.info(`${emoji} ${operation} completed in ${durationSeconds}s`, {
       operation,
       durationMs,
       durationSeconds,
-      performance: durationMs < 1000 ? 'fast' : durationMs < 5000 ? 'normal' : 'slow',
+      performance,
       ...metadata,
     });
   },
