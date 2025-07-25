@@ -9,50 +9,67 @@ import type {
 
 /**
  * WordPress to Healthy Life blog category mapping
- * Maps WordPress categories to valid blog categories
+ * Maps WordPress categories to valid Astro content collection categories
+ * Based on actual categories found in XML: allgemein, ernaehrung, immunsystem, 
+ * lesenswertes, lifestyle-psyche, mikronaehrstoffe, organsysteme, wissenschaftliches, wissenswertes
  */
 const CATEGORY_MAPPING: Record<string, BlogCategory> = {
-  // Direct mappings
-  ernährung: "Ernährung",
-  immunsystem: "Immunsystem",
-  gesundheit: "Gesundheit",
-  wellness: "Wellness",
-  "mentale gesundheit": "Mentale Gesundheit",
-  fitness: "Fitness",
-  prävention: "Prävention",
-  naturheilkunde: "Naturheilkunde",
+  // Direct mappings from WordPress XML (nicename format)
+  allgemein: "Wissenswertes", // Map generic "Allgemein" to "Wissenswertes"
+  ernaehrung: "Ernährung",
+  immunsystem: "Immunsystem", 
+  lesenswertes: "Lesenswertes",
+  "lifestyle-psyche": "Lifestyle & Psyche", // WordPress uses dash, Astro uses ampersand
+  mikronaehrstoffe: "Mikronährstoffe",
   organsysteme: "Organsysteme",
   wissenschaftliches: "Wissenschaftliches",
+  wissenswertes: "Wissenswertes",
+
+  // Direct mappings from WordPress XML (display name format with HTML entities)
+  "allgemein": "Wissenswertes",
+  "ernährung": "Ernährung",
+  "lifestyle & psyche": "Lifestyle & Psyche",
+  "lifestyle &amp; psyche": "Lifestyle & Psyche", // Handle HTML entity
+  "mikronährstoffe": "Mikronährstoffe",
+
+  // Map non-matching categories to closest equivalents
+  gesundheit: "Wissenswertes", // Map Gesundheit to Wissenswertes
+  wellness: "Lifestyle & Psyche", // Map Wellness to Lifestyle & Psyche
+  fitness: "Lifestyle & Psyche", // Map Fitness to Lifestyle & Psyche
+  "mentale gesundheit": "Lifestyle & Psyche", // Map Mentale Gesundheit to Lifestyle & Psyche
+  prävention: "Wissenswertes", // Map Prävention to Wissenswertes
+  naturheilkunde: "Wissenschaftliches", // Map Naturheilkunde to Wissenschaftliches
 
   // English to German mappings
   nutrition: "Ernährung",
-  health: "Gesundheit",
-  "mental health": "Mentale Gesundheit",
-  prevention: "Prävention",
-  "natural medicine": "Naturheilkunde",
+  health: "Wissenswertes",
+  "mental health": "Lifestyle & Psyche",
+  prevention: "Wissenswertes",
+  "natural medicine": "Wissenschaftliches",
   organs: "Organsysteme",
   science: "Wissenschaftliches",
+  micronutrients: "Mikronährstoffe",
 
   // Common variations
   nahrung: "Ernährung",
   körper: "Organsysteme",
   medizin: "Wissenschaftliches",
+  vitamine: "Mikronährstoffe",
+  mineralstoffe: "Mikronährstoffe",
 };
 
 /**
- * Valid blog categories from types.ts
+ * Valid blog categories from Astro content collection schema
  */
 const VALID_CATEGORIES: BlogCategory[] = [
   "Ernährung",
-  "Gesundheit",
-  "Wellness",
-  "Mentale Gesundheit",
-  "Fitness",
   "Immunsystem",
-  "Prävention",
-  "Naturheilkunde",
+  "Lesenswertes",
+  "Lifestyle & Psyche",
+  "Mikronährstoffe",
   "Organsysteme",
   "Wissenschaftliches",
+  "Wissenswertes",
 ];
 
 /**
@@ -62,7 +79,7 @@ const VALID_CATEGORIES: BlogCategory[] = [
  */
 const categoriesGetter: FrontmatterGetter = (post: Post): BlogCategory[] => {
   if (!post.data.category) {
-    return ["Gesundheit"]; // Default category if none found
+    return ["Wissenswertes"]; // Default category if none found
   }
 
   try {
@@ -134,7 +151,7 @@ const categoriesGetter: FrontmatterGetter = (post: Post): BlogCategory[] => {
 
     // Remove duplicates and ensure we have at least one category
     const uniqueCategories = [...new Set(mappedCategories)];
-    return uniqueCategories.length > 0 ? uniqueCategories : ["Gesundheit"];
+    return uniqueCategories.length > 0 ? uniqueCategories : ["Wissenswertes"];
   } catch (error) {
     throw new ConversionError("Failed to process post categories", {
       originalError: error,

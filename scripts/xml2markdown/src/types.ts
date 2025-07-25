@@ -268,19 +268,17 @@ export type FrontmatterValue =
 export type FrontmatterGetter = (post: Post) => FrontmatterValue;
 
 /**
- * Available blog categories (German)
+ * Available blog categories (German) - must match Astro content collection schema exactly
  */
 export type BlogCategory =
   | "Ernährung"
-  | "Gesundheit"
-  | "Wellness"
-  | "Mentale Gesundheit"
-  | "Fitness"
   | "Immunsystem"
-  | "Prävention"
-  | "Naturheilkunde"
+  | "Lesenswertes"
+  | "Lifestyle & Psyche"
+  | "Mikronährstoffe"
   | "Organsysteme"
-  | "Wissenschaftliches";
+  | "Wissenschaftliches"
+  | "Wissenswertes";
 
 /**
  * Blog post group classification
