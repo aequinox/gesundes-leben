@@ -15,7 +15,7 @@ function getFilenameFromUrl(url: string): string {
   }
 
   try {
-    const filename = url.split("/").slice(-1)[0];
+    const [filename] = url.split("/").slice(-1);
     try {
       return decodeURIComponent(filename);
     } catch (_error) {

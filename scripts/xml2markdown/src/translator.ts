@@ -133,8 +133,8 @@ function initTurndownService(): ExtendedTurndownService {
     filter: "figure",
     replacement: (_content: string, node) => {
       const domNode = node as DOMNode;
-      const img = domNode.querySelector?.("img") || null;
-      const figcaption = domNode.querySelector?.("figcaption") || null;
+      const img = domNode.querySelector?.("img") ?? null;
+      const figcaption = domNode.querySelector?.("figcaption") ?? null;
 
       if (img) {
         // Extract image details
@@ -148,7 +148,6 @@ function initTurndownService(): ExtendedTurndownService {
         // Store image import for later use (will be added to frontmatter or imports)
         const extendedService = turndownService as ExtendedTurndownService;
         extendedService._imageImports ??= [];
-        }
         extendedService._imageImports.push({
           variable: imageVar,
           path: src.includes("images/")
@@ -199,11 +198,9 @@ function initTurndownService(): ExtendedTurndownService {
         // Preserve figures without images but with captions
         const result = `\n\n<figure>\n\n${_content}\n\n</figure>\n\n`;
         return result.replace("\n\n\n\n", "\n\n"); // collapse quadruple newlines
-      } else {
-        // does not contain image or figcaption, do not preserve
-        return _content;
       }
-      
+      // does not contain image or figcaption, do not preserve
+      return _content;
     },
   });
 
@@ -247,7 +244,7 @@ function getPostContent(
       throw new XmlConversionError("Post content is missing");
     }
 
-    let content = postData.encoded[0];
+    let [content] = postData.encoded;
 
     // insert an empty div element between double line breaks
     // this nifty trick causes turndown to keep adjacent paragraphs separated

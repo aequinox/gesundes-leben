@@ -60,13 +60,13 @@ export class VisionatiService {
     }
 
     this.apiKey = apiKey;
-    this.baseUrl = config.baseUrl || "https://api.visionati.com/api";
-    this.backend = config.backend || "claude";
-    this.language = config.language || "de";
-    this.prompt = config.prompt || this.getDefaultGermanHealthPrompt();
-    this.timeout = config.timeout || 30000;
-    this.maxConcurrent = config.maxConcurrent || 5;
-    this.retryAttempts = config.retryAttempts || 3;
+    this.baseUrl = config.baseUrl ?? "https://api.visionati.com/api";
+    this.backend = config.backend ?? "claude";
+    this.language = config.language ?? "de";
+    this.prompt = config.prompt ?? this.getDefaultGermanHealthPrompt();
+    this.timeout = config.timeout ?? 30000;
+    this.maxConcurrent = config.maxConcurrent ?? 5;
+    this.retryAttempts = config.retryAttempts ?? 3;
 
     // Rate limiting and concurrency control
     this.activeRequests = 0;
@@ -135,7 +135,10 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
     const cacheKey = this.getCacheKey(imageUrl);
     if (this.requestCache.has(cacheKey)) {
       xmlLogger.debug(`📋 Using in-memory cached result for: ${imageUrl}`);
-      return this.requestCache.get(cacheKey)!;
+      const cachedResult = this.requestCache.get(cacheKey);
+      if (cachedResult) {
+        return cachedResult;
+      }
     }
 
     this.cacheMisses++;
@@ -288,7 +291,7 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
       }
     }
 
-    throw lastError || new Error("Unknown error occurred");
+    throw lastError ?? new Error("Unknown error occurred");
   }
 
   /**
@@ -334,12 +337,13 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
       // Try different response structures
       if (typedResponse.all?.assets && typedResponse.all.assets.length > 0) {
         // Original working format from JavaScript version
-        const descriptions = typedResponse.all.assets[0].descriptions || [];
+        const descriptions = typedResponse.all.assets[0].descriptions ?? [];
         if (descriptions.length === 0) {
           throw new Error("No descriptions found in API response");
         }
-        description = descriptions[0].description;
-        creditsUsed = typedResponse.credits_paid || 1;
+        const [{ description: desc }] = descriptions;
+        description = desc;
+        creditsUsed = typedResponse.credits_paid ?? 1;
 
         // Debug log the actual description content
         xmlLogger.debug(`🔍 Raw description from Visionati: "${description}"`);
@@ -347,17 +351,18 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
         // Alternative format: direct result field
         description = typedResponse.result;
         creditsUsed =
-          typedResponse.credits_paid || typedResponse.credits_used || 1;
+          typedResponse.credits_paid ?? typedResponse.credits_used ?? 1;
       } else if (typedResponse.description) {
         // Alternative format: direct description field
-        description = typedResponse.description;
+        const { description: desc } = typedResponse;
+        description = desc;
         creditsUsed =
-          typedResponse.credits_paid || typedResponse.credits_used || 1;
+          typedResponse.credits_paid ?? typedResponse.credits_used ?? 1;
       } else if (typedResponse.text) {
         // Alternative format: text field
         description = typedResponse.text;
         creditsUsed =
-          typedResponse.credits_paid || typedResponse.credits_used || 1;
+          typedResponse.credits_paid ?? typedResponse.credits_used ?? 1;
       } else if (typeof response === "string") {
         // Direct string response
         description = response;
@@ -462,7 +467,7 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
     error: Error
   ): VisionatiResponse {
     const originalFilename =
-      imageUrl.split("/").pop()?.split("?")[0] || "image";
+      imageUrl.split("/").pop()?.split("?")[0] ?? "image";
     const fallbackFilename = originalFilename.replace(/\.[^/.]+$/, "");
 
     return {

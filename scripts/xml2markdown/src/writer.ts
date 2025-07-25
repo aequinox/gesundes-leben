@@ -56,68 +56,6 @@ interface Payload<T = unknown> {
 }
 
 /**
- * Write markdown files and download images for posts
- * @throws {XmlConversionError} When file writing fails
- */
-async function writeFilesPromise(
-  posts: Post[],
-  config: XmlConverterConfig
-): Promise<void> {
-  // Process images FIRST if AI enhancement is enabled
-  if (config.generateAltTexts) {
-    await writeImageFilesPromise(posts, config);
-  }
-
-  // Now write markdown files with updated metadata
-  await writeMarkdownFilesPromise(posts, config);
-
-  // Process remaining images if AI was not enabled
-  if (!config.generateAltTexts) {
-    await writeImageFilesPromise(posts, config);
-  }
-}
-
-/**
- * Process an array of payloads with a given load function
- */
-async function processPayloadsPromise<T>(
-  payloads: Payload<T>[],
-  loadFunc: (item: T) => Promise<string | Buffer> | string | Buffer
-): Promise<void> {
-  const promises = payloads.map(
-    payload =>
-      new Promise((resolve, reject) => {
-        setTimeout(async () => {
-          try {
-            const data = await Promise.resolve(loadFunc(payload.item));
-            await writeFile(payload.destinationPath, data);
-            logger.success(`${chalk.green("[OK]")} ${payload.name}`);
-            resolve(undefined);
-          } catch (error) {
-            logger.error(
-              `${chalk.red("[FAILED]")} ${payload.name} ${chalk.red(
-                `(${(error as Error).toString()})`
-              )}`
-            );
-            reject(error);
-          }
-        }, payload.delay);
-      })
-  );
-
-  const results = await Promise.allSettled(promises);
-  const failedCount = results.filter(
-    result => result.status === "rejected"
-  ).length;
-
-  if (failedCount === 0) {
-    logger.success("Done, got them all!");
-  } else {
-    logger.warn(`Done, but with ${chalk.red(`${failedCount} failed`)}.`);
-  }
-}
-
-/**
  * Write data to a file, creating directories as needed
  * @throws {XmlConversionError} When file writing fails
  */
@@ -137,43 +75,65 @@ async function writeFile(
 }
 
 /**
- * Write markdown files for posts
+ * Check if a file exists
  */
-async function writeMarkdownFilesPromise(
-  posts: Post[],
-  config: XmlConverterConfig
-): Promise<void> {
-  // package up posts into payloads
-  let skipCount = 0;
-  let delay = 0;
-  const payloads = posts.flatMap(post => {
-    const destinationPath = getPostPath(post, config);
-    if (checkFile(destinationPath)) {
-      // already exists, don't need to save again
-      skipCount++;
-      return [];
-    }
-    const payload: Payload<Post> = {
-      item: post,
-      name:
-        (config.includeOtherTypes ? `${post.meta.type} - ` : "") +
-        post.meta.slug,
-      destinationPath,
-      delay,
-    };
-    delay += settings.markdown_file_write_delay;
-    return [payload];
-  });
+function checkFile(filePath: string): boolean {
+  return fs.existsSync(filePath);
+}
 
-  const remainingCount = payloads.length;
-  if (remainingCount + skipCount === 0) {
-    logger.info("\nNo posts to save...");
+/**
+ * Get destination path for a post
+ */
+function getPostPath(post: Post, config: XmlConverterConfig): string {
+  // Use pubDatetime field instead of date (matches FRONTMATTER_FIELDS config)
+  const dateValue = (post.frontmatter.pubDatetime ??
+    post.frontmatter.date) as string;
+
+  let dt;
+  if (settings.custom_date_formatting) {
+    dt = luxon.DateTime.fromFormat(dateValue, settings.custom_date_formatting);
   } else {
-    logger.info(
-      `\nSaving ${remainingCount} posts (${skipCount} already exist)...`
-    );
-    await processPayloadsPromise(payloads, loadMarkdownFilePromise);
+    dt = luxon.DateTime.fromISO(dateValue);
   }
+
+  // If date is invalid, use current date as fallback
+  if (!dt.isValid) {
+    logger.warn(
+      `Invalid date for post ${post.meta.slug}: ${dateValue}. Using current date as fallback.`
+    );
+    dt = luxon.DateTime.now();
+  }
+
+  // start with base output dir
+  const pathSegments = [config.output];
+
+  // create segment for post type if we're dealing with more than just "post"
+  if (config.includeOtherTypes) {
+    pathSegments.push(post.meta.type);
+  }
+
+  if (config.yearFolders) {
+    pathSegments.push(dt.toFormat("yyyy"));
+  }
+
+  if (config.monthFolders) {
+    pathSegments.push(dt.toFormat("LL"));
+  }
+
+  // create slug fragment, possibly date prefixed
+  let slugFragment = post.meta.slug;
+  if (config.prefixDate) {
+    slugFragment = `${dt.toFormat("yyyy-LL-dd")}-${slugFragment}`;
+  }
+
+  // use slug fragment as folder or filename as specified
+  if (config.postFolders) {
+    pathSegments.push(slugFragment, "index.mdx");
+  } else {
+    pathSegments.push(`${slugFragment}.mdx`);
+  }
+
+  return path.join(...pathSegments);
 }
 
 /**
@@ -193,7 +153,7 @@ function loadMarkdownFilePromise(post: Post): string {
       if (value.length > 0) {
         // array of one or more strings - format as YAML array
         outputValue = value.reduce((list, item) => {
-          const cleanItem = (item || "").toString().replace(/"/g, '\\"');
+          const cleanItem = (item ?? "").toString().replace(/"/g, '\\"');
           return `${list}\n  - ${cleanItem}`;
         }, "");
       }
@@ -252,6 +212,235 @@ function loadMarkdownFilePromise(post: Post): string {
 
   output += `\n${post.content}\n`;
   return output;
+}
+
+/**
+ * Update posts with AI-enhanced image metadata
+ */
+async function updatePostsWithImageMetadata(
+  posts: Post[],
+  processedImages: {
+    originalUrl: string;
+    originalFilename: string;
+    finalFilename: string;
+    altText: string;
+    destinationPath: string;
+    data: Buffer;
+    aiEnhanced: boolean;
+    creditsUsed: number;
+    error?: string;
+  }[],
+  imagesDir: string
+): Promise<void> {
+  // Import heroImage generator to re-generate after AI processing
+  const { default: heroImageGenerator } = await import(
+    "./frontmatter/heroImage.js"
+  );
+
+  // Create lookup map for processed images
+  const imageMap = new Map<string, (typeof processedImages)[0]>();
+  processedImages.forEach(img => {
+    imageMap.set(img.originalUrl, img);
+  });
+
+  // Update posts that contain these images
+  posts.forEach(post => {
+    // Find posts that have images in this directory by checking if any image paths match
+    const postHasImagesInDir = post.meta.imageUrls.some(url => {
+      const processedImage = imageMap.get(url);
+      return (
+        processedImage &&
+        path.dirname(processedImage.destinationPath) === imagesDir
+      );
+    });
+
+    // Only update posts that match this images directory
+    if (postHasImagesInDir) {
+      let heroImageUpdated = false;
+
+      post.meta.imageUrls.forEach((imageUrl, _index) => {
+        const processedImage = imageMap.get(imageUrl);
+        if (processedImage) {
+          // Store AI-enhanced metadata for use in content generation
+          post.meta.aiImageMetadata ??= new Map();
+
+          post.meta.aiImageMetadata.set(imageUrl, {
+            altText: processedImage.altText,
+            filename: processedImage.finalFilename,
+            aiEnhanced: processedImage.aiEnhanced,
+            creditsUsed: processedImage.creditsUsed,
+          });
+
+          // Update imageImports array with AI-enhanced filenames
+          if (post.imageImports && processedImage.aiEnhanced) {
+            // Log for debugging
+            xmlLogger.debug(
+              `🔍 Looking for imports matching: ${processedImage.originalFilename}`
+            );
+
+            post.imageImports.forEach(imageImport => {
+              // Check if this import matches the original filename
+              const originalFilename =
+                processedImage.originalFilename ??
+                processedImage.originalUrl.split("/").pop();
+
+              // More flexible matching to handle different path formats
+              const importFilename =
+                imageImport.filename ?? imageImport.path.split("/").pop();
+              const matches =
+                importFilename === originalFilename ||
+                imageImport.path.includes(originalFilename ?? "") ||
+                (importFilename &&
+                  originalFilename &&
+                  importFilename.toLowerCase() ===
+                    originalFilename.toLowerCase());
+
+              if (matches) {
+                // Save old variable name for content replacement
+                const oldVariable = imageImport.variable;
+                // Update to use AI-enhanced filename
+                const oldPath = imageImport.path;
+                imageImport.path = `./images/${processedImage.finalFilename}`;
+                imageImport.filename = processedImage.finalFilename;
+                // Regenerate variable name for new filename
+                const newVariable = generateImageVariableName(
+                  processedImage.finalFilename
+                );
+                imageImport.variable = newVariable;
+
+                // Update variable references in post content
+                if (post.content && oldVariable !== newVariable) {
+                  // Replace variable references in content (e.g., src={oldVariable} -> src={newVariable})
+                  const variableRegex = new RegExp(`\\b${oldVariable}\\b`, "g");
+                  const replacementCount = (
+                    post.content.match(variableRegex) ?? []
+                  ).length;
+                  post.content = post.content.replace(
+                    variableRegex,
+                    newVariable
+                  );
+                  xmlLogger.info(
+                    `📝 Updated content variables (${replacementCount} occurrences):`,
+                    {
+                      oldVariable,
+                      newVariable,
+                      originalFile: originalFilename,
+                      aiFile: processedImage.finalFilename,
+                    }
+                  );
+                }
+
+                xmlLogger.debug(
+                  `Updated image import: ${oldPath} → ${imageImport.path}`
+                );
+              }
+            });
+          }
+
+          // Check if this is the hero image and update cover image filename
+          if (
+            post.meta.coverImage &&
+            (imageUrl.endsWith(post.meta.coverImage) ||
+              imageUrl.includes(post.meta.coverImage))
+          ) {
+            post.meta.coverImage = processedImage.finalFilename;
+            heroImageUpdated = true;
+          }
+        }
+      });
+
+      // Re-generate heroImage frontmatter after AI processing if hero image was updated
+      if (heroImageUpdated && post.frontmatter) {
+        const newHeroImage = heroImageGenerator(post);
+        post.frontmatter.heroImage = newHeroImage;
+        xmlLogger.info(`✨ Updated heroImage for ${post.meta.slug}:`, {
+          oldFilename: "Depositphotos_97583692.jpg",
+          newFilename: post.meta.coverImage,
+          heroImage: newHeroImage,
+        });
+      }
+    }
+  });
+}
+
+/**
+ * Process an array of payloads with a given load function
+ */
+async function processPayloadsPromise<T>(
+  payloads: Payload<T>[],
+  loadFunc: (item: T) => Promise<string | Buffer> | string | Buffer
+): Promise<void> {
+  const promises = payloads.map(
+    payload =>
+      new Promise((resolve, reject) => {
+        setTimeout(async () => {
+          try {
+            const data = await Promise.resolve(loadFunc(payload.item));
+            await writeFile(payload.destinationPath, data);
+            logger.success(`${chalk.green("[OK]")} ${payload.name}`);
+            resolve(undefined);
+          } catch (error) {
+            logger.error(
+              `${chalk.red("[FAILED]")} ${payload.name} ${chalk.red(
+                `(${(error as Error).toString()})`
+              )}`
+            );
+            reject(error);
+          }
+        }, payload.delay);
+      })
+  );
+
+  const results = await Promise.allSettled(promises);
+  const failedCount = results.filter(
+    result => result.status === "rejected"
+  ).length;
+
+  if (failedCount === 0) {
+    logger.success("Done, got them all!");
+  } else {
+    logger.warn(`Done, but with ${chalk.red(`${failedCount} failed`)}.`);
+  }
+}
+
+/**
+ * Write markdown files for posts
+ */
+async function writeMarkdownFilesPromise(
+  posts: Post[],
+  config: XmlConverterConfig
+): Promise<void> {
+  // package up posts into payloads
+  let skipCount = 0;
+  let delay = 0;
+  const payloads = posts.flatMap(post => {
+    const destinationPath = getPostPath(post, config);
+    if (checkFile(destinationPath)) {
+      // already exists, don't need to save again
+      skipCount++;
+      return [];
+    }
+    const payload: Payload<Post> = {
+      item: post,
+      name:
+        (config.includeOtherTypes ? `${post.meta.type} - ` : "") +
+        post.meta.slug,
+      destinationPath,
+      delay,
+    };
+    delay += settings.markdown_file_write_delay;
+    return [payload];
+  });
+
+  const remainingCount = payloads.length;
+  if (remainingCount + skipCount === 0) {
+    logger.info("\nNo posts to save...");
+  } else {
+    logger.info(
+      `\nSaving ${remainingCount} posts (${skipCount} already exist)...`
+    );
+    await processPayloadsPromise(payloads, loadMarkdownFilePromise);
+  }
 }
 
 /**
@@ -374,214 +563,25 @@ async function writeImageFilesPromise(
 }
 
 /**
- * Update posts with AI-enhanced image metadata
+ * Write markdown files and download images for posts
+ * @throws {XmlConversionError} When file writing fails
  */
-async function updatePostsWithImageMetadata(
+async function writeFilesPromise(
   posts: Post[],
-  processedImages: {
-    originalUrl: string;
-    originalFilename: string;
-    finalFilename: string;
-    altText: string;
-    destinationPath: string;
-    data: Buffer;
-    aiEnhanced: boolean;
-    creditsUsed: number;
-    error?: string;
-  }[],
-  imagesDir: string
+  config: XmlConverterConfig
 ): Promise<void> {
-  // Import heroImage generator to re-generate after AI processing
-  const { default: heroImageGenerator } = await import(
-    "./frontmatter/heroImage.js"
-  );
-
-  // Create lookup map for processed images
-  const imageMap = new Map<string, (typeof processedImages)[0]>();
-  processedImages.forEach(img => {
-    imageMap.set(img.originalUrl, img);
-  });
-
-  // Update posts that contain these images
-  posts.forEach(post => {
-    // Find posts that have images in this directory by checking if any image paths match
-    const postHasImagesInDir = post.meta.imageUrls.some(url => {
-      const processedImage = imageMap.get(url);
-      return (
-        processedImage &&
-        path.dirname(processedImage.destinationPath) === imagesDir
-      );
-    });
-
-    // Only update posts that match this images directory
-    if (postHasImagesInDir) {
-      let heroImageUpdated = false;
-
-      post.meta.imageUrls.forEach((imageUrl, _index) => {
-        const processedImage = imageMap.get(imageUrl);
-        if (processedImage) {
-          // Store AI-enhanced metadata for use in content generation
-          post.meta.aiImageMetadata ??= new Map();
-
-          post.meta.aiImageMetadata.set(imageUrl, {
-            altText: processedImage.altText,
-            filename: processedImage.finalFilename,
-            aiEnhanced: processedImage.aiEnhanced,
-            creditsUsed: processedImage.creditsUsed,
-          });
-
-          // Update imageImports array with AI-enhanced filenames
-          if (post.imageImports && processedImage.aiEnhanced) {
-            // Log for debugging
-            xmlLogger.debug(
-              `🔍 Looking for imports matching: ${processedImage.originalFilename}`
-            );
-
-            post.imageImports.forEach(imageImport => {
-              // Check if this import matches the original filename
-              const originalFilename =
-                processedImage.originalFilename ??
-                processedImage.originalUrl.split("/").pop();
-
-              // More flexible matching to handle different path formats
-              const importFilename =
-                imageImport.filename ?? imageImport.path.split("/").pop();
-              const matches =
-                importFilename === originalFilename ||
-                imageImport.path.includes(originalFilename ?? "") ||
-                (importFilename &&
-                  originalFilename &&
-                  importFilename.toLowerCase() ===
-                    originalFilename.toLowerCase());
-
-              if (matches) {
-                // Save old variable name for content replacement
-                const oldVariable = imageImport.variable;
-                // Update to use AI-enhanced filename
-                const oldPath = imageImport.path;
-                imageImport.path = `./images/${processedImage.finalFilename}`;
-                imageImport.filename = processedImage.finalFilename;
-                // Regenerate variable name for new filename
-                const newVariable = generateImageVariableName(
-                  processedImage.finalFilename
-                );
-                imageImport.variable = newVariable;
-
-                // Update variable references in post content
-                if (post.content && oldVariable !== newVariable) {
-                  // Replace variable references in content (e.g., src={oldVariable} -> src={newVariable})
-                  const variableRegex = new RegExp(`\\b${oldVariable}\\b`, "g");
-                  const replacementCount = (
-                    post.content.match(variableRegex) || []
-                  ).length;
-                  post.content = post.content.replace(
-                    variableRegex,
-                    newVariable
-                  );
-                  xmlLogger.info(
-                    `📝 Updated content variables (${replacementCount} occurrences):`,
-                    {
-                      oldVariable,
-                      newVariable,
-                      originalFile: originalFilename,
-                      aiFile: processedImage.finalFilename,
-                    }
-                  );
-                }
-
-                xmlLogger.debug(
-                  `Updated image import: ${oldPath} → ${imageImport.path}`
-                );
-              }
-            });
-          }
-
-          // Check if this is the hero image and update cover image filename
-          if (
-            post.meta.coverImage &&
-            (imageUrl.endsWith(post.meta.coverImage) ||
-              imageUrl.includes(post.meta.coverImage))
-          ) {
-            post.meta.coverImage = processedImage.finalFilename;
-            heroImageUpdated = true;
-          }
-        }
-      });
-
-      // Re-generate heroImage frontmatter after AI processing if hero image was updated
-      if (heroImageUpdated && post.frontmatter) {
-        const newHeroImage = heroImageGenerator(post);
-        post.frontmatter.heroImage = newHeroImage;
-        xmlLogger.info(`✨ Updated heroImage for ${post.meta.slug}:`, {
-          oldFilename: "Depositphotos_97583692.jpg",
-          newFilename: post.meta.coverImage,
-          heroImage: newHeroImage,
-        });
-      }
-    }
-  });
-}
-
-/**
- * Get destination path for a post
- */
-function getPostPath(post: Post, config: XmlConverterConfig): string {
-  // Use pubDatetime field instead of date (matches FRONTMATTER_FIELDS config)
-  const dateValue = (post.frontmatter.pubDatetime ??
-    post.frontmatter.date) as string;
-
-  let dt;
-  if (settings.custom_date_formatting) {
-    dt = luxon.DateTime.fromFormat(dateValue, settings.custom_date_formatting);
-  } else {
-    dt = luxon.DateTime.fromISO(dateValue);
+  // Process images FIRST if AI enhancement is enabled
+  if (config.generateAltTexts) {
+    await writeImageFilesPromise(posts, config);
   }
 
-  // If date is invalid, use current date as fallback
-  if (!dt.isValid) {
-    logger.warn(
-      `Invalid date for post ${post.meta.slug}: ${dateValue}. Using current date as fallback.`
-    );
-    dt = luxon.DateTime.now();
+  // Now write markdown files with updated metadata
+  await writeMarkdownFilesPromise(posts, config);
+
+  // Process remaining images if AI was not enabled
+  if (!config.generateAltTexts) {
+    await writeImageFilesPromise(posts, config);
   }
-
-  // start with base output dir
-  const pathSegments = [config.output];
-
-  // create segment for post type if we're dealing with more than just "post"
-  if (config.includeOtherTypes) {
-    pathSegments.push(post.meta.type);
-  }
-
-  if (config.yearFolders) {
-    pathSegments.push(dt.toFormat("yyyy"));
-  }
-
-  if (config.monthFolders) {
-    pathSegments.push(dt.toFormat("LL"));
-  }
-
-  // create slug fragment, possibly date prefixed
-  let slugFragment = post.meta.slug;
-  if (config.prefixDate) {
-    slugFragment = `${dt.toFormat("yyyy-LL-dd")}-${slugFragment}`;
-  }
-
-  // use slug fragment as folder or filename as specified
-  if (config.postFolders) {
-    pathSegments.push(slugFragment, "index.mdx");
-  } else {
-    pathSegments.push(`${slugFragment}.mdx`);
-  }
-
-  return path.join(...pathSegments);
-}
-
-/**
- * Check if a file exists
- */
-function checkFile(filePath: string): boolean {
-  return fs.existsSync(filePath);
 }
 
 export { writeFilesPromise };
