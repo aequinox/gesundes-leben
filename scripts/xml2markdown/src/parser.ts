@@ -227,7 +227,7 @@ function collectScrapedImages(
 ): Image[] {
   const images: Image[] = [];
   const imgRegex =
-    /<img[^>]*src="(.+?\.(?:gif|jpe?g|png|webp|avif|svg))"[^>]*>/gi;
+    /<img[^>]*src="(.+?\.(?:gif|jpe?g|png|webp|avif))"[^>]*>/gi;
 
   for (const postType of postTypes) {
     const postsOfType = getItemsOfType(channelData, postType);

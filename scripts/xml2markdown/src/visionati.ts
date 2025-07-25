@@ -149,7 +149,8 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
       return this.queueRequest(imageUrl);
     }
 
-    return this.executeRequest(imageUrl);
+    const result = await this.executeRequest(imageUrl);
+    return result;
   }
 
   /**
@@ -207,7 +208,7 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
       xmlLogger.debug(`🔍 Analyzing image: ${imageUrl}`);
 
       const response = await this.makeApiRequest(imageUrl);
-      const parsedResponse = this.parseApiResponse(response, imageUrl);
+      const parsedResponse = await this.parseApiResponse(response, imageUrl);
 
       // Cache successful response in memory
       const cacheKey = this.getCacheKey(imageUrl);
@@ -298,13 +299,13 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
    * Parse Visionati API response into standardized format
    * @param {unknown} response - Raw API response
    * @param {string} imageUrl - Original image URL
-   * @returns {VisionatiResponse} Parsed response
+   * @returns {Promise<VisionatiResponse>} Parsed response
    * @private
    */
-  private parseApiResponse(
+  private async parseApiResponse(
     response: unknown,
     imageUrl: string
-  ): VisionatiResponse {
+  ): Promise<VisionatiResponse> {
     try {
       // Add debug logging to see actual response structure
       xmlLogger.debug(
@@ -318,6 +319,7 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
 
       // Type for various response formats
       interface VisionatiApiResponse {
+        // Legacy format
         all?: {
           assets?: Array<{
             descriptions?: Array<{
@@ -330,11 +332,43 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
         text?: string;
         credits_paid?: number;
         credits_used?: number;
+        
+        // New API format (request confirmation)
+        request_id?: string;
+        user_id?: number;
+        urls?: string[];
+        files?: number;
+        file_names?: string[];
+        features?: string[];
+        backends?: string[];
+        role?: string;
+        tag_score?: number;
+        capture_interval?: number;
+        max_frames?: number;
+        language?: string;
+        prompt?: string;
+        success?: boolean;
+        response_uri?: string;
+        
+        // Error format
+        error?: string;
       }
 
       const typedResponse = response as VisionatiApiResponse;
 
-      // Try different response structures
+      // Handle error responses first
+      if (typedResponse.error) {
+        throw new Error(`Visionati API error: ${typedResponse.error}`);
+      }
+
+      // Handle new API format with polling mechanism
+      if (typedResponse.response_uri && typedResponse.request_id) {
+        xmlLogger.debug(`🔄 Batch response detected, polling: ${typedResponse.response_uri}`);
+        const polledResponse = await this.pollForResults(typedResponse.response_uri);
+        return this.parsePolledResponse(polledResponse, imageUrl);
+      }
+
+      // Try different immediate response structures
       if (typedResponse.all?.assets && typedResponse.all.assets.length > 0) {
         // Original working format from JavaScript version
         const descriptions = typedResponse.all.assets[0].descriptions ?? [];
@@ -603,6 +637,149 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
     }
 
     return stats;
+  }
+
+  /**
+   * Poll for results from response_uri (for batch requests)
+   * @param {string} responseUri - URI to poll for results
+   * @returns {Promise<unknown>} Polled response
+   * @private
+   */
+  private async pollForResults(responseUri: string): Promise<unknown> {
+    const maxPollingAttempts = 10;
+    const pollingInterval = 2000; // 2 seconds
+
+    for (let attempt = 1; attempt <= maxPollingAttempts; attempt++) {
+      try {
+        xmlLogger.debug(`🔄 Polling attempt ${attempt}/${maxPollingAttempts}: ${responseUri}`);
+        
+        const response = await axios({
+          method: "GET",
+          url: responseUri,
+          headers: {
+            "X-API-Key": this.apiKey,
+            "User-Agent": "healthy-life-xml-converter/2.0.0",
+          },
+          timeout: this.timeout,
+        });
+
+        if (response.status === 200 && response.data) {
+          // Check if we got actual results or if it's still processing
+          if (response.data.status === "processing") {
+            xmlLogger.debug(`⏳ Still processing, waiting ${pollingInterval}ms...`);
+            await this.delay(pollingInterval);
+            continue;
+          }
+          
+          xmlLogger.debug(`✅ Polling completed successfully`);
+          return response.data;
+        }
+
+        throw new Error(`Polling failed with status: ${response.status}`);
+      } catch (error) {
+        if (attempt === maxPollingAttempts) {
+          throw new Error(`Polling failed after ${maxPollingAttempts} attempts: ${(error as Error).message}`);
+        }
+        
+        xmlLogger.warn(`⚠️ Polling attempt ${attempt} failed, retrying...`);
+        await this.delay(pollingInterval);
+      }
+    }
+
+    throw new Error("Polling timeout - max attempts reached");
+  }
+
+  /**
+   * Parse polled response from batch request
+   * @param {unknown} response - Polled response data
+   * @param {string} imageUrl - Original image URL
+   * @returns {VisionatiResponse} Parsed response
+   * @private
+   */
+  private parsePolledResponse(response: unknown, imageUrl: string): VisionatiResponse {
+    try {
+      xmlLogger.debug("🔍 Parsing polled response:", JSON.stringify(response, null, 2));
+
+      // The polled response should contain the actual analysis results
+      const polledData = response as {
+        all?: {
+          assets?: Array<{
+            descriptions?: Array<{
+              description?: string;
+              text?: string;
+            }>;
+          }>;
+        };
+        results?: Array<{
+          descriptions?: Array<{
+            text?: string;
+          }>;
+        }>;
+        credits_paid?: number;
+        credits_used?: number;
+      };
+
+      let description: string | undefined;
+      let creditsUsed = 1;
+
+      // Try different formats in the polled response
+      if (polledData.all?.assets && polledData.all.assets.length > 0) {
+        const descriptions = polledData.all.assets[0].descriptions ?? [];
+        if (descriptions.length > 0) {
+          description = descriptions[0].description ?? descriptions[0].text;
+        }
+        creditsUsed = polledData.credits_paid ?? polledData.credits_used ?? 1;
+      } else if (polledData.results && polledData.results.length > 0) {
+        const descriptions = polledData.results[0].descriptions ?? [];
+        if (descriptions.length > 0) {
+          description = descriptions[0].text;
+        }
+        creditsUsed = polledData.credits_paid ?? polledData.credits_used ?? 1;
+      }
+
+      if (!description) {
+        throw new Error("No description found in polled response");
+      }
+
+      xmlLogger.debug(`🔍 Extracted description from polled response: "${description}"`);
+
+      // Parse description and filename separated by @
+      const parts = description.split("@").map(part => part.trim());
+      if (parts.length !== 2) {
+        // If no @ separator, treat entire response as alt text and generate filename
+        const altText = description.trim();
+        const generatedFilename = this.generateFilenameFromAltText(altText);
+
+        return {
+          description: altText,
+          filename: this.sanitizeFilename(generatedFilename),
+          originalUrl: imageUrl,
+          creditsUsed,
+        };
+      }
+
+      const [altTextPart, filename] = parts;
+
+      // Extract alt text from square brackets if present
+      const bracketMatch = altTextPart.match(/^\[(.*)\]$/);
+      const altText = bracketMatch ? bracketMatch[1] : altTextPart;
+
+      return {
+        description: altText,
+        filename: this.sanitizeFilename(filename),
+        originalUrl: imageUrl,
+        creditsUsed,
+      };
+    } catch (error) {
+      throw new XmlConversionError(
+        `Failed to parse polled response: ${(error as Error).message}`,
+        {
+          originalError: error as Error,
+          response,
+          imageUrl,
+        }
+      );
+    }
   }
 
   /**

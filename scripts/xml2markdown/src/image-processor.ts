@@ -141,9 +141,17 @@ export class ImageProcessor {
       return [];
     }
 
+    // Filter out SVG files as they cause API issues and don't need AI processing
+    const filteredUrls = imageUrls.filter(url => !url.toLowerCase().endsWith('.svg'));
+    const svgsSkipped = imageUrls.length - filteredUrls.length;
+    
+    if (svgsSkipped > 0) {
+      xmlLogger.info(`⏭️ Skipped ${svgsSkipped} SVG files (not suitable for AI processing)`);
+    }
+
     // Deduplicate URLs to avoid processing same image multiple times
-    const uniqueUrls = Array.from(new Set(imageUrls));
-    const duplicatesRemoved = imageUrls.length - uniqueUrls.length;
+    const uniqueUrls = Array.from(new Set(filteredUrls));
+    const duplicatesRemoved = filteredUrls.length - uniqueUrls.length;
     
     if (duplicatesRemoved > 0) {
       xmlLogger.info(`🔄 Removed ${duplicatesRemoved} duplicate image URLs`);
@@ -259,6 +267,12 @@ _batchIndex = 0
     destinationDir: string
   ): Promise<ProcessedImage> {
     const startTime = Date.now();
+    
+    // Skip SVG files entirely as they cause API issues
+    if (imageUrl.toLowerCase().endsWith('.svg')) {
+      xmlLogger.warn(`⏭️ Skipping SVG file: ${imageUrl}`);
+      return this.createSkippedImageResult(imageUrl, destinationDir, "SVG files are not supported for AI processing");
+    }
     
     try {
       xmlLogger.debug(`🔍 Processing image: ${imageUrl}`);
@@ -468,6 +482,35 @@ _batchIndex = 0
       aiEnhanced: false,
       creditsUsed: 0,
       error: error.message,
+    };
+  }
+
+  /**
+   * Create a skipped image result for files that don't need processing
+   * @param {string} imageUrl - Image URL
+   * @param {string} destinationDir - Destination directory
+   * @param {string} reason - Reason for skipping
+   * @returns {ProcessedImage} Skipped image result
+   * @private
+   */
+  private createSkippedImageResult(
+    imageUrl: string,
+    destinationDir: string,
+    reason: string
+  ): ProcessedImage {
+    const originalFilename = shared.getFilenameFromUrl(imageUrl);
+    const finalFilename = this.sanitizeFilename(originalFilename);
+
+    return {
+      originalUrl: imageUrl,
+      originalFilename,
+      finalFilename,
+      altText: "SVG-Grafik - Gesundheitsblog",
+      destinationPath: path.join(destinationDir, finalFilename),
+      data: Buffer.alloc(0),
+      aiEnhanced: false,
+      creditsUsed: 0,
+      error: `Skipped: ${reason}`,
     };
   }
 

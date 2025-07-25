@@ -70,8 +70,8 @@ function initTurndownService(): ExtendedTurndownService {
     codeBlockStyle: "fenced",
   });
 
-  // Use gfm plugin correctly - pass the plugin function itself
-  turndownService.use(gfm);
+  // Use gfm plugin correctly - call it to get the actual plugin
+  turndownService.use(gfm());
 
   // preserve embedded tweets
   turndownService.addRule("tweet", {

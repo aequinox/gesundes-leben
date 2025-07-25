@@ -7,7 +7,7 @@ import {
  * XML converter logger configured for the project
  * Uses the project's centralized logging system with enhanced context
  */
-const xmlLogger = projectLogger.configure({
+const configuredLogger = projectLogger.configure({
   component: "xml2markdown",
   minLevel: LogLevelName.DEBUG, // Enhanced logging for development
   timestampFormat: "time",
@@ -32,17 +32,17 @@ export interface Logger {
 }
 
 const logger: Logger = {
-  info: (...args) => xmlLogger.info(...args),
-  success: (...args) => xmlLogger.info(...args), // Map success to info
-  error: (...args) => xmlLogger.error(...args),
-  warn: (...args) => xmlLogger.warn(...args),
-  debug: (...args) => xmlLogger.debug(...args),
-  trace: (...args) => xmlLogger.trace(...args),
+  info: (...args) => configuredLogger.info(...args),
+  success: (...args) => configuredLogger.info(...args), // Map success to info
+  error: (...args) => configuredLogger.error(...args),
+  warn: (...args) => configuredLogger.warn(...args),
+  debug: (...args) => configuredLogger.debug(...args),
+  trace: (...args) => configuredLogger.trace(...args),
   
   // Enhanced structured logging implementations
   logProgress: (operation: string, current: number, total: number, metadata = {}) => {
     const percentage = Math.round((current / total) * 100);
-    xmlLogger.info(`📊 ${operation}: ${current}/${total} (${percentage}%)`, {
+    configuredLogger.info(`📊 ${operation}: ${current}/${total} (${percentage}%)`, {
       operation,
       current,
       total,
@@ -64,7 +64,7 @@ const logger: Logger = {
       performance = 'normal';
     }
     
-    xmlLogger.info(`${emoji} ${operation} completed in ${durationSeconds}s`, {
+    configuredLogger.info(`${emoji} ${operation} completed in ${durationSeconds}s`, {
       operation,
       durationMs,
       durationSeconds,
@@ -80,18 +80,26 @@ const logger: Logger = {
     
     switch (status) {
       case 'start':
-        xmlLogger.info(message, { operation, status, ...metadata });
+        configuredLogger.info(message, { operation, status, ...metadata });
         break;
       case 'success':
-        xmlLogger.info(message, { operation, status, ...metadata });
+        configuredLogger.info(message, { operation, status, ...metadata });
         break;
       case 'error':
-        xmlLogger.error(message, { operation, status, ...metadata });
+        configuredLogger.error(message, { operation, status, ...metadata });
         break;
     }
   },
 };
 
 export default logger;
-// xmlLogger is used internally by converter.ts
-export { xmlLogger };
+
+// Create a type-safe wrapper for internal xmlLogger usage
+export const xmlLogger = {
+  info: (...args: unknown[]) => configuredLogger.info(...args),
+  success: (...args: unknown[]) => configuredLogger.info(...args),
+  error: (...args: unknown[]) => configuredLogger.error(...args),
+  warn: (...args: unknown[]) => configuredLogger.warn(...args),
+  debug: (...args: unknown[]) => configuredLogger.debug(...args),
+  trace: (...args: unknown[]) => configuredLogger.trace(...args),
+};
