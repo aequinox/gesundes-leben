@@ -1,11 +1,17 @@
 import { ConversionError } from "../errors.js";
-import type { Post, WordPressCategoryData, WordPressCategoryAlt } from "../types.js";
+import type {
+  Post,
+  WordPressCategoryData,
+  WordPressCategoryAlt,
+} from "../types.js";
 
 /**
  * Type guard to check if category uses alternative format
  */
-function isAltFormat(category: WordPressCategoryData): category is WordPressCategoryAlt {
-  return '_' in category && '$' in category;
+function isAltFormat(
+  category: WordPressCategoryData
+): category is WordPressCategoryAlt {
+  return "_" in category && "$" in category;
 }
 
 /**
@@ -45,8 +51,7 @@ export default (post: Post): string => {
     // Check WordPress custom fields for group assignment
     if (post.data.postmeta) {
       const groupMeta = post.data.postmeta.find(
-        (meta) =>
-          meta.meta_key[0] === "group" || meta.meta_key[0] === "_group"
+        meta => meta.meta_key[0] === "group" || meta.meta_key[0] === "_group"
       );
       if (groupMeta && groupMeta.meta_value[0]) {
         const metaGroup = groupMeta.meta_value[0].toLowerCase();

@@ -7,7 +7,11 @@ import { XmlConversionError } from "./errors.js";
 import { xmlLogger } from "./logger.js";
 import * as shared from "./shared.js";
 import type { XmlConverterConfig } from "./types.js";
-import { VisionatiService, type VisionatiResponse, type VisionatiConfig } from "./visionati.js";
+import {
+  VisionatiService,
+  type VisionatiResponse,
+  type VisionatiConfig,
+} from "./visionati.js";
 
 // Type for axios configuration
 interface AxiosConfig {
@@ -278,7 +282,7 @@ export class ImageProcessor {
         };
         message: string;
       }
-      
+
       const errorObj = error as AxiosError;
       if (errorObj.response) {
         throw new XmlConversionError(
@@ -405,7 +409,7 @@ export class ImageProcessor {
         code?: string;
         message: string;
       }
-      
+
       const nodeError = error as NodeError;
       if (nodeError.code !== "EEXIST") {
         throw new XmlConversionError(`Failed to create directory: ${dirPath}`, {
@@ -434,7 +438,10 @@ export class ImageProcessor {
       xmlLogger.debug(`   • Memory cache hits: ${stats.memoryCachedResponses}`);
       xmlLogger.debug(`   • Active requests: ${stats.activeRequests}`);
 
-      if (stats.persistentCacheStats && typeof stats.persistentCacheStats === 'object') {
+      if (
+        stats.persistentCacheStats &&
+        typeof stats.persistentCacheStats === "object"
+      ) {
         const cacheStats = stats.persistentCacheStats as {
           enabled?: boolean;
           validEntries?: number;

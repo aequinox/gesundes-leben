@@ -67,21 +67,18 @@ const categoriesGetter: FrontmatterGetter = (post: Post): BlogCategory[] => {
 
   try {
     const rawCategories = post.data.category
-      .filter(
-        (category: WordPressCategoryData) => {
-          if ('_' in category && '$' in category) {
-            return category.$.domain === "category";
-          }
-          return category["@_domain"] === "category";
+      .filter((category: WordPressCategoryData) => {
+        if ("_" in category && "$" in category) {
+          return category.$.domain === "category";
         }
-      )
+        return category["@_domain"] === "category";
+      })
       .map((category: WordPressCategoryData) => {
-        if ('_' in category && '$' in category) {
+        if ("_" in category && "$" in category) {
           return decodeURIComponent(category._);
         }
         return decodeURIComponent(category["#text"]);
-      }
-      )
+      })
       .filter(
         (category: string) => !settings.filter_categories.includes(category)
       );

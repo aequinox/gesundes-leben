@@ -11,10 +11,7 @@ import type { WizardOption, XmlConverterConfig } from "./types.js";
 
 // Use import.meta.resolve to find package.json relative to current module
 const pkgJson = JSON.parse(
-  fs.readFileSync(
-    new URL("../package.json", import.meta.url),
-    "utf8"
-  )
+  fs.readFileSync(new URL("../package.json", import.meta.url), "utf8")
 );
 
 const options: WizardOption[] = [
@@ -187,8 +184,8 @@ function replaceAliases(argv: string[]): string[] {
  * @param {string[]} argv - Command line arguments
  * @returns {Command} Parsed command object
  */
-function parseCommandLine(argv: string[]): { 
-  opts(): Record<string, unknown>; 
+function parseCommandLine(argv: string[]): {
+  opts(): Record<string, unknown>;
   wizard?: boolean;
 } {
   // setup for help output

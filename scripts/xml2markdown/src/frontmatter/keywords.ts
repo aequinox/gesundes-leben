@@ -1,11 +1,17 @@
 import { ConversionError } from "../errors.js";
-import type { Post, WordPressCategoryData, WordPressCategoryAlt } from "../types.js";
+import type {
+  Post,
+  WordPressCategoryData,
+  WordPressCategoryAlt,
+} from "../types.js";
 
 /**
  * Type guard to check if category uses alternative format
  */
-function isAltFormat(category: WordPressCategoryData): category is WordPressCategoryAlt {
-  return '_' in category && '$' in category;
+function isAltFormat(
+  category: WordPressCategoryData
+): category is WordPressCategoryAlt {
+  return "_" in category && "$" in category;
 }
 
 /**
@@ -19,7 +25,7 @@ export default (post: Post): string[] => {
     // First try to get keywords from WordPress meta
     if (post.data.postmeta) {
       const keywordsMeta = post.data.postmeta.find(
-        (meta) =>
+        meta =>
           meta.meta_key[0] === "_yoast_wpseo_focuskw" ||
           meta.meta_key[0] === "keywords"
       );

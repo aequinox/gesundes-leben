@@ -298,7 +298,10 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
    * @returns {VisionatiResponse} Parsed response
    * @private
    */
-  private parseApiResponse(response: unknown, imageUrl: string): VisionatiResponse {
+  private parseApiResponse(
+    response: unknown,
+    imageUrl: string
+  ): VisionatiResponse {
     try {
       // Add debug logging to see actual response structure
       xmlLogger.debug(
@@ -325,9 +328,9 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
         credits_paid?: number;
         credits_used?: number;
       }
-      
+
       const typedResponse = response as VisionatiApiResponse;
-      
+
       // Try different response structures
       if (typedResponse.all?.assets && typedResponse.all.assets.length > 0) {
         // Original working format from JavaScript version
@@ -337,21 +340,24 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
         }
         description = descriptions[0].description;
         creditsUsed = typedResponse.credits_paid || 1;
-        
+
         // Debug log the actual description content
         xmlLogger.debug(`🔍 Raw description from Visionati: "${description}"`);
       } else if (typedResponse.result) {
         // Alternative format: direct result field
         description = typedResponse.result;
-        creditsUsed = typedResponse.credits_paid || typedResponse.credits_used || 1;
+        creditsUsed =
+          typedResponse.credits_paid || typedResponse.credits_used || 1;
       } else if (typedResponse.description) {
         // Alternative format: direct description field
         description = typedResponse.description;
-        creditsUsed = typedResponse.credits_paid || typedResponse.credits_used || 1;
+        creditsUsed =
+          typedResponse.credits_paid || typedResponse.credits_used || 1;
       } else if (typedResponse.text) {
         // Alternative format: text field
         description = typedResponse.text;
-        creditsUsed = typedResponse.credits_paid || typedResponse.credits_used || 1;
+        creditsUsed =
+          typedResponse.credits_paid || typedResponse.credits_used || 1;
       } else if (typeof response === "string") {
         // Direct string response
         description = response;
@@ -387,7 +393,7 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
       }
 
       const [altTextPart, filename] = parts;
-      
+
       // Extract alt text from square brackets if present
       const bracketMatch = altTextPart.match(/^\[(.*)\]$/);
       const altText = bracketMatch ? bracketMatch[1] : altTextPart;

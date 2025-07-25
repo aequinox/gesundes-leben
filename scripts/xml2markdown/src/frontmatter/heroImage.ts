@@ -49,9 +49,10 @@ export default (post: Post): { src: string; alt: string } | undefined => {
   // Fallback to WordPress attachment data if no AI alt text
   if (!altText && post.data.postmeta && post.meta.coverImageId) {
     const altMeta = post.data.postmeta.find(
-      (meta) =>
+      meta =>
         meta.meta_key[0] === "_wp_attachment_image_alt" &&
-        (meta as unknown as {post_id?: string}).post_id === post.meta.coverImageId
+        (meta as unknown as { post_id?: string }).post_id ===
+          post.meta.coverImageId
     );
     if (altMeta && altMeta.meta_value[0]) {
       altText = decodeURIComponent(altMeta.meta_value[0]);

@@ -395,7 +395,7 @@ async function updatePostsWithImageMetadata(
   );
 
   // Create lookup map for processed images
-  const imageMap = new Map<string, typeof processedImages[0]>();
+  const imageMap = new Map<string, (typeof processedImages)[0]>();
   processedImages.forEach(img => {
     imageMap.set(img.originalUrl, img);
   });

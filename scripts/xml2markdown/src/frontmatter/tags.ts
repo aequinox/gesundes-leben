@@ -1,11 +1,17 @@
 import { ConversionError } from "../errors.js";
-import type { Post, WordPressCategoryData, WordPressCategoryAlt } from "../types.js";
+import type {
+  Post,
+  WordPressCategoryData,
+  WordPressCategoryAlt,
+} from "../types.js";
 
 /**
  * Type guard to check if category uses alternative format
  */
-function isAltFormat(category: WordPressCategoryData): category is WordPressCategoryAlt {
-  return '_' in category && '$' in category;
+function isAltFormat(
+  category: WordPressCategoryData
+): category is WordPressCategoryAlt {
+  return "_" in category && "$" in category;
 }
 
 /**
