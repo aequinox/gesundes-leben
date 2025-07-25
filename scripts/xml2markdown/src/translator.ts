@@ -13,7 +13,7 @@ interface DOMNode {
   attributes?: Record<string, string>;
   getAttribute(name: string): string | null;
   querySelector?(selector: string): DOMNode | null;
-  
+
   // Additional HTMLElement properties that may be used by Turndown
   tagName?: string;
   className?: string;
@@ -71,19 +71,20 @@ function initTurndownService(): ExtendedTurndownService {
   });
 
   // Use gfm plugin correctly - it should be called with the service as parameter
-  turndownService.use(gfm);
+  turndownService.use(gfm());
 
   // preserve embedded tweets
   turndownService.addRule("tweet", {
-    filter: (node) =>
+    filter: node =>
       (node as DOMNode).nodeName === "BLOCKQUOTE" &&
       (node as DOMNode).getAttribute("class") === "twitter-tweet",
-    replacement: (_content: string, node) => `\n\n${(node as DOMNode).outerHTML}`,
+    replacement: (_content: string, node) =>
+      `\n\n${(node as DOMNode).outerHTML}`,
   });
 
   // preserve embedded codepens
   turndownService.addRule("codepen", {
-    filter: (node) => {
+    filter: node => {
       // codepen embed snippets have changed over the years
       // but this series of checks should find the commonalities
       const domNode = node as DOMNode;
@@ -93,7 +94,8 @@ function initTurndownService(): ExtendedTurndownService {
         domNode.getAttribute("class") === "codepen"
       );
     },
-    replacement: (_content: string, node) => `\n\n${(node as DOMNode).outerHTML}`,
+    replacement: (_content: string, node) =>
+      `\n\n${(node as DOMNode).outerHTML}`,
   });
 
   // preserve embedded scripts (for tweets, codepens, gists, etc.)
@@ -102,7 +104,10 @@ function initTurndownService(): ExtendedTurndownService {
     replacement: (_content: string, node) => {
       const domNode = node as DOMNode;
       let before = "\n\n";
-      if (domNode.previousSibling && domNode.previousSibling.nodeName !== "#text") {
+      if (
+        domNode.previousSibling &&
+        domNode.previousSibling.nodeName !== "#text"
+      ) {
         // keep twitter and codepen <script> tags snug with the element above them
         before = "\n";
       }
@@ -213,10 +218,10 @@ function initTurndownService(): ExtendedTurndownService {
 
   // convert <pre> into a code block with language when appropriate
   turndownService.addRule("pre", {
-    filter: (node) => {
+    filter: node => {
       // a <pre> with <code> inside will already render nicely, so don't interfere
       const domNode = node as DOMNode;
-      return domNode.nodeName === "PRE" && !(domNode.querySelector?.("code"));
+      return domNode.nodeName === "PRE" && !domNode.querySelector?.("code");
     },
     replacement: (_content: string, node) => {
       const domNode = node as DOMNode;

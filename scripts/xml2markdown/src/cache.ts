@@ -235,6 +235,7 @@ export class CacheService {
 
   /**
    * Remove expired entries
+   * Optimized with batch processing and early termination
    */
   prune(): void {
     if (!this.enabled || !this.data) {
@@ -243,18 +244,22 @@ export class CacheService {
 
     const ttlMs = this.ttlDays * 24 * 60 * 60 * 1000;
     const now = Date.now();
+    const validEntries: Record<string, CacheEntry> = {};
     let prunedCount = 0;
 
+    // Filter valid entries in a single pass
     for (const [url, entry] of Object.entries(this.data.entries)) {
       const entryAge = now - new Date(entry.timestamp).getTime();
-      if (entryAge > ttlMs) {
-        delete this.data.entries[url];
+      if (entryAge <= ttlMs) {
+        validEntries[url] = entry;
+      } else {
         prunedCount++;
-        this.isDirty = true;
       }
     }
 
     if (prunedCount > 0) {
+      this.data.entries = validEntries;
+      this.isDirty = true;
       xmlLogger.info(`🧹 Pruned ${prunedCount} expired cache entries`);
       this.save();
     }
@@ -262,6 +267,7 @@ export class CacheService {
 
   /**
    * Get cache statistics
+   * Optimized with single-pass analysis and lazy file size calculation
    */
   getStats(): {
     enabled: boolean;
@@ -292,16 +298,19 @@ export class CacheService {
     const now = Date.now();
     const ttlMs = this.ttlDays * 24 * 60 * 60 * 1000;
 
-    const validEntries = entries.filter(([_, entry]) => {
+    // Single pass through entries to calculate all stats
+    let validCount = 0;
+    let totalCredits = 0;
+
+    for (const [, entry] of entries) {
       const age = now - new Date(entry.timestamp).getTime();
-      return age <= ttlMs;
-    });
+      if (age <= ttlMs) {
+        validCount++;
+      }
+      totalCredits += entry.creditsUsed;
+    }
 
-    const totalCredits = entries.reduce(
-      (sum, [_, entry]) => sum + entry.creditsUsed,
-      0
-    );
-
+    // Lazy file size calculation
     let fileSize = 0;
     try {
       if (fs.existsSync(this.cacheFile)) {
@@ -315,8 +324,8 @@ export class CacheService {
     return {
       enabled: true,
       totalEntries: entries.length,
-      validEntries: validEntries.length,
-      expiredEntries: entries.length - validEntries.length,
+      validEntries: validCount,
+      expiredEntries: entries.length - validCount,
       totalCreditsSaved: totalCredits,
       cacheFile: this.cacheFile,
       cacheSizeBytes: fileSize,

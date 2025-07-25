@@ -47,23 +47,24 @@ export interface Post {
 
 /**
  * Raw XML item data structure from WordPress export
+ * Improved with readonly arrays for immutability
  */
 export interface RawXmlItem {
-  [key: string]: unknown;
-  post_id?: string[];
-  post_name?: string[];
-  post_type?: string[];
-  status?: string[];
-  pubDate?: string[];
-  encoded?: string[];
-  link?: string[];
-  title?: string[];
-  excerpt?: string[];
-  creator?: string[];
-  is_sticky?: string[];
-  postmeta?: unknown[];
-  category?: unknown[];
-  tag?: unknown[];
+  readonly [key: string]: unknown;
+  readonly post_id?: readonly string[];
+  readonly post_name?: readonly string[];
+  readonly post_type?: readonly string[];
+  readonly status?: readonly string[];
+  readonly pubDate?: readonly string[];
+  readonly encoded?: readonly string[];
+  readonly link?: readonly string[];
+  readonly title?: readonly string[];
+  readonly excerpt?: readonly string[];
+  readonly creator?: readonly string[];
+  readonly is_sticky?: readonly string[];
+  readonly postmeta?: readonly unknown[];
+  readonly category?: readonly unknown[];
+  readonly tag?: readonly unknown[];
 }
 
 /**

@@ -53,10 +53,11 @@ export async function convertXmlToMdx(
       xmlLogger.info("💾 Writing MDX files and downloading images...");
       await writeFilesPromise(posts, validatedConfig);
 
-      // Calculate statistics
-      const imagesDownloaded = posts.reduce((total, post) => {
-        return total + (post.imageImports?.length || 0);
-      }, 0);
+      // Calculate statistics efficiently
+      let imagesDownloaded = 0;
+      for (const post of posts) {
+        imagesDownloaded += post.imageImports?.length || 0;
+      }
 
       const result: ConversionResult = {
         postsProcessed: posts.length,

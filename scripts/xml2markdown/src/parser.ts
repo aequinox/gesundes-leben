@@ -3,7 +3,6 @@ import fs from "fs";
 import * as xml2js from "xml2js";
 
 import { XmlConversionError, XmlValidationError } from "./errors.js";
-
 // Import all frontmatter getters manually since require-directory doesn't work with ES modules
 import author from "./frontmatter/author.js";
 import categories from "./frontmatter/categories.js";
@@ -231,6 +230,7 @@ function getPostCoverImageId(postData: RawXmlItem): string | undefined {
 
 /**
  * Collect attached images from channel data
+ * Optimized with compiled regex and early validation
  */
 function collectAttachedImages(channelData: RawXmlItem[]): Image[] {
   // Interface for attachment items with additional WordPress fields
@@ -238,22 +238,23 @@ function collectAttachedImages(channelData: RawXmlItem[]): Image[] {
     attachment_url?: string[];
     post_parent?: string[];
   }
-  
-  const images = getItemsOfType(channelData, "attachment")
-    // filter to certain image file types
-    .filter(attachment => {
-      const attachmentItem = attachment as AttachmentItem;
-      const attachmentUrl = attachmentItem.attachment_url;
-      return attachmentUrl && /\.(gif|jpe?g|png|webp)$/i.test(attachmentUrl[0]);
-    })
-    .map(attachment => {
-      const attachmentItem = attachment as AttachmentItem;
-      return {
+
+  const imageExtRegex = /\.(gif|jpe?g|png|webp)$/i;
+  const attachments = getItemsOfType(channelData, "attachment");
+  const images: Image[] = [];
+
+  for (const attachment of attachments) {
+    const attachmentItem = attachment as AttachmentItem;
+    const attachmentUrl = attachmentItem.attachment_url?.[0];
+
+    if (attachmentUrl && imageExtRegex.test(attachmentUrl)) {
+      images.push({
         id: attachment.post_id?.[0] ?? "",
         postId: attachmentItem.post_parent?.[0] ?? "",
-        url: attachmentItem.attachment_url?.[0] ?? "",
-      };
-    });
+        url: attachmentUrl,
+      });
+    }
+  }
 
   logger.info(`${images.length} attached images found.`);
   return images;
@@ -261,34 +262,41 @@ function collectAttachedImages(channelData: RawXmlItem[]): Image[] {
 
 /**
  * Collect images from post content
+ * Optimized with compiled regex and reduced allocations
  */
 function collectScrapedImages(
   channelData: RawXmlItem[],
   postTypes: string[]
 ): Image[] {
   const images: Image[] = [];
-  postTypes.forEach(postType => {
-    getItemsOfType(channelData, postType).forEach(postData => {
+  const imgRegex =
+    /<img[^>]*src="(.+?\.(?:gif|jpe?g|png|webp|avif|svg))"[^>]*>/gi;
+
+  for (const postType of postTypes) {
+    const postsOfType = getItemsOfType(channelData, postType);
+
+    for (const postData of postsOfType) {
       const postId = postData.post_id?.[0] ?? "";
       const postContent = postData.encoded?.[0] ?? "";
       const postLink = postData.link?.[0] ?? "";
 
-      const matches = [
-        ...postContent.matchAll(
-          /<img[^>]*src="(.+?\.(?:gif|jpe?g|png|webp|avif|svg))"[^>]*>/gi
-        ),
-      ];
-      matches.forEach(match => {
-        // base the matched image URL relative to the post URL
-        const url = new URL(match[1], postLink).href;
-        images.push({
-          id: "-1",
-          postId: postId.toString(),
-          url,
-        });
-      });
-    });
-  });
+      let match;
+      imgRegex.lastIndex = 0; // Reset regex state
+
+      while ((match = imgRegex.exec(postContent)) !== null) {
+        try {
+          const url = new URL(match[1], postLink).href;
+          images.push({
+            id: "-1",
+            postId,
+            url,
+          });
+        } catch {
+          logger.warn(`Invalid image URL in post ${postId}: ${match[1]}`);
+        }
+      }
+    }
+  }
 
   logger.info(`${images.length} images scraped from post body content.`);
   return images;
@@ -318,34 +326,41 @@ function updateHeroImageMetadata(
 
 /**
  * Merge images into posts
+ * Optimized with Map-based lookups for O(1) post access
  */
 function mergeImagesIntoPosts(
   images: Image[],
   posts: Omit<Post, "frontmatter">[]
 ): void {
-  images.forEach(image => {
-    posts.forEach(post => {
-      let shouldAttach = false;
+  // Create maps for O(1) lookups instead of nested loops
+  const postsByIdMap = new Map<string, Omit<Post, "frontmatter">>();
+  const postsByCoverIdMap = new Map<string, Omit<Post, "frontmatter">>();
 
-      // this image was uploaded as an attachment to this post
-      if (image.postId === post.meta.id) {
-        shouldAttach = true;
+  for (const post of posts) {
+    postsByIdMap.set(post.meta.id, post);
+    if (post.meta.coverImageId) {
+      postsByCoverIdMap.set(post.meta.coverImageId, post);
+    }
+  }
+
+  for (const image of images) {
+    // Check if image is attached to a post
+    const attachedPost = postsByIdMap.get(image.postId);
+    if (attachedPost && !attachedPost.meta.imageUrls.includes(image.url)) {
+      attachedPost.meta.imageUrls.push(image.url);
+    }
+
+    // Check if image is a featured image
+    const featuredPost = postsByCoverIdMap.get(image.id);
+    if (featuredPost) {
+      featuredPost.meta.coverImage = shared.getFilenameFromUrl(image.url);
+      updateHeroImageMetadata(featuredPost, image.url);
+
+      if (!featuredPost.meta.imageUrls.includes(image.url)) {
+        featuredPost.meta.imageUrls.push(image.url);
       }
-
-      // this image was set as the featured image for this post
-      if (image.id === post.meta.coverImageId) {
-        shouldAttach = true;
-        post.meta.coverImage = shared.getFilenameFromUrl(image.url);
-
-        // Update hero image metadata (no import needed since heroImage uses string paths)
-        updateHeroImageMetadata(post, image.url);
-      }
-
-      if (shouldAttach && !post.meta.imageUrls.includes(image.url)) {
-        post.meta.imageUrls.push(image.url);
-      }
-    });
-  });
+    }
+  }
 }
 
 /**
