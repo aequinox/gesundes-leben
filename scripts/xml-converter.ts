@@ -11,6 +11,7 @@ import { Command } from 'commander';
 
 import { logger, LogLevelName } from '../src/utils/logger.js';
 
+import { CacheService } from './xml2markdown/src/cache.js';
 import { convertXmlToMdxWithErrorHandling, validateXmlFile, ensureOutputDirectory } from './xml2markdown/src/converter.js';
 import type { XmlConverterConfig } from './xml2markdown/src/types.js';
 
@@ -45,6 +46,11 @@ program
   .option('--visionati-language <lang>', 'Response language', 'de')
   .option('--visionati-prompt <prompt>', 'Custom prompt for image analysis')
   .option('--visionati-max-concurrent <num>', 'Max concurrent API requests', '5')
+  .option('--visionati-cache-disable', 'Disable caching of Visionati results')
+  .option('--visionati-cache-file <file>', 'Cache file location', '.visionati-cache.json')
+  .option('--visionati-cache-ttl <days>', 'Cache TTL in days', '30')
+  .option('--clear-cache', 'Clear Visionati cache and exit')
+  .option('--cache-stats', 'Show cache statistics and exit')
   .option('--dry-run', 'Show what would be converted without actually converting')
   .option('-v, --verbose', 'Enable verbose logging')
   .option('-q, --quiet', 'Suppress non-error output')
@@ -60,6 +66,38 @@ program
 
       cliLogger.info('🚀 XML to MDX Converter v2.0.0');
       cliLogger.info('🏥 Healthy Life Blog - WordPress Export Processor');
+      
+      // Handle cache management commands
+      if (options.clearCache || options.cacheStats) {
+        const cacheConfig = {
+          enabled: true,
+          cacheFile: options.visionatiCacheFile || '.visionati-cache.json',
+          ttlDays: parseInt(options.visionatiCacheTtl) || 30
+        };
+        
+        const cacheService = new CacheService(cacheConfig);
+        
+        if (options.clearCache) {
+          cliLogger.info('🧹 Clearing Visionati cache...');
+          cacheService.clear();
+          cliLogger.info('✅ Cache cleared successfully');
+          process.exit(0);
+        }
+        
+        if (options.cacheStats) {
+          cliLogger.info('📊 Visionati Cache Statistics:');
+          const stats = cacheService.getStats();
+          cliLogger.info(`  • Cache enabled: ${stats.enabled ? '✅' : '❌'}`);
+          cliLogger.info(`  • Total entries: ${stats.totalEntries}`);
+          cliLogger.info(`  • Valid entries: ${stats.validEntries}`);
+          cliLogger.info(`  • Expired entries: ${stats.expiredEntries}`);
+          cliLogger.info(`  • Credits saved: ${stats.totalCreditsSaved}`);
+          cliLogger.info(`  • Cache file: ${stats.cacheFile}`);
+          cliLogger.info(`  • Cache size: ${stats.cacheSizeKB} KB`);
+          cliLogger.info(`  • TTL: ${stats.ttlDays} days`);
+          process.exit(0);
+        }
+      }
       
       // Validate required options
       if (!options.input) {
@@ -112,7 +150,11 @@ program
         visionatiBackend: options.visionatiBackend as 'claude' | 'gpt4' | 'gemini',
         visionatiLanguage: options.visionatiLanguage,
         visionatiPrompt: options.visionatiPrompt,
-        visionatiMaxConcurrent: parseInt(options.visionatiMaxConcurrent) || 5
+        visionatiMaxConcurrent: parseInt(options.visionatiMaxConcurrent) || 5,
+        // Visionati cache configuration
+        visionatiCacheEnabled: !options.visionatiCacheDisable,
+        visionatiCacheFile: options.visionatiCacheFile || '.visionati-cache.json',
+        visionatiCacheTTL: parseInt(options.visionatiCacheTtl) || 30
       };
 
       // Show configuration in verbose mode
@@ -139,6 +181,11 @@ program
           cliLogger.info(`    - Language: ${config.visionatiLanguage}`);
           cliLogger.info(`    - Max concurrent: ${config.visionatiMaxConcurrent}`);
           cliLogger.info(`    - API key: ${visionatiApiKey ? '✅ Configured' : '❌ Missing'}`);
+          cliLogger.info(`    - Cache: ${config.visionatiCacheEnabled ? '✅ Enabled' : '❌ Disabled'}`);
+          if (config.visionatiCacheEnabled) {
+            cliLogger.info(`    - Cache file: ${config.visionatiCacheFile}`);
+            cliLogger.info(`    - Cache TTL: ${config.visionatiCacheTTL} days`);
+          }
         }
         process.exit(0);
       }
@@ -217,6 +264,19 @@ Examples:
 
   # Process custom post types and pages
   $ bun xml-converter -i export.xml --include-other-types
+
+  # Show cache statistics
+  $ bun xml-converter --cache-stats
+
+  # Clear cache
+  $ bun xml-converter --clear-cache
+
+  # Disable cache for current run
+  $ bun xml-converter -i export.xml --generate-alt-texts --visionati-cache-disable
+
+  # Use custom cache file and TTL
+  $ bun xml-converter -i export.xml --generate-alt-texts \\
+    --visionati-cache-file my-cache.json --visionati-cache-ttl 60
 
 Environment Variables:
   VISIONATI_API_KEY    Visionati API key (alternative to --visionati-api-key)

@@ -40,20 +40,20 @@ bun run xml-convert -i export.xml --dry-run
 
 ### Command Line Options
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `-i, --input <file>` | Input WordPress XML file path | Required |
-| `-o, --output <dir>` | Output directory path | `./src/data/blog` |
-| `--year-folders` | Organize posts into year folders | `false` |
-| `--month-folders` | Organize into month folders (requires --year-folders) | `false` |
-| `--post-folders` | Create individual folders for each post | `false` |
-| `--prefix-date` | Add date prefix to filenames/folders | `false` |
-| `--save-attached-images` | Download attached images | `true` |
-| `--save-scraped-images` | Download images from post content | `true` |
-| `--include-other-types` | Include custom post types and pages | `false` |
-| `--dry-run` | Preview without making changes | `false` |
-| `-v, --verbose` | Enable verbose logging | `false` |
-| `-q, --quiet` | Suppress non-error output | `false` |
+| Option                   | Description                                           | Default           |
+| ------------------------ | ----------------------------------------------------- | ----------------- |
+| `-i, --input <file>`     | Input WordPress XML file path                         | Required          |
+| `-o, --output <dir>`     | Output directory path                                 | `./src/data/blog` |
+| `--year-folders`         | Organize posts into year folders                      | `false`           |
+| `--month-folders`        | Organize into month folders (requires --year-folders) | `false`           |
+| `--post-folders`         | Create individual folders for each post               | `false`           |
+| `--prefix-date`          | Add date prefix to filenames/folders                  | `false`           |
+| `--save-attached-images` | Download attached images                              | `true`            |
+| `--save-scraped-images`  | Download images from post content                     | `true`            |
+| `--include-other-types`  | Include custom post types and pages                   | `false`           |
+| `--dry-run`              | Preview without making changes                        | `false`           |
+| `-v, --verbose`          | Enable verbose logging                                | `false`           |
+| `-q, --quiet`            | Suppress non-error output                             | `false`           |
 
 ### Advanced Examples
 
@@ -92,15 +92,15 @@ author: "healthy-life-author"
 pubDatetime: "2024-01-15T10:30:00.000Z"
 modDatetime: "2024-01-16T08:20:00.000Z"
 description: "Learn practical strategies for anger management..."
-keywords: 
+keywords:
   - anger management
   - mental health
   - wellness
-categories: 
+categories:
   - Gesundheit
   - Wellness
 group: "pro"
-tags: 
+tags:
   - tips
   - psychology
 heroImage:
@@ -127,28 +127,28 @@ More content with properly converted images...
 
 ## Frontmatter Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string | WordPress post ID |
-| `title` | string | Post title |
-| `author` | string | Author identifier (defaults to "healthy-life-author") |
-| `pubDatetime` | string | Publication date in ISO format |
-| `modDatetime` | string | Last modified date in ISO format |
-| `description` | string | Post excerpt or generated description |
-| `keywords` | array | Extracted keywords (max 10) |
-| `categories` | array | Mapped German categories |
-| `group` | string | Classification: "pro", "kontra", or "fragezeiten" |
-| `tags` | array | WordPress tags |
-| `heroImage` | object | Featured image with `src` and `alt` |
-| `draft` | boolean | Draft status |
-| `featured` | boolean | Featured status |
+| Field         | Type    | Description                                           |
+| ------------- | ------- | ----------------------------------------------------- |
+| `id`          | string  | WordPress post ID                                     |
+| `title`       | string  | Post title                                            |
+| `author`      | string  | Author identifier (defaults to "healthy-life-author") |
+| `pubDatetime` | string  | Publication date in ISO format                        |
+| `modDatetime` | string  | Last modified date in ISO format                      |
+| `description` | string  | Post excerpt or generated description                 |
+| `keywords`    | array   | Extracted keywords (max 10)                           |
+| `categories`  | array   | Mapped German categories                              |
+| `group`       | string  | Classification: "pro", "kontra", or "fragezeiten"     |
+| `tags`        | array   | WordPress tags                                        |
+| `heroImage`   | object  | Featured image with `src` and `alt`                   |
+| `draft`       | boolean | Draft status                                          |
+| `featured`    | boolean | Featured status                                       |
 
 ## Category Mapping
 
 WordPress categories are intelligently mapped to German blog categories:
 
 - Nutrition → Ernährung
-- Health → Gesundheit  
+- Health → Gesundheit
 - Wellness → Wellness
 - Mental Health → Mentale Gesundheit
 - Fitness → Fitness
@@ -181,16 +181,19 @@ src/data/blog/
 The converter automatically transforms HTML `<figure>` elements into Astro `<Image>` components:
 
 ### Input (WordPress HTML)
+
 ```html
 <figure class="alignright">
-  <img src="images/Teabag-Plastic-Header.jpg" alt="Eine weiße Tasse mit einem Totenkopfsymbol...">
-  <figcaption>
-    Bild von KI-generiert
-  </figcaption>
+  <img
+    src="images/Teabag-Plastic-Header.jpg"
+    alt="Eine weiße Tasse mit einem Totenkopfsymbol..."
+  />
+  <figcaption>Bild von KI-generiert</figcaption>
 </figure>
 ```
 
 ### Output (Astro MDX)
+
 ```javascript
 ---
 // frontmatter here
@@ -211,12 +214,12 @@ import teabagPlasticHeader from "./images/Teabag-Plastic-Header.jpg";
 
 The converter automatically detects image positioning from WordPress CSS classes:
 
-| WordPress Class | Position Output | Description |
-|----------------|-----------------|-------------|
-| `alignright` | `position="right"` | Right-aligned image |
-| `alignleft` | `position="left"` | Left-aligned image |
-| `aligncenter` | `position="center"` | Center-aligned image |
-| Custom classes | `position="center"` | Default fallback |
+| WordPress Class | Position Output     | Description          |
+| --------------- | ------------------- | -------------------- |
+| `alignright`    | `position="right"`  | Right-aligned image  |
+| `alignleft`     | `position="left"`   | Left-aligned image   |
+| `aligncenter`   | `position="center"` | Center-aligned image |
+| Custom classes  | `position="center"` | Default fallback     |
 
 ### Variable Name Generation
 

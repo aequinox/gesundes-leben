@@ -44,3 +44,7 @@ tsconfig.tsbuildinfo
 
 # WordPress export files
 xml/
+
+# Visionati cache files
+.visionati-cache.json
+*.visionati-cache.json

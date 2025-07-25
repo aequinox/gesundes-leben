@@ -2,7 +2,7 @@
  * TypeScript declarations for logger.js
  */
 
-import type { Logger } from '../../../src/utils/logger.js';
+import type { Logger } from "../../../src/utils/logger.js";
 
 export const xmlLogger: Logger;
 

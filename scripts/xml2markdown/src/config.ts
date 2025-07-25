@@ -1,13 +1,13 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-import type { XmlConverterConfig } from './types.js';
+import type { XmlConverterConfig } from "./types.js";
 
 /**
  * Zod schema for XML converter configuration validation
  */
 export const XmlConverterConfigSchema = z.object({
-  input: z.string().min(1, 'Input file path is required'),
-  output: z.string().min(1, 'Output directory path is required'),
+  input: z.string().min(1, "Input file path is required"),
+  output: z.string().min(1, "Output directory path is required"),
   yearFolders: z.boolean().default(false),
   monthFolders: z.boolean().default(false),
   postFolders: z.boolean().default(false),
@@ -18,11 +18,15 @@ export const XmlConverterConfigSchema = z.object({
   // Visionati AI configuration
   generateAltTexts: z.boolean().default(false),
   visionatiApiKey: z.string().optional(),
-  visionatiBackend: z.enum(['claude', 'gpt4', 'gemini']).default('claude'),
-  visionatiLanguage: z.string().default('de'),
+  visionatiBackend: z.enum(["claude", "gpt4", "gemini"]).default("claude"),
+  visionatiLanguage: z.string().default("de"),
   visionatiPrompt: z.string().optional(),
   visionatiTimeout: z.number().min(5000).max(120000).default(30000),
   visionatiMaxConcurrent: z.number().min(1).max(20).default(5),
+  // Visionati cache configuration
+  visionatiCacheEnabled: z.boolean().default(true),
+  visionatiCacheFile: z.string().default(".visionati-cache.json"),
+  visionatiCacheTTL: z.number().min(1).max(365).default(30),
 });
 
 /**
@@ -31,15 +35,17 @@ export const XmlConverterConfigSchema = z.object({
  * @returns Validated configuration
  * @throws {XmlValidationError} When configuration is invalid
  */
-export async function validateConfig(config: unknown): Promise<XmlConverterConfig> {
+export async function validateConfig(
+  config: unknown
+): Promise<XmlConverterConfig> {
   try {
     return XmlConverterConfigSchema.parse(config);
   } catch (error) {
-    const { XmlValidationError } = await import('./errors.js');
+    const { XmlValidationError } = await import("./errors.js");
     if (error instanceof z.ZodError) {
-      throw new XmlValidationError('Invalid configuration', {
+      throw new XmlValidationError("Invalid configuration", {
         errors: error.issues,
-        received: config
+        received: config,
       });
     }
     throw error;
@@ -50,8 +56,8 @@ export async function validateConfig(config: unknown): Promise<XmlConverterConfi
  * Default configuration values
  */
 export const defaultConfig: XmlConverterConfig = {
-  input: '',
-  output: './output',
+  input: "",
+  output: "./output",
   yearFolders: false,
   monthFolders: false,
   postFolders: false,
@@ -65,38 +71,38 @@ export const defaultConfig: XmlConverterConfig = {
  * Available blog categories for validation
  */
 export const BLOG_CATEGORIES = [
-  'Ernährung',
-  'Gesundheit', 
-  'Wellness',
-  'Mentale Gesundheit',
-  'Fitness',
-  'Immunsystem',
-  'Prävention',
-  'Naturheilkunde',
-  'Organsysteme',
-  'Wissenschaftliches'
+  "Ernährung",
+  "Gesundheit",
+  "Wellness",
+  "Mentale Gesundheit",
+  "Fitness",
+  "Immunsystem",
+  "Prävention",
+  "Naturheilkunde",
+  "Organsysteme",
+  "Wissenschaftliches",
 ] as const;
 
 /**
  * Available blog groups for validation
  */
-export const BLOG_GROUPS = ['pro', 'kontra', 'fragezeiten'] as const;
+export const BLOG_GROUPS = ["pro", "kontra", "fragezeiten"] as const;
 
 /**
  * Frontmatter fields configuration
  */
 export const FRONTMATTER_FIELDS = [
-  'id:id',
-  'title:title', 
-  'author:author',
-  'pubDatetime:pubDatetime',
-  'modDatetime:modDatetime',
-  'excerpt:description',
-  'keywords:keywords',
-  'categories:categories',
-  'group:group',
-  'tags:tags',
-  'heroImage:heroImage',
-  'draft:draft',
-  'featured:featured'
+  "id:id",
+  "title:title",
+  "author:author",
+  "pubDatetime:pubDatetime",
+  "modDatetime:modDatetime",
+  "excerpt:description",
+  "keywords:keywords",
+  "categories:categories",
+  "group:group",
+  "tags:tags",
+  "heroImage:heroImage",
+  "draft:draft",
+  "featured:featured",
 ] as const;

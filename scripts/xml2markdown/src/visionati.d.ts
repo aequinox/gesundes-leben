@@ -8,7 +8,7 @@ export interface VisionatiConfig {
   /** API base URL */
   baseUrl?: string;
   /** AI backend to use */
-  backend?: 'claude' | 'gpt4' | 'gemini';
+  backend?: "claude" | "gpt4" | "gemini";
   /** Response language */
   language?: string;
   /** Custom prompt template */
@@ -55,22 +55,22 @@ export interface VisionatiStats {
  */
 export declare class VisionatiService {
   constructor(config: VisionatiConfig);
-  
+
   /**
    * Generate alt text and filename for an image URL
    */
   generateAltText(imageUrl: string): Promise<VisionatiResponse>;
-  
+
   /**
    * Generate alt texts for multiple images with batching
    */
   generateAltTexts(imageUrls: string[]): Promise<VisionatiResponse[]>;
-  
+
   /**
    * Get service statistics
    */
   getStats(): VisionatiStats;
-  
+
   /**
    * Clear cache and reset state
    */

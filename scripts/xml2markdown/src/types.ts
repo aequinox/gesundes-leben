@@ -14,12 +14,15 @@ export interface PostMeta {
   type: string;
   imageUrls: string[];
   /** AI-enhanced image metadata map (URL -> metadata) */
-  aiImageMetadata?: Map<string, {
-    altText: string;
-    filename: string;
-    aiEnhanced: boolean;
-    creditsUsed: number;
-  }>;
+  aiImageMetadata?: Map<
+    string,
+    {
+      altText: string;
+      filename: string;
+      aiEnhanced: boolean;
+      creditsUsed: number;
+    }
+  >;
 }
 
 /**
@@ -43,6 +46,27 @@ export interface Post {
 }
 
 /**
+ * Raw XML item data structure from WordPress export
+ */
+export interface RawXmlItem {
+  [key: string]: unknown;
+  post_id?: string[];
+  post_name?: string[];
+  post_type?: string[];
+  status?: string[];
+  pubDate?: string[];
+  encoded?: string[];
+  link?: string[];
+  title?: string[];
+  excerpt?: string[];
+  creator?: string[];
+  is_sticky?: string[];
+  postmeta?: unknown[];
+  category?: unknown[];
+  tag?: unknown[];
+}
+
+/**
  * Raw WordPress post data from XML
  */
 export interface WordPressPostData {
@@ -55,8 +79,10 @@ export interface WordPressPostData {
   link: string[];
   title: string[];
   excerpt: string[];
+  creator?: string[];
+  is_sticky?: string[];
   postmeta?: WordPressPostMeta[];
-  category?: WordPressCategory[];
+  category?: WordPressCategoryData[];
   tag?: WordPressTag[];
 }
 
@@ -69,21 +95,37 @@ export interface WordPressPostMeta {
 }
 
 /**
- * WordPress category data
+ * WordPress category data (format varies by context)
  */
 export interface WordPressCategory {
-  '#text': string;
-  '@_domain': string;
-  '@_nicename': string;
+  "#text": string;
+  "@_domain": string;
+  "@_nicename": string;
 }
+
+/**
+ * Alternative WordPress category format used in some contexts
+ */
+export interface WordPressCategoryAlt {
+  _: string;
+  $: {
+    domain: string;
+    nicename?: string;
+  };
+}
+
+/**
+ * Union type for WordPress category data that can handle different XML formats
+ */
+export type WordPressCategoryData = WordPressCategory | WordPressCategoryAlt;
 
 /**
  * WordPress tag data
  */
 export interface WordPressTag {
-  '#text': string;
-  '@_domain': string;
-  '@_nicename': string;
+  "#text": string;
+  "@_domain": string;
+  "@_nicename": string;
 }
 
 /**
@@ -119,11 +161,15 @@ export interface XmlConverterConfig {
   // Visionati AI features
   generateAltTexts?: boolean;
   visionatiApiKey?: string;
-  visionatiBackend?: 'claude' | 'gpt4' | 'gemini';
+  visionatiBackend?: "claude" | "gpt4" | "gemini";
   visionatiLanguage?: string;
   visionatiPrompt?: string;
   visionatiTimeout?: number;
   visionatiMaxConcurrent?: number;
+  // Visionati cache configuration
+  visionatiCacheEnabled?: boolean;
+  visionatiCacheFile?: string;
+  visionatiCacheTTL?: number;
 }
 
 /**
@@ -141,13 +187,13 @@ export interface ConversionResult {
 /**
  * Frontmatter field value types
  */
-export type FrontmatterValue = 
-  | string 
-  | number 
-  | boolean 
-  | string[] 
+export type FrontmatterValue =
+  | string
+  | number
+  | boolean
+  | string[]
   | Record<string, string | number | boolean>
-  | null 
+  | null
   | undefined;
 
 /**
@@ -158,22 +204,22 @@ export type FrontmatterGetter = (post: Post) => FrontmatterValue;
 /**
  * Available blog categories (German)
  */
-export type BlogCategory = 
-  | 'Ernährung'
-  | 'Gesundheit'
-  | 'Wellness'
-  | 'Mentale Gesundheit'
-  | 'Fitness'
-  | 'Immunsystem'
-  | 'Prävention'
-  | 'Naturheilkunde'
-  | 'Organsysteme'
-  | 'Wissenschaftliches';
+export type BlogCategory =
+  | "Ernährung"
+  | "Gesundheit"
+  | "Wellness"
+  | "Mentale Gesundheit"
+  | "Fitness"
+  | "Immunsystem"
+  | "Prävention"
+  | "Naturheilkunde"
+  | "Organsysteme"
+  | "Wissenschaftliches";
 
 /**
  * Blog post group classification
  */
-export type BlogGroup = 'pro' | 'kontra' | 'fragezeiten';
+export type BlogGroup = "pro" | "kontra" | "fragezeiten";
 
 /**
  * Hero image configuration
@@ -200,4 +246,19 @@ export interface BlogFrontmatter {
   heroImage: HeroImage;
   draft: boolean;
   featured: boolean;
+}
+
+/**
+ * CLI wizard option configuration
+ */
+export interface WizardOption {
+  name: string;
+  type: "boolean" | "file" | "folder";
+  description: string;
+  default: boolean | string;
+  aliases?: string[];
+  prompt?: string;
+  coerce?: (value: string) => boolean | string;
+  validate?: (value: string) => boolean | string;
+  isProvided?: boolean;
 }
