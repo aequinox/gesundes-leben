@@ -18,12 +18,22 @@ export default (post: Post): { src: string; alt: string } | undefined => {
 
   // Check if we have AI-enhanced metadata for this image
   if (post.meta.aiImageMetadata) {
-    // Find the hero image URL in imageUrls and get AI metadata
-    const heroImageUrl = post.meta.imageUrls.find(
+    // First try to find URL by enhanced filename
+    let heroImageUrl = post.meta.imageUrls.find(
       (url: string) =>
         url.endsWith(post.meta.coverImage || "") ||
         url.includes(post.meta.coverImage || "")
     );
+
+    // If not found, try to find by matching AI-enhanced filename in metadata
+    if (!heroImageUrl) {
+      for (const [url, metadata] of post.meta.aiImageMetadata.entries()) {
+        if (metadata.filename === post.meta.coverImage) {
+          heroImageUrl = url;
+          break;
+        }
+      }
+    }
 
     if (heroImageUrl && post.meta.aiImageMetadata.has(heroImageUrl)) {
       const aiMetadata = post.meta.aiImageMetadata.get(heroImageUrl);
