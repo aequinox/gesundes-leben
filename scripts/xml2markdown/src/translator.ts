@@ -70,8 +70,9 @@ function initTurndownService(): ExtendedTurndownService {
     codeBlockStyle: "fenced",
   });
 
-  // Use gfm plugin correctly - call it to get the actual plugin
-  turndownService.use(gfm());
+  // Use gfm plugin correctly - invoke it with the service
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (gfm as any)(turndownService);
 
   // preserve embedded tweets
   turndownService.addRule("tweet", {

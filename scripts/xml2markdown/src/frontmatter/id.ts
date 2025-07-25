@@ -14,7 +14,7 @@ export default idGetter;
 
 /* Alternative implementation using WordPress post ID:
 module.exports = (post) => {
-  if (!post.data.post_id || !post.data.post_id[0]) {
+  if (!post.data.post_id?.[0]) {
     throw new ConversionError("Post ID is missing");
   }
   return post.data.post_id[0];

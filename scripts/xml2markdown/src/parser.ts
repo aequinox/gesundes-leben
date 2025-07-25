@@ -359,11 +359,23 @@ async function parseFilePromise(config: XmlConverterConfig): Promise<Post[]> {
   try {
     logger.info("Parsing...");
     const content = await fs.promises.readFile(config.input, "utf8");
+    logger.info(`📄 XML file size: ${Math.round(content.length / 1024)}KB`);
+    
     const allData = await xml2js.parseStringPromise(content, {
       trim: true,
       tagNameProcessors: [xml2js.processors.stripPrefix],
     });
+    
+    if (!allData?.rss?.channel?.[0]) {
+      throw new Error("Invalid WordPress XML structure: missing rss.channel");
+    }
+    
     const channelData = allData.rss.channel[0].item as RawXmlItem[];
+    if (!channelData) {
+      throw new Error("No items found in WordPress XML channel");
+    }
+    
+    logger.info(`📋 Found ${channelData.length} items in XML`);
 
     const postTypes = getPostTypes(channelData, config);
     const posts = collectPosts(channelData, postTypes, config);
@@ -384,6 +396,7 @@ async function parseFilePromise(config: XmlConverterConfig): Promise<Post[]> {
 
     return completePosts;
   } catch (error) {
+    logger.error("❌ XML parsing failed:", error);
     throw new XmlConversionError("Failed to parse WordPress export file", {
       originalError: error,
     });
