@@ -82,14 +82,14 @@ async function writeFilesPromise(
  */
 async function processPayloadsPromise<T>(
   payloads: Payload<T>[],
-  loadFunc: (item: T) => Promise<string | Buffer>
+  loadFunc: (item: T) => Promise<string | Buffer> | string | Buffer
 ): Promise<void> {
   const promises = payloads.map(
     payload =>
       new Promise((resolve, reject) => {
         setTimeout(async () => {
           try {
-            const data = await loadFunc(payload.item);
+            const data = await Promise.resolve(loadFunc(payload.item));
             await writeFile(payload.destinationPath, data);
             logger.success(`${chalk.green("[OK]")} ${payload.name}`);
             resolve(undefined);
@@ -152,18 +152,17 @@ async function writeMarkdownFilesPromise(
       // already exists, don't need to save again
       skipCount++;
       return [];
-    } else {
-      const payload: Payload<Post> = {
-        item: post,
-        name:
-          (config.includeOtherTypes ? `${post.meta.type} - ` : "") +
-          post.meta.slug,
-        destinationPath,
-        delay,
-      };
-      delay += settings.markdown_file_write_delay;
-      return [payload];
     }
+    const payload: Payload<Post> = {
+      item: post,
+      name:
+        (config.includeOtherTypes ? `${post.meta.type} - ` : "") +
+        post.meta.slug,
+      destinationPath,
+      delay,
+    };
+    delay += settings.markdown_file_write_delay;
+    return [payload];
   });
 
   const remainingCount = payloads.length;
@@ -180,7 +179,7 @@ async function writeMarkdownFilesPromise(
 /**
  * Load markdown content for a post with proper YAML formatting for Healthy Life blog
  */
-async function loadMarkdownFilePromise(post: Post): Promise<string> {
+function loadMarkdownFilePromise(post: Post): string {
   let output = "---\n";
 
   Object.entries(post.frontmatter).forEach(([key, value]) => {
@@ -202,12 +201,12 @@ async function loadMarkdownFilePromise(post: Post): Promise<string> {
       // Handle objects like heroImage: { src: "...", alt: "..." }
       if (key === "heroImage") {
         const heroImage = value as { src?: string; alt?: string };
-        outputValue = `\n  src: ${heroImage.src || ""}\n  alt: ${(heroImage.alt || "").replace(/"/g, '\\"')}`;
+        outputValue = `\n  src: ${heroImage.src ?? ""}\n  alt: ${(heroImage.alt ?? "").replace(/"/g, '\\"')}`;
       } else {
         // Generic object handling
         outputValue = `\n${Object.entries(value)
           .map(([objKey, objValue]) => {
-            const cleanValue = (objValue || "").toString().replace(/"/g, '\\"');
+            const cleanValue = (objValue ?? "").toString().replace(/"/g, '\\"');
             return `  ${objKey}: ${cleanValue}`;
           })
           .join("\n")}`;
@@ -217,7 +216,7 @@ async function loadMarkdownFilePromise(post: Post): Promise<string> {
       outputValue = value.toString();
     } else {
       // single string/number value
-      const escapedValue = (value || "").toString().replace(/"/g, '\\"');
+      const escapedValue = (value ?? "").toString().replace(/"/g, '\\"');
       if (escapedValue.length > 0) {
         // Don't quote boolean-like strings, numbers, or certain special values
         if (
@@ -323,42 +322,46 @@ async function writeImageFilesPromise(
   });
 
   // Process each post's images
-  for (const [imagesDir, urls] of processedByPost) {
-    try {
-      const processedImages = await imageProcessor.processImages(
-        urls,
-        imagesDir
-      );
+  const directoryProcessingPromises = Array.from(processedByPost.entries()).map(
+    async ([imagesDir, urls]) => {
+      try {
+        const processedImages = await imageProcessor.processImages(
+          urls,
+          imagesDir
+        );
 
-      // Save processed images to disk
-      await Promise.all(
-        processedImages.map(async processedImage => {
-          if (processedImage.data && processedImage.data.length > 0) {
-            try {
-              await fs.promises.writeFile(
-                processedImage.destinationPath,
-                processedImage.data
-              );
-              xmlLogger.debug(`💾 Saved: ${processedImage.finalFilename}`);
-            } catch (error) {
-              xmlLogger.error(
-                `❌ Failed to save ${processedImage.finalFilename}:`,
-                error
-              );
+        // Save processed images to disk
+        await Promise.all(
+          processedImages.map(async processedImage => {
+            if (processedImage.data && processedImage.data.length > 0) {
+              try {
+                await fs.promises.writeFile(
+                  processedImage.destinationPath,
+                  processedImage.data
+                );
+                xmlLogger.debug(`💾 Saved: ${processedImage.finalFilename}`);
+              } catch (error) {
+                xmlLogger.error(
+                  `❌ Failed to save ${processedImage.finalFilename}:`,
+                  error
+                );
+              }
             }
-          }
-        })
-      );
+          })
+        );
 
-      // Update post metadata with AI-enhanced information
-      await updatePostsWithImageMetadata(posts, processedImages, imagesDir);
-    } catch (error) {
-      xmlLogger.error(
-        `❌ Failed to process images for directory ${imagesDir}:`,
-        error
-      );
+        // Update post metadata with AI-enhanced information
+        await updatePostsWithImageMetadata(posts, processedImages, imagesDir);
+      } catch (error) {
+        xmlLogger.error(
+          `❌ Failed to process images for directory ${imagesDir}:`,
+          error
+        );
+      }
     }
-  }
+  );
+  
+  await Promise.all(directoryProcessingPromises);
 
   // Log final statistics
   const stats = imageProcessor.getStats();
@@ -418,9 +421,7 @@ async function updatePostsWithImageMetadata(
         const processedImage = imageMap.get(imageUrl);
         if (processedImage) {
           // Store AI-enhanced metadata for use in content generation
-          if (!post.meta.aiImageMetadata) {
-            post.meta.aiImageMetadata = new Map();
-          }
+          post.meta.aiImageMetadata ??= new Map();
 
           post.meta.aiImageMetadata.set(imageUrl, {
             altText: processedImage.altText,
@@ -439,15 +440,15 @@ async function updatePostsWithImageMetadata(
             post.imageImports.forEach(imageImport => {
               // Check if this import matches the original filename
               const originalFilename =
-                processedImage.originalFilename ||
+                processedImage.originalFilename ??
                 processedImage.originalUrl.split("/").pop();
 
               // More flexible matching to handle different path formats
               const importFilename =
-                imageImport.filename || imageImport.path.split("/").pop();
+                imageImport.filename ?? imageImport.path.split("/").pop();
               const matches =
                 importFilename === originalFilename ||
-                imageImport.path.includes(originalFilename || "") ||
+                imageImport.path.includes(originalFilename ?? "") ||
                 (importFilename &&
                   originalFilename &&
                   importFilename.toLowerCase() ===
@@ -526,7 +527,7 @@ async function updatePostsWithImageMetadata(
  */
 function getPostPath(post: Post, config: XmlConverterConfig): string {
   // Use pubDatetime field instead of date (matches FRONTMATTER_FIELDS config)
-  const dateValue = (post.frontmatter.pubDatetime ||
+  const dateValue = (post.frontmatter.pubDatetime ??
     post.frontmatter.date) as string;
 
   let dt;
@@ -579,8 +580,8 @@ function getPostPath(post: Post, config: XmlConverterConfig): string {
 /**
  * Check if a file exists
  */
-function checkFile(path: string): boolean {
-  return fs.existsSync(path);
+function checkFile(filePath: string): boolean {
+  return fs.existsSync(filePath);
 }
 
 export { writeFilesPromise };

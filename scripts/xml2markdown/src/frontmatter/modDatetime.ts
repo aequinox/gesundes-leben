@@ -8,7 +8,7 @@ import { formatDate } from "./utils/dateFormatter.js";
  * Uses publication date as WordPress doesn't reliably store modification dates
  */
 export default (post: Post): string => {
-  if (!post.data.pubDate || !post.data.pubDate[0]) {
+  if (!post.data.pubDate?.[0]) {
     throw new XmlValidationError("Post modification date is missing", {
       field: "modDate",
     });

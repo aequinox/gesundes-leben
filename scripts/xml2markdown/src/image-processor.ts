@@ -91,8 +91,8 @@ export class ImageProcessor {
       if (this.config.visionatiCacheEnabled !== false) {
         const cacheConfig = {
           enabled: true,
-          cacheFile: this.config.visionatiCacheFile || ".visionati-cache.json",
-          ttlDays: this.config.visionatiCacheTTL || 30,
+          cacheFile: this.config.visionatiCacheFile ?? ".visionati-cache.json",
+          ttlDays: this.config.visionatiCacheTTL ?? 30,
         };
 
         this.cacheService = new CacheService(cacheConfig);
@@ -105,11 +105,11 @@ export class ImageProcessor {
 
       const visionatiConfig: VisionatiConfig = {
         apiKey: this.config.visionatiApiKey,
-        backend: this.config.visionatiBackend || "claude",
-        language: this.config.visionatiLanguage || "de",
+        backend: this.config.visionatiBackend ?? "claude",
+        language: this.config.visionatiLanguage ?? "de",
         prompt: this.config.visionatiPrompt,
-        timeout: this.config.visionatiTimeout || 30000,
-        maxConcurrent: this.config.visionatiMaxConcurrent || 5,
+        timeout: this.config.visionatiTimeout ?? 30000,
+        maxConcurrent: this.config.visionatiMaxConcurrent ?? 5,
         retryAttempts: 3,
       };
 
@@ -157,7 +157,7 @@ export class ImageProcessor {
     await this.ensureDirectory(destinationDir);
 
     const results: ProcessedImage[] = [];
-    const batchSize = this.config.visionatiMaxConcurrent || 5;
+    const batchSize = this.config.visionatiMaxConcurrent ?? 5;
     const totalBatches = Math.ceil(uniqueUrls.length / batchSize);
     let processedBatches = 0;
 
@@ -218,7 +218,7 @@ export class ImageProcessor {
   async processImageWithRetry(
     imageUrl: string,
     destinationDir: string,
-    _batchIndex: number = 0
+_batchIndex = 0
   ): Promise<ProcessedImage> {
     let lastError: Error | null = null;
     
@@ -248,7 +248,7 @@ export class ImageProcessor {
     }
     
     // Return error result if all retries failed
-    return this.createErrorResult(imageUrl, lastError?.message || "Unknown error");
+    return this.createErrorResult(imageUrl, lastError?.message ?? "Unknown error");
   }
 
   /**
@@ -298,8 +298,8 @@ export class ImageProcessor {
         altText,
         destinationPath,
         data: imageData,
-        aiEnhanced: Boolean(aiMetadata) && !aiMetadata?.error,
-        creditsUsed: aiMetadata?.creditsUsed || 0,
+        aiEnhanced: Boolean(aiMetadata) && !(aiMetadata?.error),
+        creditsUsed: aiMetadata?.creditsUsed ?? 0,
         processingTimeMs: processingTime,
         fileSizeBytes: imageData.length,
       };
@@ -429,7 +429,7 @@ export class ImageProcessor {
    * @private
    */
   private sanitizeFilename(filename: string): string {
-    const name = path.parse(filename).name;
+    const { name } = path.parse(filename);
     const ext = path.extname(filename) || ".jpg";
 
     const sanitized = name
@@ -558,10 +558,10 @@ export class ImageProcessor {
         };
         if (cacheStats.enabled) {
           xmlLogger.info(
-            `   • Cache entries: ${cacheStats.validEntries || 0} valid, ${cacheStats.expiredEntries || 0} expired`
+            `   • Cache entries: ${cacheStats.validEntries ?? 0} valid, ${cacheStats.expiredEntries ?? 0} expired`
           );
           xmlLogger.info(
-            `   • Credits saved by cache: ${cacheStats.totalCreditsSaved || 0}`
+            `   • Credits saved by cache: ${cacheStats.totalCreditsSaved ?? 0}`
           );
         }
       }
@@ -593,7 +593,7 @@ export class ImageProcessor {
         this.processedCount > 0
           ? (this.aiEnhancedCount / this.processedCount) * 100
           : 0,
-      visionatiStats: this.visionatiService?.getStats() || null,
+      visionatiStats: this.visionatiService?.getStats() ?? null,
     };
   }
 

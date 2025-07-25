@@ -29,7 +29,7 @@ export default (post: Post): string[] => {
           meta.meta_key[0] === "_yoast_wpseo_focuskw" ||
           meta.meta_key[0] === "keywords"
       );
-      if (keywordsMeta && keywordsMeta.meta_value[0]) {
+      if (keywordsMeta?.meta_value?.[0]) {
         const metaKeywords = keywordsMeta.meta_value[0]
           .split(",")
           .map((keyword: string) => keyword.trim())

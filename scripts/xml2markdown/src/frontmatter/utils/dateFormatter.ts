@@ -1,8 +1,8 @@
 import * as luxon from "luxon";
 
 import { XmlConversionError } from "../../errors.js";
-import * as settings from "../../settings.js";
 import logger from "../../logger.js";
+import * as settings from "../../settings.js";
 
 /**
  * Format a date from RFC2822 format according to settings
@@ -38,11 +38,11 @@ function formatDate(dateStr: string, fieldName: string): string {
 
     if (settings.custom_date_formatting) {
       return dateTime.toFormat(settings.custom_date_formatting);
-    } else if (settings.include_time_with_date) {
-      return dateTime.toISO();
-    } else {
-      return dateTime.toISODate();
     }
+    if (settings.include_time_with_date) {
+      return dateTime.toISO();
+    }
+    return dateTime.toISODate();
   } catch (error) {
     if (error instanceof XmlConversionError) {
       throw error;

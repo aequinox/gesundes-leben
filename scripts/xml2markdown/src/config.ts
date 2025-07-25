@@ -13,10 +13,10 @@ export const XmlConverterConfigSchema = z.object({
   // Required file paths with validation
   input: z.string()
     .min(1, "Input file path is required")
-    .refine(async (path) => {
+    .refine(async (inputPath) => {
       try {
-        await fs.promises.access(path, fs.constants.R_OK);
-        return path.toLowerCase().endsWith('.xml');
+        await fs.promises.access(inputPath, fs.constants.R_OK);
+        return inputPath.toLowerCase().endsWith('.xml');
       } catch {
         return false;
       }
@@ -24,9 +24,9 @@ export const XmlConverterConfigSchema = z.object({
     
   output: z.string()
     .min(1, "Output directory path is required")
-    .transform((path) => {
+    .transform((outputPath) => {
       // Resolve relative paths to absolute
-      return path.startsWith('/') ? path : process.cwd() + '/' + path;
+      return outputPath.startsWith('/') ? outputPath : `${process.cwd()}/${outputPath}`;
     }),
     
   // File organization options
@@ -120,6 +120,47 @@ export const XmlConverterConfigSchema = z.object({
  * @throws {XmlValidationError} When configuration is invalid
  */
 /**
+ * Perform additional runtime validations
+ * @param config Validated configuration object
+ */
+async function performRuntimeValidations(config: XmlConverterConfig): Promise<void> {
+  const { XmlConfigurationError } = await import("./errors.js");
+  
+  // Validate input file exists and is readable
+  try {
+    const stats = await fs.promises.stat(config.input);
+    if (!stats.isFile()) {
+      throw XmlConfigurationError.forInvalidValue(
+        "input",
+        config.input,
+        "valid file path"
+      );
+    }
+  } catch (error) {
+    if (error instanceof XmlConfigurationError) {
+      throw error;
+    }
+    throw XmlConfigurationError.forInvalidValue(
+      "input",
+      config.input,
+      "accessible file path"
+    );
+  }
+  
+  // Validate output directory can be created
+  try {
+    await fs.promises.mkdir(config.output, { recursive: true });
+    await fs.promises.access(config.output, fs.constants.W_OK);
+  } catch {
+    throw XmlConfigurationError.forInvalidValue(
+      "output",
+      config.output,
+      "writable directory path"
+    );
+  }
+}
+
+/**
  * Enhanced configuration validation with detailed error reporting
  * @param config - Configuration object to validate
  * @returns Promise resolving to validated configuration
@@ -172,47 +213,6 @@ export async function validateConfig(
     throw new XmlConfigurationError("Unexpected configuration error", {
       originalError: error,
     });
-  }
-}
-
-/**
- * Perform additional runtime validations
- * @param config Validated configuration object
- */
-async function performRuntimeValidations(config: XmlConverterConfig): Promise<void> {
-  const { XmlConfigurationError } = await import("./errors.js");
-  
-  // Validate input file exists and is readable
-  try {
-    const stats = await fs.promises.stat(config.input);
-    if (!stats.isFile()) {
-      throw XmlConfigurationError.forInvalidValue(
-        "input",
-        config.input,
-        "valid file path"
-      );
-    }
-  } catch (error) {
-    if (error instanceof XmlConfigurationError) {
-      throw error;
-    }
-    throw XmlConfigurationError.forInvalidValue(
-      "input",
-      config.input,
-      "accessible file path"
-    );
-  }
-  
-  // Validate output directory can be created
-  try {
-    await fs.promises.mkdir(config.output, { recursive: true });
-    await fs.promises.access(config.output, fs.constants.W_OK);
-  } catch {
-    throw XmlConfigurationError.forInvalidValue(
-      "output",
-      config.output,
-      "writable directory path"
-    );
   }
 }
 

@@ -13,7 +13,7 @@ import type { Post } from "../types.js";
  * @throws {ConversionError} When date parsing fails
  */
 export default (post: Post): string => {
-  if (!post.data.pubDate || !post.data.pubDate[0]) {
+  if (!post.data.pubDate?.[0]) {
     throw new XmlValidationError("Post publication date is missing", {
       field: "pubDate",
     });
@@ -33,11 +33,11 @@ export default (post: Post): string => {
 
     if (settings.custom_date_formatting) {
       return dateTime.toFormat(settings.custom_date_formatting);
-    } else if (settings.include_time_with_date) {
-      return dateTime.toISO();
-    } else {
-      return dateTime.toISODate();
     }
+    if (settings.include_time_with_date) {
+      return dateTime.toISO();
+    }
+    return dateTime.toISODate();
   } catch (error) {
     if (error instanceof XmlConversionError) {
       throw error;

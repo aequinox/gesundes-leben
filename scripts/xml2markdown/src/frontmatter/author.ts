@@ -7,7 +7,7 @@ import type { Post, FrontmatterGetter } from "../types.js";
  * @throws {ConversionError} When creator data is missing
  */
 const authorGetter: FrontmatterGetter = (post: Post): string => {
-  if (!post.data.creator || !post.data.creator[0]) {
+  if (!post.data.creator?.[0]) {
     throw new ConversionError("Post creator data is missing");
   }
 

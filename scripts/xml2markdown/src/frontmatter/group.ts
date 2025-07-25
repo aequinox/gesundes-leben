@@ -53,7 +53,7 @@ export default (post: Post): string => {
       const groupMeta = post.data.postmeta.find(
         meta => meta.meta_key[0] === "group" || meta.meta_key[0] === "_group"
       );
-      if (groupMeta && groupMeta.meta_value[0]) {
+      if (groupMeta?.meta_value?.[0]) {
         const metaGroup = groupMeta.meta_value[0].toLowerCase();
         if (["pro", "kontra", "fragezeiten"].includes(metaGroup)) {
           return metaGroup;
@@ -105,7 +105,7 @@ export default (post: Post): string => {
     }
 
     // Check post title for indicators
-    if (post.data.title && post.data.title[0]) {
+    if (post.data.title?.[0]) {
       const title = post.data.title[0].toLowerCase();
 
       // Question indicators

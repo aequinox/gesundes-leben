@@ -21,8 +21,8 @@ export default (post: Post): { src: string; alt: string } | undefined => {
     // First try to find URL by enhanced filename
     let heroImageUrl = post.meta.imageUrls.find(
       (url: string) =>
-        url.endsWith(post.meta.coverImage || "") ||
-        url.includes(post.meta.coverImage || "")
+        url.endsWith(post.meta.coverImage ?? "") ||
+        url.includes(post.meta.coverImage ?? "")
     );
 
     // If not found, try to find by matching AI-enhanced filename in metadata
@@ -36,10 +36,10 @@ export default (post: Post): { src: string; alt: string } | undefined => {
     }
 
     if (heroImageUrl && post.meta.aiImageMetadata.has(heroImageUrl)) {
-      const aiMetadata = post.meta.aiImageMetadata.get(heroImageUrl);
-      if (aiMetadata) {
-        altText = aiMetadata.altText;
-        actualFilename = aiMetadata.filename; // Use AI-enhanced filename
+      const { altText: aiAltText, filename: aiFilename } = post.meta.aiImageMetadata.get(heroImageUrl) ?? {};
+      if (aiAltText && aiFilename) {
+        altText = aiAltText;
+        actualFilename = aiFilename; // Use AI-enhanced filename
       }
     }
   }
@@ -54,7 +54,7 @@ export default (post: Post): { src: string; alt: string } | undefined => {
         (meta as unknown as { post_id?: string }).post_id ===
           post.meta.coverImageId
     );
-    if (altMeta && altMeta.meta_value[0]) {
+    if (altMeta?.meta_value?.[0]) {
       altText = decodeURIComponent(altMeta.meta_value[0]);
     }
   }
@@ -71,7 +71,7 @@ export default (post: Post): { src: string; alt: string } | undefined => {
 
     if (cleanName && cleanName.length > 3) {
       altText = cleanName;
-    } else if (post.data.title && post.data.title[0]) {
+    } else if (post.data.title?.[0]) {
       // Fallback to post title
       altText = `Beitragsbild für: ${post.data.title[0]}`;
     } else {

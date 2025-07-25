@@ -8,7 +8,7 @@ import type { Post, FrontmatterGetter } from "../types.js";
  * @throws {ConversionError} When title is missing
  */
 const titleGetter: FrontmatterGetter = (post: Post): string => {
-  if (!post.data.title || !post.data.title[0]) {
+  if (!post.data.title?.[0]) {
     throw new ConversionError("Post title is missing");
   }
 

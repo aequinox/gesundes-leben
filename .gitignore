@@ -40,7 +40,7 @@ tests/performance/baseline-*.json
 # test coverage and reports
 coverage/
 html/
-tsconfig.tsbuildinfo
+**/tsconfig.tsbuildinfo
 
 # WordPress export files
 xml/

@@ -6,7 +6,7 @@ import type { Post } from "../types.js";
  * Returns true if post status is not "publish"
  */
 export default (post: Post): boolean => {
-  if (!post.data.status || !post.data.status[0]) {
+  if (!post.data.status?.[0]) {
     throw new XmlConversionError("Post status is missing");
   }
 

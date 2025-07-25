@@ -7,7 +7,7 @@ import type { Post } from "../types.js";
  * This value is already validated by the parser's getPostTypes function
  */
 export default (post: Post): string => {
-  if (!post.data.post_type || !post.data.post_type[0]) {
+  if (!post.data.post_type?.[0]) {
     throw new ConversionError("Post type is missing");
   }
 

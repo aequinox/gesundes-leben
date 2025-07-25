@@ -32,7 +32,7 @@ import { writeFilesPromise } from "./writer.js";
  * console.log(`Processed ${result.postsProcessed} posts`);
  * ```
  */
-export async function convertXmlToMdx(
+export function convertXmlToMdx(
   config: Partial<XmlConverterConfig>
 ): Promise<ConversionResult> {
   return handleAsync(async () => {

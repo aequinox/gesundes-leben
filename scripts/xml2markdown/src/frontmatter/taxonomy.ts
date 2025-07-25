@@ -34,7 +34,7 @@ export default (post: Post): string[] => {
       })
       .map((category: WordPressCategoryData) => {
         if (isAltFormat(category)) {
-          return decodeURIComponent(category.$.nicename || category._);
+          return decodeURIComponent(category.$.nicename ?? category._);
         }
         return decodeURIComponent(category["@_nicename"]);
       });

@@ -7,7 +7,7 @@ import { formatDate } from "./utils/dateFormatter.js";
  * Get post publication date/time
  */
 export default (post: Post): string => {
-  if (!post.data.pubDate || !post.data.pubDate[0]) {
+  if (!post.data.pubDate?.[0]) {
     throw new XmlValidationError("Post publication date is missing", {
       field: "pubDate",
     });

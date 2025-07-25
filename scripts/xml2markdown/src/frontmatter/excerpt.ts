@@ -6,7 +6,7 @@ import type { Post } from "../types.js";
  * Replaces all consecutive newlines with a single space
  */
 export default (post: Post): string | undefined => {
-  if (!post.data.encoded || !post.data.encoded[1]) {
+  if (!post.data.encoded?.[1]) {
     throw new ConversionError("Post excerpt is missing");
   }
 
