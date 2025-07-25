@@ -330,13 +330,19 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
       
       // Try different response structures
       if (typedResponse.all?.assets && typedResponse.all.assets.length > 0) {
-        // Original expected format
-        const descriptions = typedResponse.all.assets[0].descriptions || [];
-        if (descriptions.length === 0) {
-          throw new Error("No descriptions found in API response");
+        // Handle the current API format: all.assets[].descriptions[].description
+        const asset = typedResponse.all.assets[0];
+        if (asset.descriptions && asset.descriptions.length > 0) {
+          const desc = asset.descriptions[0];
+          if (desc && desc.description) {
+            description = desc.description;
+            creditsUsed = typedResponse.credits_paid || typedResponse.credits_used || 1;
+          } else {
+            throw new Error("Description object found but no description text");
+          }
+        } else {
+          throw new Error("Asset found but no descriptions array");
         }
-        description = descriptions[0].description;
-        creditsUsed = typedResponse.credits_paid || 1;
       } else if (typedResponse.result) {
         // Alternative format: direct result field
         description = typedResponse.result;

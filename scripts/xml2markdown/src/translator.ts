@@ -70,7 +70,7 @@ function initTurndownService(): ExtendedTurndownService {
     codeBlockStyle: "fenced",
   });
 
-  turndownService.use(gfm);
+  turndownService.use(gfm());
 
   // preserve embedded tweets
   turndownService.addRule("tweet", {

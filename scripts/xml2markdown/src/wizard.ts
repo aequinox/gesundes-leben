@@ -1,5 +1,4 @@
 import fs from "fs";
-import { createRequire } from "module";
 import path from "path";
 
 import camelcase from "camelcase";
@@ -10,8 +9,13 @@ import { ConversionError } from "./errors.js";
 import logger from "./logger.js";
 import type { WizardOption, XmlConverterConfig } from "./types.js";
 
-const require = createRequire(import.meta.url);
-const pkgJson = require("../package.json");
+// Use import.meta.resolve to find package.json relative to current module
+const pkgJson = JSON.parse(
+  fs.readFileSync(
+    new URL("../package.json", import.meta.url),
+    "utf8"
+  )
+);
 
 const options: WizardOption[] = [
   // wizard must always be first
