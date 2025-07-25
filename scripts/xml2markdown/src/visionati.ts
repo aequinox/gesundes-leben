@@ -169,6 +169,7 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
     for (const batch of batches) {
       xmlLogger.debug(`📦 Processing batch of ${batch.length} images`);
       const batchPromises = batch.map(url => this.generateAltText(url));
+       
       const batchResults = await Promise.allSettled(batchPromises);
 
       batchResults.forEach((result, index) => {
@@ -185,9 +186,11 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
         }
       });
 
-      // Small delay between batches to respect rate limits
-      if (batches.indexOf(batch) < batches.length - 1) {
-        await this.delay(1000);
+      // Optional delay between batches for rate limiting (configurable)
+      if (batches.indexOf(batch) < batches.length - 1 && batches.length > 2) {
+        // Only add delay for large batch operations to avoid overwhelming the API
+         
+        await this.delay(500); // Reduced delay for better performance
       }
     }
 
@@ -272,6 +275,7 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
 
     for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
       try {
+         
         const response = await axios(config);
 
         if (response.status === 200 && response.data) {
@@ -287,6 +291,7 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
           xmlLogger.warn(
             `🔄 Retry attempt ${attempt}/${this.retryAttempts} for ${imageUrl} in ${delay}ms`
           );
+           
           await this.delay(delay);
         }
       }
@@ -653,6 +658,7 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
       try {
         xmlLogger.debug(`🔄 Polling attempt ${attempt}/${maxPollingAttempts}: ${responseUri}`);
         
+         
         const response = await axios({
           method: "GET",
           url: responseUri,
@@ -667,6 +673,7 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
           // Check if we got actual results or if it's still processing
           if (response.data.status === "processing") {
             xmlLogger.debug(`⏳ Still processing, waiting ${pollingInterval}ms...`);
+             
             await this.delay(pollingInterval);
             continue;
           }
@@ -682,6 +689,7 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
         }
         
         xmlLogger.warn(`⚠️ Polling attempt ${attempt} failed, retrying...`);
+         
         await this.delay(pollingInterval);
       }
     }

@@ -183,6 +183,7 @@ export class ImageProcessor {
         this.processImageWithRetry(url, destinationDir, index)
       );
       
+       
       const batchResults = await Promise.allSettled(batchPromises);
 
       batchResults.forEach((result, index) => {
@@ -235,9 +236,11 @@ _batchIndex = 0
         if (attempt > 0) {
           const delay = this.baseRetryDelayMs * Math.pow(2, attempt - 1);
           xmlLogger.debug(`⏳ Retrying image processing after ${delay}ms delay: ${imageUrl}`);
+           
           await this.sleep(delay);
         }
         
+         
         return await this.processImage(imageUrl, destinationDir);
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
