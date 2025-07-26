@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitest/config';
+import path from 'path';
 
 export default defineConfig({
   test: {
@@ -42,17 +43,17 @@ export default defineConfig({
       'src/**/*.test.{js,ts}',
       'tests/**/*.test.{js,ts}'
     ],
-    environment: 'happy-dom',
-    
-    resolve: {
-      alias: {
-        '@': './src',
-        '@/config': './src/config',
-        '@/utils': './src/utils',
-        '@/types': './src/types',
-        '@/data': './src/data',
-        '@tests': './tests'
-      }
+    environment: 'happy-dom'
+  },
+
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@/config': path.resolve(__dirname, './src/config.ts'),
+      '@/utils': path.resolve(__dirname, './src/utils'),
+      '@/types': path.resolve(__dirname, './src/types'),
+      '@/data': path.resolve(__dirname, './src/data'),
+      '@tests': path.resolve(__dirname, './tests')
     }
   },
 

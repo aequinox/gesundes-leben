@@ -1,5 +1,17 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+// Use mocked LOCALE from vitest setup
+vi.mock("@/config", () => ({
+  LOCALE: {
+    lang: "de",
+    langTag: ["de-DE"],
+  },
+  SITE: {
+    title: "Healthy Life Test",
+  },
+}));
+
+// Import the mocked LOCALE for test usage
 import { LOCALE } from "@/config";
 
 import { clearDateFormatterCache, createSafeDate, formatDate } from "../date";
@@ -162,6 +174,67 @@ describe("date utilities", () => {
 
       // Restore original
       (LOCALE as any).langTag = originalLangTag;
+    });
+
+    it("should handle string langTag configuration", () => {
+      let calledWith: any = null;
+
+      // Mock string langTag
+      const originalLangTag = LOCALE.langTag;
+      (LOCALE as any).langTag = "de-DE";
+
+      Intl.DateTimeFormat = function (locale: any, options: any) {
+        calledWith = { locale, options };
+        return {
+          format: () => "15. Jan 2025",
+        } as any;
+      } as any;
+
+      formatDate(testDate);
+
+      expect(calledWith?.locale).toBe("de-DE");
+
+      // Restore original
+      (LOCALE as any).langTag = originalLangTag;
+    });
+  });
+
+  describe("Cache functionality", () => {
+    it("should clear the date formatter cache", () => {
+      // Use date utilities to populate cache
+      formatDate(new Date("2024-01-15"));
+
+      // Clear the cache
+      clearDateFormatterCache();
+
+      // This should work without error, indicating cache was cleared
+      expect(() => clearDateFormatterCache()).not.toThrow();
+    });
+
+    it("should handle date formatter caching", () => {
+      // Format the same date multiple times to test caching
+      const date = new Date("2024-01-15");
+      const result1 = formatDate(date);
+      const result2 = formatDate(date);
+
+      expect(result1).toBe(result2);
+      expect(typeof result1).toBe("string");
+    });
+
+    it("should handle edge cases in date formatting", () => {
+      // Test various edge cases
+      const edgeCases = [
+        "2024-01-01T00:00:00.000Z",
+        "2024-12-31T23:59:59.999Z",
+        1704067200000, // Timestamp
+        new Date(2024, 0, 1), // Date object
+      ];
+
+      edgeCases.forEach(dateInput => {
+        const safeDate = createSafeDate(dateInput);
+        const formatted = formatDate(safeDate);
+        expect(typeof formatted).toBe("string");
+      });
     });
   });
 });

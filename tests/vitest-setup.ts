@@ -63,10 +63,11 @@ global.performance = {
   clearMeasures: vi.fn()
 };
 
-// Mock URL constructor for health blog routing tests
-global.URL = class URL {
+// Mock URL constructor for health blog routing tests  
+const OriginalURL = globalThis.URL;
+global.URL = class URL extends OriginalURL {
   constructor(url: string, base?: string) {
-    return new (globalThis as unknown as { URL: typeof URL }).URL(url, base);
+    super(url, base);
   }
 } as unknown as typeof URL;
 
