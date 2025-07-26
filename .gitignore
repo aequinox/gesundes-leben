@@ -44,6 +44,12 @@ html/
 **/.tsbuildinfo
 *.tsbuildinfo
 
+# Playwright test results and artifacts
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
 # WordPress export files
 xml/
 
