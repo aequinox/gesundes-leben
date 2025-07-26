@@ -47,6 +47,10 @@ draft: false
 featured: false
 ---
 
+import List from "@/components/sections/List.astro";
+import Blockquote from "@/components/elements/Blockquote.astro";
+import Accordion from "@/components/sections/Accordion.astro";
+
 ## Woran du erkennen kannst, dass dein Körper mehr Nährstoffe benötigt
 
 **und wie du einen Nährstoffmangel beheben kannst.**
@@ -54,6 +58,180 @@ featured: false
 Hast du dich jemals gefragt, ob dein Körper heimlich um Hilfe ruft? Manchmal sind die Anzeichen subtil, manchmal auch so offensichtlich wie ein rosa Elefant im Raum. Aber keine Sorge, es ist möglich, diese Warnzeichen zu entschlüsseln und sicherzustellen, dass du von dem Mangel in die Fülle kommst und dein Körper wieder vor Gesundheit strotzt. 
 
 Stell dir vor, dein Körper ist wie ein luxuriöses Auto. Du würdest es niemals mit minderwertigem Treibstoff füllen oder wichtige Wartungen vergessen, oder? Genau so solltest du auch deinen Körper behandeln. Nährstoffe sind das Lebenselixier, das dich auf Trab hält und es dir ermöglicht, all die erstaunlichen Dinge zu tun, die du liebst. Manchmal aber zeigt dein Körper kleine Warnzeichen, dass es ihm an bestimmten Nährstoffen mangelt. Hier zeige ich dir die 18 wichtigsten Anzeichen von Nährstoffmangel, damit du sie erkennen – und im Anschluss beheben kannst.
+
+<List
+  title="Die 18 wichtigsten Warnzeichen für Nährstoffmangel"
+  subtitle="Lerne die Signale deines Körpers zu verstehen und richtig zu deuten"
+  items={[
+    {
+      intro: "1. Fettige Haut",
+      content: "Übermäßig glänzende Haut durch hormonelle Ungleichgewichte",
+      subitems: [
+        { content: "Zinkmangel reguliert Androgene und Talgproduktion" },
+        { content: "Vitamin B2-Mangel kann fettige Haut begünstigen" },
+        { content: "Weiße Flecken auf den Nägeln als Zinkmangel-Hinweis" }
+      ]
+    },
+    {
+      intro: "2. Risse in Mundwinkeln/Fersen",
+      content: "Schmerzhafte kleine Hautrisse besonders im Winter",
+      subitems: [
+        { content: "Vitamin B2 (Riboflavin) oder B3-Mangel" },
+        { content: "Vitamin D-Mangel verstärkt das Problem" },
+        { content: "B-Vitamine sind essentiell für Zellreparatur" }
+      ]
+    },
+    {
+      intro: "3. Schuppige Haut", 
+      content: "Trockene, schuppige Haut um Nase oder Stirn",
+      subitems: [
+        { content: "Ungleichgewicht zwischen Omega-3 und Omega-6" },
+        { content: "Reduziere Omega-6 (frittierte Lebensmittel)" },
+        { content: "Erhöhe Omega-3 (fetter Fisch, Leinsamen)" }
+      ]
+    },
+    {
+      intro: "4. Gelbe Augen",
+      content: "Gelbliche Verfärbung des Augenweiß (Gelbsucht)",
+      subitems: [
+        { content: "Vitamin B12-Mangel kann megaloblastäre Anämie verursachen" },
+        { content: "Immer ärztlich abklären lassen!" },
+        { content: "Besonders Vegetarier/Veganer betroffen" }
+      ]
+    },
+    {
+      intro: "5. Chronischer Husten",
+      content: "Ständiges Kratzen im Hals oder anhaltender Husten",
+      subitems: [
+        { content: "Kalziummangel kann laryngeale Spasmen verursachen" },
+        { content: "Vitamin C-Mangel schwächt die Atemwege" },
+        { content: "200mg Kalzium vor dem Schlaf kann helfen" }
+      ]
+    },
+    {
+      intro: "6. Zahnfleischbluten",
+      content: "Geschwollenes oder blutendes Zahnfleisch",
+      subitems: [
+        { content: "Vitamin C-Mangel erhöht Gefäßdurchlässigkeit" },
+        { content: "Subklinischer Skorbut möglich" },
+        { content: "Zucker behindert Vitamin C-Aufnahme" }
+      ]
+    },
+    {
+      intro: "7. Spröde, rissige Lippen",
+      content: "Ständig trockene und aufgesprungene Lippen",
+      subitems: [
+        { content: "Vitamin B2 (Riboflavin) oder B6-Mangel" },
+        { content: "Zu viele raffinierte Getreideprodukte" },
+        { content: "Vollkornbrot und Nüsse helfen" }
+      ]
+    },
+    {
+      intro: "8. Bein-/Wadenkrämpfe",
+      content: "Nächtliche oder belastungsbedingte Muskelkrämpfe",
+      subitems: [
+        { content: "Magnesiummangel (bis zu 48% der Bevölkerung)" },
+        { content: "Kaliummangel durch Verluste möglich" },
+        { content: "Elektrolyt-Ungleichgewicht stört Muskelkontraktion" }
+      ]
+    },
+    {
+      intro: "9. Reizbarkeit",
+      content: "Häufige Gereiztheit oder übermäßige Wut",
+      subitems: [
+        { content: "Magnesium-, Omega-3- oder Vitamin B1-Mangel" },
+        { content: "Vitamin B1 (Thiamin) reduziert Grübeln" },
+        { content: "Nährhefe hilft bei Nervosität" }
+      ]
+    },
+    {
+      intro: "10. Asthma",
+      content: "Verstärkte asthmatische Symptome oder Atembeschwerden",
+      subitems: [
+        { content: "Vitamin D3-Mangel verschlimmert Entzündungen" },
+        { content: "Immunmodulatorische Wirkung auf Atemwege" },
+        { content: "Reduziert Exazerbationen und Kortisonbedarf" }
+      ]
+    },
+    {
+      intro: "11. Verlust äußerer Augenbrauen",
+      content: "Haarverlust besonders im äußeren Augenbrauendrittel",
+      subitems: [
+        { content: "Jodmangel führt zu Schilddrüsenunterfunktion" },
+        { content: "Baden-Württemberg ist Jod-Mangelgebiet" },
+        { content: "Auch Wimpern können betroffen sein" }
+      ]
+    },
+    {
+      intro: "12. Nachtblindheit",
+      content: "Schwierigkeiten beim Sehen in der Dämmerung",
+      subitems: [
+        { content: "Vitamin A-Mangel (Retinol) in tierischen Produkten" },
+        { content: "Beta-Carotin muss erst umgewandelt werden" },
+        { content: "Eigelb ist hervorragende Quelle" }
+      ]
+    }
+  ]}
+/>
+
+<List
+  items={[
+    {
+      intro: "13. Verlangen nach Eis",
+      content: "Starkes Verlangen nach Eis oder Non-Food-Artikeln",
+      subitems: [
+        { content: "Pica-Syndrom oft mit Eisenmangel verbunden" },
+        { content: "Pagophagie (Eisverlangen) häufig bei Anämie" },
+        { content: "Bluttest zur Eisenwert-Kontrolle empfohlen" }
+      ]
+    },
+    {
+      intro: "14. Depressionen",
+      content: "Niedergeschlagenheit und depressive Verstimmungen",
+      subitems: [
+        { content: "Vitamin D-Mangel senkt Serotoninspiegel" },
+        { content: "Serotonin als 'Glückshormon' wichtig" },
+        { content: "Wintermonate besonders betroffen" }
+      ]
+    },
+    {
+      intro: "15. Verspannungen/Rückenschmerzen",
+      content: "Besonders unterer Rücken, verstärkt im Winter",
+      subitems: [
+        { content: "Vitamin D-Mangel verursacht Muskelverspannungen" },
+        { content: "Vor dem Schlaf oder zu Mahlzeiten einnehmen" },
+        { content: "Dosierung nach aktuellem Blutwert berechnen" }
+      ]
+    },
+    {
+      intro: "16. Verlangen nach Salzigem", 
+      content: "Besonders nächtliche Gelüste auf salzige Snacks",
+      subitems: [
+        { content: "Natriummangel durch Sport und Schwitzen" },
+        { content: "Meer- oder Steinsalz bevorzugen" },
+        { content: "Salz-Mythos: Natürliches Salz ist gesund" }
+      ]
+    },
+    {
+      intro: "17. Erektionsstörung",
+      content: "Erektile Dysfunktion als mögliches Mangelsymptom",
+      subitems: [
+        { content: "Zinkmangel reduziert Testosteronproduktion" },
+        { content: "L-Arginin/L-Citrullin fördern NO-Synthese" },
+        { content: "Ginseng und Vitamin D3 können helfen" }
+      ]
+    },
+    {
+      intro: "18. Alpträume",
+      content: "Häufige Albträume oder unruhiger Schlaf",
+      subitems: [
+        { content: "Vitamin B1 (Thiamin) beruhigt die Amygdala" },
+        { content: "Nährhefe hilft bei Angstreaktionen" },
+        { content: "Zu viele raffinierte Kohlenhydrate als Ursache" }
+      ]
+    }
+  ]}
+/>
 
 ## 1\. Fettige Haut – was deine Haut dir sagen will
 
