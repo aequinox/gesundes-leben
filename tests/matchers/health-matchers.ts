@@ -12,7 +12,7 @@ import {
   HealthContentValidator,
   NutritionValidator,
   ReferenceValidator
-} from '../utils/health-test-helpers.js';
+} from '../utils/health-test-helpers';
 
 // Initialize validators
 const healthValidator = new HealthContentValidator();
@@ -23,7 +23,7 @@ const referenceValidator = new ReferenceValidator();
 // Health Content Matchers
 // =============================================================================
 
-interface HealthContentMatchers<R = unknown> {
+interface HealthContentMatchers<R = unknown> extends Record<string, any> {
   /**
    * Assert that content contains valid German health terminology
    */
@@ -49,7 +49,7 @@ interface HealthContentMatchers<R = unknown> {
 // Nutrition Data Matchers
 // =============================================================================
 
-interface NutritionMatchers<R = unknown> {
+interface NutritionMatchers<R = unknown> extends Record<string, any> {
   /**
    * Assert that nutrition data complies with DGE standards
    */
@@ -75,7 +75,7 @@ interface NutritionMatchers<R = unknown> {
 // Reference Quality Matchers
 // =============================================================================
 
-interface ReferenceMatchers<R = unknown> {
+interface ReferenceMatchers<R = unknown> extends Record<string, any> {
   /**
    * Assert that reference is credible and high-quality
    */
@@ -101,7 +101,7 @@ interface ReferenceMatchers<R = unknown> {
 // German Health Blog Specific Matchers
 // =============================================================================
 
-interface GermanHealthMatchers<R = unknown> {
+interface GermanHealthMatchers<R = unknown> extends Record<string, any> {
   /**
    * Assert that content uses appropriate German medical terminology
    */
@@ -127,7 +127,7 @@ interface GermanHealthMatchers<R = unknown> {
 // Accessibility & User Experience Matchers
 // =============================================================================
 
-interface HealthAccessibilityMatchers<R = unknown> {
+interface HealthAccessibilityMatchers<R = unknown> extends Record<string, any> {
   /**
    * Assert that health content is accessible to all users
    */
@@ -223,9 +223,9 @@ const healthContentMatchers = {
   }
 };
 
-const nutritionMatchers: NutritionMatchers = {
-  toComplyWithDGEStandards(context = {}) {
-    const nutritionData = this.actual;
+const nutritionMatchers = {
+  toComplyWithDGEStandards(received: any, context = {}) {
+    const nutritionData = received;
     const result = nutritionValidator.validateNutritionData(nutritionData, context);
     
     return {
@@ -236,8 +236,8 @@ const nutritionMatchers: NutritionMatchers = {
     };
   },
 
-  toHaveBalancedMacronutrients() {
-    const data = this.actual;
+  toHaveBalancedMacronutrients(received: any) {
+    const data = received;
     
     // Calculate macronutrient percentages
     const proteinCals = data.protein * 4;
@@ -262,8 +262,8 @@ const nutritionMatchers: NutritionMatchers = {
     };
   },
 
-  toHaveAccurateCalorieCalculation(tolerance = 0.05) {
-    const data = this.actual;
+  toHaveAccurateCalorieCalculation(received: any, tolerance = 0.05) {
+    const data = received;
     
     const proteinCals = data.protein * 4;
     const carbCals = data.carbs * 4;
@@ -281,8 +281,8 @@ const nutritionMatchers: NutritionMatchers = {
     };
   },
 
-  toBeRealisticNutritionData() {
-    const data = this.actual;
+  toBeRealisticNutritionData(received: any) {
+    const data = received;
     const issues: string[] = [];
     
     // Check for realistic ranges
@@ -311,9 +311,9 @@ const nutritionMatchers: NutritionMatchers = {
   }
 };
 
-const referenceMatchers: ReferenceMatchers = {
-  toBeCredibleReference() {
-    const reference = this.actual;
+const referenceMatchers = {
+  toBeCredibleReference(received: any) {
+    const reference = received;
     const result = referenceValidator.validateReference(reference);
     
     return {
@@ -324,8 +324,8 @@ const referenceMatchers: ReferenceMatchers = {
     };
   },
 
-  toBeRecentAndRelevant(maxYearsOld = 10) {
-    const reference = this.actual;
+  toBeRecentAndRelevant(received: any, maxYearsOld = 10) {
+    const reference = received;
     const currentYear = new Date().getFullYear();
     const age = currentYear - reference.year;
     
@@ -337,8 +337,8 @@ const referenceMatchers: ReferenceMatchers = {
     };
   },
 
-  toHaveProperScientificFormat() {
-    const reference = this.actual;
+  toHaveProperScientificFormat(received: any) {
+    const reference = received;
     const issues: string[] = [];
     
     if (!reference.title || reference.title.length < 10) {
@@ -365,8 +365,8 @@ const referenceMatchers: ReferenceMatchers = {
     };
   },
 
-  toSupportHealthClaims(claims: string[]) {
-    const reference = this.actual;
+  toSupportHealthClaims(received: any, claims: string[]) {
+    const reference = received;
     const title = reference.title.toLowerCase();
     const abstract = reference.abstract?.toLowerCase() || '';
     
@@ -384,9 +384,9 @@ const referenceMatchers: ReferenceMatchers = {
   }
 };
 
-const germanHealthMatchers: GermanHealthMatchers = {
-  toUseCorrectGermanMedicalTerms() {
-    const content = this.actual as string;
+const germanHealthMatchers = {
+  toUseCorrectGermanMedicalTerms(received: any) {
+    const content = received as string;
     
     // Check for common English terms that should be in German
     const englishTerms = ['nutrition', 'vitamin', 'mineral', 'protein', 'carbohydrate'];
@@ -408,8 +408,8 @@ const germanHealthMatchers: GermanHealthMatchers = {
     };
   },
 
-  toReferenceGermanHealthInstitutions() {
-    const content = this.actual as string;
+  toReferenceGermanHealthInstitutions(received: any) {
+    const content = received as string;
     
     const germanInstitutions = [
       'DGE', 'Deutsche Gesellschaft für Ernährung',
@@ -430,8 +430,8 @@ const germanHealthMatchers: GermanHealthMatchers = {
     };
   },
 
-  toUseGermanHealthStandards() {
-    const content = this.actual as string;
+  toUseGermanHealthStandards(received: any) {
+    const content = received as string;
     
     // Check for German/European measurement standards
     const hasGermanStandards = 
@@ -456,8 +456,8 @@ const germanHealthMatchers: GermanHealthMatchers = {
     };
   },
 
-  toBeCulturallyAppropriateForGermany() {
-    const content = this.actual as string;
+  toBeCulturallyAppropriateForGermany(received: any) {
+    const content = received as string;
     
     const culturalMarkers = {
       positive: ['Deutschland', 'Europa', 'Krankenversicherung', 'Hausarzt', 'Apotheke'],
@@ -481,9 +481,9 @@ const germanHealthMatchers: GermanHealthMatchers = {
   }
 };
 
-const accessibilityMatchers: HealthAccessibilityMatchers = {
-  toBeAccessibleHealthContent() {
-    const element = this.actual as Element;
+const accessibilityMatchers = {
+  toBeAccessibleHealthContent(received: any) {
+    const element = received as Element;
     const issues: string[] = [];
     
     // Check for proper heading structure
@@ -516,8 +516,8 @@ const accessibilityMatchers: HealthAccessibilityMatchers = {
     };
   },
 
-  toHighlightHealthWarnings() {
-    const element = this.actual as Element;
+  toHighlightHealthWarnings(received: any) {
+    const element = received as Element;
     
     const warnings = element.querySelectorAll('.warning, .alert, .caution, [data-warning]');
     const hasProperHighlighting = Array.from(warnings).every(warning => {
@@ -544,8 +544,8 @@ const accessibilityMatchers: HealthAccessibilityMatchers = {
     };
   },
 
-  toHaveWellStructuredHealthInfo() {
-    const element = this.actual as Element;
+  toHaveWellStructuredHealthInfo(received: any) {
+    const element = received as Element;
     const issues: string[] = [];
     
     // Check for logical heading hierarchy
@@ -580,8 +580,8 @@ const accessibilityMatchers: HealthAccessibilityMatchers = {
     };
   },
 
-  toPresentHealthDataClearly() {
-    const element = this.actual as Element;
+  toPresentHealthDataClearly(received: any) {
+    const element = received as Element;
     const issues: string[] = [];
     
     // Check for clear data presentation

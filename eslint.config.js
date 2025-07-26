@@ -135,6 +135,8 @@ export default [
   {
     ignores: [
       "dist/**",
+      "**/dist/**",
+      "**/*.d.ts",
       ".astro/**",
       "public/**",
       "html/**",
@@ -146,8 +148,12 @@ export default [
       ".prettierrc.mjs",
       "docs/**",
       "scripts/**/*.js",
+      "scripts/**/*.test.ts",
       "tests/**/*.js",
       "src/scripts/wp-to-mdx/**",
+      "scripts/dist/**",
+      "scripts/xml2markdown/dist/**",
+      "/tmp/**",
     ],
   },
 ];

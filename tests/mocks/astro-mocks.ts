@@ -43,12 +43,8 @@ export const createAstroContentMocks = () => {
       },
       rendered: {
         // Content: () => '<p>Mock content</p>', // Not part of RenderedContent interface
-        headings: [
-          { depth: 1, slug: 'introduction', text: 'Einführung' },
-          { depth: 2, slug: 'vitamins', text: 'Vitamine' }
-        ],
         remarkPluginFrontmatter: {}
-      }
+      } as any
     },
     {
       id: 'test-wellness-article.mdx',
@@ -78,12 +74,8 @@ export const createAstroContentMocks = () => {
       },
       rendered: {
         // Content: () => '<p>Mock wellness content</p>', // Not part of RenderedContent interface
-        headings: [
-          { depth: 1, slug: 'mindfulness', text: 'Achtsamkeit' },
-          { depth: 2, slug: 'techniques', text: 'Techniken' }
-        ],
         remarkPluginFrontmatter: {}
-      }
+      } as any
     }
   ];
 
@@ -100,9 +92,8 @@ export const createAstroContentMocks = () => {
       },
       rendered: {
         // Content: () => '<p>Mock author bio</p>', // Not part of RenderedContent interface
-        headings: [],
         remarkPluginFrontmatter: {}
-      }
+      } as any
     }
   ];
 
@@ -120,9 +111,8 @@ export const createAstroContentMocks = () => {
       },
       rendered: {
         // Content: () => '<p>Mock glossary definition</p>', // Not part of RenderedContent interface
-        headings: [],
         remarkPluginFrontmatter: {}
-      }
+      } as any
     }
   ];
 
