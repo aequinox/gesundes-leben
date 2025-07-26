@@ -26,7 +26,7 @@ const CATEGORY_MAPPING: Record<string, BlogCategory> = {
   wissenswertes: "Wissenswertes",
 
   // Direct mappings from WordPress XML (display name format with HTML entities)
-  "allgemein": "Wissenswertes",
+  "Allgemein": "Wissenswertes",
   "ernährung": "Ernährung",
   "lifestyle & psyche": "Lifestyle & Psyche",
   "lifestyle &amp; psyche": "Lifestyle & Psyche", // Handle HTML entity
