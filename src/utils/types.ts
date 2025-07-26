@@ -2,10 +2,6 @@ import type { CollectionEntry } from "astro:content";
 
 export type Post = CollectionEntry<"blog">;
 export type Author = CollectionEntry<"authors">;
-// export type Tag = {
-//   tag: string;
-//   tagName: string;
-// };
 
 /**
  * Tag type representing a string tag used in blog posts
@@ -15,7 +11,6 @@ export type Tag = string;
 
 export const GROUPS = ["pro", "kontra", "fragezeiten"] as const;
 export const CATEGORIES = [
-  // 'Alle',
   "Ernährung",
   "Immunsystem",
   "Lesenswertes",
