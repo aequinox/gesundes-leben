@@ -28,6 +28,9 @@ heroImage:
 draft: false
 ---
 
+import Blockquote from "@/components/elements/Blockquote.astro";
+import Image from "@/components/elements/Image.astro";
+
 ## Inhaltsverzeichnis
 
 ## Intermittierendes Fasten - wie es dir gelingen kann.
@@ -46,9 +49,12 @@ Und bereits ca. 400 Jahre v. Chr. sagte Hippokrates, der Vater der modernen Med
 
 Der griechische Philosoph Platon sagte:
 
+<Blockquote 
+  author="Platon"
+  role="Griechischer Philosoph (ca. 428-348 v. Chr.)"
+>
 Ich faste für mehr körperliche und geistige Leistungsfähigkeit.
-
-**Platon**
+</Blockquote>
 
 Er meinte damit, dass Fasten hilft, sowohl seine geistige als auch seine körperliche Energie effizienter zu nutzen. Die heutige Forschung zeigt, dass Platon damit richtig lag, denn Fasten verbessert sowohl unsere metabolische Flexibilität als auch unsere Energieeffizienz.
 
@@ -74,17 +80,12 @@ Es gibt verschiedene Methoden, um die metabolische Flexibilität und die Energie
 
 Alle diese Strategien helfen dabei, den Körper effizienter zu machen.
 
-<figure>
-
-![Zwei Frauen, die in einem Fitnessraum trainieren, mit darübergelegten Textblöcken, die verschiedene Gesundheits- und Ernährungstipps aufhören.](images/Intermittierendes-Fasten-5-Moeglichkeiten-724x1024.jpg)
-
-<figcaption>
-
-Foto von Bruce Mars auf Unsplash
-
-</figcaption>
-
-</figure>
+<Image
+  src="./images/Intermittierendes-Fasten-5-Moeglichkeiten-724x1024.jpg"
+  alt="Zwei Frauen, die in einem Fitnessraum trainieren, mit darübergelegten Textblöcken, die verschiedene Gesundheits- und Ernährungstipps aufhören."
+  title="Foto von Bruce Mars auf Unsplash"
+  position="center"
+/>
 
 ## Ketogene Diät oder zyklische ketogene Diät
 
@@ -96,7 +97,11 @@ Ketone liefern eine große Menge an zellulärer Energie. Ferner erzeugt der Gluk
 
 Wenn du fastest, baust du Fettreserven ab und dein Körper produziert Ketone. Diese Ketone stellen die Energie bereit, die du benötigst, um dich zu bewegen und die dein Körper benötigt, um alle lebensnotwendigen Aktivitäten auszuführen. Der Keton-Stoffwechsel unterstützt den Körper dabei, während des Fastens effektiver zu entgiften.
 
-![Infografik über den Vergleich von traditioneller und ketogener Ernährung und deren Auswirkungen auf den Blutzucker und die Energiegewinnung.](images/Wie-funktioniert-Ketose-1024x1024.jpg)
+<Image
+  src="./images/Wie-funktioniert-Ketose-1024x1024.jpg"
+  alt="Infografik über den Vergleich von traditioneller und ketogener Ernährung und deren Auswirkungen auf den Blutzucker und die Energiegewinnung."
+  position="center"
+/>
 
 ## Energieeinsparung 
 
@@ -106,9 +111,12 @@ Wir benötigen Energie für eine Reihe verschiedener Körpersysteme, einschließ
 
 Die Verdauung verbraucht sehr viel Energie, um die aufgenommene Nahrung zu zerlegen, zu verdauen und die Nährstoffe aufzunehmen. **Das Fasten erlaubt es uns, gespeicherte Nährstoffe zu verwenden, ohne den üblichen Energieaufwand der Verdauung, und fordert unseren Körper, effizienter mit den vorhandenen Ressourcen umzugehen.** Anders ausgedrückt, lebst du beim Fasten sozusagen von deinen Reserven und bist nicht darauf angewiesen, neue Nahrung aufzunehmen, deren Verdauung dich eben wieder Energie kosten würde. So wie ein elektrisches Gerät, das nicht am Strom hängt, sondern stattdessen auf Batterie läuft.
 
+<Blockquote 
+  author="Hippokrates von Kos"
+  role="Der Vater der modernen Medizin (ca. 460-370 v. Chr.)"
+>
 Wer stark, gesund und jung bleiben will, sei mäßig, übe den Körper, atme reine Luft und heile sein Weh eher durch Fasten als durch Medikamente.
-
-**Hippokrates**
+</Blockquote>
 
 ## 5 Vorteile des Intermittierenden Fastens
 
@@ -116,17 +124,12 @@ Eine gesunde Ernährung mit viel antientzündlichen Lebensmitteln führt zu deut
 
 Um von einer Krankheit zu genesen, benötigt der Körper so viel Energie wie möglich, die er dann für die Unterstützung des Immunsystems und die Regeneration verwenden kann. Eine ganz natürliche Reaktion des Körpers ist es daher, dass du deinen Appetit verlierst, wenn du krank bist. Es ist ein cleverer, angeborener Mechanismus, um uns zum Fasten zu bringen. **Denn beim Fasten kann die ganze Energie, die normalerweise für die Verdauung verbraucht wird, dann für die Bekämpfung und Regulation der Krankheit eingesetzt werden. Und immerhin werden satte 30 Prozent der gesamten dir zur Verfügung stehenden Energie für die Verdauung verbraucht.**
 
-<figure>
-
-![Infografik: Vorteile des intermittierenden Fastens mit Wecker im Hintergrund.](images/Intermittierendes-Fasten-5-Vorteile-724x1024.jpg)
-
-<figcaption>
-
-Foto von Towfiqu Barbhuiya auf Unsplash
-
-</figcaption>
-
-</figure>
+<Image
+  src="./images/Intermittierendes-Fasten-5-Vorteile-724x1024.jpg"
+  alt="Infografik: Vorteile des intermittierenden Fastens mit Wecker im Hintergrund."
+  title="Foto von Towfiqu Barbhuiya auf Unsplash"
+  position="center"
+/>
 
 ### 1\. Fasten verbessert die Immunregulation.
 
@@ -164,15 +167,16 @@ STH und Insulin sind hormonelle Gegenspieler. Das bedeutet, dass sie auf entgege
 
 Fasten hat sich als wirksam erwiesen, um die Insulinausschüttung zu verringern und die Insulinsensitivität zu verbessern. Dadurch kann der Körper also Insulin besser nutzen, sodass beim Essen weniger Insulin benötigt wird. Sinkt der Insulinbedarf, werden Entzündungen im Körper verringert und die STH Werte steigen.
 
-![Avatar von Sandra](images/autorin-sandra-profilbild-gesundheitsexpertin.png)
-
-Der Therapeuten Tipp!
+<Blockquote 
+  author="Sandra Pfeiffer"
+  role="Heilpraktikerin, Systemische Therapeutin, Mediatorin & Traumatherapeutin"
+  avatar="images/autorin-sandra-profilbild-gesundheitsexpertin.png"
+  label="Der Therapeuten Tipp!"
+>
 
 Heutzutage herrscht bei uns gewissermaßen ein ständiges Überangebot an Essen.  Praktisch könnten wir zu jeder Zeit essen, wenn wir möchten. Tatsächlich empfehlen auch viele Gesundheitsberater, über den Tag verteilt 5 bis 6 kleine Mahlzeiten zu sich zu nehmen. Dieser Vorgang sendet jedoch dem Körper ein Signal des Überflusses, welches – siehe oben – **Fetteinlagerungen, Entzündungen im Körper und zu hohe Blutzuckerspiegel fördert und oxidativen Stress verursacht. Und oxidativer Stress ist Pro-Aging**, d. h. er lässt dich altern. Das häufige Essen hemmt auch die Ausschüttung wichtiger Hormone für die Gewebereparatur. Und diese Hormone besitzen eine starke Anti-Aging-Wirkung.
 **Es lässt sich also wissenschaftlich fundiert sagen, dass es gesünder ist, das Essen auf wenige Mahlzeiten täglich zu konzentrieren und Snacks zu vermeiden.**
-
-Sandra Pfeiffer
-Heilpraktikerin, Systemische Therapeutin, Mediatorin & Traumatherapeutin
+</Blockquote>
 
 ### 5\. Intermittierendes Fasten und chronische Krankheiten
 
@@ -377,7 +381,11 @@ Ein sehr großer Vorteil des Fastens ist es auch, dass du deine **Selbstkontroll
 Über die Jahrhunderte hinweg haben weise Männer und spirituelle Führer nicht umsonst das Fasten praktiziert und auch darüber gesprochen, denn es hat das Potenzial, die Gesundheit unseres Geistes, Körpers und unserer Seele erheblich zu verbessern. Vielleicht fühlst du dich inspiriert, das intermittierende Fasten einfach einmal für dich zu testen und es am eigenen Körper zu erproben. Er wird es dir danken. **#sogehtgesund**
 Teile uns doch gerne mit, welche Erfahrungen du damit machst.
 
-![Infografik über Fasten ](images/Fasten-als-Geschenk-an-dich-410x1024.jpg)
+<Image
+  src="./images/Fasten-als-Geschenk-an-dich-410x1024.jpg"
+  alt="Infografik über Fasten als Geschenk an dich selbst"
+  position="center"
+/>
 
 Quellen:
 

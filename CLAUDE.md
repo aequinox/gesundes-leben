@@ -147,11 +147,31 @@ references:
   - "mindfulness-meditation-stress-reduction"
 ```
 
+### Component Usage for Content Team
+The blog uses enhanced Astro components for improved performance, accessibility, and SEO:
+
+**Component Documentation**:
+- 📖 Full guide: `docs/component-style-guide.md`
+- 🔖 Quick reference: `docs/component-quick-reference.md`
+
+**Key Components**:
+- **List**: Enhanced lists with better styling (`@/components/elements/List.astro`)
+- **Blockquote**: Professional quotes and expert tips (`@/components/elements/Blockquote.astro`)
+- **Accordion**: Collapsible content sections (`@/components/elements/Accordion.astro`)
+- **Image**: Responsive, optimized images with multiple styles (`@/components/elements/Image.astro`)
+
+**Content Migration Rules**:
+- ❌ Never use markdown images `![alt](image.jpg)`
+- ✅ Always use Image component with proper alt text
+- ✅ Convert bullet lists to List components
+- ✅ Use Blockquote for "Therapeuten Tipp" sections
+- ✅ Use Accordion for warnings and collapsible content
+
 ### Development Tips
 1. Always run type checking before commits (`bun run build`)
 2. Use the predefined CATEGORIES constant for blog post categories
 3. Images should be placed in the post's folder under `images/`
-4. Use responsive image components for performance
+4. Use enhanced component system for all content (see component docs)
 5. German language conventions apply throughout the codebase
 6. Add new scientific references to `references.json` for reuse across articles
 

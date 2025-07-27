@@ -50,6 +50,7 @@ featured: false
 import List from "@/components/sections/List.astro";
 import Blockquote from "@/components/elements/Blockquote.astro";
 import Accordion from "@/components/sections/Accordion.astro";
+import Image from "@/components/elements/Image.astro";
 
 ## Woran du erkennen kannst, dass dein Körper mehr Nährstoffe benötigt
 
@@ -251,21 +252,26 @@ Die Lösung? Achte darauf, dass du genügend Zink zu dir nimmst und deinen Zucke
 
 Wir werben für Partner und Produkte, von denen wir überzeugt sind und mit denen wir in der Praxis ausgezeichnete Erfahrungen gemacht haben. Das bedeutet, diese entsprechen hohen Standards bezüglich Qualität, Preis-Leistungs-Verhältnis, therapeutisch wirksamer Dosierung, Reinheit und Nachhaltigkeit. Die Einnahmen, die wir durch manche der Empfehlungen erzielen, kommen dem Blog zugute. **#weildueswertbist**
 
-Bei Dauereinnahme von Zink bitte beachten!
+<Accordion 
+  items={[
+    {
+      title: "⚠️ Bei Dauereinnahme von Zink bitte beachten!",
+      content: `Zink ist ein essenzielles Spurenelement, das für viele Funktionen im Körper wichtig ist, darunter das Immunsystem, die Wundheilung und die DNA-Synthese. Eine langfristige Einnahme von Zink in hohen Dosen kann jedoch negative Auswirkungen haben:
 
-Zink ist ein essenzielles Spurenelement, das für viele Funktionen im Körper wichtig ist, darunter das Immunsystem, die Wundheilung und die DNA-Synthese. Eine langfristige Einnahme von Zink in hohen Dosen kann jedoch negative Auswirkungen haben. Hier sind einige Gründe:
+**Kupfermangel**: Hohe Zinkdosen können die Aufnahme von Kupfer beeinträchtigen, was zu einem Kupfermangel führen kann. Kupfer ist ebenfalls ein essenzielles Spurenelement und spielt eine Rolle bei der Bildung roter Blutkörperchen und der Aufrechterhaltung der Nervenzellen.
 
-- **Kupfermangel**: Hohe Zinkdosen können die Aufnahme von Kupfer beeinträchtigen, was zu einem Kupfermangel führen kann. Kupfer ist ebenfalls ein essenzielles Spurenelement und spielt eine Rolle bei der Bildung roter Blutkörperchen und der Aufrechterhaltung der Nervenzellen.
+**Verringerte Immunfunktion**: Obwohl Zink für ein funktionierendes Immunsystem wichtig ist, kann eine Überdosierung die Immunfunktion tatsächlich beeinträchtigen.
 
-- **Verringerte Immunfunktion**: Obwohl Zink für ein funktionierendes Immunsystem wichtig ist, kann eine Überdosierung die Immunfunktion tatsächlich beeinträchtigen.
+**Magen-Darm-Beschwerden**: Zu viel Zink kann zu Übelkeit, Erbrechen, Durchfall und Bauchschmerzen führen.
 
-- **Magen-Darm-Beschwerden**: Zu viel Zink kann zu Übelkeit, Erbrechen, Durchfall und Bauchschmerzen führen.
+**Beeinträchtigung der Cholesterinwerte**: Hohe Dosen von Zink können auch das Gleichgewicht der Lipide im Blut stören, was langfristig das Risiko für Herz-Kreislauf-Erkrankungen erhöhen kann.
 
-- **Beeinträchtigung der Cholesterinwerte**: Hohe Dosen von Zink können auch das Gleichgewicht der Lipide im Blut stören, was langfristig das Risiko für Herz-Kreislauf-Erkrankungen erhöhen kann.
+**Interaktion mit Medikamenten**: Zink kann mit bestimmten Medikamenten interagieren, wie Antibiotika und Diuretika, und deren Wirksamkeit beeinträchtigen.
 
-- **Interaktion mit Medikamenten**: Zink kann mit bestimmten Medikamenten interagieren, wie Antibiotika und Diuretika, und deren Wirksamkeit beeinträchtigen.
-
-Daher ist es wichtig, Zinkpräparate nur in Absprache mit einem Arzt oder Heilpraktiker einzunehmen und die empfohlene tägliche Dosis nicht zu überschreiten.
+**Daher ist es wichtig, Zinkpräparate nur in Absprache mit einem Arzt oder Heilpraktiker einzunehmen und die empfohlene tägliche Dosis nicht zu überschreiten.**`
+    }
+  ]}
+/>
 
 ## 2\. Risse in den Mundwinkeln oder an den Fersen
 
@@ -321,7 +327,12 @@ Hast du schon einmal gelbe Verfärbungen im Augenweiß (Sklera) oder auf der Hau
 
 Vitamin B12 ist hauptsächlich in tierischen Produkten wie Fleisch, Milch und Eiern enthalten. Deshalb laufen vorwiegend Menschen, die sich rein vegetarisch oder vegan ernähren, Gefahr, in einen Vitamin-B12-Mangel zu rutschen. 
 
-![](images/autor-kai-profilbild-gesundheitsexperte.png)
+<Image
+  src="./images/autor-kai-profilbild-gesundheitsexperte.png"
+  alt="Kai Renner - Heilpraktiker und Gesundheitsexperte"
+  position="center"
+  style="polaroid"
+/>
 
 Der Therapeuten Tipp!
 
