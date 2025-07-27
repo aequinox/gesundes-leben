@@ -85,6 +85,12 @@ export interface I18nStrings {
       label: string;
       tags: string;
       type: string;
+      contentType: string;
+      category: string;
+      author: string;
+      readingTime: string;
+      publishDate: string;
+      healthDomain: string;
     };
   };
 }
@@ -175,6 +181,12 @@ export const deStrings: I18nStrings = {
       label: "Filter",
       tags: "Kategorien",
       type: "Typ",
+      contentType: "Inhaltstyp",
+      category: "Kategorie",
+      author: "Autor",
+      readingTime: "Lesedauer",
+      publishDate: "Veröffentlichungsdatum",
+      healthDomain: "Gesundheitsbereich",
     },
   },
 };
@@ -265,6 +277,12 @@ export const enStrings: I18nStrings = {
       label: "Filters",
       tags: "Tags",
       type: "Type",
+      contentType: "Content Type",
+      category: "Category",
+      author: "Author",
+      readingTime: "Reading Time",
+      publishDate: "Publication Date",
+      healthDomain: "Health Domain",
     },
   },
 };

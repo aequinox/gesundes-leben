@@ -42,12 +42,13 @@ const components = {
 ---
 
 <Fragment>
-  {/* Hero Image with Parallax Effect */}
+  {/* Hero Image with Parallax Effect - Excluded from search */}
   {
     heroImage && (
       <div
         id="hero-parallax-container"
         class="relative mx-auto mt-4 h-0 overflow-hidden pb-[66.67%] md:pb-[56.25%]"
+        data-pagefind-ignore
       >
         <div class="absolute inset-0 h-[120%] w-full translate-y-[-10%]">
           <Picture
@@ -69,8 +70,13 @@ const components = {
     )
   }
 
-  {/* Article Content */}
-  <article id="article" class="article-content mx-auto prose mt-6 max-w-none">
+  {/* Article Content with Health-Focused Weighting */}
+  <article
+    id="article"
+    class="article-content mx-auto prose mt-6 max-w-none"
+    data-pagefind-weight="15"
+    data-pagefind-meta={`healthContent:true,medicalTerminology:${post.data.categories?.some(cat => ["Immunsystem", "Organsysteme", "Mikronährstoffe"].includes(cat)) ? "high" : "medium"}`}
+  >
     <Content components={components} />
   </article>
 </Fragment>

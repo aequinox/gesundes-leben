@@ -44,22 +44,42 @@ const pageTitle = propTitle ? propTitle : t("glossary.all");
 <Layout title={title}>
   <Header activeNav="glossary" />
 
-  <main id="main-content" class="mx-auto w-full max-w-content">
+  <main
+    id="main-content"
+    class="mx-auto w-full max-w-content"
+    data-pagefind-body
+    data-pagefind-meta="type:glossary,contentType:definition,language:de,difficulty:beginner,medicalRelevance:reference"
+    data-pagefind-weight="8"
+  >
     <!-- Hero Section -->
-    <PageHero title={pageTitle} subtitle={t("glossary.description")} />
-
-    <Hr />
+    <div data-pagefind-ignore>
+      <PageHero title={pageTitle} subtitle={t("glossary.description")} />
+      <Hr />
+    </div>
 
     <!-- Glossary Grid Section -->
     <section class="py-12">
       <div class="mx-auto max-w-content">
-        <p class="mb-10 text-center text-lg text-foreground italic opacity-80">
+        <p
+          class="mb-10 text-center text-lg text-foreground italic opacity-80"
+          data-pagefind-ignore
+        >
           Entdecke unser Glossar mit wichtigen Begriffen und Definitionen.
           Klicke auf einen Eintrag, um mehr zu erfahren.
         </p>
 
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {paginatedPosts.map(post => <GlossaryCard {post} />)}
+        <div
+          class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          data-pagefind-weight="12"
+        >
+          {
+            paginatedPosts.map(post => (
+              <GlossaryCard
+                {post}
+                data-pagefind-meta={`term:${post.data.title},type:glossary`}
+              />
+            ))
+          }
         </div>
       </div>
     </section>

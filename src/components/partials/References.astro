@@ -1,0 +1,261 @@
+---
+import { getCollection } from "astro:content";
+
+import { logger } from "@/utils/logger";
+
+interface ReferenceData {
+  type: "journal" | "website";
+  title: string;
+  authors?: string[];
+  year?: number;
+  journal?: string;
+  volume?: number;
+  issue?: number;
+  pages?: string;
+  doi?: string;
+  url?: string;
+  keywords?: string[];
+  abstract?: string;
+}
+
+interface Props {
+  referenceIds: string[];
+}
+
+const { referenceIds } = Astro.props;
+
+// Get references data
+let referencesData: Record<string, ReferenceData> = {};
+try {
+  const referencesCollection = await getCollection("references");
+  if (referencesCollection && referencesCollection.length > 0) {
+    referencesData = referencesCollection[0].data as Record<
+      string,
+      ReferenceData
+    >;
+  }
+} catch (error) {
+  logger.warn("Failed to load references collection:", error);
+}
+
+// Filter references based on provided IDs
+const references = referenceIds
+  .map(id => ({ id, ...referencesData[id] }))
+  .filter(ref => ref.title); // Only include references that exist
+
+// Calculate reference types and metadata
+const journalCount = references.filter(ref => ref.type === "journal").length;
+const websiteCount = references.filter(ref => ref.type === "website").length;
+const totalReferences = references.length;
+
+// Generate keywords from all references
+const allKeywords = references
+  .flatMap(ref => ref.keywords || [])
+  .filter((keyword, index, array) => array.indexOf(keyword) === index) // Remove duplicates
+  .slice(0, 10); // Limit to 10 most relevant keywords
+
+// Generate authors list
+const allAuthors = references
+  .flatMap(ref => ref.authors || [])
+  .filter((author, index, array) => array.indexOf(author) === index)
+  .slice(0, 8); // Limit to 8 authors for metadata
+---
+
+{
+  totalReferences > 0 && (
+    <section
+      class="mt-8 rounded-lg border bg-muted/30 p-6"
+      data-pagefind-weight="12"
+      data-pagefind-meta={`referenceCount:${totalReferences},journalReferences:${journalCount},websiteReferences:${websiteCount},scientificKeywords:${allKeywords.join(",")},referenceAuthors:${allAuthors.join(",")},hasScientificReferences:true,contentType:references`}
+      data-pagefind-filter="Referenzen"
+      aria-labelledby="references-heading"
+    >
+      <h2
+        id="references-heading"
+        class="mb-4 text-xl font-semibold text-foreground"
+        data-pagefind-weight="15"
+      >
+        Wissenschaftliche Quellen
+      </h2>
+
+      {/* References Metadata Summary for Search */}
+      <div
+        class="sr-only"
+        data-pagefind-meta={`referenceSummary:${totalReferences} wissenschaftliche Quellen: ${journalCount} Fachzeitschriften, ${websiteCount} Websites`}
+      >
+        Dieser Artikel stützt sich auf {totalReferences} wissenschaftliche
+        Quellen, darunter {journalCount} Fachartikel aus renommierten
+        Zeitschriften und {websiteCount}
+        vertrauenswürdige Online-Quellen.
+      </div>
+
+      <ol class="space-y-4" role="list">
+        {references.map((ref, index) => (
+          <li
+            class="text-sm leading-relaxed"
+            data-pagefind-weight="8"
+            data-pagefind-meta={`referenceType:${ref.type},referenceYear:${ref.year},doi:${ref.doi || "none"}`}
+          >
+            <div class="flex gap-3">
+              <span class="text-muted-foreground flex-shrink-0 font-medium">
+                [{index + 1}]
+              </span>
+              <div class="flex-1">
+                {/* Authors */}
+                {ref.authors && ref.authors.length > 0 && (
+                  <span
+                    class="font-medium text-foreground"
+                    data-pagefind-meta={`authors:${ref.authors.join(", ")}`}
+                  >
+                    {ref.authors.join(", ")}
+                    {ref.authors.length === 1 ? "" : " et al."}
+                  </span>
+                )}
+
+                {/* Year */}
+                {ref.year && (
+                  <span class="text-muted-foreground"> ({ref.year}). </span>
+                )}
+
+                {/* Title */}
+                <span
+                  class="font-medium text-accent hover:text-accent/80"
+                  data-pagefind-weight="10"
+                  data-pagefind-meta={`referenceTitle:${ref.title}`}
+                >
+                  {ref.title}
+                </span>
+
+                {/* Journal info for journal articles */}
+                {ref.type === "journal" && (
+                  <span class="text-muted-foreground">
+                    .{" "}
+                    <em data-pagefind-meta={`journal:${ref.journal}`}>
+                      {ref.journal}
+                    </em>
+                    {ref.volume && `, ${ref.volume}`}
+                    {ref.issue && `(${ref.issue})`}
+                    {ref.pages && `, ${ref.pages}`}
+                  </span>
+                )}
+
+                {/* DOI and URL */}
+                <div class="mt-1 flex flex-wrap gap-4 text-xs">
+                  {ref.doi && (
+                    <div class="flex items-center gap-1">
+                      <span class="text-muted-foreground">DOI:</span>
+                      <a
+                        href={`https://doi.org/${ref.doi}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="font-mono text-accent hover:text-accent/80 hover:underline"
+                        data-pagefind-meta={`doi:${ref.doi}`}
+                      >
+                        {ref.doi}
+                      </a>
+                    </div>
+                  )}
+
+                  {ref.url && (
+                    <div class="flex items-center gap-1">
+                      <span class="text-muted-foreground">URL:</span>
+                      <a
+                        href={ref.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="break-all text-accent hover:text-accent/80 hover:underline"
+                        aria-label={`Externe Quelle: ${ref.title}`}
+                      >
+                        {ref.url.replace(/^https?:\/\//, "")}
+                      </a>
+                    </div>
+                  )}
+                </div>
+
+                {/* Keywords for search indexing */}
+                {ref.keywords && ref.keywords.length > 0 && (
+                  <div
+                    class="sr-only"
+                    data-pagefind-meta={`keywords:${ref.keywords.join(",")}`}
+                  >
+                    Schlüsselwörter: {ref.keywords.join(", ")}
+                  </div>
+                )}
+
+                {/* Abstract for search indexing */}
+                {ref.abstract && (
+                  <div
+                    class="sr-only"
+                    data-pagefind-weight="6"
+                    data-pagefind-meta={`hasAbstract:true`}
+                  >
+                    Zusammenfassung: {ref.abstract}
+                  </div>
+                )}
+              </div>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      {/* Scientific credibility indicator */}
+      <div class="text-muted-foreground mt-4 flex items-center gap-2 text-xs">
+        <svg
+          class="h-4 w-4 text-green-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span data-pagefind-meta="scientificallyBacked:true">
+          Wissenschaftlich fundiert: {totalReferences} Quellen
+        </span>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  /* Enhanced styling for references */
+  .references-list {
+    counter-reset: reference-counter;
+  }
+
+  .references-list li {
+    counter-increment: reference-counter;
+  }
+
+  /* Ensure proper text wrapping for long URLs */
+  .references-list a {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Focus indicators for accessibility */
+  .references-list a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Print styles */
+  @media print {
+    .references-list a {
+      color: black;
+      text-decoration: underline;
+    }
+
+    .references-list a:after {
+      content: " (" attr(href) ")";
+      font-size: 0.8em;
+      color: #666;
+    }
+  }
+</style>

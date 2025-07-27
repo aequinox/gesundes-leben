@@ -69,8 +69,7 @@ const i18n = getI18nStrings("de");
 </Layout>
 
 <script>
-  import type { LoggerConfig } from "@/utils/logger";
-  import { logger, LogLevelName } from "@/utils/logger";
+  import { logger, LogLevelName, type LoggerConfig } from "@/utils/logger";
 
   // Configure logger for search component
   logger.configure({
@@ -236,7 +235,13 @@ const i18n = getI18nStrings("de");
           showSubResults: true,
           showImages: false,
           excerptLength: 30,
-          openFilters: [searchStrings.filters.tags, searchStrings.filters.type],
+          openFilters: [
+            "Inhaltstyp",
+            "Kategorie",
+            "Autor",
+            "Gesundheitsbereich",
+            "Lesedauer",
+          ],
           translations: {
             placeholder: searchStrings.placeholder,
             clear_search: searchStrings.clearSearch,

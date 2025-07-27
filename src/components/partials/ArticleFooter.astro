@@ -2,8 +2,9 @@
 import Button from "@/components/elements/Button.astro";
 import Hr from "@/components/elements/Hr.astro";
 import Tag from "@/components/elements/Tag.astro";
+import References from "@/components/partials/References.astro";
 import RelatedPosts from "@/components/partials/RelatedPosts.astro";
-import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { getI18nStrings } from "@/config/i18n";
 import { slugify } from "@/utils/slugs";
 import type { Post } from "@/utils/types";
 
@@ -11,20 +12,24 @@ import ShareLinks from "../ShareLinks.astro";
 
 interface Props {
   post: Post;
+  references?: string[];
 }
 
-const { post }: Props = Astro.props;
+const { post, references }: Props = Astro.props;
 const {
   data: { tags = [] },
 } = post;
 
-const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
+const i18n = getI18nStrings("de");
 ---
 
 <Fragment>
   {/* References */}
-  <!-- {references && references.length > 0 && <References references={references} />} -->
+  {
+    references && references.length > 0 && (
+      <References referenceIds={references} />
+    )
+  }
 
   <Hr variant="dots" />
 
@@ -47,10 +52,10 @@ const t = useTranslations(lang);
       size="sm"
       icon="tabler:chevron-up"
       iconPosition="start"
-      ariaLabel={t("nav.backToTop")}
+      ariaLabel={i18n.general.backToTop}
       class="whitespace-nowrap"
     >
-      {t("nav.backToTop")}
+      {i18n.general.backToTop}
     </Button>
 
     <ShareLinks />

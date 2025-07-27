@@ -15,15 +15,19 @@ const {
 ---
 
 <Fragment>
-  {/* Categories */}
-  <div class="mb-2 flex flex-wrap text-xs uppercase">
+  {/* Categories with Enhanced Search Metadata */}
+  <div
+    class="mb-2 flex flex-wrap text-xs uppercase"
+    data-pagefind-meta={`categories:${categories?.join(",") || ""}`}
+  >
     {
       categories &&
         categories.map((category: string) => (
           <div
             transition:name={slugify(title + category)}
             class="mr-[0.125rem] mb-1 inline-flex items-center text-sm font-medium text-accent after:[&:not(:last-child)]:ml-[0.125rem] after:[&:not(:last-child)]:content-['|']"
-            data-pagefind-filter="category"
+            data-pagefind-filter="Kategorie"
+            data-pagefind-meta={`category:${category},healthDomain:${category === "Immunsystem" || category === "Organsysteme" ? "medical" : category === "Ernährung" || category === "Mikronährstoffe" ? "nutrition" : "lifestyle"}`}
           >
             {category}
           </div>
@@ -31,14 +35,20 @@ const {
     }
   </div>
 
-  {/* Title */}
+  {/* Title with Enhanced Weight */}
   <h1
     transition:name={slugify(title)}
     class="mb-4 text-xl font-semibold lg:text-3xl"
+    data-pagefind-weight="20"
+    data-pagefind-meta={`title:${title}`}
   >
     {title}
   </h1>
 
-  {/* Article Meta */}
-  <ArticleMeta post={post} showAuthor={true} showReadingTime={true} />
+  {/* Article Meta with Search Metadata */}
+  <div
+    data-pagefind-meta={`tags:${post.data.tags?.join(",") || ""},readingTime:${post.data.readingTime || 0}`}
+  >
+    <ArticleMeta post={post} showAuthor={true} showReadingTime={true} />
+  </div>
 </Fragment>

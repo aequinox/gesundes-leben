@@ -47,7 +47,7 @@ const {
     keywords,
     categories,
     tags,
-    // references,
+    references,
   },
 } = post;
 
@@ -105,18 +105,27 @@ const primaryCategory = categories?.[0] || "Gesundheit";
   <Header />
   <!-- Main Content Grid -->
   <div class="relative mx-auto mt-8 grid max-w-content grid-cols-12 gap-8">
-    <!-- Main Content Area -->
+    <!-- Main Content Area with Enhanced Pagefind Metadata -->
     <main
       id="main-content"
       class="col-span-12 mx-auto w-full max-w-none px-4 pb-12 2xl:col-span-8"
+      data-pagefind-body
+      data-pagefind-meta={`type:blog,author:${authorEntry?.data.name || SITE.author},category:${primaryCategory},readingTime:${post.data.readingTime || 0},publishDate:${pubDatetime.toISOString().split("T")[0]},healthTopic:${categories?.includes("Organsysteme") || categories?.includes("Immunsystem") ? "medical" : "lifestyle"},hasReferences:${references && references.length > 0 ? "true" : "false"},referenceCount:${references?.length || 0},language:de`}
+      data-pagefind-weight="10"
     >
       <ArticleHeader post={post as Post} />
-      <ArticleContent post={post as Post} />
-      <ArticleFooter post={post as Post} />
+      <ArticleContent post={post as Post} data-pagefind-weight="15" />
+      <ArticleFooter
+        post={post as Post}
+        references={references}
+        data-pagefind-weight="5"
+      />
     </main>
 
-    <!-- Table of Contents Sidebar -->
-    <ArticleSidebar />
+    <!-- Table of Contents Sidebar - Excluded from search -->
+    <aside data-pagefind-ignore>
+      <ArticleSidebar />
+    </aside>
   </div>
 
   <Footer />
