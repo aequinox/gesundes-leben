@@ -68,6 +68,25 @@ export interface I18nStrings {
     error: string;
     notFound: string;
   };
+  search: {
+    pageTitle: string;
+    pageDescription: string;
+    ariaLabel: string;
+    placeholder: string;
+    devWarning: string;
+    buildCommand: string;
+    noResults: string;
+    oneResult: string;
+    manyResults: string;
+    searching: string;
+    clearSearch: string;
+    loadMore: string;
+    filters: {
+      label: string;
+      tags: string;
+      type: string;
+    };
+  };
 }
 
 /**
@@ -137,6 +156,27 @@ export const deStrings: I18nStrings = {
     error: "Ein Fehler ist aufgetreten",
     notFound: "Nicht gefunden",
   },
+  search: {
+    pageTitle: "Suche",
+    pageDescription:
+      "Durchsuche alle Artikel nach relevanten Gesundheits- und Wellness-Inhalten...",
+    ariaLabel: "Artikel-Suche",
+    placeholder: "Artikel durchsuchen...",
+    devWarning:
+      "DEV-Modus Warnung! Du musst das Projekt mindestens einmal erstellen, um die Suchergebnisse während der Entwicklung zu sehen.",
+    buildCommand: "bun run build",
+    noResults: "Keine Ergebnisse für [SEARCH_TERM] gefunden",
+    oneResult: "Ein Ergebnis für [SEARCH_TERM]",
+    manyResults: "[COUNT] Ergebnisse für [SEARCH_TERM]",
+    searching: "Suche nach [SEARCH_TERM]...",
+    clearSearch: "Suche löschen",
+    loadMore: "Mehr laden",
+    filters: {
+      label: "Filter",
+      tags: "Kategorien",
+      type: "Typ",
+    },
+  },
 };
 
 /**
@@ -205,6 +245,27 @@ export const enStrings: I18nStrings = {
     loading: "Loading...",
     error: "An error occurred",
     notFound: "Not found",
+  },
+  search: {
+    pageTitle: "Search",
+    pageDescription:
+      "Search all articles for relevant health and wellness content...",
+    ariaLabel: "Article search",
+    placeholder: "Search articles...",
+    devWarning:
+      "DEV mode Warning! You need to build the project at least once to see the search results during development.",
+    buildCommand: "bun run build",
+    noResults: "No results found for [SEARCH_TERM]",
+    oneResult: "One result for [SEARCH_TERM]",
+    manyResults: "[COUNT] results for [SEARCH_TERM]",
+    searching: "Searching for [SEARCH_TERM]...",
+    clearSearch: "Clear search",
+    loadMore: "Load more",
+    filters: {
+      label: "Filters",
+      tags: "Tags",
+      type: "Type",
+    },
   },
 };
 
