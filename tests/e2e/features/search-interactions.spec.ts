@@ -422,8 +422,8 @@ test.describe('Search Interactions', () => {
         const resultsContainer = page.locator('#pagefind-results, .search-results');
         
         if (await resultsContainer.count() > 0) {
-          // Test scroll behavior
-          await resultsContainer.scroll({ top: 100 });
+          // Test scroll behavior using page.evaluate
+          await resultsContainer.evaluate(el => el.scrollTop = 100);
           await page.waitForTimeout(500);
           
           // Results should still be visible after scroll
@@ -449,7 +449,7 @@ test.describe('Search Interactions', () => {
       await page.waitForFunction(() => {
         const results = document.querySelector('#pagefind-results, .search-results');
         const noResults = document.querySelector('.no-results, .pagefind-zero-results');
-        return results?.children.length > 0 || noResults;
+        return (results?.children?.length ?? 0) > 0 || noResults !== null;
       }, { timeout: 5000 });
       
       const searchTime = Date.now() - startTime;
