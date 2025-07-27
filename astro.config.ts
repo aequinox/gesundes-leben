@@ -56,6 +56,22 @@ export default defineConfig({
     optimizeDeps: {
       exclude: ["@resvg/resvg-js"],
     },
+    build: {
+      rollupOptions: {
+        output: {
+          // Separate vendor chunks for better caching
+          manualChunks: {
+            vendor: ["astro"],
+            utils: ["lodash.kebabcase", "slugify", "dayjs"],
+            ui: ["@astrojs/mdx", "astro-icon"],
+          },
+        },
+      },
+      // Enable CSS code splitting
+      cssCodeSplit: true,
+      // Optimize chunk size
+      chunkSizeWarningLimit: 1000,
+    },
   },
   image: {
     // Set the endpoint to use for image optimization in dev and SSR.

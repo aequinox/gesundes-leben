@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * @file componentFactory.ts
  * @description Component factory utilities for creating reusable, type-safe Astro components
@@ -31,7 +30,7 @@ import { validateProps, type PropValidationSchema } from "./propValidation";
 /**
  * Base interface for all interactive components
  */
-export interface InteractiveComponent extends Record<string, any> {
+export interface InteractiveComponent extends Record<string, unknown> {
   /** Whether the component is disabled */
   disabled?: boolean;
   /** Loading state */
@@ -46,7 +45,7 @@ export interface InteractiveComponent extends Record<string, any> {
  * Base interface for components with variants
  */
 export interface VariantComponent<T extends string = string>
-  extends Record<string, any> {
+  extends Record<string, unknown> {
   /** Visual variant */
   variant?: T;
   /** Size variant */
@@ -58,7 +57,7 @@ export interface VariantComponent<T extends string = string>
 /**
  * Base interface for layout components
  */
-export interface LayoutComponent extends Record<string, any> {
+export interface LayoutComponent extends Record<string, unknown> {
   /** Layout orientation */
   orientation?: "horizontal" | "vertical";
   /** Gap between elements */
@@ -72,7 +71,7 @@ export interface LayoutComponent extends Record<string, any> {
 /**
  * Base interface for content components
  */
-export interface ContentComponent extends Record<string, any> {
+export interface ContentComponent extends Record<string, unknown> {
   /** Content title */
   title?: string;
   /** Content description */
@@ -147,7 +146,7 @@ export function createComponentFactory<T extends Record<string, unknown>>(
 /**
  * Create button component variants
  */
-export function createButtonVariants<T extends Record<string, any>>(
+export function createButtonVariants<T extends Record<string, unknown>>(
   customVariants: Record<string, Partial<T>> = {}
 ) {
   const defaultButtonVariants = {
@@ -195,7 +194,7 @@ export function createButtonVariants<T extends Record<string, any>>(
 /**
  * Create badge component variants
  */
-export function createBadgeVariants<T extends Record<string, any>>(
+export function createBadgeVariants<T extends Record<string, unknown>>(
   customVariants: Record<string, Partial<T>> = {}
 ) {
   const defaultBadgeVariants = {
@@ -242,7 +241,7 @@ export function createBadgeVariants<T extends Record<string, any>>(
 /**
  * Create card component variants
  */
-export function createCardVariants<T extends Record<string, any>>(
+export function createCardVariants<T extends Record<string, unknown>>(
   customVariants: Record<string, Partial<T>> = {}
 ) {
   const defaultCardVariants = {
@@ -285,7 +284,7 @@ export function createCardVariants<T extends Record<string, any>>(
 /**
  * Create layout component variants
  */
-export function createLayoutVariants<T extends Record<string, any>>(
+export function createLayoutVariants<T extends Record<string, unknown>>(
   customVariants: Record<string, Partial<T>> = {}
 ) {
   const defaultLayoutVariants = {
