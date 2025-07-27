@@ -4,7 +4,7 @@
 
 root = true
 
-# All files
+# All files - matches Prettier defaults
 [*]
 charset = utf-8
 end_of_line = lf
@@ -12,35 +12,86 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 indent_style = space
 indent_size = 2
+max_line_length = 80
 
-# Markdown files
+# Markdown files - matches MDX processing
 [*.{md,mdx}]
 trim_trailing_whitespace = false
+max_line_length = 120
 
-# TypeScript and JavaScript files
-[*.{ts,tsx,js,jsx}]
+# TypeScript and JavaScript files - matches ESLint/Prettier
+[*.{ts,tsx,js,jsx,mjs,cjs}]
 indent_size = 2
+max_line_length = 80
+quote_type = double
 
-# Astro files
+# Astro files - matches Astro plugin settings
 [*.astro]
 indent_size = 2
+max_line_length = 80
+quote_type = double
 
-# YAML files
+# YAML files - strict formatting
 [*.{yml,yaml}]
 indent_size = 2
+max_line_length = 120
 
-# JSON files
-[*.json]
+# JSON files - standard formatting
+[*.{json,jsonc}]
 indent_size = 2
+max_line_length = 120
 
 # Configuration files
-[{package.json,.travis.yml}]
+[{package.json,.travis.yml,.github/workflows/*.yml}]
 indent_size = 2
 
 # HTML files
 [*.html]
 indent_size = 2
+max_line_length = 120
 
-# CSS files
-[*.{css,scss,sass}]
+# CSS files - matches Tailwind plugin
+[*.{css,scss,sass,postcss}]
 indent_size = 2
+max_line_length = 80
+
+# Shell scripts
+[*.{sh,bash}]
+indent_size = 2
+end_of_line = lf
+
+# Git files
+[.git*]
+indent_size = 2
+
+# Docker files  
+[{Dockerfile,docker-compose*.yml}]
+indent_size = 2
+
+# Test files - matches Vitest globals
+[*.{test,spec}.{ts,tsx,js,jsx}]
+indent_size = 2
+max_line_length = 100
+
+# WordPress migration scripts - special handling
+[src/scripts/wp-to-mdx/**]
+indent_size = 2
+max_line_length = 80
+
+# Build and config files
+[*.{config,conf}.{ts,js,mjs}]
+indent_size = 2
+max_line_length = 100
+
+# ESLint and Prettier config
+[{.eslintrc*,.prettierrc*}]
+indent_size = 2
+
+# Documentation
+[*.{txt,rst}]
+max_line_length = 120
+trim_trailing_whitespace = true
+
+# License and legal files
+[{LICENSE,COPYING,COPYRIGHT,AUTHORS,CONTRIBUTORS}]
+max_line_length = 120

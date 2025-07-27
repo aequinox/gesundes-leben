@@ -7,21 +7,21 @@
  * Single Responsibility: CSS class composition
  */
 import {
-  type ButtonVariant,
-  type ButtonSize,
-  type ButtonShape,
-  variantClasses,
-  sizeClasses,
-  shapeClasses,
-  stateClasses,
-} from "./ButtonVariants";
-
-import {
   animationStyles,
   buttonBaseClasses,
   cn,
   focusStyles,
 } from "@/utils/ui/designSystem";
+
+import {
+  shapeClasses,
+  sizeClasses,
+  stateClasses,
+  variantClasses,
+  type ButtonShape,
+  type ButtonSize,
+  type ButtonVariant,
+} from "./ButtonVariants";
 
 export interface ButtonClassOptions {
   variant: ButtonVariant;

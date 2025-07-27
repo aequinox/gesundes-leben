@@ -2,9 +2,9 @@
  * @file slugs.test.ts
  * @description Comprehensive tests for slug utility functions
  */
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { slugify, getPostSlug } from "../slugs";
+import { getPostSlug, slugify } from "../slugs";
 import type { Post } from "../types";
 
 describe("Slug Utilities", () => {
@@ -285,6 +285,53 @@ describe("Slug Utilities", () => {
 
       expect(typeof result).toBe("string");
       expect(end - start).toBeLessThan(50); // Should complete in under 50ms
+    });
+
+    it("should handle complex option combinations", () => {
+      const testText = "Complex Test String & More!";
+
+      // Test all boolean combinations
+      const options = [
+        { lower: true, strict: true, trim: true },
+        { lower: false, strict: true, trim: true },
+        { lower: true, strict: false, trim: true },
+        { lower: true, strict: true, trim: false },
+        { lower: false, strict: false, trim: false },
+        { replacement: "_", remove: /[!&]/g, locale: "en" },
+      ];
+
+      options.forEach(opts => {
+        const result = slugify(testText, opts);
+        expect(typeof result).toBe("string");
+      });
+    });
+
+    it("should throw error for invalid input types", () => {
+      // This tests input validation in slugs.ts
+      expect(() => slugify({} as any)).toThrow(
+        "Invalid input: string required"
+      );
+      expect(() => slugify(123 as any)).toThrow(
+        "Invalid input: string required"
+      );
+      expect(() => slugify(null as any)).toThrow(
+        "Invalid input: string required"
+      );
+      expect(() => slugify(undefined as any)).toThrow(
+        "Invalid input: string required"
+      );
+    });
+
+    it("should handle valid array and string inputs", () => {
+      // Test that forces both code paths to achieve coverage
+      const arrayResult = slugify(["valid", "array"]);
+      expect(Array.isArray(arrayResult)).toBe(true);
+      expect(arrayResult).toEqual(["valid", "array"]);
+
+      // Test string input works
+      const stringResult = slugify("test string");
+      expect(typeof stringResult).toBe("string");
+      expect(stringResult).toBe("test-string");
     });
   });
 });

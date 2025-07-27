@@ -8,6 +8,8 @@
  * - Performance-optimized crawl delays
  * - German health content compliance
  */
+import { EnumChangefreq } from "sitemap";
+
 import { SITE } from "../config";
 
 import type { SupportedLanguage } from "./i18n";
@@ -36,10 +38,10 @@ export interface SEOConfig {
       archives: number;
     };
     changefreq: {
-      homepage: string;
-      articles: string;
-      pages: string;
-      archives: string;
+      homepage: EnumChangefreq;
+      articles: EnumChangefreq;
+      pages: EnumChangefreq;
+      archives: EnumChangefreq;
     };
   };
   robots: {
@@ -77,10 +79,10 @@ export const seoConfig: SEOConfig = {
       archives: 0.4,
     },
     changefreq: {
-      homepage: "daily",
-      articles: "weekly",
-      pages: "monthly",
-      archives: "yearly",
+      homepage: EnumChangefreq.DAILY,
+      articles: EnumChangefreq.WEEKLY,
+      pages: EnumChangefreq.MONTHLY,
+      archives: EnumChangefreq.YEARLY,
     },
   },
 
@@ -237,12 +239,14 @@ export function getRobotPolicies(): RobotPolicy[] {
   const isDevelopment = import.meta.env.DEV;
   const basePolicy = seoConfig.robots.policies;
 
-  if (isDevelopment) {
+  if (
+    isDevelopment &&
+    seoConfig.robots.environmentSpecific.development.userAgent
+  ) {
+    const devPolicy = seoConfig.robots.environmentSpecific.development;
     return [
       {
-        ...seoConfig.robots.environmentSpecific.development,
-        userAgent: seoConfig.robots.environmentSpecific.development
-          .userAgent as string,
+        ...devPolicy,
         sitemap: seoConfig.sitemap.baseUrls,
       },
     ];

@@ -1,4 +1,4 @@
-import type { Root, RootContent, Link, Text, Html } from "mdast";
+import type { Html, Link, Root, RootContent, Text } from "mdast";
 import type { Plugin } from "unified";
 import { visit } from "unist-util-visit";
 

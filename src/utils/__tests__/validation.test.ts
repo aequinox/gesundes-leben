@@ -2,14 +2,14 @@
  * @file validation.test.ts
  * @description Comprehensive test suite for email validation utilities
  */
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
-  isValidEmail,
-  isSimpleValidEmail,
-  validateEmails,
   extractEmailDomain,
+  isSimpleValidEmail,
+  isValidEmail,
   normalizeEmail,
+  validateEmails,
 } from "../validation";
 
 describe("isValidEmail", () => {
@@ -325,6 +325,45 @@ describe("RFC compliance", () => {
 
     nonCompliantEmails.forEach(email => {
       expect(isValidEmail(email)).toBe(false);
+    });
+  });
+
+  describe("coverage edge cases", () => {
+    it("should handle domain length validation", () => {
+      // Test empty domain (line 208-210)
+      expect(isValidEmail("user@")).toBe(false);
+
+      // Test very long domain (line 208-210)
+      const longDomain = "a".repeat(254);
+      expect(isValidEmail(`user@${longDomain}`)).toBe(false);
+    });
+
+    it("should handle insufficient domain labels", () => {
+      // Test single label domain (lines 236-238)
+      expect(isValidEmail("user@single")).toBe(false);
+      expect(isValidEmail("user@localhost")).toBe(false);
+    });
+
+    it("should handle error conditions gracefully", () => {
+      // Test malformed input that could cause errors
+      const malformedInputs = [
+        {
+          toString: () => "test@example.com",
+          trim: () => {
+            throw new Error("test");
+          },
+        },
+        null,
+        undefined,
+        123,
+        [],
+      ];
+
+      malformedInputs.forEach(input => {
+        const result = isValidEmail(input as any);
+        expect(typeof result).toBe("boolean");
+        expect(result).toBe(false);
+      });
     });
   });
 });

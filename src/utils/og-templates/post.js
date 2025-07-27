@@ -1,6 +1,8 @@
 // import { html } from "satori-html";
 import satori from "satori";
 
+import { SITE } from "@/config";
+
 import { defaultLang } from "../../i18n/ui";
 import { useTranslations } from "../../i18n/utils";
 import { getAuthorDisplayName } from "../authors";
@@ -9,13 +11,11 @@ import { logger } from "../logger";
 
 import {
   OG_COLORS,
-  OG_IMAGE_DIMENSIONS,
-  OG_TYPOGRAPHY,
-  OG_LAYOUT,
   OG_EFFECTS,
+  OG_IMAGE_DIMENSIONS,
+  OG_LAYOUT,
+  OG_TYPOGRAPHY,
 } from "./constants";
-
-import { SITE } from "@/config";
 
 export default async post => {
   const title = post.data.title;

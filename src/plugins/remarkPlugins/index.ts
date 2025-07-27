@@ -1,5 +1,6 @@
 // import { replaceRelativeLinks } from "./remark-img-links";
 import type { RemarkPlugins } from "astro";
+
 import remarkCollapse from "remark-collapse";
 import remarkToc from "remark-toc";
 

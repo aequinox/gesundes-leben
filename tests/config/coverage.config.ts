@@ -6,19 +6,19 @@
  * and customized for different test environments (unit, integration, component, health).
  */
 
-import type { CoverageConfigDefaults } from 'vitest/config';
+import type { coverageConfigDefaults } from 'vitest/config';
 
 /**
  * Base coverage configuration shared across all environments
  */
-export const baseCoverageConfig: Partial<CoverageConfigDefaults> = {
+export const baseCoverageConfig: Partial<typeof coverageConfigDefaults> = {
   provider: 'v8',
   reportOnFailure: true,
   all: true,
   skipFull: false,
   clean: true,
   cleanOnRerun: true,
-  sourcemap: true,
+  // sourcemap: true, // Not available in current vitest version
   
   // Standard exclusions for all environments
   exclude: [

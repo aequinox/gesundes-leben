@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * @file componentFactory.ts
  * @description Component factory utilities for creating reusable, type-safe Astro components
@@ -20,10 +21,10 @@
  * const primaryButton = buttonVariants.primary;
  * ```
  */
-import { validateProps, type PropValidationSchema } from "./propValidation";
-
-import type { SizeVariant, ColorVariant, ValidationResult } from "@/types";
+import type { ColorVariant, SizeVariant, ValidationResult } from "@/types";
 import { logger } from "@/utils/logger";
+
+import { validateProps, type PropValidationSchema } from "./propValidation";
 
 // === Generic Component Interfaces ===
 

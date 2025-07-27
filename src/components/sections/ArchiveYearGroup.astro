@@ -14,13 +14,13 @@
  * ```
  */
 
-import Badge from "../elements/Badge.astro";
-
-import ArchiveMonthGroup from "./ArchiveMonthGroup.astro";
-
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { groupByCondition } from "@/utils/posts";
 import type { Post } from "@/utils/types";
+
+import Badge from "../elements/Badge.astro";
+
+import ArchiveMonthGroup from "./ArchiveMonthGroup.astro";
 
 export interface Props {
   /** The year to display */

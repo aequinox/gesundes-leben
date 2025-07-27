@@ -1,8 +1,8 @@
-import { describe, expect, it, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import {
-  filterPosts,
   extractUniqueTags,
+  filterPosts,
   filterPostsByTag,
   getTagCounts,
 } from "../tags";

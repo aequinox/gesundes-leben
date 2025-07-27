@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <rect width="400" height="300" fill="#f8f9fa"/>
+  
+  <!-- Plate -->
+  <ellipse cx="200" cy="200" rx="120" ry="20" fill="#e9ecef" stroke="#dee2e6" stroke-width="2"/>
+  <ellipse cx="200" cy="195" rx="120" ry="20" fill="#ffffff" stroke="#dee2e6" stroke-width="2"/>
+  
+  <!-- Toast slice -->
+  <rect x="160" y="160" width="80" height="60" rx="8" fill="#deb887" stroke="#cd853f" stroke-width="2"/>
+  
+  <!-- Egg -->
+  <ellipse cx="140" cy="170" rx="25" ry="20" fill="#ffffff" stroke="#dee2e6" stroke-width="2"/>
+  <circle cx="140" cy="170" r="8" fill="#ffd700"/>
+  
+  <!-- Fork -->
+  <line x1="280" y1="140" x2="280" y2="200" stroke="#6c757d" stroke-width="3"/>
+  <line x1="275" y1="145" x2="275" y2="155" stroke="#6c757d" stroke-width="2"/>
+  <line x1="280" y1="145" x2="280" y2="155" stroke="#6c757d" stroke-width="2"/>
+  <line x1="285" y1="145" x2="285" y2="155" stroke="#6c757d" stroke-width="2"/>
+  
+  <!-- Text -->
+  <text x="200" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#6c757d">Frühstück</text>
+</svg>

@@ -4,12 +4,6 @@
  */
 import type { Node, Root } from "mdast";
 
-/** Remark plugin type */
-// export type RemarkPlugin = (
-//   tree: Root,
-//   context: RemarkContext
-// ) => void | Promise<void>;
-
 /** Node predicate test */
 export type PredicateTest<T extends Node> = (node: T) => boolean;
 
@@ -18,29 +12,6 @@ export type Test = string | PredicateTest<Node>;
 
 /** Node visitor function */
 export type BuildVisitor<T extends Node> = (node: T) => void;
-
-/** Markdown processing options */
-// export interface MarkdownOptions {
-//   /** GFM (GitHub Flavored Markdown) */
-//   readonly gfm?: boolean;
-//   /** Footnotes support */
-//   readonly footnotes?: boolean;
-//   /** Math expressions */
-//   readonly math?: boolean;
-//   /** Custom plugins */
-//   readonly plugins?: RemarkPlugin[];
-//   /** Syntax highlighting */
-//   readonly highlight?: boolean;
-//   /** Table of contents */
-//   readonly toc?:
-//     | boolean
-//     | {
-//         /** Maximum heading depth */
-//         readonly maxDepth?: number;
-//         /** Heading levels to include */
-//         readonly levels?: number[];
-//       };
-// }
 
 /** Code block options */
 export interface CodeBlockOptions {

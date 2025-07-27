@@ -16,7 +16,12 @@
    *
    * @see https://www.typescriptlang.org/tsconfig#exclude
    */
-  "exclude": ["dist", "public/pagefind", "src/scripts/wp-to-mdx/**"],
+  "exclude": [
+    "dist",
+    "public/pagefind",
+    "src/scripts/wp-to-mdx/**",
+    "scripts/**"
+  ],
   /**
    * Configure TypeScript compiler options
    *
@@ -48,18 +53,6 @@
      */
     "jsxImportSource": "react",
     /**
-     * Target the latest ECMAScript version for output
-     *
-     * @see https://www.typescriptlang.org/tsconfig#target
-     */
-    "target": "ESNext",
-    /**
-     * Enable all strict type-checking options
-     *
-     * @see https://www.typescriptlang.org/tsconfig#strict
-     */
-    "strict": true,
-    /**
      * Configure module path aliases for cleaner imports
      *
      * @see https://www.typescriptlang.org/tsconfig#paths
@@ -67,24 +60,6 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    /**
-     * Allow JavaScript files to be included in the TypeScript project
-     *
-     * @see https://www.typescriptlang.org/tsconfig#allowJs
-     */
-    "allowJs": true,
-    /**
-     * Specify the module resolution strategy
-     *
-     * @see https://www.typescriptlang.org/tsconfig#moduleResolution
-     */
-    "moduleResolution": "bundler",
-    /**
-     * Enable incremental compilation
-     *
-     * @see https://www.typescriptlang.org/tsconfig#incremental
-     */
-    "incremental": true,
     /**
      * Skip type checking of declaration files
      *
@@ -97,12 +72,6 @@
      * @see https://www.typescriptlang.org/tsconfig#exactOptionalPropertyTypes
      */
     "exactOptionalPropertyTypes": false,
-    /**
-     * Ensure consistent casing in imports
-     *
-     * @see https://www.typescriptlang.org/tsconfig#forceConsistentCasingInFileNames
-     */
-    "forceConsistentCasingInFileNames": true,
     /**
      * Error on unreachable code patterns
      *
@@ -120,6 +89,12 @@
      *
      * @see https://www.typescriptlang.org/tsconfig#noUnusedParameters
      */
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    /**
+     * Don't emit JavaScript files (Astro handles compilation)
+     *
+     * @see https://www.typescriptlang.org/tsconfig#noEmit
+     */
+    "noEmit": true
   }
 }

@@ -519,6 +519,7 @@ export class ScrollProgress {
     this.ticking = true;
     requestAnimationFrame(() => {
       if (!this.article) {
+        this.ticking = false;
         return;
       }
 

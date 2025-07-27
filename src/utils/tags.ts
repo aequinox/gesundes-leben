@@ -4,10 +4,10 @@
  * Utility functions for managing tags in blog posts.
  * Provides functionality for extracting, filtering, and manipulating tags.
  */
-import type { Post } from "./types";
-
 import { SITE } from "@/config";
 import { slugify } from "@/utils/slugs";
+
+import type { Post } from "./types";
 
 /**
  * Tag information with both slugified and original forms

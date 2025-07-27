@@ -1,11 +1,11 @@
 import { getCollection, render } from "astro:content";
 
+import { SITE } from "@/config";
+
 import { handleAsync } from "./errors";
 import { logger } from "./logger";
 import { slugify } from "./slugs";
-import type { Post, Category, Tag } from "./types";
-
-import { SITE } from "@/config";
+import type { Category, Post, Tag } from "./types";
 
 /**
  * Interface for post processing options

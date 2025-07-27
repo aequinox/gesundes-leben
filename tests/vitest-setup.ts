@@ -1,8 +1,8 @@
 import { vi } from 'vitest';
 import '@testing-library/jest-dom';
 
-// Import health matchers for all tests (disabled temporarily while fixing)
-// import './matchers/health-matchers';
+// Import health matchers for all tests
+import './matchers/health-matchers';
 
 // =============================================================================
 // Global Test Environment Setup for Healthy Life Blog
@@ -48,7 +48,7 @@ Object.defineProperty(window, 'scrollTo', {
 });
 
 // Mock requestAnimationFrame
-global.requestAnimationFrame = vi.fn(cb => setTimeout(cb, 16));
+global.requestAnimationFrame = vi.fn(cb => setTimeout(cb, 16) as unknown as number);
 global.cancelAnimationFrame = vi.fn();
 
 // Performance API mock for health blog performance testing
@@ -63,10 +63,11 @@ global.performance = {
   clearMeasures: vi.fn()
 };
 
-// Mock URL constructor for health blog routing tests
-global.URL = class URL {
+// Mock URL constructor for health blog routing tests  
+const OriginalURL = globalThis.URL;
+global.URL = class URL extends OriginalURL {
   constructor(url: string, base?: string) {
-    return new (globalThis as unknown as { URL: typeof URL }).URL(url, base);
+    super(url, base);
   }
 } as unknown as typeof URL;
 
@@ -239,7 +240,7 @@ beforeEach(() => {
   
   // Reset window location
   delete (window as unknown as { location?: Location }).location;
-  window.location = {
+  (window as any).location = {
     href: 'http://localhost:3000/',
     origin: 'http://localhost:3000',
     pathname: '/',

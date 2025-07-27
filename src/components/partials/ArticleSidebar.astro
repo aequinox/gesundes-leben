@@ -27,10 +27,10 @@ const t = useTranslations(lang);
 
   <!-- Desktop Progress Bar -->
   <div id="pin" class="hidden md:block">
-    <div class="mx-4 overflow-hidden">
+    <div class="mx-4 mb-2 h-px overflow-hidden">
       <div
         id="progress-aside"
-        class="h-px w-full bg-gradient-to-r from-accent/50 to-accent"
+        class="h-full w-0 rounded-full bg-gradient-to-r from-accent/50 to-accent transition-all duration-300 ease-out"
         role="progressbar"
         aria-label="Reading progress sidebar"
         aria-valuemin="0"
@@ -203,19 +203,56 @@ const t = useTranslations(lang);
     }
   }
 
-  document.addEventListener("astro:page-load", () => {
+  let scrollProgressInstance: any = null;
+  let isInitialized = false;
+
+  function initializeComponents() {
+    if (isInitialized) {
+      return;
+    }
+    isInitialized = true;
+
     // Import and initialize the TableOfContents class
     import("@/utils/ui/TableOfContentsEngine").then(({ TableOfContents }) => {
       new TableOfContents();
     });
 
-    const scrollProgress = new ScrollProgress();
-    window.addEventListener("scroll", () => scrollProgress.update(), {
-      passive: true,
-    });
+    scrollProgressInstance = new ScrollProgress();
+
+    // Proper initial state handling
+    const initializeProgress = () => {
+      if (document.readyState === "complete") {
+        scrollProgressInstance.update();
+      } else {
+        requestAnimationFrame(() => {
+          setTimeout(() => scrollProgressInstance.update(), 100);
+        });
+      }
+    };
+
+    initializeProgress();
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        scrollProgressInstance.update();
+      },
+      {
+        passive: true,
+      }
+    );
 
     new BackToTopButton();
     new FloatingTOC();
+  }
+
+  // Single initialization point
+  document.addEventListener("astro:page-load", initializeComponents);
+
+  // Reset on navigation
+  document.addEventListener("astro:before-swap", () => {
+    isInitialized = false;
+    scrollProgressInstance = null;
   });
 </script>
 
@@ -283,18 +320,9 @@ const t = useTranslations(lang);
       0 0 0 1px rgba(255, 255, 255, 0.1);
   }
 
-  /* Progress bar enhancement */
+  /* Ensure consistent progress bar styling */
   #progress-aside {
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      oklch(var(--color-accent) / 0.3) 20%,
-      oklch(var(--color-accent)) 50%,
-      oklch(var(--color-accent) / 0.3) 80%,
-      transparent 100%
-    );
-    height: 2px;
-    border-radius: 1px;
+    transition: width 0.3s ease-out;
   }
 
   /* TOC heading enhancement */

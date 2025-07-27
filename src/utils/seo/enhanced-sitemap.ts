@@ -169,7 +169,7 @@ export class EnhancedSitemapGenerator {
    * Generate sitemap entry for blog post
    */
   generateBlogPostEntry(post: CollectionEntry<"blog">): SitemapEntry {
-    const url = `${this.config.baseUrl}/posts/${post.slug}/`;
+    const url = `${this.config.baseUrl}/posts/${post.id}/`;
     const isHealthContent = this.isHealthContent(post);
 
     const images = post.data.heroImage

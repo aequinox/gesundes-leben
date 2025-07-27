@@ -448,5 +448,7 @@ export function reportComponentError(
 
 // Make error reporting available globally
 if (typeof window !== "undefined") {
-  window.reportComponentError = reportComponentError;
+  (
+    window as Window & { reportComponentError?: typeof reportComponentError }
+  ).reportComponentError = reportComponentError;
 }

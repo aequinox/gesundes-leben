@@ -1,8 +1,8 @@
 import type {
   InteractiveComponentProps,
   NavigationComponentProps,
-  SizeVariant,
   ShapeVariant,
+  SizeVariant,
 } from "./base";
 
 /** Available button types */

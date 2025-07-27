@@ -1,0 +1,62 @@
+{
+  "name": "wordpress-export-to-markdown",
+  "version": "2.4.0",
+  "description": "Converts a WordPress export XML file into Markdown files.",
+  "main": "index.ts",
+  "type": "module",
+  "repository": "https://github.com/lonekorean/wordpress-export-to-markdown.git",
+  "keywords": [
+    "blog",
+    "convert",
+    "export",
+    "markdown",
+    "wordpress"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui",
+    "test:watch": "vitest --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{js,ts,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,ts,json,md}\""
+  },
+  "author": "Will Boyd <will@codersblock.com> (https://codersblock.com)",
+  "license": "MIT",
+  "engines": {
+    "node": ">= 18.0.0",
+    "bun": ">= 1.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.11.0",
+    "luxon": "^3.7.1",
+    "turndown": "^7.2.0",
+    "turndown-plugin-gfm": "^1.0.2",
+    "uuid": "^11.1.0",
+    "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.8",
+    "@types/luxon": "^3.6.2",
+    "@types/node": "^24.1.0",
+    "@types/turndown": "^5.0.5",
+    "@types/uuid": "^10.0.0",
+    "@types/xml2js": "^0.4.14",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/ui": "^3.2.4",
+    "eslint": "^9.31.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.3",
+    "prettier": "^3.6.2",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "bin": {
+    "wordpress-export-to-markdown": "./index.ts"
+  }
+}

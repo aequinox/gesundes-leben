@@ -35,11 +35,11 @@
 import { Icon } from "astro-icon/components";
 import { Picture } from "astro:assets";
 
-import Badge from "../elements/Badge.astro";
-import ArticleMeta from "../partials/ArticleMeta.astro";
-
 import { getPostSlug, slugify } from "@/utils/slugs";
 import type { Post } from "@/utils/types";
+
+import Badge from "../elements/Badge.astro";
+import ArticleMeta from "../partials/ArticleMeta.astro";
 
 export interface Props {
   /** The blog post entry to display */
