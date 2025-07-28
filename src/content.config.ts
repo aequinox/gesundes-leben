@@ -83,24 +83,29 @@ const favorites = defineCollection({
 });
 
 const references = defineCollection({
-  loader: glob({ pattern: "references.json", base: PATHS.references }),
-  schema: z.record(
-    z.string(),
-    z.object({
-      type: z.enum(["journal", "website"]),
-      title: z.string().min(1, "Title cannot be empty"),
-      authors: z.array(z.string()),
-      year: z.number(),
-      journal: z.string().optional(),
-      volume: z.number().optional(),
-      issue: z.number().optional(),
-      pages: z.string().optional(),
-      doi: z.string().optional(),
-      url: z.string().url("Invalid URL format"),
-      keywords: z.array(z.string()).default([]),
-      abstract: z.string().optional(),
-    })
-  ),
+  loader: glob({ pattern: "**/[^_]*.yaml", base: PATHS.references }),
+  schema: z.object({
+    type: z.enum(["journal", "website", "book"]),
+    title: z.string().min(1, "Title cannot be empty"),
+    authors: z.array(z.string()),
+    year: z.number(),
+    // Journal-specific fields
+    journal: z.string().optional(),
+    volume: z.number().optional(),
+    issue: z.number().optional(),
+    pages: z.string().optional(),
+    doi: z.string().optional(),
+    // Book-specific fields
+    publisher: z.string().optional(),
+    location: z.string().optional(),
+    edition: z.string().optional(),
+    isbn: z.string().optional(),
+    // Common fields
+    url: z.string().url("Invalid URL format").optional(),
+    pmid: z.string().optional(),
+    keywords: z.array(z.string()).default([]),
+    abstract: z.string().optional(),
+  }),
 });
 
 export const collections = { authors, blog, favorites, glossary, references };

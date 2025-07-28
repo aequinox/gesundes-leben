@@ -1,0 +1,14 @@
+type: "report"
+title: "Versichertenbefragung der Kassenärztlichen Bundesvereinigung 2021"
+authors: ["Kassenärztliche Bundesvereinigung"]
+year: 2021
+institution: "Kassenärztliche Bundesvereinigung"
+url: "https://www.kbv.de/media/sp/2021_KBV-Versichertenbefragung_Berichtband.pdf"
+keywords:
+  [
+    "versichertenbefragung",
+    "kassenärztliche bundesvereinigung",
+    "healthcare survey",
+    "germany",
+  ]
+abstract: "Survey report of insured persons by the German Association of Statutory Health Insurance Physicians for 2021."

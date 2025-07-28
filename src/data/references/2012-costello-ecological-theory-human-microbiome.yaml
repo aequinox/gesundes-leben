@@ -1,0 +1,19 @@
+type: "journal"
+title: "The application of ecological theory toward an understanding of the human microbiome"
+authors:
+  [
+    "Costello, Elizabeth K.",
+    "Stagaman, Keaton",
+    "Dethlefsen, Les",
+    "Bohannan, Brendan J.M.",
+    "Relman, David A.",
+  ]
+year: 2012
+journal: "Science"
+volume: "336"
+issue: "6086"
+pages: "1255-1262"
+url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4208626/"
+pmcid: "PMC4208626"
+keywords: ["ecological theory", "human microbiome", "microbial ecology"]
+abstract: "Application of ecological theory toward an understanding of the human microbiome and its interactions with the host."

@@ -1,0 +1,25 @@
+type: "journal"
+title: "Elderberry flavonoids bind to and prevent H1N1 infection in vitro"
+authors:
+  [
+    "Roschek Jr, Bill",
+    "Fink, Ryan C.",
+    "McMichael, Matthew",
+    "Alberte, Randolph S.",
+  ]
+year: 2009
+journal: "Phytochemistry"
+volume: "70"
+issue: "10"
+pages: "1255-1261"
+url: "https://pubmed.ncbi.nlm.nih.gov/19682714/"
+pmid: "19682714"
+keywords:
+  [
+    "elderberry flavonoids",
+    "H1N1",
+    "infection prevention",
+    "in vitro",
+    "antiviral",
+  ]
+abstract: "In vitro study demonstrating that elderberry flavonoids bind to and prevent H1N1 infection."

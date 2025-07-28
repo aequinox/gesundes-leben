@@ -1,0 +1,26 @@
+type: "journal"
+title: "Glycyrrhizin effectively inhibits SARS-CoV-2 replication by inhibiting the viral main protease"
+authors:
+  [
+    "van de Sand, Lukas",
+    "Bormann, Maren",
+    "Alt, Mara",
+    "Schipper, Lisa",
+    "Heilingloh, Carola Spohn",
+    "Steinmann, Eike",
+    "Todt, Daniel",
+    "Dittmer, Ulf",
+    "Elsner, Carsten",
+    "Hendricks, Robert",
+    "Banchet-Cadeddu, Arnaud",
+  ]
+year: 2021
+journal: "Viruses"
+volume: "13"
+issue: "4"
+pages: "609"
+url: "https://pubmed.ncbi.nlm.nih.gov/33918301/"
+pmid: "33918301"
+doi: "10.3390/v13040609"
+keywords: ["glycyrrhizin", "sars-cov-2", "viral protease", "covid-19"]
+abstract: "Study demonstrating that glycyrrhizin effectively inhibits SARS-CoV-2 replication by inhibiting the viral main protease."

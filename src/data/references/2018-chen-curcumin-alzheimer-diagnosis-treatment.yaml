@@ -1,0 +1,21 @@
+type: "journal"
+title: "Use of curcumin in diagnosis, prevention, and treatment of Alzheimer's disease"
+authors:
+  [
+    "Chen, Min",
+    "Du, Zhan-You",
+    "Zheng, Xin",
+    "Li, Dong-Liang",
+    "Zhou, Rui-Ping",
+    "Zhang, Kai",
+  ]
+year: 2018
+journal: "Neural Regeneration Research"
+volume: "13"
+issue: "4"
+pages: "742"
+url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5950688/"
+pmcid: "PMC5950688"
+keywords:
+  ["curcumin", "alzheimer disease", "diagnosis", "prevention", "treatment"]
+abstract: "Review of curcumin use in diagnosis, prevention, and treatment of Alzheimer's disease."

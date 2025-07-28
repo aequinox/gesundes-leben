@@ -4,16 +4,24 @@ import { getCollection } from "astro:content";
 import { logger } from "@/utils/logger";
 
 interface ReferenceData {
-  type: "journal" | "website";
+  type: "journal" | "website" | "book";
   title: string;
   authors?: string[];
   year?: number;
+  // Journal fields
   journal?: string;
   volume?: number;
   issue?: number;
   pages?: string;
   doi?: string;
+  // Book fields
+  publisher?: string;
+  location?: string;
+  edition?: string;
+  isbn?: string;
+  // Common fields
   url?: string;
+  pmid?: string;
   keywords?: string[];
   abstract?: string;
 }
@@ -25,27 +33,34 @@ interface Props {
 const { referenceIds } = Astro.props;
 
 // Get references data
-let referencesData: Record<string, ReferenceData> = {};
+let references: Array<ReferenceData & { id: string }> = [];
 try {
   const referencesCollection = await getCollection("references");
-  if (referencesCollection && referencesCollection.length > 0) {
-    referencesData = referencesCollection[0].data as Record<
-      string,
-      ReferenceData
-    >;
-  }
+
+  // Map each reference ID to its corresponding entry
+  references = referenceIds
+    .map(id => {
+      const refEntry = referencesCollection.find(ref => ref.id === id);
+      if (refEntry) {
+        return {
+          id,
+          ...refEntry.data,
+        };
+      }
+      return null;
+    })
+    .filter(
+      (ref): ref is ReferenceData & { id: string } =>
+        ref !== null && Boolean(ref.title)
+    );
 } catch (error) {
   logger.warn("Failed to load references collection:", error);
 }
 
-// Filter references based on provided IDs
-const references = referenceIds
-  .map(id => ({ id, ...referencesData[id] }))
-  .filter(ref => ref.title); // Only include references that exist
-
 // Calculate reference types and metadata
 const journalCount = references.filter(ref => ref.type === "journal").length;
 const websiteCount = references.filter(ref => ref.type === "website").length;
+const bookCount = references.filter(ref => ref.type === "book").length;
 const totalReferences = references.length;
 
 // Generate keywords from all references
@@ -66,7 +81,7 @@ const allAuthors = references
     <section
       class="mt-8 rounded-lg border bg-muted/30 p-6"
       data-pagefind-weight="12"
-      data-pagefind-meta={`referenceCount:${totalReferences},journalReferences:${journalCount},websiteReferences:${websiteCount},scientificKeywords:${allKeywords.join(",")},referenceAuthors:${allAuthors.join(",")},hasScientificReferences:true,contentType:references`}
+      data-pagefind-meta={`referenceCount:${totalReferences},journalReferences:${journalCount},websiteReferences:${websiteCount},bookReferences:${bookCount},scientificKeywords:${allKeywords.join(",")},referenceAuthors:${allAuthors.join(",")},hasScientificReferences:true,contentType:references`}
       data-pagefind-filter="Referenzen"
       aria-labelledby="references-heading"
     >
@@ -81,11 +96,11 @@ const allAuthors = references
       {/* References Metadata Summary for Search */}
       <div
         class="sr-only"
-        data-pagefind-meta={`referenceSummary:${totalReferences} wissenschaftliche Quellen: ${journalCount} Fachzeitschriften, ${websiteCount} Websites`}
+        data-pagefind-meta={`referenceSummary:${totalReferences} wissenschaftliche Quellen: ${journalCount} Fachzeitschriften, ${bookCount} Bücher, ${websiteCount} Websites`}
       >
         Dieser Artikel stützt sich auf {totalReferences} wissenschaftliche
         Quellen, darunter {journalCount} Fachartikel aus renommierten
-        Zeitschriften und {websiteCount}
+        Zeitschriften, {bookCount} Fachbücher und {websiteCount}
         vertrauenswürdige Online-Quellen.
       </div>
 
@@ -139,7 +154,20 @@ const allAuthors = references
                   </span>
                 )}
 
-                {/* DOI and URL */}
+                {/* Book info for books */}
+                {ref.type === "book" && (
+                  <span class="text-muted-foreground">
+                    . {ref.edition && `${ref.edition}. `}
+                    {ref.publisher && (
+                      <span data-pagefind-meta={`publisher:${ref.publisher}`}>
+                        {ref.publisher}
+                      </span>
+                    )}
+                    {ref.location && `, ${ref.location}`}
+                  </span>
+                )}
+
+                {/* DOI, PMID and URL */}
                 <div class="mt-1 flex flex-wrap gap-4 text-xs">
                   {ref.doi && (
                     <div class="flex items-center gap-1">
@@ -153,6 +181,33 @@ const allAuthors = references
                       >
                         {ref.doi}
                       </a>
+                    </div>
+                  )}
+
+                  {ref.pmid && (
+                    <div class="flex items-center gap-1">
+                      <span class="text-muted-foreground">PMID:</span>
+                      <a
+                        href={`https://pubmed.ncbi.nlm.nih.gov/${ref.pmid}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="font-mono text-accent hover:text-accent/80 hover:underline"
+                        data-pagefind-meta={`pmid:${ref.pmid}`}
+                      >
+                        {ref.pmid}
+                      </a>
+                    </div>
+                  )}
+
+                  {ref.isbn && (
+                    <div class="flex items-center gap-1">
+                      <span class="text-muted-foreground">ISBN:</span>
+                      <span
+                        class="text-muted-foreground font-mono"
+                        data-pagefind-meta={`isbn:${ref.isbn}`}
+                      >
+                        {ref.isbn}
+                      </span>
                     </div>
                   )}
 

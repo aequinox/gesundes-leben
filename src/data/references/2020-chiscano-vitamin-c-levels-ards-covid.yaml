@@ -1,0 +1,30 @@
+type: journal
+title: "Vitamin C levels in patients with SARS-CoV-2-associated acute respiratory distress syndrome"
+authors:
+  - "Chiscano-Camón, L."
+  - "Ruiz-Rodriguez, J. C."
+  - "Ruiz-Sanmartin, A."
+  - "Roca, O."
+  - "Macaya, L."
+  - "Castaneda, S."
+  - "Sanchez, G."
+  - "Gonzalez, J."
+  - "Teixido, C."
+  - "Barahona, I."
+  - "Fernandez-Barat, L."
+  - "Ferrer, R."
+year: 2020
+journal: "Critical Care"
+volume: 24
+issue: 1
+pages: "1-3"
+doi: "10.1186/s13054-020-03249-y"
+url: "https://ccforum.biomedcentral.com/articles/10.1186/s13054-020-03249-y"
+keywords:
+  - vitamin c levels
+  - sars-cov-2
+  - acute respiratory distress syndrome
+  - ards
+  - covid-19
+  - critical care
+abstract: "Study examining vitamin C levels in patients with SARS-CoV-2-associated acute respiratory distress syndrome."
