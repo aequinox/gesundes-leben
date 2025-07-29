@@ -93,6 +93,21 @@ export interface I18nStrings {
       healthDomain: string;
     };
   };
+  references: {
+    title: string;
+    summary: string;
+    credibilityIndicator: string;
+    keywordLabel: string;
+    summaryLabel: string;
+    externalSourceLabel: string;
+    types: {
+      journal: string;
+      website: string;
+      book: string;
+      report: string;
+      other: string;
+    };
+  };
 }
 
 /**
@@ -189,6 +204,22 @@ export const deStrings: I18nStrings = {
       healthDomain: "Gesundheitsbereich",
     },
   },
+  references: {
+    title: "Wissenschaftliche Quellen",
+    summary:
+      "Dieser Artikel stützt sich auf {count} wissenschaftliche Quellen, darunter {journals} Fachartikel aus renommierten Zeitschriften, {books} Fachbücher, {websites} vertrauenswürdige Online-Quellen, {reports} Berichte und {others} weitere Quellen.",
+    credibilityIndicator: "Wissenschaftlich fundiert: {count} Quellen",
+    keywordLabel: "Schlüsselwörter:",
+    summaryLabel: "Zusammenfassung:",
+    externalSourceLabel: "Externe Quelle:",
+    types: {
+      journal: "Fachzeitschrift",
+      website: "Website",
+      book: "Buch",
+      report: "Bericht",
+      other: "Weitere Quelle",
+    },
+  },
 };
 
 /**
@@ -283,6 +314,22 @@ export const enStrings: I18nStrings = {
       readingTime: "Reading Time",
       publishDate: "Publication Date",
       healthDomain: "Health Domain",
+    },
+  },
+  references: {
+    title: "Scientific Sources",
+    summary:
+      "This article is based on {count} scientific sources, including {journals} journal articles from renowned publications, {books} books, {websites} trusted online sources, {reports} reports, and {others} other sources.",
+    credibilityIndicator: "Scientifically backed: {count} sources",
+    keywordLabel: "Keywords:",
+    summaryLabel: "Abstract:",
+    externalSourceLabel: "External source:",
+    types: {
+      journal: "Journal",
+      website: "Website",
+      book: "Book",
+      report: "Report",
+      other: "Other source",
     },
   },
 };

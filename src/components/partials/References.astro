@@ -1,4 +1,5 @@
 ---
+import { getI18nStrings } from "@/config/i18n";
 import { logger } from "@/utils/logger";
 import { getReferencesByIds, type Reference } from "@/utils/references";
 
@@ -7,6 +8,7 @@ interface Props {
 }
 
 const { referenceIds } = Astro.props;
+const i18n = getI18nStrings("de");
 
 // Get references data using the utility function
 let references: Reference[] = [];
@@ -70,6 +72,15 @@ const allAuthors = references
   .flatMap(ref => ref.authors || [])
   .filter((author, index, array) => array.indexOf(author) === index)
   .slice(0, 8); // Limit to 8 authors for metadata
+
+// Create localized summary text
+const summaryText = i18n.references.summary
+  .replace("{count}", totalReferences.toString())
+  .replace("{journals}", journalCount.toString())
+  .replace("{books}", bookCount.toString())
+  .replace("{websites}", websiteCount.toString())
+  .replace("{reports}", reportCount.toString())
+  .replace("{others}", otherCount.toString());
 ---
 
 {
@@ -78,7 +89,7 @@ const allAuthors = references
       class="mt-8 rounded-lg border bg-muted/30 p-6"
       data-pagefind-weight="12"
       data-pagefind-meta={`referenceCount:${totalReferences},journalReferences:${journalCount},websiteReferences:${websiteCount},bookReferences:${bookCount},reportReferences:${reportCount},otherReferences:${otherCount},scientificKeywords:${allKeywords.join(",")},referenceAuthors:${allAuthors.join(",")},hasScientificReferences:true,contentType:references`}
-      data-pagefind-filter="Referenzen"
+      data-pagefind-filter={i18n.references.title}
       aria-labelledby="references-heading"
     >
       <h2
@@ -86,19 +97,15 @@ const allAuthors = references
         class="mb-4 text-xl font-semibold text-foreground"
         data-pagefind-weight="15"
       >
-        Wissenschaftliche Quellen
+        {i18n.references.title}
       </h2>
 
       {/* References Metadata Summary for Search */}
       <div
         class="sr-only"
-        data-pagefind-meta={`referenceSummary:${totalReferences} wissenschaftliche Quellen: ${journalCount} Fachzeitschriften, ${bookCount} Bücher, ${websiteCount} Websites, ${reportCount} Berichte, ${otherCount} weitere Quellen`}
+        data-pagefind-meta={`referenceSummary:${summaryText}`}
       >
-        Dieser Artikel stützt sich auf {totalReferences} wissenschaftliche
-        Quellen, darunter {journalCount} Fachartikel aus renommierten
-        Zeitschriften, {bookCount} Fachbücher, {websiteCount}
-        vertrauenswürdige Online-Quellen, {reportCount} Berichte und{" "}
-        {otherCount} weitere Quellen.
+        {summaryText}
       </div>
 
       <ol class="space-y-4" role="list">
@@ -240,7 +247,7 @@ const allAuthors = references
                         target="_blank"
                         rel="noopener noreferrer"
                         class="break-all text-accent hover:text-accent/80 hover:underline"
-                        aria-label={`Externe Quelle: ${ref.title}`}
+                        aria-label={`${i18n.references.externalSourceLabel} ${ref.title}`}
                       >
                         {ref.url.replace(/^https?:\/\//, "")}
                       </a>
@@ -254,7 +261,7 @@ const allAuthors = references
                     class="sr-only"
                     data-pagefind-meta={`keywords:${ref.keywords.join(",")}`}
                   >
-                    Schlüsselwörter: {ref.keywords.join(", ")}
+                    {i18n.references.keywordLabel} {ref.keywords.join(", ")}
                   </div>
                 )}
 
@@ -265,7 +272,7 @@ const allAuthors = references
                     data-pagefind-weight="6"
                     data-pagefind-meta={`hasAbstract:true`}
                   >
-                    Zusammenfassung: {ref.abstract}
+                    {i18n.references.summaryLabel} {ref.abstract}
                   </div>
                 )}
               </div>
@@ -291,7 +298,10 @@ const allAuthors = references
           />
         </svg>
         <span data-pagefind-meta="scientificallyBacked:true">
-          Wissenschaftlich fundiert: {totalReferences} Quellen
+          {i18n.references.credibilityIndicator.replace(
+            "{count}",
+            totalReferences.toString()
+          )}
         </span>
       </div>
     </section>
