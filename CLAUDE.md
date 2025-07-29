@@ -202,7 +202,7 @@ The blog uses enhanced Astro components for improved performance, accessibility,
 3. Images should be placed in the post's folder under `images/`
 4. Use enhanced component system for all content (see component docs)
 5. German language conventions apply throughout the codebase
-6. Add new scientific references to `references.json` for reuse across articles
+6. Add new scientific references as individual YAML files in `src/data/references/` for reuse across articles
 
 ### Git Workflow
 **Commit Strategy**: Commit to git repository (Gitea) after every major step or feature completion. Use detailed, descriptive commit messages that explain the what, why, and impact of changes.
