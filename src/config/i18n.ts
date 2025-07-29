@@ -100,12 +100,52 @@ export interface I18nStrings {
     keywordLabel: string;
     summaryLabel: string;
     externalSourceLabel: string;
+    plurals: {
+      sources: {
+        zero: string;
+        one: string;
+        other: string;
+      };
+      journals: {
+        zero: string;
+        one: string;
+        other: string;
+      };
+      books: {
+        zero: string;
+        one: string;
+        other: string;
+      };
+      websites: {
+        zero: string;
+        one: string;
+        other: string;
+      };
+      reports: {
+        zero: string;
+        one: string;
+        other: string;
+      };
+      others: {
+        zero: string;
+        one: string;
+        other: string;
+      };
+    };
     types: {
       journal: string;
       website: string;
       book: string;
       report: string;
       other: string;
+    };
+    accessibility: {
+      referenceSection: string;
+      referenceList: string;
+      referenceItem: string;
+      externalLink: string;
+      doiLink: string;
+      pmidLink: string;
     };
   };
 }
@@ -212,12 +252,52 @@ export const deStrings: I18nStrings = {
     keywordLabel: "Schlüsselwörter:",
     summaryLabel: "Zusammenfassung:",
     externalSourceLabel: "Externe Quelle:",
+    plurals: {
+      sources: {
+        zero: "Keine wissenschaftlichen Quellen",
+        one: "Eine wissenschaftliche Quelle",
+        other: "{count} wissenschaftliche Quellen",
+      },
+      journals: {
+        zero: "keine Fachzeitschriften",
+        one: "eine Fachzeitschrift",
+        other: "{count} Fachzeitschriften",
+      },
+      books: {
+        zero: "keine Bücher",
+        one: "ein Buch",
+        other: "{count} Bücher",
+      },
+      websites: {
+        zero: "keine Websites",
+        one: "eine Website",
+        other: "{count} Websites",
+      },
+      reports: {
+        zero: "keine Berichte",
+        one: "einen Bericht",
+        other: "{count} Berichte",
+      },
+      others: {
+        zero: "keine weiteren Quellen",
+        one: "eine weitere Quelle",
+        other: "{count} weitere Quellen",
+      },
+    },
     types: {
       journal: "Fachzeitschrift",
       website: "Website",
       book: "Buch",
       report: "Bericht",
       other: "Weitere Quelle",
+    },
+    accessibility: {
+      referenceSection: "Bereich mit wissenschaftlichen Quellen",
+      referenceList: "Liste der wissenschaftlichen Quellen",
+      referenceItem: "Wissenschaftliche Quelle {index}",
+      externalLink: "Externe Quelle: {title} (Öffnet in neuem Fenster)",
+      doiLink: "DOI-Link zu {title} (Öffnet in neuem Fenster)",
+      pmidLink: "PubMed-Link zu {title} (Öffnet in neuem Fenster)",
     },
   },
 };
@@ -324,12 +404,52 @@ export const enStrings: I18nStrings = {
     keywordLabel: "Keywords:",
     summaryLabel: "Abstract:",
     externalSourceLabel: "External source:",
+    plurals: {
+      sources: {
+        zero: "No scientific sources",
+        one: "One scientific source",
+        other: "{count} scientific sources",
+      },
+      journals: {
+        zero: "no journal articles",
+        one: "one journal article",
+        other: "{count} journal articles",
+      },
+      books: {
+        zero: "no books",
+        one: "one book",
+        other: "{count} books",
+      },
+      websites: {
+        zero: "no websites",
+        one: "one website",
+        other: "{count} websites",
+      },
+      reports: {
+        zero: "no reports",
+        one: "one report",
+        other: "{count} reports",
+      },
+      others: {
+        zero: "no other sources",
+        one: "one other source",
+        other: "{count} other sources",
+      },
+    },
     types: {
       journal: "Journal",
       website: "Website",
       book: "Book",
       report: "Report",
       other: "Other source",
+    },
+    accessibility: {
+      referenceSection: "Scientific sources section",
+      referenceList: "List of scientific sources",
+      referenceItem: "Scientific source {index}",
+      externalLink: "External source: {title} (Opens in new window)",
+      doiLink: "DOI link to {title} (Opens in new window)",
+      pmidLink: "PubMed link to {title} (Opens in new window)",
     },
   },
 };
@@ -350,13 +470,38 @@ export function getI18nStrings(
 }
 
 /**
- * Get specific translation key with fallback
+ * Interpolation values for translations
+ */
+export interface InterpolationValues {
+  [key: string]: string | number | boolean;
+}
+
+/**
+ * Pluralization options
+ */
+export interface PluralizationOptions {
+  count: number;
+  zero?: string;
+  one?: string;
+  few?: string;
+  many?: string;
+  other: string;
+}
+
+/**
+ * Enhanced translation function with interpolation and pluralization
  */
 export function t(
   key: string,
-  language: SupportedLanguage = "de",
-  fallback?: string
+  options: {
+    language?: SupportedLanguage;
+    fallback?: string;
+    values?: InterpolationValues;
+    pluralization?: PluralizationOptions;
+  } = {}
 ): string {
+  const { language = "de", fallback, values = {}, pluralization } = options;
+
   const strings = getI18nStrings(language);
 
   // Support nested key access like 'seo.medical.disclaimer'
@@ -371,7 +516,60 @@ export function t(
     }
   }
 
-  return typeof value === "string" ? value : fallback || key;
+  let translatedText = typeof value === "string" ? value : fallback || key;
+
+  // Handle pluralization
+  if (pluralization) {
+    const { count, zero, one, few, many, other } = pluralization;
+
+    if (count === 0 && zero !== undefined) {
+      translatedText = zero;
+    } else if (count === 1 && one !== undefined) {
+      translatedText = one;
+    } else if (count > 1 && count <= 4 && few !== undefined) {
+      translatedText = few;
+    } else if (count > 4 && many !== undefined) {
+      translatedText = many;
+    } else {
+      translatedText = other;
+    }
+  }
+
+  // Handle interpolation with multiple placeholder formats
+  return interpolateString(translatedText, values);
+}
+
+/**
+ * Advanced string interpolation with support for multiple formats
+ */
+function interpolateString(
+  template: string,
+  values: InterpolationValues
+): string {
+  return template.replace(
+    /\{(\w+)\}|\[(\w+)\]|\$\{(\w+)\}/g,
+    (match, curly, square, dollar) => {
+      const key = curly || square || dollar;
+      const value = values[key];
+
+      if (value !== undefined) {
+        return String(value);
+      }
+
+      return match; // Return original if no replacement found
+    }
+  );
+}
+
+/**
+ * Get specific translation key with fallback (legacy support)
+ */
+export function getTranslation(
+  key: string,
+  language: SupportedLanguage = "de",
+  fallback?: string
+): string {
+  return t(key, { language, fallback });
 }
 
 /**
