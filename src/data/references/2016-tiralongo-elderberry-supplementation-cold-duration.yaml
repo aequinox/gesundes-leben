@@ -1,19 +1,23 @@
-type: "journal"
-title: "Elderberry supplementation reduces cold duration and symptoms in air-travellers: A randomized, double-blind placebo-controlled clinical trial"
-authors: ["Tiralongo, Evelin", "Wee, Shirley S.", "Lea, Rodney A."]
+type: journal
+title: "Elderberry supplementation reduces cold duration and symptoms in
+  air-travellers: A randomized, double-blind placebo-controlled clinical trial"
+authors:
+  - Tiralongo, Evelin
+  - Wee, Shirley S.
+  - Lea, Rodney A.
 year: 2016
-journal: "Nutrients"
-volume: "8"
-issue: "4"
+journal: Nutrients
+volume: 8
+issue: 4
 pages: "182"
-url: "https://pubmed.ncbi.nlm.nih.gov/27023596/"
+url: https://pubmed.ncbi.nlm.nih.gov/27023596/
 pmid: "27023596"
 keywords:
-  [
-    "elderberry supplementation",
-    "cold duration",
-    "air travelers",
-    "clinical trial",
-    "immune support",
-  ]
-abstract: "Randomized, double-blind placebo-controlled clinical trial showing that elderberry supplementation reduces cold duration and symptoms in air travelers."
+  - elderberry supplementation
+  - cold duration
+  - air travelers
+  - clinical trial
+  - immune support
+abstract: Randomized, double-blind placebo-controlled clinical trial showing
+  that elderberry supplementation reduces cold duration and symptoms in air
+  travelers.

@@ -1,20 +1,23 @@
-type: "journal"
-title: "Randomized study of the efficacy and safety of oral elderberry extract in the treatment of influenza A and B virus infections"
+type: journal
+title: Randomized study of the efficacy and safety of oral elderberry extract in
+  the treatment of influenza A and B virus infections
 authors:
-  ["Zakay-Rones, Zichria", "Thom, Evelyn", "Wollan, Terry", "Wadstein, Jon"]
+  - Zakay-Rones, Zichria
+  - Thom, Evelyn
+  - Wollan, Terry
+  - Wadstein, Jon
 year: 2004
-journal: "Journal of International Medical Research"
-volume: "32"
-issue: "2"
-pages: "132-140"
-url: "https://pubmed.ncbi.nlm.nih.gov/15080016/"
+journal: Journal of International Medical Research
+volume: 32
+issue: 2
+pages: 132-140
+url: https://pubmed.ncbi.nlm.nih.gov/15080016/
 pmid: "15080016"
 keywords:
-  [
-    "elderberry extract",
-    "influenza treatment",
-    "randomized study",
-    "antiviral",
-    "Sambucus nigra",
-  ]
-abstract: "Randomized clinical study examining the efficacy and safety of oral elderberry extract in treating influenza A and B virus infections."
+  - elderberry extract
+  - influenza treatment
+  - randomized study
+  - antiviral
+  - Sambucus nigra
+abstract: Randomized clinical study examining the efficacy and safety of oral
+  elderberry extract in treating influenza A and B virus infections.

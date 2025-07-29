@@ -1,25 +1,23 @@
-type: "journal"
-title: "Binding of a natural anthocyanin inhibitor to influenza neuraminidase by mass spectrometry"
+type: journal
+title: Binding of a natural anthocyanin inhibitor to influenza neuraminidase by
+  mass spectrometry
 authors:
-  [
-    "Swaminathan, Kavya",
-    "Dyason, Jacinta C.",
-    "Maggioni, Antonio",
-    "von Itzstein, Mark",
-    "Downard, Kevin M.",
-  ]
+  - Swaminathan, Kavya
+  - Dyason, Jacinta C.
+  - Maggioni, Antonio
+  - von Itzstein, Mark
+  - Downard, Kevin M.
 year: 2013
-journal: "Analytical and Bioanalytical Chemistry"
-volume: "405"
-pages: "6563-6572"
-url: "https://pubmed.ncbi.nlm.nih.gov/23748498/"
+journal: Analytical and Bioanalytical Chemistry
+volume: 405
+pages: 6563-6572
+url: https://pubmed.ncbi.nlm.nih.gov/23748498/
 pmid: "23748498"
 keywords:
-  [
-    "anthocyanin inhibitor",
-    "influenza neuraminidase",
-    "mass spectrometry",
-    "natural compounds",
-    "antiviral",
-  ]
-abstract: "Mass spectrometry study examining the binding of natural anthocyanin inhibitors to influenza neuraminidase."
+  - anthocyanin inhibitor
+  - influenza neuraminidase
+  - mass spectrometry
+  - natural compounds
+  - antiviral
+abstract: Mass spectrometry study examining the binding of natural anthocyanin
+  inhibitors to influenza neuraminidase.

@@ -1,18 +1,21 @@
-type: "journal"
-title: "Substituent effects on the binding of natural product anthocyanidin inhibitors to influenza neuraminidase with mass spectrometry"
-authors: ["Swaminathan, Kavya", "Müller, Patrick", "Downard, Kevin M."]
+type: journal
+title: Substituent effects on the binding of natural product anthocyanidin
+  inhibitors to influenza neuraminidase with mass spectrometry
+authors:
+  - Swaminathan, Kavya
+  - Müller, Patrick
+  - Downard, Kevin M.
 year: 2014
-journal: "Analytica Chimica Acta"
-volume: "828"
-pages: "61-69"
-url: "https://pubmed.ncbi.nlm.nih.gov/24845816/"
+journal: Analytica Chimica Acta
+volume: 828
+pages: 61-69
+url: https://pubmed.ncbi.nlm.nih.gov/24845816/
 pmid: "24845816"
 keywords:
-  [
-    "anthocyanidin inhibitors",
-    "influenza neuraminidase",
-    "mass spectrometry",
-    "natural products",
-    "substituent effects",
-  ]
-abstract: "Mass spectrometry analysis of substituent effects on the binding of natural product anthocyanidin inhibitors to influenza neuraminidase."
+  - anthocyanidin inhibitors
+  - influenza neuraminidase
+  - mass spectrometry
+  - natural products
+  - substituent effects
+abstract: Mass spectrometry analysis of substituent effects on the binding of
+  natural product anthocyanidin inhibitors to influenza neuraminidase.

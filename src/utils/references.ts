@@ -22,7 +22,7 @@ import {
 } from "@/utils/referenceCache";
 
 // Types based on the content schema
-export type ReferenceType = "journal" | "website" | "book";
+export type ReferenceType = "journal" | "website" | "book" | "report" | "other";
 
 export interface ReferenceData {
   type: ReferenceType;
@@ -32,7 +32,7 @@ export interface ReferenceData {
   // Journal-specific fields
   journal?: string;
   volume?: number;
-  issue?: number;
+  issue?: number | string;
   pages?: string;
   doi?: string;
   // Book-specific fields
@@ -238,6 +238,8 @@ export async function getReferencesByType(): Promise<
     journal: allReferences.filter(ref => ref.type === "journal"),
     website: allReferences.filter(ref => ref.type === "website"),
     book: allReferences.filter(ref => ref.type === "book"),
+    report: allReferences.filter(ref => ref.type === "report"),
+    other: allReferences.filter(ref => ref.type === "other"),
   };
 }
 
@@ -262,6 +264,8 @@ export async function getReferenceStats(): Promise<ReferenceStats> {
       journal: allReferences.filter(ref => ref.type === "journal").length,
       website: allReferences.filter(ref => ref.type === "website").length,
       book: allReferences.filter(ref => ref.type === "book").length,
+      report: allReferences.filter(ref => ref.type === "report").length,
+      other: allReferences.filter(ref => ref.type === "other").length,
     };
 
     const years = allReferences.map(ref => ref.year);
@@ -482,10 +486,13 @@ export function validateReferenceData(
   // Required fields
   if (!data.type) {
     errors.push({ field: "type", message: "Type is required" });
-  } else if (!["journal", "website", "book"].includes(data.type)) {
+  } else if (
+    !["journal", "website", "book", "report", "other"].includes(data.type)
+  ) {
     errors.push({
       field: "type",
-      message: "Type must be 'journal', 'website', or 'book'",
+      message:
+        "Type must be 'journal', 'website', 'book', 'report', or 'other'",
     });
   }
 

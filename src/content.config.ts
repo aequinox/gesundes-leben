@@ -85,14 +85,14 @@ const favorites = defineCollection({
 const references = defineCollection({
   loader: glob({ pattern: "**/[^_]*.yaml", base: PATHS.references }),
   schema: z.object({
-    type: z.enum(["journal", "website", "book"]),
+    type: z.enum(["journal", "website", "book", "report", "other"]),
     title: z.string().min(1, "Title cannot be empty"),
     authors: z.array(z.string()),
     year: z.number(),
     // Journal-specific fields
     journal: z.string().optional(),
     volume: z.number().optional(),
-    issue: z.number().optional(),
+    issue: z.union([z.number(), z.string()]).optional(),
     pages: z.string().optional(),
     doi: z.string().optional(),
     // Book-specific fields

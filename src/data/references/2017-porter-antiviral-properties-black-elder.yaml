@@ -1,19 +1,21 @@
-type: "journal"
-title: "A review of the antiviral properties of black elder (Sambucus nigra L.) products"
-authors: ["Porter, Randall S.", "Bode, Robert F."]
+type: journal
+title: A review of the antiviral properties of black elder (Sambucus nigra L.)
+  products
+authors:
+  - Porter, Randall S.
+  - Bode, Robert F.
 year: 2017
-journal: "Phytotherapy Research"
-volume: "31"
-issue: "4"
-pages: "533-554"
-url: "https://pubmed.ncbi.nlm.nih.gov/28198157/"
+journal: Phytotherapy Research
+volume: 31
+issue: 4
+pages: 533-554
+url: https://pubmed.ncbi.nlm.nih.gov/28198157/
 pmid: "28198157"
 keywords:
-  [
-    "black elder",
-    "Sambucus nigra",
-    "antiviral properties",
-    "phytotherapy",
-    "review",
-  ]
-abstract: "Comprehensive review of the antiviral properties of black elderberry products and their mechanisms of action."
+  - black elder
+  - Sambucus nigra
+  - antiviral properties
+  - phytotherapy
+  - review
+abstract: Comprehensive review of the antiviral properties of black elderberry
+  products and their mechanisms of action.

@@ -1,33 +1,32 @@
-type: "journal"
-title: "Prolonged fasting reduces IGF-1/PKA to promote hematopoietic-stem-cell-based regeneration and reverse immunosuppression"
+type: journal
+title: Prolonged fasting reduces IGF-1/PKA to promote
+  hematopoietic-stem-cell-based regeneration and reverse immunosuppression
 authors:
-  [
-    "Cheng, Chia-Wei",
-    "Adams, Gregor B.",
-    "Perin, Laura",
-    "Wei, Min",
-    "Zhou, Xiaoying",
-    "Lam, Ben S.",
-    "Da Sacco, Stefano",
-    "Mirisola, Mario",
-    "Quinn, David I.",
-    "Dorff, Tanya B.",
-    "Kopchick, John J.",
-    "Longo, Valter D.",
-  ]
+  - Cheng, Chia-Wei
+  - Adams, Gregor B.
+  - Perin, Laura
+  - Wei, Min
+  - Zhou, Xiaoying
+  - Lam, Ben S.
+  - Da Sacco, Stefano
+  - Mirisola, Mario
+  - Quinn, David I.
+  - Dorff, Tanya B.
+  - Kopchick, John J.
+  - Longo, Valter D.
 year: 2014
-journal: "Cell Stem Cell"
-volume: "14"
-issue: "6"
-pages: "810-823"
-url: "https://www.cell.com/cell-stem-cell/fulltext/S1934-5909(14)00151-9"
+journal: Cell Stem Cell
+volume: 14
+issue: 6
+pages: 810-823
+url: https://www.cell.com/cell-stem-cell/fulltext/S1934-5909(14)00151-9
 keywords:
-  [
-    "prolonged fasting",
-    "IGF-1",
-    "PKA",
-    "hematopoietic stem cells",
-    "immunosuppression",
-    "regeneration",
-  ]
-abstract: "Study demonstrating how prolonged fasting reduces IGF-1/PKA signaling to promote hematopoietic stem cell-based regeneration and reverse immunosuppression."
+  - prolonged fasting
+  - IGF-1
+  - PKA
+  - hematopoietic stem cells
+  - immunosuppression
+  - regeneration
+abstract: Study demonstrating how prolonged fasting reduces IGF-1/PKA signaling
+  to promote hematopoietic stem cell-based regeneration and reverse
+  immunosuppression.

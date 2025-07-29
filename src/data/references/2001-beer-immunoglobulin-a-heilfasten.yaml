@@ -1,16 +1,19 @@
-type: "journal"
-title: "Verläufe des sekretorischen Immunglobulins A des Darms und der allgemeinen Befindlichkeit von Patienten unter naturheilkundlicher Therapie und Heilfasten"
-authors: ["Beer, A. M."]
+type: journal
+title: Verläufe des sekretorischen Immunglobulins A des Darms und der
+  allgemeinen Befindlichkeit von Patienten unter naturheilkundlicher Therapie
+  und Heilfasten
+authors:
+  - Beer, A. M.
 year: 2001
-journal: "Forschende Komplementärmedizin und Klassische Naturheilkunde"
-volume: "8"
-pages: "346-353"
+journal: Forschende Komplementärmedizin und Klassische Naturheilkunde
+volume: 8
+pages: 346-353
 keywords:
-  [
-    "Immunoglobulin A",
-    "Heilfasten",
-    "naturheilkundliche Therapie",
-    "Darm",
-    "Befindlichkeit",
-  ]
-abstract: "Studie über die Verläufe des sekretorischen Immunglobulins A des Darms und der allgemeinen Befindlichkeit von Patienten unter naturheilkundlicher Therapie und Heilfasten."
+  - Immunoglobulin A
+  - Heilfasten
+  - naturheilkundliche Therapie
+  - Darm
+  - Befindlichkeit
+abstract: Studie über die Verläufe des sekretorischen Immunglobulins A des Darms
+  und der allgemeinen Befindlichkeit von Patienten unter naturheilkundlicher
+  Therapie und Heilfasten.

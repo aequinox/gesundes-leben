@@ -1,10 +1,16 @@
-type: "journal"
+type: journal
 title: "Ultraprocessed food: addictive, toxic, and ready for regulation"
-authors: ["Lustig, Robert H."]
+authors:
+  - Lustig, Robert H.
 year: 2020
-journal: "Nutrients"
-volume: "12"
-issue: "11"
+journal: Nutrients
+volume: 12
+issue: 11
 pages: "3401"
-keywords: ["ultraprocessed food", "addictive", "toxic", "food regulation"]
-abstract: "Review examining the addictive and toxic properties of ultraprocessed foods and arguments for regulation."
+keywords:
+  - ultraprocessed food
+  - addictive
+  - toxic
+  - food regulation
+abstract: Review examining the addictive and toxic properties of ultraprocessed
+  foods and arguments for regulation.

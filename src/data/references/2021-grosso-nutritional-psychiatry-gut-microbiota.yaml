@@ -1,12 +1,18 @@
-type: "journal"
+type: journal
 title: "Nutritional Psychiatry: How Diet Affects Brain through Gut Microbiota"
-authors: ["Grosso, Giuseppe"]
+authors:
+  - Grosso, Giuseppe
 year: 2021
-journal: "Nutrients"
-volume: "13"
-issue: "4"
+journal: Nutrients
+volume: 13
+issue: 4
 pages: "1282"
-url: "https://www.mdpi.com/2072-6643/13/4/1282/htm"
+url: https://www.mdpi.com/2072-6643/13/4/1282/htm
 keywords:
-  ["nutritional psychiatry", "diet", "brain", "gut microbiota", "nutrients"]
-abstract: "Review on nutritional psychiatry examining how diet affects brain function through gut microbiota."
+  - nutritional psychiatry
+  - diet
+  - brain
+  - gut microbiota
+  - nutrients
+abstract: Review on nutritional psychiatry examining how diet affects brain
+  function through gut microbiota.

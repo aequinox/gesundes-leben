@@ -1,25 +1,28 @@
-type: "journal"
-title: "Unravelling the collateral damage of antibiotics on gut bacteria"
+type: journal
+title: Unravelling the collateral damage of antibiotics on gut bacteria
 authors:
-  [
-    "Maier, Lisa",
-    "Pruteanu, Mihaela",
-    "Kuhn, Michael",
-    "Zeller, Georg",
-    "Telzerow, Anja",
-    "Anderson, Exene Erin",
-    "Brochado, Ana Rita",
-    "Fernandez, Keith Conrad",
-    "Dose, Hitomi",
-    "Mori, Hirotada",
-    "Patil, Kiran Raosaheb",
-    "Bork, Peer",
-    "Typas, Athanasios",
-  ]
+  - Maier, Lisa
+  - Pruteanu, Mihaela
+  - Kuhn, Michael
+  - Zeller, Georg
+  - Telzerow, Anja
+  - Anderson, Exene Erin
+  - Brochado, Ana Rita
+  - Fernandez, Keith Conrad
+  - Dose, Hitomi
+  - Mori, Hirotada
+  - Patil, Kiran Raosaheb
+  - Bork, Peer
+  - Typas, Athanasios
 year: 2021
-journal: "Nature"
-volume: "599"
-pages: "120-124"
-url: "https://www.nature.com/articles/s41586-021-03986-2"
-keywords: ["antibiotics", "gut bacteria", "collateral damage", "microbiome"]
-abstract: "Study examining the collateral damage of antibiotics on gut bacteria and the microbiome."
+journal: Nature
+volume: 599
+pages: 120-124
+url: https://www.nature.com/articles/s41586-021-03986-2
+keywords:
+  - antibiotics
+  - gut bacteria
+  - collateral damage
+  - microbiome
+abstract: Study examining the collateral damage of antibiotics on gut bacteria
+  and the microbiome.

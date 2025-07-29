@@ -1,16 +1,19 @@
-type: "journal"
-title: "The role of probiotics and prebiotics in modulating of the gut-brain axis"
+type: journal
+title: The role of probiotics and prebiotics in modulating of the gut-brain axis
 authors:
-  [
-    "Ansari, F.",
-    "Neshat, M.",
-    "Pourjafar, H.",
-    "Jafari, S.",
-    "Samakkhah, S. A.",
-    "Mirzakhani, E.",
-  ]
+  - Ansari, F.
+  - Neshat, M.
+  - Pourjafar, H.
+  - Jafari, S.
+  - Samakkhah, S. A.
+  - Mirzakhani, E.
 year: 2023
-journal: "Frontiers in Nutrition"
-volume: "10"
-keywords: ["gut-brain axis", "probiotics", "prebiotics", "microbiome"]
-abstract: "Review on the role of probiotics and prebiotics in modulating the gut-brain axis."
+journal: Frontiers in Nutrition
+volume: 10
+keywords:
+  - gut-brain axis
+  - probiotics
+  - prebiotics
+  - microbiome
+abstract: Review on the role of probiotics and prebiotics in modulating the
+  gut-brain axis.

@@ -1,21 +1,24 @@
-type: "journal"
-title: "Antiviral effects of Glycyrrhiza species"
+type: journal
+title: Antiviral effects of Glycyrrhiza species
 authors:
-  [
-    "Fiore, Cristina",
-    "Eisenhut, Michael",
-    "Krausse, Rolf",
-    "Ragazzi, Eugenio",
-    "Pellati, Daniela",
-    "Armanini, Decio",
-    "Bielenberg, Jörg",
-  ]
+  - Fiore, Cristina
+  - Eisenhut, Michael
+  - Krausse, Rolf
+  - Ragazzi, Eugenio
+  - Pellati, Daniela
+  - Armanini, Decio
+  - Bielenberg, Jörg
 year: 2008
-journal: "Phytotherapy Research"
-volume: "22"
-issue: "2"
-pages: "141-148"
-url: "https://pubmed.ncbi.nlm.nih.gov/17886224/"
+journal: Phytotherapy Research
+volume: 22
+issue: 2
+pages: 141-148
+url: https://pubmed.ncbi.nlm.nih.gov/17886224/
 pmid: "17886224"
-keywords: ["glycyrrhiza", "antiviral", "licorice", "phytotherapy"]
-abstract: "Review of antiviral effects of Glycyrrhiza species and their potential therapeutic applications."
+keywords:
+  - glycyrrhiza
+  - antiviral
+  - licorice
+  - phytotherapy
+abstract: Review of antiviral effects of Glycyrrhiza species and their potential
+  therapeutic applications.

@@ -1,19 +1,22 @@
-type: "journal"
-title: "The effect of Sambucol, a black elderberry-based, natural product, on the production of human cytokines: I. Inflammatory cytokines"
-authors: ["Barak, Vivian", "Halperin, Tal", "Kalickman, Inna"]
+type: journal
+title: "The effect of Sambucol, a black elderberry-based, natural product, on
+  the production of human cytokines: I. Inflammatory cytokines"
+authors:
+  - Barak, Vivian
+  - Halperin, Tal
+  - Kalickman, Inna
 year: 2001
-journal: "European Cytokine Network"
-volume: "12"
-issue: "2"
-pages: "290-296"
-url: "https://pubmed.ncbi.nlm.nih.gov/11399518/"
+journal: European Cytokine Network
+volume: 12
+issue: 2
+pages: 290-296
+url: https://pubmed.ncbi.nlm.nih.gov/11399518/
 pmid: "11399518"
 keywords:
-  [
-    "Sambucol",
-    "black elderberry",
-    "cytokine production",
-    "inflammatory cytokines",
-    "immune modulation",
-  ]
-abstract: "Study examining the effect of Sambucol, a black elderberry-based natural product, on human inflammatory cytokine production."
+  - Sambucol
+  - black elderberry
+  - cytokine production
+  - inflammatory cytokines
+  - immune modulation
+abstract: Study examining the effect of Sambucol, a black elderberry-based
+  natural product, on human inflammatory cytokine production.

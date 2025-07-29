@@ -1,9 +1,18 @@
-type: "journal"
-title: "Effect of a high-monounsaturated fat diet enriched with avocado in NIDDM (Non Insulin Dependent Diabetes Mellitus)"
-authors: ["Lerman Garber, I."]
+type: journal
+title: Effect of a high-monounsaturated fat diet enriched with avocado in NIDDM
+  (Non Insulin Dependent Diabetes Mellitus)
+authors:
+  - Lerman Garber, I.
 year: 1994
-journal: "Diabetes Care"
-volume: "17"
-pages: "311-315"
-keywords: ["avocado", "diabetes", "NIDDM", "monounsaturated fat", "blood sugar"]
-abstract: "Study examining the effects of a high-monounsaturated fat diet enriched with avocado in patients with non-insulin dependent diabetes mellitus."
+journal: Diabetes Care
+volume: 17
+pages: 311-315
+keywords:
+  - avocado
+  - diabetes
+  - NIDDM
+  - monounsaturated fat
+  - blood sugar
+abstract: Study examining the effects of a high-monounsaturated fat diet
+  enriched with avocado in patients with non-insulin dependent diabetes
+  mellitus.

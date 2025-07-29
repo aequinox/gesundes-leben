@@ -1,31 +1,29 @@
-type: "journal"
-title: "Ultra-processed food consumption and mental health: A systematic review and meta-analysis of observational studies"
+type: journal
+title: "Ultra-processed food consumption and mental health: A systematic review
+  and meta-analysis of observational studies"
 authors:
-  [
-    "Lane, Melissa M.",
-    "Davis, Jessica A.",
-    "Beattie, Sophie",
-    "Gómez-Donoso, Clara",
-    "Loughman, Amy",
-    "O'Neil, Adrienne",
-    "Jacka, Felice",
-    "Berk, Michael",
-    "Page, Rachelle",
-    "Marx, Wolfgang",
-    "Rocks, Tetyana",
-  ]
+  - Lane, Melissa M.
+  - Davis, Jessica A.
+  - Beattie, Sophie
+  - Gómez-Donoso, Clara
+  - Loughman, Amy
+  - O'Neil, Adrienne
+  - Jacka, Felice
+  - Berk, Michael
+  - Page, Rachelle
+  - Marx, Wolfgang
+  - Rocks, Tetyana
 year: 2022
-journal: "Nutrients"
-volume: "14"
-issue: "13"
+journal: Nutrients
+volume: 14
+issue: 13
 pages: "2568"
-url: "https://pubmed.ncbi.nlm.nih.gov/35807749/"
+url: https://pubmed.ncbi.nlm.nih.gov/35807749/
 pmid: "35807749"
 keywords:
-  [
-    "ultra-processed food",
-    "mental health",
-    "systematic review",
-    "meta-analysis",
-  ]
-abstract: "Systematic review and meta-analysis examining the relationship between ultra-processed food consumption and mental health outcomes."
+  - ultra-processed food
+  - mental health
+  - systematic review
+  - meta-analysis
+abstract: Systematic review and meta-analysis examining the relationship between
+  ultra-processed food consumption and mental health outcomes.

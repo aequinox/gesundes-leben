@@ -1,17 +1,17 @@
-type: "journal"
-title: "Therapeutic potential of curcumin in digestive diseases"
-authors: ["Dulbecco, Pietro", "Savarino, Vincenzo"]
+type: journal
+title: Therapeutic potential of curcumin in digestive diseases
+authors:
+  - Dulbecco, Pietro
+  - Savarino, Vincenzo
 year: 2013
-journal: "World Journal of Gastroenterology"
-volume: "19"
-issue: "48"
+journal: World Journal of Gastroenterology
+volume: 19
+issue: 48
 pages: "9256"
-url: "https://www.wjgnet.com/1007-9327/full/v19/i48/9256.htm"
+url: https://www.wjgnet.com/1007-9327/full/v19/i48/9256.htm
 keywords:
-  [
-    "curcumin",
-    "digestive diseases",
-    "gastroenterology",
-    "therapeutic potential",
-  ]
-abstract: "Review of the therapeutic potential of curcumin in various digestive diseases."
+  - curcumin
+  - digestive diseases
+  - gastroenterology
+  - therapeutic potential
+abstract: Review of the therapeutic potential of curcumin in various digestive diseases.

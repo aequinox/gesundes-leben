@@ -1,9 +1,14 @@
-type: "journal"
-title: "Nitrosativer Stress - Teil 1"
-authors: ["Kuklinski, Bodo"]
+type: journal
+title: Nitrosativer Stress - Teil 1
+authors:
+  - Kuklinski, Bodo
 year: 2008
-journal: "Internationales Journal für orthomolekulare und verwandte Medizin"
-issue: "124"
-url: "https://www.dr-kuklinski.info/wp-content/uploads/2019/08/kuklinski-praxisrelevanz-nitrosativer-stress-1.pdf"
-keywords: ["nitrosativer stress", "orthomolekulare medizin", "kuklinski"]
-abstract: "Erste Abhandlung über nitrosativen Stress und dessen Praxisrelevanz in der orthomolekularen Medizin."
+journal: Internationales Journal für orthomolekulare und verwandte Medizin
+issue: 124
+url: https://www.dr-kuklinski.info/wp-content/uploads/2019/08/kuklinski-praxisrelevanz-nitrosativer-stress-1.pdf
+keywords:
+  - nitrosativer stress
+  - orthomolekulare medizin
+  - kuklinski
+abstract: Erste Abhandlung über nitrosativen Stress und dessen Praxisrelevanz in
+  der orthomolekularen Medizin.

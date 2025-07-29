@@ -1,20 +1,22 @@
-type: "journal"
-title: "Ultra-processed food consumption among US adults from 2001 to 2018"
+type: journal
+title: Ultra-processed food consumption among US adults from 2001 to 2018
 authors:
-  [
-    "Juul, Filippa",
-    "Parekh, Niyati",
-    "Martinez-Steele, Euridice",
-    "Monteiro, Carlos Augusto",
-    "Chang, Virginia W.",
-  ]
+  - Juul, Filippa
+  - Parekh, Niyati
+  - Martinez-Steele, Euridice
+  - Monteiro, Carlos Augusto
+  - Chang, Virginia W.
 year: 2022
-journal: "The American Journal of Clinical Nutrition"
-volume: "115"
-issue: "1"
-pages: "211-221"
-url: "https://pubmed.ncbi.nlm.nih.gov/34647997/"
+journal: The American Journal of Clinical Nutrition
+volume: 115
+issue: 1
+pages: 211-221
+url: https://pubmed.ncbi.nlm.nih.gov/34647997/
 pmid: "34647997"
 keywords:
-  ["ultra-processed food", "food consumption", "US adults", "dietary trends"]
-abstract: "Study examining ultra-processed food consumption trends among US adults from 2001 to 2018."
+  - ultra-processed food
+  - food consumption
+  - US adults
+  - dietary trends
+abstract: Study examining ultra-processed food consumption trends among US
+  adults from 2001 to 2018.

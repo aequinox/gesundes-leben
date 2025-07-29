@@ -1,11 +1,16 @@
-type: "journal"
-title: "Phytochemical and therapeutic potential of cucumber"
-authors: ["Mukherjee, Pulok K."]
+type: journal
+title: Phytochemical and therapeutic potential of cucumber
+authors:
+  - Mukherjee, Pulok K.
 year: 2013
-journal: "Fitoterapia"
-volume: "84"
-pages: "227-36"
-url: "https://pubmed.ncbi.nlm.nih.gov/23098877/"
-doi: "10.1016/j.fitote.2012.10.003"
-keywords: ["cucumber", "phytochemical", "therapeutic", "fitoterapia"]
-abstract: "Study on the phytochemical composition and therapeutic potential of cucumber."
+journal: Fitoterapia
+volume: 84
+pages: 227-36
+url: https://pubmed.ncbi.nlm.nih.gov/23098877/
+doi: 10.1016/j.fitote.2012.10.003
+keywords:
+  - cucumber
+  - phytochemical
+  - therapeutic
+  - fitoterapia
+abstract: Study on the phytochemical composition and therapeutic potential of cucumber.

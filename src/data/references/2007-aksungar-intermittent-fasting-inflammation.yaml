@@ -1,18 +1,20 @@
-type: "journal"
-title: "Interleukin-6, C-reactive protein and biochemical parameters during prolonged intermittent fasting"
-authors: ["Aksungar, Fehime B.", "Topkaya, Aynur E.", "Akyildiz, Mahmut"]
+type: journal
+title: Interleukin-6, C-reactive protein and biochemical parameters during
+  prolonged intermittent fasting
+authors:
+  - Aksungar, Fehime B.
+  - Topkaya, Aynur E.
+  - Akyildiz, Mahmut
 year: 2007
-journal: "Annals of Nutrition and Metabolism"
-volume: "51"
-issue: "1"
-pages: "88-95"
-url: "https://pubmed.ncbi.nlm.nih.gov/17374948/"
+journal: Annals of Nutrition and Metabolism
+volume: 51
+issue: 1
+pages: 88-95
+url: https://pubmed.ncbi.nlm.nih.gov/17374948/
 pmid: "17374948"
 keywords:
-  [
-    "intermittent fasting",
-    "inflammation",
-    "interleukin-6",
-    "C-reactive protein",
-  ]
-abstract: "Study examining inflammatory markers during prolonged intermittent fasting."
+  - intermittent fasting
+  - inflammation
+  - interleukin-6
+  - C-reactive protein
+abstract: Study examining inflammatory markers during prolonged intermittent fasting.

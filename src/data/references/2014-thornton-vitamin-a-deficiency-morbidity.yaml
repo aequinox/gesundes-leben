@@ -1,18 +1,19 @@
-type: "journal"
-title: "Vitamin A deficiency is associated with gastrointestinal and respiratory morbidity in school-age children"
-authors: ["Thornton, K. A."]
+type: journal
+title: Vitamin A deficiency is associated with gastrointestinal and respiratory
+  morbidity in school-age children
+authors:
+  - Thornton, K. A.
 year: 2014
-journal: "J Nutr"
-volume: "144"
-issue: "4"
-pages: "496-503"
-url: "https://pubmed.ncbi.nlm.nih.gov/24500929/"
+journal: J Nutr
+volume: 144
+issue: 4
+pages: 496-503
+url: https://pubmed.ncbi.nlm.nih.gov/24500929/
 keywords:
-  [
-    "vitamin a deficiency",
-    "children",
-    "morbidity",
-    "gastrointestinal",
-    "respiratory",
-  ]
-abstract: "Study on vitamin A deficiency and its association with gastrointestinal and respiratory morbidity in school-age children."
+  - vitamin a deficiency
+  - children
+  - morbidity
+  - gastrointestinal
+  - respiratory
+abstract: Study on vitamin A deficiency and its association with
+  gastrointestinal and respiratory morbidity in school-age children.

@@ -1,10 +1,16 @@
-type: "journal"
-title: "The Human Gut Microbiome in Health and Disease"
-authors: ["Bull, M.J.", "Plummer, N.T."]
+type: journal
+title: The Human Gut Microbiome in Health and Disease
+authors:
+  - Bull, M.J.
+  - Plummer, N.T.
 year: 2014
 journal: "Integrative Medicine: A Clinicians Journal"
-volume: "13"
-issue: "6"
-pages: "17-22"
-keywords: ["gut microbiome", "health", "disease", "human microbiome"]
-abstract: "Review of the human gut microbiome in health and disease."
+volume: 13
+issue: 6
+pages: 17-22
+keywords:
+  - gut microbiome
+  - health
+  - disease
+  - human microbiome
+abstract: Review of the human gut microbiome in health and disease.

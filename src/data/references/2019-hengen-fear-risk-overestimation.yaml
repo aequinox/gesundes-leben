@@ -1,10 +1,18 @@
-type: "journal"
-title: "What's the risk? Fearful individuals generally overestimate negative outcomes and they dread outcomes of specific events"
-authors: ["Hengen, Kristina M.", "Alpers, Georg W."]
+type: journal
+title: What's the risk? Fearful individuals generally overestimate negative
+  outcomes and they dread outcomes of specific events
+authors:
+  - Hengen, Kristina M.
+  - Alpers, Georg W.
 year: 2019
-journal: "Frontiers in Psychology"
-volume: "10"
+journal: Frontiers in Psychology
+volume: 10
 pages: "1676"
-url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6682660/"
-keywords: ["fear", "risk perception", "anxiety", "overestimation"]
-abstract: "Study on how fearful individuals overestimate negative outcomes and dread specific events."
+url: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6682660/
+keywords:
+  - fear
+  - risk perception
+  - anxiety
+  - overestimation
+abstract: Study on how fearful individuals overestimate negative outcomes and
+  dread specific events.

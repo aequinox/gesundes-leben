@@ -1,26 +1,24 @@
-type: "journal"
-title: "A new high-quality elderberry plant extract exerts antiviral and immunomodulatory effects in vitro and ex vivo"
+type: journal
+title: A new high-quality elderberry plant extract exerts antiviral and
+  immunomodulatory effects in vitro and ex vivo
 authors:
-  [
-    "Schön, Christiane",
-    "Mödinger, Yvonne",
-    "Krüger, Franziska",
-    "Doebis, Cornelia",
-    "Pischel, Ivo",
-    "Bonnländer, Bernd",
-  ]
+  - Schön, Christiane
+  - Mödinger, Yvonne
+  - Krüger, Franziska
+  - Doebis, Cornelia
+  - Pischel, Ivo
+  - Bonnländer, Bernd
 year: 2021
-journal: "Food and Agricultural Immunology"
-volume: "32"
-issue: "1"
-pages: "650-662"
-url: "https://www.tandfonline.com/doi/full/10.1080/09540105.2021.1978941"
+journal: Food and Agricultural Immunology
+volume: 32
+issue: 1
+pages: 650-662
+url: https://www.tandfonline.com/doi/full/10.1080/09540105.2021.1978941
 keywords:
-  [
-    "elderberry extract",
-    "antiviral effects",
-    "immunomodulatory",
-    "in vitro",
-    "ex vivo",
-  ]
-abstract: "Study demonstrating that a new high-quality elderberry plant extract exerts antiviral and immunomodulatory effects in vitro and ex vivo."
+  - elderberry extract
+  - antiviral effects
+  - immunomodulatory
+  - in vitro
+  - ex vivo
+abstract: Study demonstrating that a new high-quality elderberry plant extract
+  exerts antiviral and immunomodulatory effects in vitro and ex vivo.

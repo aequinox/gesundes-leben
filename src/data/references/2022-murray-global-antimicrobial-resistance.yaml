@@ -1,187 +1,185 @@
-type: "journal"
-title: "Global burden of bacterial antimicrobial resistance in 2019: a systematic analysis"
+type: journal
+title: "Global burden of bacterial antimicrobial resistance in 2019: a
+  systematic analysis"
 authors:
-  [
-    "Murray, Christopher JL",
-    "Ikuta, Kevin S.",
-    "Sharara, Fablina",
-    "Swetschinski, Lucien",
-    "Robles Aguilar, Gisela",
-    "Gray, Authia",
-    "Han, Chieh",
-    "Bisignano, Catherine",
-    "Rao, Puja",
-    "Wool, Eve",
-    "Johnson, Sarah C.",
-    "Browne, Annie J.",
-    "Chipeta, Michael Give",
-    "Fell, Frederick",
-    "Hackett, Sean",
-    "Haines-Woodhouse, Georgina",
-    "Hamadani, Bahar Hasan Kashef",
-    "Kumaran, Erin A.P.",
-    "McManigal, Barney",
-    "Achalapong, Sureeruk",
-    "Agarwal, Rakesh",
-    "Akech, Samuel",
-    "Albertson, Samuel",
-    "Amuasi, John",
-    "Andrews, Jason",
-    "Aravkin, Aleksandr",
-    "Ashley, Elizabeth",
-    "Babin, François-Xavier",
-    "Bailey, Freddie",
-    "Baker, Stephen",
-    "Basnyat, Buddha",
-    "Bekker, Arjun",
-    "Bender, Rose",
-    "Bethou, Adhisivam",
-    "Bielicki, Julia",
-    "Boonkasidecha, Suppawat",
-    "Bukosia, Josephine",
-    "Carvalheiro, Carlos",
-    "Castañeda-Orjuela, Carlos",
-    "Chansamouth, Vilada",
-    "Chaurasia, Suman",
-    "Chigovera, Perfect",
-    "Chikwanha, Patrick",
-    "Chilot, Desta",
-    "Chimed-Ochir, Odgerel",
-    "Chopra, Harsh",
-    "Chung, Rebecca",
-    "Cook, Anthony J.",
-    "Cooper, Ben",
-    "Cressey, Tim R.",
-    "Criollo-Mora, Ester",
-    "Cunningham, Matthew",
-    "Darboe, Saffiatou",
-    "Day, Nicholas P.J.",
-    "De Luca, Maia",
-    "Dokova, Klara",
-    "Dramowski, Angela",
-    "Dunachie, Susanna J.",
-    "Duong Bich, Thuy",
-    "Eckmanns, Tim",
-    "Eibach, Daniel",
-    "Emary, Amanda",
-    "Feasey, Nicholas",
-    "Fisher-Pearson, Nikki",
-    "Forrest, Karen",
-    "Garcia, Carla",
-    "Garrett, Denise",
-    "Gastmeier, Petra",
-    "Giref, Ababi Zergaw",
-    "Greer, Raheela Chandni",
-    "Gupta, Varun",
-    "Haller, Sebastian",
-    "Haselbeck, Andrea",
-    "Hay, Simon I.",
-    "Holm, Marianne",
-    "Hopkins, Susan",
-    "Iregui, Alma Carolina",
-    "Jacobs, Jan",
-    "Jarovsky, Daniel",
-    "Javanmardi, Fatemeh",
-    "Khorana, Maharaj",
-    "Kissoon, Niranjan",
-    "Kobeissi, Eman",
-    "Kostyanev, Tomislav",
-    "Krapp, Fabiana",
-    "Krumkamp, Ralf",
-    "Kumar, Ajay",
-    "Kyu, Hmwe Hmwe",
-    "Lim, Cherry",
-    "Lim, Kristen",
-    "Limmathurotsakul, Direk",
-    "Loftus, Michael J.",
-    "Lunn, Miles",
-    "Ma, Jianing",
-    "Manoharan, Anuradha",
-    "Marks, Florian",
-    "May, Jürgen",
-    "Mayxay, Mayfong",
-    "Mturi, Neema",
-    "Munera-Huertas, Tania",
-    "Musicha, Patrick",
-    "Musila, Lilian A.",
-    "Mussi-Pinhata, Marisa M.",
-    "Naidu, Rakesh N.",
-    "Nakamura, Tomomi",
-    "Nanavati, Ravi",
-    "Nangia, Sushma",
-    "Newton, Paul",
-    "Ngoun, Chanpheaktra",
-    "Novotney, Amanda",
-    "Nwakanma, Davis",
-    "Obiero, Cynthia W.",
-    "Ochoa, Theresa J.",
-    "Olivas-Martinez, Antonio",
-    "Olliaro, Piero",
-    "Ooko, Erick",
-    "Ortiz-Brizuela, Edgar",
-    "Ounchanum, Pimsiri",
-    "Pak, Gideok D.",
-    "Paredes, Jose Luis",
-    "Peleg, Anton Y.",
-    "Perrone, Carlo",
-    "Plakkal, Nishad",
-    "Ponce-de-Leon, Alfredo",
-    "Raad, Mahmoud",
-    "Ramdin, Tanusha",
-    "Riddell, Amy",
-    "Roberts, Tamalee",
-    "Robotham, Julie V.",
-    "Roca, Anna",
-    "Rosenthal, Victor Daniel",
-    "Rudd, Kristina E.",
-    "Russell, Neal",
-    "Sader, Helio S.",
-    "Saengchan, Wasan",
-    "Schnall, Jessica",
-    "Scott, Janet A.G.",
-    "Seekaew, Pich",
-    "Sgambelluri, Francesca",
-    "Shirley, Nancy",
-    "Shivamallappa, Siddhartha",
-    "Steenkeste, Nicolas",
-    "Steingart, Karen R.",
-    "Stoeva, Temenuga",
-    "Tasak, Nidanuch",
-    "Thaiprakong, Anchana",
-    "Thwaites, Guy",
-    "Turner, Claudia",
-    "Turner, Paul",
-    "van Doorn, H. Rogier",
-    "Velaphi, Sithembiso",
-    "Vongpradith, Avina",
-    "Vongsouvath, Manivanh",
-    "Vu, Hien",
-    "Walsh, Timothy",
-    "Waner, Sofia",
-    "Wangrangsimakul, Tri",
-    "Wozniak, Teresa",
-    "Young Sharma, Tippawan E.M.",
-    "Yu, Kaspar C.",
-    "Zheng, Peng",
-    "Sartorius, Benn",
-    "Lopez, Alan D.",
-    "Stergachis, Andy",
-    "Moore, Catrin",
-    "Dolecek, Christiane",
-    "Naghavi, Mohsen",
-  ]
+  - Murray, Christopher JL
+  - Ikuta, Kevin S.
+  - Sharara, Fablina
+  - Swetschinski, Lucien
+  - Robles Aguilar, Gisela
+  - Gray, Authia
+  - Han, Chieh
+  - Bisignano, Catherine
+  - Rao, Puja
+  - Wool, Eve
+  - Johnson, Sarah C.
+  - Browne, Annie J.
+  - Chipeta, Michael Give
+  - Fell, Frederick
+  - Hackett, Sean
+  - Haines-Woodhouse, Georgina
+  - Hamadani, Bahar Hasan Kashef
+  - Kumaran, Erin A.P.
+  - McManigal, Barney
+  - Achalapong, Sureeruk
+  - Agarwal, Rakesh
+  - Akech, Samuel
+  - Albertson, Samuel
+  - Amuasi, John
+  - Andrews, Jason
+  - Aravkin, Aleksandr
+  - Ashley, Elizabeth
+  - Babin, François-Xavier
+  - Bailey, Freddie
+  - Baker, Stephen
+  - Basnyat, Buddha
+  - Bekker, Arjun
+  - Bender, Rose
+  - Bethou, Adhisivam
+  - Bielicki, Julia
+  - Boonkasidecha, Suppawat
+  - Bukosia, Josephine
+  - Carvalheiro, Carlos
+  - Castañeda-Orjuela, Carlos
+  - Chansamouth, Vilada
+  - Chaurasia, Suman
+  - Chigovera, Perfect
+  - Chikwanha, Patrick
+  - Chilot, Desta
+  - Chimed-Ochir, Odgerel
+  - Chopra, Harsh
+  - Chung, Rebecca
+  - Cook, Anthony J.
+  - Cooper, Ben
+  - Cressey, Tim R.
+  - Criollo-Mora, Ester
+  - Cunningham, Matthew
+  - Darboe, Saffiatou
+  - Day, Nicholas P.J.
+  - De Luca, Maia
+  - Dokova, Klara
+  - Dramowski, Angela
+  - Dunachie, Susanna J.
+  - Duong Bich, Thuy
+  - Eckmanns, Tim
+  - Eibach, Daniel
+  - Emary, Amanda
+  - Feasey, Nicholas
+  - Fisher-Pearson, Nikki
+  - Forrest, Karen
+  - Garcia, Carla
+  - Garrett, Denise
+  - Gastmeier, Petra
+  - Giref, Ababi Zergaw
+  - Greer, Raheela Chandni
+  - Gupta, Varun
+  - Haller, Sebastian
+  - Haselbeck, Andrea
+  - Hay, Simon I.
+  - Holm, Marianne
+  - Hopkins, Susan
+  - Iregui, Alma Carolina
+  - Jacobs, Jan
+  - Jarovsky, Daniel
+  - Javanmardi, Fatemeh
+  - Khorana, Maharaj
+  - Kissoon, Niranjan
+  - Kobeissi, Eman
+  - Kostyanev, Tomislav
+  - Krapp, Fabiana
+  - Krumkamp, Ralf
+  - Kumar, Ajay
+  - Kyu, Hmwe Hmwe
+  - Lim, Cherry
+  - Lim, Kristen
+  - Limmathurotsakul, Direk
+  - Loftus, Michael J.
+  - Lunn, Miles
+  - Ma, Jianing
+  - Manoharan, Anuradha
+  - Marks, Florian
+  - May, Jürgen
+  - Mayxay, Mayfong
+  - Mturi, Neema
+  - Munera-Huertas, Tania
+  - Musicha, Patrick
+  - Musila, Lilian A.
+  - Mussi-Pinhata, Marisa M.
+  - Naidu, Rakesh N.
+  - Nakamura, Tomomi
+  - Nanavati, Ravi
+  - Nangia, Sushma
+  - Newton, Paul
+  - Ngoun, Chanpheaktra
+  - Novotney, Amanda
+  - Nwakanma, Davis
+  - Obiero, Cynthia W.
+  - Ochoa, Theresa J.
+  - Olivas-Martinez, Antonio
+  - Olliaro, Piero
+  - Ooko, Erick
+  - Ortiz-Brizuela, Edgar
+  - Ounchanum, Pimsiri
+  - Pak, Gideok D.
+  - Paredes, Jose Luis
+  - Peleg, Anton Y.
+  - Perrone, Carlo
+  - Plakkal, Nishad
+  - Ponce-de-Leon, Alfredo
+  - Raad, Mahmoud
+  - Ramdin, Tanusha
+  - Riddell, Amy
+  - Roberts, Tamalee
+  - Robotham, Julie V.
+  - Roca, Anna
+  - Rosenthal, Victor Daniel
+  - Rudd, Kristina E.
+  - Russell, Neal
+  - Sader, Helio S.
+  - Saengchan, Wasan
+  - Schnall, Jessica
+  - Scott, Janet A.G.
+  - Seekaew, Pich
+  - Sgambelluri, Francesca
+  - Shirley, Nancy
+  - Shivamallappa, Siddhartha
+  - Steenkeste, Nicolas
+  - Steingart, Karen R.
+  - Stoeva, Temenuga
+  - Tasak, Nidanuch
+  - Thaiprakong, Anchana
+  - Thwaites, Guy
+  - Turner, Claudia
+  - Turner, Paul
+  - van Doorn, H. Rogier
+  - Velaphi, Sithembiso
+  - Vongpradith, Avina
+  - Vongsouvath, Manivanh
+  - Vu, Hien
+  - Walsh, Timothy
+  - Waner, Sofia
+  - Wangrangsimakul, Tri
+  - Wozniak, Teresa
+  - Young Sharma, Tippawan E.M.
+  - Yu, Kaspar C.
+  - Zheng, Peng
+  - Sartorius, Benn
+  - Lopez, Alan D.
+  - Stergachis, Andy
+  - Moore, Catrin
+  - Dolecek, Christiane
+  - Naghavi, Mohsen
 year: 2022
-journal: "The Lancet"
-volume: "399"
-issue: "10325"
-pages: "629-655"
-url: "https://pubmed.ncbi.nlm.nih.gov/35065702/"
+journal: The Lancet
+volume: 399
+issue: 10325
+pages: 629-655
+url: https://pubmed.ncbi.nlm.nih.gov/35065702/
 pmid: "35065702"
 keywords:
-  [
-    "antimicrobial resistance",
-    "global burden",
-    "bacterial resistance",
-    "systematic analysis",
-  ]
-abstract: "Systematic analysis of the global burden of bacterial antimicrobial resistance in 2019."
+  - antimicrobial resistance
+  - global burden
+  - bacterial resistance
+  - systematic analysis
+abstract: Systematic analysis of the global burden of bacterial antimicrobial
+  resistance in 2019.
