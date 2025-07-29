@@ -59,7 +59,7 @@ The project uses Astro's content collections for structured content:
 2. **Blog** (`src/data/blog/`): Main blog posts in MDX format with complex frontmatter
 3. **Glossary** (`src/data/glossary/`): Term definitions for health-related concepts
 4. **Favorites** (`src/data/favorites/`): YAML files for product recommendations
-5. **References** (`src/data/references/references.json`): Scientific papers and website references in centralized JSON format
+5. **References** (`src/data/references/`): Scientific papers and website references as individual YAML files
 
 ### Component Architecture
 ```
@@ -127,24 +127,53 @@ Blog posts require:
 Optional fields include `group`, `tags`, `description`, `keywords`, `canonicalURL`, `references`
 
 ### References System
-The project uses a centralized references collection stored in `src/data/references/references.json`:
+The project uses a YAML-based references collection stored in individual files in `src/data/references/`:
 
-**Structure**: Key-value pairs where keys are reference IDs and values contain:
-- `type`: "journal" or "website"
-- `title`: Reference title
-- `authors`: Array of author names
-- `year`: Publication year
-- `journal`: Journal name (for academic papers)
-- `url`: Direct link to source
+**YAML File Structure**: Each reference is stored as a separate `.yaml` file with:
+- `type`: "journal", "website", "book", "report", or "other"
+- `title`: Reference title (required)
+- `authors`: Array of author names (required)
+- `year`: Publication year as number (required)
+- `journal`: Journal name (for journal articles)
+- `volume`, `issue`, `pages`: Journal metadata (optional)
+- `publisher`, `location`, `edition`, `isbn`: Book metadata (optional)
+- `url`: Direct link to source (optional, must be valid URL)
 - `doi`: DOI identifier (optional)
-- `keywords`: Array of keywords
+- `pmid`: PubMed ID (optional)
+- `keywords`: Array of keywords (optional)
 - `abstract`: Brief description (optional)
+
+**Reference Naming Schema**: Follow the pattern `year-author-topic-keywords`
+- Format: `YYYY-lastname-topic-keywords`
+- Example: `2023-smith-nutrition-health`
+- Use lowercase, separate words with hyphens
+- Keep total length reasonable (under 50 characters)
 
 **Usage in blog posts**: Add reference IDs to the `references` array in frontmatter:
 ```yaml
 references: 
-  - "nutrition-gut-health-review"
-  - "mindfulness-meditation-stress-reduction"
+  - "2023-smith-nutrition-health"
+  - "2024-jones-mindfulness-meditation-stress"
+```
+
+**Example YAML file** (`src/data/references/2023-smith-nutrition-health.yaml`):
+```yaml
+type: journal
+title: "Nutrition and Gut Health: A Comprehensive Review"
+authors:
+  - "Smith, J."
+  - "Johnson, K."
+year: 2023
+journal: "Journal of Nutrition Research"
+volume: 45
+issue: 3
+pages: "123-145"
+doi: "10.1234/jnr.2023.45.3.123"
+keywords:
+  - "nutrition"
+  - "gut health"
+  - "microbiome"
+abstract: "This study examines the relationship between nutrition and gut health..."
 ```
 
 ### Component Usage for Content Team
