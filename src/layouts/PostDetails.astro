@@ -117,7 +117,7 @@ const primaryCategory = categories?.[0] || "Gesundheit";
       <ArticleHeader post={post as Post} />
       <ArticleContent post={post as Post} data-pagefind-weight="15" />
 
-      {/* References directly after article content */}
+      {/* References component */}
       {
         references && references.length > 0 && (
           <References referenceIds={references} />

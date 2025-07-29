@@ -1,128 +1,76 @@
 ---
-import { getI18nStrings, t } from "@/config/i18n";
-import { logger } from "@/utils/logger";
-import { getReferencesByIds, type Reference } from "@/utils/references";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+
+import { parse } from "yaml";
+
+import { t } from "@/config/i18n";
 
 interface Props {
   referenceIds: string[];
 }
 
-const { referenceIds } = Astro.props;
-const i18n = getI18nStrings("de");
-
-// Get references data using the utility function
-let references: Reference[] = [];
-let debugInfo = "";
-
-try {
-  if (referenceIds && referenceIds.length > 0) {
-    debugInfo = `Loading ${referenceIds.length} references: ${referenceIds.join(", ")}`;
-    logger.info(debugInfo);
-
-    references = await getReferencesByIds(referenceIds);
-
-    if (references.length === 0) {
-      debugInfo = `No references found for IDs: ${referenceIds.join(", ")}`;
-      logger.warn(debugInfo);
-    } else {
-      logger.info(
-        `Successfully loaded ${references.length}/${referenceIds.length} references`
-      );
-
-      // Log each reference for debugging
-      references.forEach((ref, i) => {
-        logger.info(
-          `Reference ${i + 1}: ${ref.id} - ${ref.title} (${ref.type})`
-        );
-      });
-
-      // Check for missing references
-      const foundIds = references.map(ref => ref.id);
-      const missingIds = referenceIds.filter(id => !foundIds.includes(id));
-      if (missingIds.length > 0) {
-        logger.warn(`Missing references: ${missingIds.join(", ")}`);
-        debugInfo += ` | Missing: ${missingIds.join(", ")}`;
-      }
-    }
-  } else {
-    debugInfo = `No reference IDs provided`;
-    logger.info(debugInfo);
-  }
-} catch (error) {
-  logger.error("Failed to load references:", error);
-  debugInfo = `Error loading references: ${error}`;
+// Reference interface (copied from the working debug component)
+interface ReferenceData {
+  type: string;
+  title: string;
+  authors: string[];
+  year: number;
+  journal?: string;
+  volume?: number;
+  issue?: number | string;
+  pages?: string;
+  doi?: string;
+  publisher?: string;
+  location?: string;
+  url?: string;
+  pmid?: string;
+  keywords?: string[];
+  abstract?: string;
 }
 
-// Calculate reference types and metadata
-const journalCount = references.filter(ref => ref.type === "journal").length;
-const websiteCount = references.filter(ref => ref.type === "website").length;
-const bookCount = references.filter(ref => ref.type === "book").length;
-const reportCount = references.filter(ref => ref.type === "report").length;
-const otherCount = references.filter(ref => ref.type === "other").length;
+interface Reference extends ReferenceData {
+  id: string;
+}
+
+const { referenceIds } = Astro.props;
+
+// Get references data using direct YAML reading
+const references: Reference[] = [];
+
+// Load references directly from YAML files (same approach as working debug component)
+try {
+  if (referenceIds && referenceIds.length > 0) {
+    for (const id of referenceIds) {
+      try {
+        const filePath = join(
+          process.cwd(),
+          "src/data/references",
+          `${id}.yaml`
+        );
+        const content = await readFile(filePath, "utf8");
+        const data = parse(content) as ReferenceData;
+
+        references.push({
+          id,
+          ...data,
+        });
+      } catch {
+        // Silently skip failed references in production
+      }
+    }
+  }
+} catch {
+  // Silently handle errors in production
+}
+
+// Calculate total references
 const totalReferences = references.length;
 
-// Generate keywords from all references
-const allKeywords = references
-  .flatMap(ref => ref.keywords || [])
-  .filter((keyword, index, array) => array.indexOf(keyword) === index) // Remove duplicates
-  .slice(0, 10); // Limit to 10 most relevant keywords
-
-// Generate authors list
-const allAuthors = references
-  .flatMap(ref => ref.authors || [])
-  .filter((author, index, array) => array.indexOf(author) === index)
-  .slice(0, 8); // Limit to 8 authors for metadata
-
-// Create localized summary text with proper pluralization
-const journalsText = t("references.plurals.journals", {
-  pluralization: {
-    count: journalCount,
-    other: i18n.references.plurals.journals.other,
-  },
-  values: { count: journalCount },
-});
-
-const booksText = t("references.plurals.books", {
-  pluralization: {
-    count: bookCount,
-    other: i18n.references.plurals.books.other,
-  },
-  values: { count: bookCount },
-});
-
-const websitesText = t("references.plurals.websites", {
-  pluralization: {
-    count: websiteCount,
-    other: i18n.references.plurals.websites.other,
-  },
-  values: { count: websiteCount },
-});
-
-const reportsText = t("references.plurals.reports", {
-  pluralization: {
-    count: reportCount,
-    other: i18n.references.plurals.reports.other,
-  },
-  values: { count: reportCount },
-});
-
-const othersText = t("references.plurals.others", {
-  pluralization: {
-    count: otherCount,
-    other: i18n.references.plurals.others.other,
-  },
-  values: { count: otherCount },
-});
-
-const summaryText = t("references.summary", {
-  values: {
-    count: totalReferences,
-    journals: journalsText,
-    books: booksText,
-    websites: websitesText,
-    reports: reportsText,
-    others: othersText,
-  },
+// Simple summary and credibility text
+const summaryText = `${totalReferences} wissenschaftliche Quellen`;
+const credibilityText = t("references.credibilityIndicator", {
+  values: { count: totalReferences },
 });
 ---
 
@@ -131,8 +79,7 @@ const summaryText = t("references.summary", {
     <section
       class="mt-8 rounded-lg border bg-muted/30 p-6"
       data-pagefind-weight="12"
-      data-pagefind-meta={`referenceCount:${totalReferences},journalReferences:${journalCount},websiteReferences:${websiteCount},bookReferences:${bookCount},reportReferences:${reportCount},otherReferences:${otherCount},scientificKeywords:${allKeywords.join(",")},referenceAuthors:${allAuthors.join(",")},hasScientificReferences:true,contentType:references`}
-      data-pagefind-filter={t("references.title")}
+      data-pagefind-meta="contentType:references,hasScientificReferences:true"
       aria-labelledby="references-heading"
       aria-label={t("references.accessibility.referenceSection")}
     >
@@ -161,7 +108,7 @@ const summaryText = t("references.summary", {
           <li
             class="text-sm leading-relaxed"
             data-pagefind-weight="8"
-            data-pagefind-meta={`referenceType:${ref.type},referenceYear:${ref.year},doi:${ref.doi || "none"}`}
+            data-pagefind-meta={`referenceType:${ref.type},referenceYear:${ref.year}`}
             aria-label={t("references.accessibility.referenceItem", {
               values: { index: index + 1 },
             })}
@@ -357,9 +304,7 @@ const summaryText = t("references.summary", {
           />
         </svg>
         <span data-pagefind-meta="scientificallyBacked:true">
-          {t("references.credibilityIndicator", {
-            values: { count: totalReferences },
-          })}
+          {credibilityText}
         </span>
       </div>
     </section>
