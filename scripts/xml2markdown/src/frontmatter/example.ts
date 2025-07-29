@@ -9,7 +9,7 @@
 	8. Make that pull request!
 */
 
-/* eslint-disable no-console */
+ 
 
 import type { Post } from "../types.js";
 

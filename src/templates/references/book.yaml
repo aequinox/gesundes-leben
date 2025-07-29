@@ -1,0 +1,16 @@
+# Book Reference Template
+# Copy this template and fill in the required fields
+
+type: book
+title: ""
+authors:
+  - ""
+year: 2024
+publisher: ""
+location: ""
+edition: ""
+isbn: ""
+url: ""
+keywords:
+  - ""
+abstract: ""

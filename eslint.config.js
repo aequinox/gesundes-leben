@@ -133,6 +133,15 @@ export default [
     },
   },
   {
+    files: ["scripts/**/*.ts"],
+    rules: {
+      // Allow console in CLI scripts
+      "no-console": "off",
+      // Allow any in CLI scripts for flexibility
+      "@typescript-eslint/no-explicit-any": "warn",
+    },
+  },
+  {
     ignores: [
       "dist/**",
       "**/dist/**",
