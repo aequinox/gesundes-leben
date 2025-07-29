@@ -2,7 +2,16 @@ import { existsSync } from "node:fs";
 import { writeFile, readFile, mkdir } from "node:fs/promises";
 import { join, dirname } from "node:path";
 
-import { getCollection } from "astro:content";
+// Conditional import for Astro context
+let getCollection:
+  | ((name: string) => Promise<Array<{ id: string; data: ReferenceData }>>)
+  | null = null;
+try {
+  const astroModule = await import("astro:content");
+  getCollection = astroModule.getCollection;
+} catch {
+  // Running outside Astro context, will use fallback
+}
 import { parse, stringify } from "yaml";
 
 import { logger } from "@/utils/logger";
@@ -43,18 +52,76 @@ export interface Reference extends ReferenceData {
 }
 
 /**
+ * Fallback function to read references directly from YAML files
+ */
+async function readReferencesFromFiles(): Promise<Reference[]> {
+  const referencesDir = join(process.cwd(), "src/data/references");
+
+  if (!existsSync(referencesDir)) {
+    logger.warn("References directory not found:", referencesDir);
+    return [];
+  }
+
+  try {
+    const { readdir } = await import("node:fs/promises");
+    const files = await readdir(referencesDir);
+    const yamlFiles = files.filter(
+      file => file.endsWith(".yaml") || file.endsWith(".yml")
+    );
+
+    const references: Reference[] = [];
+
+    for (const file of yamlFiles) {
+      try {
+        const filePath = join(referencesDir, file);
+        const content = await readFile(filePath, "utf8");
+        const data = parse(content) as ReferenceData;
+        const id = file.replace(/\.(yaml|yml)$/, "");
+
+        references.push({
+          id,
+          ...data,
+        });
+      } catch (error) {
+        logger.warn(`Failed to read reference file ${file}:`, error);
+      }
+    }
+
+    return references;
+  } catch (error) {
+    logger.error("Failed to read references from files:", error);
+    return [];
+  }
+}
+
+/**
  * Get all references from the collection (cached)
  */
 export async function getAllReferences(): Promise<Reference[]> {
   return withCache(CacheKeys.allReferences(), async () => {
     try {
-      const referencesCollection = await getCollection("references");
-      return referencesCollection.map(entry => ({
-        id: entry.id,
-        ...entry.data,
-      }));
+      // Try Astro's getCollection first
+      if (getCollection) {
+        const referencesCollection = await getCollection("references");
+        return referencesCollection.map(entry => ({
+          id: entry.id,
+          ...entry.data,
+        }));
+      } else {
+        // Fallback to reading files directly
+        return await readReferencesFromFiles();
+      }
     } catch (error) {
-      logger.error("Failed to load references collection:", error);
+      logger.error("Failed to load references:", error);
+      // If Astro method fails, try fallback
+      if (getCollection) {
+        logger.info("Trying fallback method...");
+        try {
+          return await readReferencesFromFiles();
+        } catch (fallbackError) {
+          logger.error("Fallback method also failed:", fallbackError);
+        }
+      }
       return [];
     }
   });
