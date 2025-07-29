@@ -1,8 +1,5 @@
 ---
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
-
-import { parse } from "yaml";
+import { getCollection } from "astro:content";
 
 import { t } from "@/config/i18n";
 
@@ -10,61 +7,16 @@ interface Props {
   referenceIds: string[];
 }
 
-// Reference interface (copied from the working debug component)
-interface ReferenceData {
-  type: string;
-  title: string;
-  authors: string[];
-  year: number;
-  journal?: string;
-  volume?: number;
-  issue?: number | string;
-  pages?: string;
-  doi?: string;
-  publisher?: string;
-  location?: string;
-  edition?: string;
-  isbn?: string;
-  url?: string;
-  pmid?: string;
-  keywords?: string[];
-  abstract?: string;
-}
-
-interface Reference extends ReferenceData {
-  id: string;
-}
+// Using Astro's CollectionEntry<"references"> type directly
 
 const { referenceIds } = Astro.props;
 
-// Get references data using direct YAML reading
-const references: Reference[] = [];
-
-// Load references directly from YAML files (same approach as working debug component)
-try {
-  if (referenceIds && referenceIds.length > 0) {
-    for (const id of referenceIds) {
-      try {
-        const filePath = join(
-          process.cwd(),
-          "src/data/references",
-          `${id}.yaml`
-        );
-        const content = await readFile(filePath, "utf8");
-        const data = parse(content) as ReferenceData;
-
-        references.push({
-          id,
-          ...data,
-        });
-      } catch {
-        // Silently skip failed references in production
-      }
-    }
-  }
-} catch {
-  // Silently handle errors in production
-}
+// Get references data using Astro's content collections
+const allReferences = await getCollection("references");
+const references =
+  referenceIds && referenceIds.length > 0
+    ? allReferences.filter(ref => referenceIds.includes(ref.id))
+    : [];
 
 // Calculate total references
 const totalReferences = references.length;
@@ -110,7 +62,7 @@ const credibilityText = t("references.credibilityIndicator", {
           <li
             class="text-sm leading-relaxed"
             data-pagefind-weight="8"
-            data-pagefind-meta={`referenceType:${ref.type},referenceYear:${ref.year}`}
+            data-pagefind-meta={`referenceType:${ref.data.type},referenceYear:${ref.data.year}`}
             aria-label={t("references.accessibility.referenceItem", {
               values: { index: index + 1 },
             })}
@@ -121,75 +73,84 @@ const credibilityText = t("references.credibilityIndicator", {
               </span>
               <div class="flex-1">
                 {/* Authors */}
-                {ref.authors && ref.authors.length > 0 && (
+                {ref.data.authors && ref.data.authors.length > 0 && (
                   <span
                     class="font-medium text-foreground"
-                    data-pagefind-meta={`authors:${ref.authors.join(", ")}`}
+                    data-pagefind-meta={`authors:${ref.data.authors.join(", ")}`}
                   >
-                    {ref.authors.join(", ")}
-                    {ref.authors.length === 1 ? "" : " et al."}
+                    {ref.data.authors.join(", ")}
+                    {ref.data.authors.length === 1 ? "" : " et al."}
                   </span>
                 )}
 
                 {/* Year */}
-                {ref.year && (
-                  <span class="text-muted-foreground"> ({ref.year}). </span>
+                {ref.data.year && (
+                  <span class="text-muted-foreground">
+                    {" "}
+                    ({ref.data.year}).{" "}
+                  </span>
                 )}
 
                 {/* Title */}
                 <span
                   class="font-medium text-accent hover:text-accent/80"
                   data-pagefind-weight="10"
-                  data-pagefind-meta={`referenceTitle:${ref.title}`}
+                  data-pagefind-meta={`referenceTitle:${ref.data.title}`}
                 >
-                  {ref.title}
+                  {ref.data.title}
                 </span>
 
                 {/* Journal info for journal articles */}
-                {ref.type === "journal" && (
+                {ref.data.type === "journal" && (
                   <span class="text-muted-foreground">
                     .{" "}
-                    <em data-pagefind-meta={`journal:${ref.journal}`}>
-                      {ref.journal}
+                    <em data-pagefind-meta={`journal:${ref.data.journal}`}>
+                      {ref.data.journal}
                     </em>
-                    {ref.volume && `, ${ref.volume}`}
-                    {ref.issue && `(${ref.issue})`}
-                    {ref.pages && `, ${ref.pages}`}
+                    {ref.data.volume && `, ${ref.data.volume}`}
+                    {ref.data.issue && `(${ref.data.issue})`}
+                    {ref.data.pages && `, ${ref.data.pages}`}
                   </span>
                 )}
 
                 {/* Book info for books */}
-                {ref.type === "book" && (
+                {ref.data.type === "book" && (
                   <span class="text-muted-foreground">
-                    . {ref.edition && `${ref.edition}. `}
-                    {ref.publisher && (
-                      <span data-pagefind-meta={`publisher:${ref.publisher}`}>
-                        {ref.publisher}
+                    . {ref.data.edition && `${ref.data.edition}. `}
+                    {ref.data.publisher && (
+                      <span
+                        data-pagefind-meta={`publisher:${ref.data.publisher}`}
+                      >
+                        {ref.data.publisher}
                       </span>
                     )}
-                    {ref.location && `, ${ref.location}`}
+                    {ref.data.location && `, ${ref.data.location}`}
                   </span>
                 )}
 
                 {/* Report info for reports */}
-                {ref.type === "report" && (
+                {ref.data.type === "report" && (
                   <span class="text-muted-foreground">
                     .{" "}
-                    {ref.publisher && (
-                      <span data-pagefind-meta={`publisher:${ref.publisher}`}>
-                        {ref.publisher}
+                    {ref.data.publisher && (
+                      <span
+                        data-pagefind-meta={`publisher:${ref.data.publisher}`}
+                      >
+                        {ref.data.publisher}
                       </span>
                     )}
-                    {ref.location && `, ${ref.location}`}
+                    {ref.data.location && `, ${ref.data.location}`}
                   </span>
                 )}
 
                 {/* Other info for other types */}
-                {ref.type === "other" && (
+                {ref.data.type === "other" && (
                   <span class="text-muted-foreground">
-                    {ref.publisher && (
-                      <span data-pagefind-meta={`publisher:${ref.publisher}`}>
-                        . {ref.publisher}
+                    {ref.data.publisher && (
+                      <span
+                        data-pagefind-meta={`publisher:${ref.data.publisher}`}
+                      >
+                        . {ref.data.publisher}
                       </span>
                     )}
                   </span>
@@ -197,90 +158,91 @@ const credibilityText = t("references.credibilityIndicator", {
 
                 {/* DOI, PMID and URL */}
                 <div class="mt-1 flex flex-wrap gap-4 text-xs">
-                  {ref.doi && (
+                  {ref.data.doi && (
                     <div class="flex items-center gap-1">
                       <span class="text-muted-foreground">DOI:</span>
                       <a
-                        href={`https://doi.org/${ref.doi}`}
+                        href={`https://doi.org/${ref.data.doi}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         class="font-mono text-accent hover:text-accent/80 hover:underline"
-                        data-pagefind-meta={`doi:${ref.doi}`}
+                        data-pagefind-meta={`doi:${ref.data.doi}`}
                         aria-label={t("references.accessibility.doiLink", {
-                          values: { title: ref.title },
+                          values: { title: ref.data.title },
                         })}
                       >
-                        {ref.doi}
+                        {ref.data.doi}
                       </a>
                     </div>
                   )}
 
-                  {ref.pmid && (
+                  {ref.data.pmid && (
                     <div class="flex items-center gap-1">
                       <span class="text-muted-foreground">PMID:</span>
                       <a
-                        href={`https://pubmed.ncbi.nlm.nih.gov/${ref.pmid}`}
+                        href={`https://pubmed.ncbi.nlm.nih.gov/${ref.data.pmid}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         class="font-mono text-accent hover:text-accent/80 hover:underline"
-                        data-pagefind-meta={`pmid:${ref.pmid}`}
+                        data-pagefind-meta={`pmid:${ref.data.pmid}`}
                         aria-label={t("references.accessibility.pmidLink", {
-                          values: { title: ref.title },
+                          values: { title: ref.data.title },
                         })}
                       >
-                        {ref.pmid}
+                        {ref.data.pmid}
                       </a>
                     </div>
                   )}
 
-                  {ref.isbn && (
+                  {ref.data.isbn && (
                     <div class="flex items-center gap-1">
                       <span class="text-muted-foreground">ISBN:</span>
                       <span
                         class="text-muted-foreground font-mono"
-                        data-pagefind-meta={`isbn:${ref.isbn}`}
+                        data-pagefind-meta={`isbn:${ref.data.isbn}`}
                       >
-                        {ref.isbn}
+                        {ref.data.isbn}
                       </span>
                     </div>
                   )}
 
-                  {ref.url && (
+                  {ref.data.url && (
                     <div class="flex items-center gap-1">
                       <span class="text-muted-foreground">URL:</span>
                       <a
-                        href={ref.url}
+                        href={ref.data.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         class="break-all text-accent hover:text-accent/80 hover:underline"
                         aria-label={t("references.accessibility.externalLink", {
-                          values: { title: ref.title },
+                          values: { title: ref.data.title },
                         })}
                       >
-                        {ref.url.replace(/^https?:\/\//, "")}
+                        {ref.data.url.replace(/^https?:\/\//, "")}
                       </a>
                     </div>
                   )}
                 </div>
 
                 {/* Keywords for search indexing */}
-                {ref.keywords && ref.keywords.length > 0 && (
+                {ref.data.keywords && ref.data.keywords.length > 0 && (
                   <div
                     class="sr-only"
-                    data-pagefind-meta={`keywords:${ref.keywords.join(",")}`}
+                    data-pagefind-meta={`keywords:${ref.data.keywords.join(",")}`}
                   >
-                    {t("references.keywordLabel")} {ref.keywords.join(", ")}
+                    {t("references.keywordLabel")}{" "}
+                    {ref.data.keywords.join(", ")}
                   </div>
                 )}
 
                 {/* Abstract for search indexing */}
-                {ref.abstract && (
+                {ref.data.abstract && (
                   <div
                     class="sr-only"
                     data-pagefind-weight="6"
                     data-pagefind-meta={`hasAbstract:true`}
                   >
-                    {t("references.summaryLabel")} {ref.abstract}
+                    {t("references.summaryLabel")} {ref.data.abstract}
                   </div>
                 )}
               </div>
