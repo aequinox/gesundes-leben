@@ -54,29 +54,29 @@ const {
     <script is:inline src="/toggle-theme.js"></script>
     <script>
       // Lazy load view transition enhancements when needed
-      if ('startViewTransition' in document || window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
-        import("@/utils/viewTransitionEnhancements").then(_module => {
-          // Module is auto-initialized on import
-          // eslint-disable-next-line no-console
-          console.log("View transition enhancements loaded");
-        }).catch(error => {
-          // eslint-disable-next-line no-console
-          console.error("Failed to load view transition enhancements:", error);
-        });
+      if (
+        "startViewTransition" in document ||
+        window.matchMedia("(prefers-reduced-motion: no-preference)").matches
+      ) {
+        import("@/utils/viewTransitionEnhancements")
+          .then(_module => {
+            // Module is auto-initialized on import
+            // eslint-disable-next-line no-console
+            console.log("View transition enhancements loaded");
+          })
+          .catch(error => {
+            // eslint-disable-next-line no-console
+            console.error(
+              "Failed to load view transition enhancements:",
+              error
+            );
+          });
       }
     </script>
   </head>
-  <body
-    data-pagefind-body
-    class="vt-optimize px-2 lg:px-12"
-    data-astro-prefetch
-  >
+  <body data-pagefind-body class="px-2 lg:px-12" data-astro-prefetch>
     {Astro.url.pathname !== "/" && <Breadcrumb />}
-    <main
-      transition:animate="slide"
-      transition:name="main-content"
-      class="vt-optimize"
-    >
+    <main transition:animate="slide" transition:name="main-content">
       <slot />
     </main>
     {import.meta.env.DEV && <SizeIndicator />}
