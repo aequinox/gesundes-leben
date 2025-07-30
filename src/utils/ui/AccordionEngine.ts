@@ -30,8 +30,6 @@ export interface AccordionOptions {
   animationDuration?: number;
   /** Maximum height for expanded panels */
   maxHeight?: string;
-  /** Whether to enable debug logging */
-  debug?: boolean;
 }
 
 /**
@@ -80,7 +78,6 @@ const DEFAULT_OPTIONS: Required<AccordionOptions> = {
   iconSelector: ".accordion-item-icon",
   animationDuration: 300,
   maxHeight: "1000px",
-  debug: false,
 };
 
 /**
@@ -129,7 +126,7 @@ let options: Required<AccordionOptions>;
  */
 function createItemState(
   element: HTMLElement,
-  index: number
+  _index: number
 ): AccordionItemState {
   const trigger = element.querySelector(
     options.triggerSelector
@@ -145,10 +142,6 @@ function createItemState(
   ) as HTMLElement | null;
 
   const isOpen = element.classList.contains(CSS_CLASSES.OPEN);
-
-  if (options.debug) {
-    logger.log("Creating item state for index", index, ": open=", isOpen);
-  }
 
   return {
     isOpen,
@@ -167,10 +160,6 @@ function createItemState(
  */
 function openItem(itemState: AccordionItemState): void {
   const { element, trigger, panel, chevron, icon } = itemState;
-
-  if (options.debug) {
-    logger.log("Opening accordion item");
-  }
 
   // Update element state
   element.classList.add(CSS_CLASSES.OPEN);
@@ -207,10 +196,6 @@ function openItem(itemState: AccordionItemState): void {
  */
 function closeItem(itemState: AccordionItemState): void {
   const { element, trigger, panel, chevron, icon } = itemState;
-
-  if (options.debug) {
-    logger.log("Closing accordion item");
-  }
 
   // Update element state
   element.classList.remove(CSS_CLASSES.OPEN);
@@ -257,15 +242,6 @@ function toggleItem(accordionState: AccordionState, itemIndex: number): void {
   }
 
   const wasOpen = itemState.isOpen;
-
-  if (options.debug) {
-    logger.log(
-      "Toggling item",
-      itemIndex,
-      ": currently",
-      wasOpen ? "open" : "closed"
-    );
-  }
 
   // Close other items if not allowing multiple
   if (!accordionState.allowMultiple && !wasOpen) {
@@ -324,10 +300,6 @@ function handleTriggerClick(event: Event): void {
   // Find the item index
   const itemIndex = parseInt((item as HTMLElement).dataset.index || "0", 10);
 
-  if (options.debug) {
-    logger.log("Trigger clicked for item", itemIndex);
-  }
-
   toggleItem(accordionState, itemIndex);
 }
 
@@ -344,15 +316,6 @@ function initializeAccordion(accordion: HTMLElement): void {
   const allowMultiple =
     accordion.getAttribute("data-allow-multiple") === "true";
   const items = accordion.querySelectorAll(options.itemSelector);
-
-  if (options.debug) {
-    logger.log(
-      "Initializing accordion with",
-      items.length,
-      "items, allowMultiple:",
-      allowMultiple
-    );
-  }
 
   const accordionState: AccordionState = {
     element: accordion,
@@ -395,10 +358,6 @@ function initializeAccordion(accordion: HTMLElement): void {
 
   // Add event listener to the accordion container (event delegation)
   accordion.addEventListener("click", handleTriggerClick);
-
-  if (options.debug) {
-    logger.log("Accordion initialized successfully");
-  }
 }
 
 /**
@@ -406,10 +365,6 @@ function initializeAccordion(accordion: HTMLElement): void {
  */
 function initializeAllAccordions(): void {
   const accordions = document.querySelectorAll(options.accordionSelector);
-
-  if (options.debug) {
-    logger.log("Found", accordions.length, "accordion containers");
-  }
 
   accordions.forEach(accordion => {
     initializeAccordion(accordion as HTMLElement);
@@ -425,10 +380,6 @@ function cleanup(): void {
   });
 
   accordionStates.clear();
-
-  if (options.debug) {
-    logger.log("Accordion cleanup completed");
-  }
 }
 
 // ======================================================================
@@ -444,13 +395,6 @@ export function initAccordionEngine(userOptions: AccordionOptions = {}): void {
   // Merge default options with user options
   options = { ...DEFAULT_OPTIONS, ...userOptions };
 
-  if (options.debug) {
-    logger.log(
-      "Initializing AccordionEngine with options:",
-      JSON.stringify(options)
-    );
-  }
-
   // Function to initialize accordions
   const initialize = () => {
     try {
@@ -459,10 +403,6 @@ export function initAccordionEngine(userOptions: AccordionOptions = {}): void {
 
       // Initialize new instances
       initializeAllAccordions();
-
-      if (options.debug) {
-        logger.log("AccordionEngine initialized successfully");
-      }
     } catch (error) {
       logger.error("Error initializing AccordionEngine:", error);
     }
@@ -480,10 +420,6 @@ export function initAccordionEngine(userOptions: AccordionOptions = {}): void {
  * Reinitializes all accordions (useful for dynamic content)
  */
 export function reinitializeAccordions(): void {
-  if (options.debug) {
-    logger.log("Reinitializing accordions");
-  }
-
   cleanup();
   initializeAllAccordions();
 }
@@ -567,10 +503,6 @@ export function getAccordionItemState(
  */
 export function destroyAccordionEngine(): void {
   cleanup();
-
-  if (options.debug) {
-    logger.log("AccordionEngine destroyed");
-  }
 }
 
 // ======================================================================

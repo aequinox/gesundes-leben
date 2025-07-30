@@ -65,13 +65,21 @@ beforeEach(() => {
     return element;
   });
 
-  document.head = {
-    appendChild: vi.fn(),
-  } as any;
+  Object.defineProperty(document, "head", {
+    writable: true,
+    configurable: true,
+    value: {
+      appendChild: vi.fn(),
+    },
+  });
 
-  document.body = {
-    appendChild: vi.fn(),
-  } as any;
+  Object.defineProperty(document, "body", {
+    writable: true,
+    configurable: true,
+    value: {
+      appendChild: vi.fn(),
+    },
+  });
 });
 
 afterEach(() => {

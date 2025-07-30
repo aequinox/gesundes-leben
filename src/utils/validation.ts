@@ -90,7 +90,6 @@ export const isValidEmail = (
 
     // Basic type and null checks
     if (!email || typeof email !== "string") {
-      logger.debug("Email validation failed: invalid input type");
       return false;
     }
 
@@ -99,23 +98,17 @@ export const isValidEmail = (
 
     // Check length constraints
     if (trimmedEmail.length === 0 || trimmedEmail.length > opts.maxLength) {
-      logger.debug(
-        "Email validation failed: length constraint",
-        trimmedEmail.length
-      );
       return false;
     }
 
     // Check for basic email structure (must contain @ and .)
     if (!trimmedEmail.includes("@") || !trimmedEmail.includes(".")) {
-      logger.debug("Email validation failed: missing @ or .");
       return false;
     }
 
     // Split email into local and domain parts
     const atIndex = trimmedEmail.lastIndexOf("@");
     if (atIndex <= 0 || atIndex === trimmedEmail.length - 1) {
-      logger.debug("Email validation failed: invalid @ position");
       return false;
     }
 
@@ -134,13 +127,7 @@ export const isValidEmail = (
 
     // Final regex validation
     const regex = opts.allowInternational ? EMAIL_REGEX : STRICT_EMAIL_REGEX;
-    const isValid = regex.test(trimmedEmail);
-
-    if (!isValid) {
-      logger.debug("Email validation failed: regex test");
-    }
-
-    return isValid;
+    return regex.test(trimmedEmail);
   } catch (error) {
     logger.error(
       "Error in email validation:",
@@ -162,31 +149,26 @@ const isValidLocalPart = (
 ): boolean => {
   // Check length (RFC 5321: max 64 characters)
   if (localPart.length === 0 || localPart.length > 64) {
-    logger.debug("Local part validation failed: length", localPart.length);
     return false;
   }
 
   // Check for consecutive dots
   if (localPart.includes("..")) {
-    logger.debug("Local part validation failed: consecutive dots");
     return false;
   }
 
   // Check for leading/trailing dots
   if (localPart.startsWith(".") || localPart.endsWith(".")) {
-    logger.debug("Local part validation failed: leading/trailing dots");
     return false;
   }
 
   // Check plus sign if not allowed
   if (!options.allowPlus && localPart.includes("+")) {
-    logger.debug("Local part validation failed: plus sign not allowed");
     return false;
   }
 
   // Check dots if not allowed
   if (!options.allowDots && localPart.includes(".")) {
-    logger.debug("Local part validation failed: dots not allowed");
     return false;
   }
 
@@ -205,13 +187,11 @@ const isValidDomainPart = (
 ): boolean => {
   // Check length (RFC 5321: max 253 characters)
   if (domainPart.length === 0 || domainPart.length > 253) {
-    logger.debug("Domain part validation failed: length", domainPart.length);
     return false;
   }
 
   // Check for consecutive dots
   if (domainPart.includes("..")) {
-    logger.debug("Domain part validation failed: consecutive dots");
     return false;
   }
 
@@ -222,9 +202,6 @@ const isValidDomainPart = (
     domainPart.startsWith("-") ||
     domainPart.endsWith("-")
   ) {
-    logger.debug(
-      "Domain part validation failed: invalid leading/trailing characters"
-    );
     return false;
   }
 
@@ -233,14 +210,12 @@ const isValidDomainPart = (
 
   // Must have at least 2 labels (e.g., example.com)
   if (labels.length < 2) {
-    logger.debug("Domain part validation failed: insufficient labels");
     return false;
   }
 
   // Check TLD length
   const tld = labels[labels.length - 1];
   if (tld.length < options.minDomainLength) {
-    logger.debug("Domain part validation failed: TLD too short", tld.length);
     return false;
   }
 
@@ -262,19 +237,16 @@ const isValidDomainPart = (
 const isValidDomainLabel = (label: string): boolean => {
   // Check length (RFC 1035: max 63 characters per label)
   if (label.length === 0 || label.length > 63) {
-    logger.debug("Domain label validation failed: length", label.length);
     return false;
   }
 
   // Check for valid characters (alphanumeric and hyphens)
   if (!/^[a-zA-Z0-9-]+$/.test(label)) {
-    logger.debug("Domain label validation failed: invalid characters");
     return false;
   }
 
   // Check for leading/trailing hyphens
   if (label.startsWith("-") || label.endsWith("-")) {
-    logger.debug("Domain label validation failed: leading/trailing hyphens");
     return false;
   }
 
