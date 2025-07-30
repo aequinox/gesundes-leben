@@ -1,27 +1,24 @@
 type: journal
 title: "Vinegar consumption increases insulin‐stimulated glucose uptake by the forearm muscle in humans with type 2 diabetes"
 authors:
-  - "Mitrou, Panayota"
-  - "Petsiou, Eirini"
-  - "Papakonstantinou, Emilia"
-  - "Maratou, Eirini"
-  - "Lambadiari, Vaia"
-  - "Dimitriadis, Panagiotis"
-  - "Spanoudi, Filio"
-  - "Raptis, Sotirios A."
-  - "Dimitriadis, George"
+  - "Mitrou, P."
+  - "Petsiou, E."
+  - "Papakonstantinou, E."
+  - "Maratou, E."
+  - "Lambadiari, V."
+  - "Dimitriadis, P."
+  - "Spanoudi, F."
+  - "Raptis, S. A."
+  - "Dimitriadis, G."
 year: 2015
 journal: "Journal of Diabetes Research"
 volume: 2015
+issue: 1
 pages: "175204"
-doi: "10.1155/2015/175204"
 url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC4438142/"
-pmid: "26064876"
 keywords:
-  - vinegar
-  - glucose uptake
-  - insulin sensitivity
-  - type 2 diabetes
-  - metabolism
-  - acetic acid
-abstract: "Study examining the effects of vinegar consumption on insulin-stimulated glucose uptake in humans with type 2 diabetes."
+  - "vinegar"
+  - "glucose uptake"
+  - "insulin sensitivity"
+  - "type 2 diabetes"
+abstract: "Study demonstrating that vinegar consumption increases insulin-stimulated glucose uptake in muscle tissue of people with type 2 diabetes"
