@@ -40,7 +40,8 @@ export { ViewTransitionEnhancer as default } from "./viewTransitions/enhancer";
 
 // Backward compatibility: provide a default initialization
 // that uses the new modular architecture
-import { initViewTransitions, ViewTransitionEnhancer } from "./viewTransitions";
+import { initViewTransitions } from "./viewTransitions";
+import type { ViewTransitionEnhancer } from "./viewTransitions";
 
 // Auto-initialize with default config for backward compatibility
 if (typeof window !== "undefined") {
