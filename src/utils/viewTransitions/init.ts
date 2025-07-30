@@ -3,8 +3,8 @@
  * Provides convenient initialization functions for the modular view transitions system
  */
 
-import type { ViewTransitionConfig } from "./config";
 import { mergeConfig, validateConfig } from "./config";
+import type { ViewTransitionConfig } from "./config";
 import { ViewTransitionEnhancer } from "./enhancer";
 
 /**

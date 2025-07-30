@@ -3,7 +3,7 @@
  * Handles performance monitoring and metrics collection
  */
 
-import type { TransitionMetrics, TransitionType } from "./config";
+import type { TransitionMetrics } from "./config";
 
 export class MetricsCollector {
   private metrics: Map<string, TransitionMetrics> = new Map();

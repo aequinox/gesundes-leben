@@ -55,10 +55,12 @@ const {
     <script>
       // Lazy load view transition enhancements when needed
       if ('startViewTransition' in document || window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
-        import("@/utils/viewTransitionEnhancements").then(module => {
+        import("@/utils/viewTransitionEnhancements").then(_module => {
           // Module is auto-initialized on import
+          // eslint-disable-next-line no-console
           console.log("View transition enhancements loaded");
         }).catch(error => {
+          // eslint-disable-next-line no-console
           console.error("Failed to load view transition enhancements:", error);
         });
       }
