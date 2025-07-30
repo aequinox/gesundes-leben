@@ -89,12 +89,14 @@ const baseTitleClasses = [
 >
   {
     title && (
-      <h2 class={baseTitleClasses} id={titleId}>
-        {title}
+      <>
+        <h2 class={baseTitleClasses} id={titleId}>
+          {title}
+        </h2>
         <span id={`${sectionId}-description`} class="sr-only">
           Liste mit {items.length} Elementen
         </span>
-      </h2>
+      </>
     )
   }
 
@@ -115,7 +117,7 @@ const baseTitleClasses = [
           role="listitem"
         >
           <div class="mt-0.5 flex-shrink-0" aria-hidden="true">
-            <div class="flex h-6 w-6 items-center justify-center rounded-full bg-accent shadow-sm">
+            <div class="flex h-4 w-4 items-center justify-center rounded-full bg-accent shadow-sm">
               <svg
                 viewBox="0 0 16 16"
                 fill="none"
@@ -123,16 +125,17 @@ const baseTitleClasses = [
                 stroke-width="2.5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class="h-3.5 w-3.5 text-white"
+                class="h-2.5 w-2.5 text-white"
                 aria-hidden="true"
               >
                 <polyline points="3 8 6 11 13 4" />
               </svg>
             </div>
           </div>
-          <span class="flex-1 text-base leading-relaxed font-normal text-foreground/90">
-            {item}
-          </span>
+          <span
+            class="flex-1 text-base leading-relaxed font-normal text-foreground/90"
+            set:html={item}
+          ></span>
         </li>
       ))
     }

@@ -1,0 +1,18 @@
+type: journal
+title: "Electromagnetic bioeffects: a multiscale molecular simulation perspective"
+authors:
+  - "Noble, B. B."
+  - "Todorova, N."
+  - "Yarovsky, I."
+year: 2022
+journal: "Physical Chemistry Chemical Physics"
+volume: 24
+issue: 11
+pages: "6327-6348"
+doi: "10.1039/d1cp05510k"
+keywords:
+  - "electromagnetic fields"
+  - "bioeffects"
+  - "molecular simulation"
+  - "multiscale modeling"
+abstract: "Molecular simulation study examining electromagnetic bioeffects from a multiscale perspective, providing insights into EMF interactions with biological systems."
