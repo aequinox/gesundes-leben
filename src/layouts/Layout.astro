@@ -53,7 +53,15 @@ const {
     <ClientRouter />
     <script is:inline src="/toggle-theme.js"></script>
     <script>
-      import "@/utils/viewTransitionEnhancements";
+      // Lazy load view transition enhancements when needed
+      if ('startViewTransition' in document || window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+        import("@/utils/viewTransitionEnhancements").then(module => {
+          // Module is auto-initialized on import
+          console.log("View transition enhancements loaded");
+        }).catch(error => {
+          console.error("Failed to load view transition enhancements:", error);
+        });
+      }
     </script>
   </head>
   <body

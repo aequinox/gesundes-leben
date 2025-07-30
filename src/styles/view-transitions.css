@@ -17,7 +17,12 @@
     --vt-easing-enter: cubic-bezier(0.25, 0.1, 0.25, 1);
     --vt-easing-exit: cubic-bezier(0.4, 0, 1, 1);
     --vt-easing-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    --vt-easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --vt-easing-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+    /* Container query breakpoints for responsive transitions */
+    --vt-container-sm: 640px;
+    --vt-container-md: 768px;
+    --vt-container-lg: 1024px;
   }
 
   /* Core View Transition Styles */
@@ -46,7 +51,35 @@
     animation: vt-filter-in var(--vt-duration-normal) var(--vt-easing-enter);
   }
 
-  /* Generic element transitions - These apply by default */
+  /* Specific element transitions for better performance */
+  /* Hero images */
+  ::view-transition-old([transition-name*="heroImage"]) {
+    animation: vt-image-out var(--vt-duration-normal) var(--vt-easing-exit);
+  }
+  
+  ::view-transition-new([transition-name*="heroImage"]) {
+    animation: vt-image-in var(--vt-duration-normal) var(--vt-easing-spring);
+  }
+  
+  /* Titles and headings */
+  ::view-transition-old([transition-name*="title"]) {
+    animation: vt-title-out var(--vt-duration-fast) var(--vt-easing-exit);
+  }
+  
+  ::view-transition-new([transition-name*="title"]) {
+    animation: vt-title-in var(--vt-duration-fast) var(--vt-easing-bounce);
+  }
+  
+  /* Tags and badges */
+  ::view-transition-old([transition-name*="tag"]) {
+    animation: vt-tag-out var(--vt-duration-fast) var(--vt-easing-exit);
+  }
+  
+  ::view-transition-new([transition-name*="tag"]) {
+    animation: vt-tag-in var(--vt-duration-fast) var(--vt-easing-bounce);
+  }
+  
+  /* Default fallback for unmatched elements */
   ::view-transition-old(*) {
     animation: vt-fade-out var(--vt-duration-fast) var(--vt-easing-exit);
   }
@@ -72,6 +105,32 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes vt-image-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+    filter: brightness(0.8);
+  }
+}
+
+@keyframes vt-image-in {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+    filter: brightness(1.2);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
   }
 }
 
@@ -136,52 +195,44 @@
 @keyframes vt-title-out {
   from {
     opacity: 1;
-    transform: translateY(0) scale(1);
-    letter-spacing: 0;
+    transform: translateY(0);
   }
   to {
     opacity: 0;
-    transform: translateY(-1rem) scale(0.95);
-    letter-spacing: -0.02em;
+    transform: translateY(-0.5rem);
   }
 }
 
 @keyframes vt-title-in {
   from {
     opacity: 0;
-    transform: translateY(1rem) scale(1.05);
-    letter-spacing: 0.02em;
+    transform: translateY(0.5rem);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
-    letter-spacing: 0;
+    transform: translateY(0);
   }
 }
 
 @keyframes vt-tag-out {
   from {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: scale(1);
   }
   to {
     opacity: 0;
-    transform: translateY(-0.5rem) scale(0.9);
+    transform: scale(0.9);
   }
 }
 
 @keyframes vt-tag-in {
   from {
     opacity: 0;
-    transform: translateY(0.5rem) scale(1.1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: translateY(-0.1rem) scale(1.05);
+    transform: scale(0.9);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: scale(1);
   }
 }
 
@@ -261,72 +312,56 @@
     contain: layout style paint;
     content-visibility: auto;
   }
+  
+  /* Container queries for responsive transitions */
+  @container (min-width: 640px) {
+    ::view-transition-old(main-content),
+    ::view-transition-new(main-content) {
+      animation-duration: var(--vt-duration-slow);
+    }
+  }
+  
+  /* Staggered animations for lists */
+  .vt-stagger-children > * {
+    animation-delay: calc(var(--stagger-index, 0) * 50ms);
+  }
 }
 
-/* Reduced Motion Support */
+/* Enhanced Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
+  /* Respect user preferences completely */
   ::view-transition-old(*),
   ::view-transition-new(*) {
-    animation-duration: 1ms !important;
-    animation-delay: 0s !important;
-  }
-
-  /* Disable complex animations for accessibility */
-  @keyframes vt-morph-out {
-    from, to {
-      transform: none;
-      filter: none;
-      letter-spacing: 0;
-    }
+    animation: none !important;
+    transition: opacity var(--vt-duration-fast) ease !important;
   }
   
-  @keyframes vt-morph-in {
-    from, to {
-      transform: none;
-      filter: none;
-      letter-spacing: 0;
-    }
+  /* Alternative visual feedback */
+  .vt-optimize {
+    transition: opacity var(--vt-duration-fast) ease;
   }
   
-  @keyframes vt-title-out {
-    from, to {
-      transform: none;
-      filter: none;
-      letter-spacing: 0;
-    }
-  }
-  
-  @keyframes vt-title-in {
-    from, to {
-      transform: none;
-      filter: none;
-      letter-spacing: 0;
-    }
-  }
-  
-  @keyframes vt-tag-out {
-    from, to {
-      transform: none;
-      filter: none;
-      letter-spacing: 0;
-    }
-  }
-  
-  @keyframes vt-tag-in {
-    from, to {
-      transform: none;
-      filter: none;
-      letter-spacing: 0;
-    }
+  /* Disable all complex animations */
+  .vt-stagger-children > * {
+    animation-delay: 0ms !important;
   }
 }
 
-/* Dark mode optimizations */
+/* Theme-aware optimizations */
 @media (prefers-color-scheme: dark) {
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    /* Slightly faster transitions in dark mode for better perceived performance */
-    animation-duration: calc(var(--vt-duration-normal) * 0.9);
+  :root {
+    /* Faster transitions in dark mode */
+    --vt-duration-fast: 150ms;
+    --vt-duration-normal: 300ms;
+    --vt-duration-slow: 450ms;
+  }
+}
+
+/* High refresh rate optimizations */
+@media (min-resolution: 120dpi) {
+  :root {
+    --vt-duration-fast: 150ms;
+    --vt-duration-normal: 250ms;
   }
 }
 

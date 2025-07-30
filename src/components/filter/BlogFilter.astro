@@ -146,18 +146,19 @@ if (Object.values(groupPostCounts).every(count => count === 0)) {
   {/* Group Selector Grid with Enhanced Styling */}
   <div
     id="group-selectors"
-    class="group-selector-container mx-auto mb-8 grid max-w-content grid-cols-1 gap-4 p-4 sm:grid-cols-3 sm:gap-6"
+    class="group-selector-container vt-stagger-children mx-auto mb-8 grid max-w-content grid-cols-1 gap-4 p-4 sm:grid-cols-3 sm:gap-6"
     role="tablist"
     aria-label="Content group filters"
   >
     {
-      allGroups.map(group => {
+      allGroups.map((group, index) => {
         const { icon, title, slogan } = groupConfig[group];
         const ariaLabel = t("group.select").replace("{type}", title);
 
         return (
           <button
             class={`group-selector group relative mb-16 transition-all duration-500 ease-out hover:-translate-y-0.5 hover:scale-[1.02] md:mb-0`}
+            style={`--stagger-index: ${index}`}
             id={`${group}-group`}
             aria-label={ariaLabel}
             type="button"
