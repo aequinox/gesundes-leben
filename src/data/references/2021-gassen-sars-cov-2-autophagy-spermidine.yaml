@@ -1,0 +1,43 @@
+type: journal
+title: "SARS-CoV-2-mediated dysregulation of metabolism and autophagy uncovers host-targeting antivirals"
+authors:
+  - "Gassen, Nils C."
+  - "Papies, Jan"
+  - "Bajaj, Tatjana"
+  - "Emanuel, Jackson"
+  - "Dethloff, Frederik"
+  - "Chua, Robyn Lee"
+  - "Trimpert, Jakob"
+  - "Heinzel, Nathalie"
+  - "Weege, Fabian"
+  - "Hölter, Sabine M."
+  - "Abdellatif, Mahmoud"
+  - "Zimpel, Andreas"
+  - "Novatchkova, Maria"
+  - "Kramer, Niklas"
+  - "Perkhofer, Lukas"
+  - "Huber, Stephan"
+  - "Kroemer, Guido"
+  - "Eisenberg, Tobias"
+  - "Knop, Michael"
+  - "Hoertel, Nicolas"
+  - "Praetner, Maximilian"
+  - "Langer, Thomas"
+  - "Madeo, Frank"
+  - "Tschöp, Matthias H."
+  - "Rein, Theo"
+year: 2021
+journal: "Nature Communications"
+volume: 12
+issue: 1
+pages: "3818"
+doi: "10.1038/s41467-021-24007-w"
+url: "https://www.nature.com/articles/s41467-021-24007-w"
+keywords:
+  - spermidine
+  - SARS-CoV-2
+  - COVID-19
+  - autophagy
+  - antiviral
+  - viral load reduction
+abstract: "Study showing spermidine can reduce SARS-CoV-2 viral load by 85% in infected lung cells through autophagy mechanisms."
