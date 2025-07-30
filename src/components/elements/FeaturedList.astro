@@ -1,0 +1,345 @@
+---
+/**
+ * FeaturedList component for displaying highlighted lists with accent-colored checkmark icons
+ * Features modern design with smooth wave decoration and accessibility optimizations
+ * Uses project's design system colors and follows WCAG guidelines
+ *
+ * @example
+ * ```astro
+ * <FeaturedList
+ *   title="Erinnere dich daran:"
+ *   items={[
+ *     "Vergebung hat nichts mit dem anderen zu tun.",
+ *     "Vergebung ist deine Entscheidung und deine Verantwortung.",
+ *     "Was auch immer geschehen ist – es ist vorbei! Vergebung dreht sich um die Zukunft, nicht um die Vergangenheit."
+ *   ]}
+ *   animationDelay={200}
+ *   disableAnimation={false}
+ * />
+ * ```
+ */
+
+// Configuration constants
+const ANIMATION_CONFIG = {
+  /** Default delay between item animations in milliseconds */
+  DEFAULT_DELAY: 150,
+  /** Animation duration in milliseconds */
+  DURATION: 600,
+  /** Intersection observer threshold */
+  THRESHOLD: 0.1,
+  /** Root margin for intersection observer */
+  ROOT_MARGIN: "50px",
+} as const;
+
+interface Props {
+  /** Optional title displayed above the list */
+  title?: string;
+  /** Array of list items to display */
+  items: readonly string[];
+  /** Additional CSS classes for the title */
+  titleClasses?: string;
+  /** Background CSS classes - defaults to surface gradient */
+  backgroundClass?: string;
+  /** Delay between item animations in milliseconds */
+  animationDelay?: number;
+  /** Disable all animations for performance or accessibility */
+  disableAnimation?: boolean;
+  /** Unique identifier for the component instance */
+  id?: string;
+}
+
+const {
+  title,
+  items = [],
+  titleClasses = "",
+  backgroundClass = "bg-gradient-to-b from-card via-card/50 to-transparent backdrop-blur-sm",
+  animationDelay = ANIMATION_CONFIG.DEFAULT_DELAY,
+  disableAnimation = false,
+  id,
+}: Props = Astro.props;
+
+// Performance: Early validation to prevent unnecessary processing
+if (!items || items.length === 0) {
+  throw new Error("FeaturedList: items prop is required and cannot be empty");
+}
+
+// Generate deterministic unique ID for accessibility and hydration consistency
+const sectionId =
+  id ||
+  `featured-list-${Astro.url.pathname.replace(/[^a-zA-Z0-9]/g, "-")}-${items.length}`;
+const titleId = title ? `${sectionId}-title` : undefined;
+const listId = `${sectionId}-list`;
+
+const baseTitleClasses = [
+  "text-lg font-medium text-accent mb-4 !mt-0",
+  titleClasses,
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<section
+  class={`featured-list-section relative mx-auto mt-6 mb-6 w-full overflow-hidden ${backgroundClass} p-6 pb-12 md:p-8 md:pb-16 ${disableAnimation ? "no-animation" : ""}`}
+  style={`--animation-delay: ${animationDelay}ms; --animation-duration: ${ANIMATION_CONFIG.DURATION}ms;`}
+  aria-labelledby={titleId}
+  aria-describedby={title ? `${sectionId}-description` : undefined}
+  data-aos={disableAnimation ? undefined : "fade-up"}
+  id={listId}
+  role="region"
+>
+  {
+    title && (
+      <h2 class={baseTitleClasses} id={titleId}>
+        {title}
+        <span id={`${sectionId}-description`} class="sr-only">
+          Liste mit {items.length} Elementen
+        </span>
+      </h2>
+    )
+  }
+
+  <ul
+    class="space-y-4"
+    role="list"
+    aria-label={title ? `${title} list` : "Featured list"}
+  >
+    {
+      items.map((item, index) => (
+        <li
+          class={`featured-list-item flex items-start gap-4 ${disableAnimation ? "no-animation" : "animate-fadeIn translate-y-2 opacity-0"}`}
+          style={
+            !disableAnimation
+              ? `animation-delay: calc(var(--animation-delay) * ${index});`
+              : undefined
+          }
+          role="listitem"
+        >
+          <div class="mt-0.5 flex-shrink-0" aria-hidden="true">
+            <div class="flex h-6 w-6 items-center justify-center rounded-full bg-accent shadow-sm">
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-3.5 w-3.5 text-white"
+                aria-hidden="true"
+              >
+                <polyline points="3 8 6 11 13 4" />
+              </svg>
+            </div>
+          </div>
+          <span class="flex-1 text-base leading-relaxed font-normal text-foreground/90">
+            {item}
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <!-- Modern Wave Decoration inspired by Fireship.io -->
+  <div
+    class="wave-decoration pointer-events-none absolute bottom-0 left-0 h-12 w-full"
+    aria-hidden="true"
+  >
+    <svg
+      class="absolute bottom-0 left-0 h-full w-full"
+      viewBox="0 0 1200 120"
+      preserveAspectRatio="xMidYMid slice"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <!-- Optimized single wave layer with semantic naming -->
+      <path
+        d="M0,80 C300,20 600,100 1200,60 L1200,120 L0,120 Z"
+        fill="oklch(from var(--accent) l c h / 0.1)"
+        class="wave-layer"
+        aria-hidden="true"></path>
+      <!-- Background blend layer for seamless integration -->
+      <path
+        d="M0,85 C300,25 600,105 1200,65 L1200,120 L0,120 Z"
+        fill="var(--background)"
+        class="wave-background"
+        aria-hidden="true"></path>
+    </svg>
+  </div>
+</section>
+
+<style>
+  /* Modern Wave Decoration Styles */
+  .featured-list-section {
+    border-radius: 1rem 1rem 0.5rem 0.5rem;
+    position: relative;
+  }
+
+  .wave-decoration {
+    z-index: -1;
+    opacity: 1;
+  }
+
+  /* Component-scoped animation styles */
+  :global(.featured-list-item.animate-fadeIn) {
+    animation: featured-fadeIn var(--animation-duration, 600ms) ease-out
+      forwards;
+  }
+
+  :global(.no-animation .featured-list-item) {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  @keyframes featured-fadeIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Accessibility: Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    :global([data-aos]),
+    :global(.featured-list-item),
+    .wave-layer,
+    .wave-background {
+      transform: none !important;
+      opacity: 1 !important;
+      transition: none !important;
+      animation: none !important;
+    }
+
+    .wave-decoration {
+      opacity: 0.4;
+    }
+
+    /* Ensure components are immediately visible without motion */
+    .featured-list-section {
+      transform: none !important;
+    }
+  }
+
+  /* Accessibility: High Contrast Mode */
+  @media (forced-colors: active) {
+    section {
+      border: 1px solid CanvasText;
+      background: Canvas;
+    }
+
+    :global(.featured-list-item svg) {
+      forced-color-adjust: auto;
+      color: LinkText;
+    }
+  }
+
+  /* Focus indicators for keyboard navigation */
+  :global(.featured-list-item:focus-within) {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+</style>
+
+<script>
+  // Optimized singleton intersection observer for all FeaturedList instances
+  class FeaturedListObserver {
+    private static instance: FeaturedListObserver;
+    private observer: IntersectionObserver | null = null;
+    private elements = new Set<Element>();
+
+    static getInstance(): FeaturedListObserver {
+      if (!FeaturedListObserver.instance) {
+        FeaturedListObserver.instance = new FeaturedListObserver();
+      }
+      return FeaturedListObserver.instance;
+    }
+
+    private constructor() {
+      this.init();
+    }
+
+    private init() {
+      if (
+        typeof window === "undefined" ||
+        !("IntersectionObserver" in window)
+      ) {
+        // Fallback for older browsers or SSR
+        return;
+      }
+
+      this.observer = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("aos-animate");
+              this.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          rootMargin: "50px",
+          threshold: 0.1,
+        }
+      );
+    }
+
+    observe(element: Element) {
+      if (!this.observer) {
+        // Fallback: immediately show element
+        element.classList.add("aos-animate");
+        return;
+      }
+
+      this.elements.add(element);
+      this.observer.observe(element);
+    }
+
+    unobserve(element: Element) {
+      if (this.observer) {
+        this.observer.unobserve(element);
+      }
+      this.elements.delete(element);
+    }
+
+    disconnect() {
+      if (this.observer) {
+        this.observer.disconnect();
+        this.elements.clear();
+      }
+    }
+  }
+
+  // Initialize current component with error handling
+  function initializeFeaturedList() {
+    try {
+      const currentSection = document.getElementById("${listId}");
+      if (
+        !currentSection ||
+        currentSection.classList.contains("no-animation")
+      ) {
+        return;
+      }
+
+      const observer = FeaturedListObserver.getInstance();
+      observer.observe(currentSection);
+    } catch {
+      // Silently handle initialization errors for graceful degradation
+    }
+  }
+
+  // Initialize on load
+  initializeFeaturedList();
+
+  // Handle Astro view transitions
+  document.addEventListener("astro:after-swap", initializeFeaturedList);
+
+  // Cleanup on page leave
+  document.addEventListener("astro:before-swap", () => {
+    try {
+      const currentSection = document.getElementById("${listId}");
+      if (currentSection) {
+        FeaturedListObserver.getInstance().unobserve(currentSection);
+      }
+    } catch {
+      // Silently handle cleanup errors for graceful degradation
+    }
+  });
+</script>
