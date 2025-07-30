@@ -1,0 +1,21 @@
+type: journal
+title: "Detection of microplastics in human lung tissue using μFTIR spectroscopy"
+authors:
+  - "Jenner, L. C."
+  - "Rotchell, J. M."
+  - "Bennett, R. T."
+  - "Cowen, M."
+  - "Tentzeris, V."
+  - "Sadofsky, L. R."
+year: 2022
+journal: "Science of The Total Environment"
+volume: 831
+pages: "154907"
+url: "https://doi.org/10.1016/j.scitotenv.2022.154907"
+doi: "10.1016/j.scitotenv.2022.154907"
+keywords:
+  - "microplastics"
+  - "human lung tissue"
+  - "μFTIR spectroscopy"
+  - "environmental health"
+abstract: "First study to detect microplastics in human lung tissue using μFTIR spectroscopy, demonstrating widespread contamination in respiratory system"
