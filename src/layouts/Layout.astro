@@ -34,7 +34,11 @@ const {
 ---
 
 <!doctype html>
-<html lang=`${SITE.lang ?? "en"}` class={`${scrollSmooth && "scroll-smooth"}`}>
+<html
+  lang=`${SITE.lang ?? "en"}`
+  class={`${scrollSmooth && "scroll-smooth"}`}
+  transition:animate="none"
+>
   <head>
     <SEO
       title={title}
@@ -48,12 +52,23 @@ const {
     />
     <ClientRouter />
     <script is:inline src="/toggle-theme.js"></script>
+    <script>
+      import "@/utils/viewTransitionEnhancements";
+    </script>
   </head>
-  <body data-pagefind-body class="px-2 lg:px-12" data-astro-prefetch>
+  <body
+    data-pagefind-body
+    class="vt-optimize px-2 lg:px-12"
+    data-astro-prefetch
+  >
     {Astro.url.pathname !== "/" && <Breadcrumb />}
-    <div transition:animate="fade" transition:name="layout">
+    <main
+      transition:animate="slide"
+      transition:name="main-content"
+      class="vt-optimize"
+    >
       <slot />
-    </div>
+    </main>
     {import.meta.env.DEV && <SizeIndicator />}
 
     {/* Site Behaviour */}

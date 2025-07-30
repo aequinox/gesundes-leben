@@ -1,0 +1,340 @@
+/* View Transitions Enhancements - Modern Astro View Transitions */
+
+@layer utilities {
+  /* View Transition Root Configuration */
+  html {
+    view-transition-name: root;
+  }
+
+  /* Enhanced Transition Duration System */
+  :root {
+    /* View transition timing tokens */
+    --vt-duration-fast: 200ms;
+    --vt-duration-normal: 350ms;
+    --vt-duration-slow: 500ms;
+
+    /* Enhanced easing curves for view transitions */
+    --vt-easing-enter: cubic-bezier(0.25, 0.1, 0.25, 1);
+    --vt-easing-exit: cubic-bezier(0.4, 0, 1, 1);
+    --vt-easing-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --vt-easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  /* Core View Transition Styles */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: var(--vt-duration-normal);
+    animation-timing-function: var(--vt-easing-enter);
+  }
+
+  /* Enhanced page transitions */
+  ::view-transition-old(main-content) {
+    animation: vt-slide-out-right var(--vt-duration-normal)
+      var(--vt-easing-exit);
+  }
+
+  ::view-transition-new(main-content) {
+    animation: vt-slide-in-left var(--vt-duration-normal) var(--vt-easing-enter);
+  }
+
+  /* Article filter transition */
+  ::view-transition-old(articles-filter) {
+    animation: vt-filter-out var(--vt-duration-normal) var(--vt-easing-exit);
+  }
+
+  ::view-transition-new(articles-filter) {
+    animation: vt-filter-in var(--vt-duration-normal) var(--vt-easing-enter);
+  }
+
+  /* Generic element transitions - These apply by default */
+  ::view-transition-old(*) {
+    animation: vt-fade-out var(--vt-duration-fast) var(--vt-easing-exit);
+  }
+
+  ::view-transition-new(*) {
+    animation: vt-fade-in var(--vt-duration-fast) var(--vt-easing-enter);
+  }
+}
+
+/* View Transition Keyframe Animations */
+@keyframes vt-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vt-slide-out-right {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(2rem);
+  }
+}
+
+@keyframes vt-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes vt-morph-out {
+  from {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    filter: blur(0px);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.95) rotate(-1deg);
+    filter: blur(1px);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8) rotate(-2deg);
+    filter: blur(4px);
+  }
+}
+
+@keyframes vt-morph-in {
+  from {
+    opacity: 0;
+    transform: scale(1.1) rotate(2deg);
+    filter: blur(4px);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05) rotate(1deg);
+    filter: blur(1px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    filter: blur(0px);
+  }
+}
+
+@keyframes vt-title-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    letter-spacing: 0;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-1rem) scale(0.95);
+    letter-spacing: -0.02em;
+  }
+}
+
+@keyframes vt-title-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem) scale(1.05);
+    letter-spacing: 0.02em;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    letter-spacing: 0;
+  }
+}
+
+@keyframes vt-tag-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-0.5rem) scale(0.9);
+  }
+}
+
+@keyframes vt-tag-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(1.1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(-0.1rem) scale(1.05);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes vt-filter-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-1rem) scaleY(0.8);
+  }
+}
+
+@keyframes vt-filter-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem) scaleY(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+@keyframes vt-category-out {
+  from {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.85) rotate(-3deg);
+  }
+}
+
+@keyframes vt-category-in {
+  from {
+    opacity: 0;
+    transform: scale(1.15) rotate(3deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05) rotate(1deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Progressive Enhancement - Only apply view transitions if supported */
+@supports (view-transition-name: none) {
+  /* Enhanced transitions for supported browsers */
+  html {
+    view-transition-name: root;
+  }
+
+  /* Smooth fallback animations for non-supporting browsers */
+  @supports not (view-transition-name: none) {
+    * {
+      transition: opacity var(--vt-duration-fast) var(--vt-easing-enter);
+    }
+  }
+}
+
+/* Performance Optimizations */
+@layer utilities {
+  /* GPU acceleration for view transition elements */
+  [style*="view-transition-name"] {
+    transform: translateZ(0);
+    will-change: transform, opacity;
+  }
+
+  /* Optimize transitions for specific elements */
+  .vt-optimize {
+    contain: layout style paint;
+    content-visibility: auto;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
+  }
+
+  /* Disable complex animations for accessibility */
+  @keyframes vt-morph-out {
+    from, to {
+      transform: none;
+      filter: none;
+      letter-spacing: 0;
+    }
+  }
+  
+  @keyframes vt-morph-in {
+    from, to {
+      transform: none;
+      filter: none;
+      letter-spacing: 0;
+    }
+  }
+  
+  @keyframes vt-title-out {
+    from, to {
+      transform: none;
+      filter: none;
+      letter-spacing: 0;
+    }
+  }
+  
+  @keyframes vt-title-in {
+    from, to {
+      transform: none;
+      filter: none;
+      letter-spacing: 0;
+    }
+  }
+  
+  @keyframes vt-tag-out {
+    from, to {
+      transform: none;
+      filter: none;
+      letter-spacing: 0;
+    }
+  }
+  
+  @keyframes vt-tag-in {
+    from, to {
+      transform: none;
+      filter: none;
+      letter-spacing: 0;
+    }
+  }
+}
+
+/* Dark mode optimizations */
+@media (prefers-color-scheme: dark) {
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    /* Slightly faster transitions in dark mode for better perceived performance */
+    animation-duration: calc(var(--vt-duration-normal) * 0.9);
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    /* Remove blur effects for high contrast */
+    filter: none !important;
+  }
+}
