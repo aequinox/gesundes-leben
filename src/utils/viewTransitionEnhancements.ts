@@ -219,7 +219,8 @@ export class ViewTransitionEnhancer {
    */
   private setupFallbackHandling(): void {
     // Check for View Transitions API support
-    if (!("startViewTransition" in document)) {
+    const hasViewTransitions = "startViewTransition" in document;
+    if (!hasViewTransitions) {
       // Add fallback class for styling
       document.documentElement.classList.add("no-view-transitions");
 
