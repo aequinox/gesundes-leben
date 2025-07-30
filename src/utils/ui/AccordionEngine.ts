@@ -77,7 +77,7 @@ const DEFAULT_OPTIONS: Required<AccordionOptions> = {
   chevronSelector: ".accordion-chevron svg",
   iconSelector: ".accordion-item-icon",
   animationDuration: 300,
-  maxHeight: "1000px",
+  maxHeight: "9999px",
 };
 
 /**

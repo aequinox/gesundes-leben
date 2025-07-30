@@ -1,6 +1,9 @@
 ---
 import { getCollection } from "astro:content";
 
+import Accordion, {
+  type AccordionItem,
+} from "@/components/sections/Accordion.astro";
 import { t } from "@/config/i18n";
 
 interface Props {
@@ -21,6 +24,19 @@ const references =
 // Calculate total references
 const totalReferences = references.length;
 
+// Create accordion item for references
+const accordionItems: AccordionItem[] =
+  totalReferences > 0
+    ? [
+        {
+          title: ` ${totalReferences} Wissenschaftliche Quellen`,
+          slotId: 0,
+          open: false,
+          icon: "tabler:file-text",
+        },
+      ]
+    : [];
+
 // Simple summary and credibility text
 const summaryText = `${totalReferences} wissenschaftliche Quellen`;
 const credibilityText = t("references.credibilityIndicator", {
@@ -31,20 +47,11 @@ const credibilityText = t("references.credibilityIndicator", {
 {
   totalReferences > 0 && (
     <section
-      class="mt-8 rounded-lg border bg-muted/30 p-6"
+      class="mt-8"
       data-pagefind-weight="12"
       data-pagefind-meta="contentType:references,hasScientificReferences:true"
-      aria-labelledby="references-heading"
       aria-label={t("references.accessibility.referenceSection")}
     >
-      <h2
-        id="references-heading"
-        class="mb-4 text-xl font-semibold text-foreground"
-        data-pagefind-weight="15"
-      >
-        {t("references.title")}
-      </h2>
-
       {/* References Metadata Summary for Search */}
       <div
         class="sr-only"
@@ -53,224 +60,236 @@ const credibilityText = t("references.credibilityIndicator", {
         {summaryText}
       </div>
 
-      <ol
-        class="space-y-4"
-        role="list"
-        aria-label={t("references.accessibility.referenceList")}
+      <Accordion
+        items={accordionItems}
+        variant="bordered"
+        size="md"
+        class="references-accordion"
       >
-        {references.map((ref, index) => (
-          <li
-            class="text-sm leading-relaxed"
-            data-pagefind-weight="8"
-            data-pagefind-meta={`referenceType:${ref.data.type},referenceYear:${ref.data.year}`}
-            aria-label={t("references.accessibility.referenceItem", {
-              values: { index: index + 1 },
-            })}
+        <div slot="content-0">
+          <ol
+            class="space-y-4"
+            role="list"
+            aria-label={t("references.accessibility.referenceList")}
           >
-            <div class="flex gap-3">
-              <span class="text-muted-foreground flex-shrink-0 font-medium">
-                [{index + 1}]
-              </span>
-              <div class="flex-1">
-                {/* Authors */}
-                {ref.data.authors && ref.data.authors.length > 0 && (
-                  <span
-                    class="font-medium text-foreground"
-                    data-pagefind-meta={`authors:${ref.data.authors.join(", ")}`}
-                  >
-                    {ref.data.authors.join(", ")}
-                    {ref.data.authors.length === 1 ? "" : " et al."}
+            {references.map((ref, index) => (
+              <li
+                class="text-sm leading-relaxed"
+                data-pagefind-weight="8"
+                data-pagefind-meta={`referenceType:${ref.data.type},referenceYear:${ref.data.year}`}
+                aria-label={t("references.accessibility.referenceItem", {
+                  values: { index: index + 1 },
+                })}
+              >
+                <div class="flex gap-3">
+                  <span class="text-muted-foreground flex-shrink-0 font-medium">
+                    [{index + 1}]
                   </span>
-                )}
-
-                {/* Year */}
-                {ref.data.year && (
-                  <span class="text-muted-foreground">
-                    {" "}
-                    ({ref.data.year}).{" "}
-                  </span>
-                )}
-
-                {/* Title */}
-                <span
-                  class="font-medium text-accent hover:text-accent/80"
-                  data-pagefind-weight="10"
-                  data-pagefind-meta={`referenceTitle:${ref.data.title}`}
-                >
-                  {ref.data.title}
-                </span>
-
-                {/* Journal info for journal articles */}
-                {ref.data.type === "journal" && (
-                  <span class="text-muted-foreground">
-                    .{" "}
-                    <em data-pagefind-meta={`journal:${ref.data.journal}`}>
-                      {ref.data.journal}
-                    </em>
-                    {ref.data.volume && `, ${ref.data.volume}`}
-                    {ref.data.issue && `(${ref.data.issue})`}
-                    {ref.data.pages && `, ${ref.data.pages}`}
-                  </span>
-                )}
-
-                {/* Book info for books */}
-                {ref.data.type === "book" && (
-                  <span class="text-muted-foreground">
-                    . {ref.data.edition && `${ref.data.edition}. `}
-                    {ref.data.publisher && (
+                  <div class="flex-1">
+                    {/* Authors */}
+                    {ref.data.authors && ref.data.authors.length > 0 && (
                       <span
-                        data-pagefind-meta={`publisher:${ref.data.publisher}`}
+                        class="font-medium text-foreground"
+                        data-pagefind-meta={`authors:${ref.data.authors.join(", ")}`}
                       >
-                        {ref.data.publisher}
+                        {ref.data.authors.join(", ")}
+                        {ref.data.authors.length === 1 ? "" : " et al."}
                       </span>
                     )}
-                    {ref.data.location && `, ${ref.data.location}`}
-                  </span>
-                )}
 
-                {/* Report info for reports */}
-                {ref.data.type === "report" && (
-                  <span class="text-muted-foreground">
-                    .{" "}
-                    {ref.data.publisher && (
-                      <span
-                        data-pagefind-meta={`publisher:${ref.data.publisher}`}
-                      >
-                        {ref.data.publisher}
+                    {/* Year */}
+                    {ref.data.year && (
+                      <span class="text-muted-foreground">
+                        {" "}
+                        ({ref.data.year}).{" "}
                       </span>
                     )}
-                    {ref.data.location && `, ${ref.data.location}`}
-                  </span>
-                )}
 
-                {/* Other info for other types */}
-                {ref.data.type === "other" && (
-                  <span class="text-muted-foreground">
-                    {ref.data.publisher && (
-                      <span
-                        data-pagefind-meta={`publisher:${ref.data.publisher}`}
-                      >
-                        . {ref.data.publisher}
+                    {/* Title */}
+                    <span
+                      class="font-medium text-accent hover:text-accent/80"
+                      data-pagefind-weight="10"
+                      data-pagefind-meta={`referenceTitle:${ref.data.title}`}
+                    >
+                      {ref.data.title}
+                    </span>
+
+                    {/* Journal info for journal articles */}
+                    {ref.data.type === "journal" && (
+                      <span class="text-muted-foreground">
+                        .{" "}
+                        <em data-pagefind-meta={`journal:${ref.data.journal}`}>
+                          {ref.data.journal}
+                        </em>
+                        {ref.data.volume && `, ${ref.data.volume}`}
+                        {ref.data.issue && `(${ref.data.issue})`}
+                        {ref.data.pages && `, ${ref.data.pages}`}
                       </span>
                     )}
-                  </span>
-                )}
 
-                {/* DOI, PMID and URL */}
-                <div class="mt-1 flex flex-wrap gap-4 text-xs">
-                  {ref.data.doi && (
-                    <div class="flex items-center gap-1">
-                      <span class="text-muted-foreground">DOI:</span>
-                      <a
-                        href={`https://doi.org/${ref.data.doi}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="font-mono text-accent hover:text-accent/80 hover:underline"
-                        data-pagefind-meta={`doi:${ref.data.doi}`}
-                        aria-label={t("references.accessibility.doiLink", {
-                          values: { title: ref.data.title },
-                        })}
-                      >
-                        {ref.data.doi}
-                      </a>
-                    </div>
-                  )}
-
-                  {ref.data.pmid && (
-                    <div class="flex items-center gap-1">
-                      <span class="text-muted-foreground">PMID:</span>
-                      <a
-                        href={`https://pubmed.ncbi.nlm.nih.gov/${ref.data.pmid}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="font-mono text-accent hover:text-accent/80 hover:underline"
-                        data-pagefind-meta={`pmid:${ref.data.pmid}`}
-                        aria-label={t("references.accessibility.pmidLink", {
-                          values: { title: ref.data.title },
-                        })}
-                      >
-                        {ref.data.pmid}
-                      </a>
-                    </div>
-                  )}
-
-                  {ref.data.isbn && (
-                    <div class="flex items-center gap-1">
-                      <span class="text-muted-foreground">ISBN:</span>
-                      <span
-                        class="text-muted-foreground font-mono"
-                        data-pagefind-meta={`isbn:${ref.data.isbn}`}
-                      >
-                        {ref.data.isbn}
+                    {/* Book info for books */}
+                    {ref.data.type === "book" && (
+                      <span class="text-muted-foreground">
+                        . {ref.data.edition && `${ref.data.edition}. `}
+                        {ref.data.publisher && (
+                          <span
+                            data-pagefind-meta={`publisher:${ref.data.publisher}`}
+                          >
+                            {ref.data.publisher}
+                          </span>
+                        )}
+                        {ref.data.location && `, ${ref.data.location}`}
                       </span>
-                    </div>
-                  )}
+                    )}
 
-                  {ref.data.url && (
-                    <div class="flex items-center gap-1">
-                      <span class="text-muted-foreground">URL:</span>
-                      <a
-                        href={ref.data.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="break-all text-accent hover:text-accent/80 hover:underline"
-                        aria-label={t("references.accessibility.externalLink", {
-                          values: { title: ref.data.title },
-                        })}
-                      >
-                        {ref.data.url.replace(/^https?:\/\//, "")}
-                      </a>
+                    {/* Report info for reports */}
+                    {ref.data.type === "report" && (
+                      <span class="text-muted-foreground">
+                        .{" "}
+                        {ref.data.publisher && (
+                          <span
+                            data-pagefind-meta={`publisher:${ref.data.publisher}`}
+                          >
+                            {ref.data.publisher}
+                          </span>
+                        )}
+                        {ref.data.location && `, ${ref.data.location}`}
+                      </span>
+                    )}
+
+                    {/* Other info for other types */}
+                    {ref.data.type === "other" && (
+                      <span class="text-muted-foreground">
+                        {ref.data.publisher && (
+                          <span
+                            data-pagefind-meta={`publisher:${ref.data.publisher}`}
+                          >
+                            . {ref.data.publisher}
+                          </span>
+                        )}
+                      </span>
+                    )}
+
+                    {/* DOI, PMID and URL */}
+                    <div class="mt-1 flex flex-wrap gap-4 text-xs">
+                      {ref.data.doi && (
+                        <div class="flex items-center gap-1">
+                          <span class="text-muted-foreground">DOI:</span>
+                          <a
+                            href={`https://doi.org/${ref.data.doi}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="font-mono text-accent hover:text-accent/80 hover:underline"
+                            data-pagefind-meta={`doi:${ref.data.doi}`}
+                            aria-label={t("references.accessibility.doiLink", {
+                              values: { title: ref.data.title },
+                            })}
+                          >
+                            {ref.data.doi}
+                          </a>
+                        </div>
+                      )}
+
+                      {ref.data.pmid && (
+                        <div class="flex items-center gap-1">
+                          <span class="text-muted-foreground">PMID:</span>
+                          <a
+                            href={`https://pubmed.ncbi.nlm.nih.gov/${ref.data.pmid}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="font-mono text-accent hover:text-accent/80 hover:underline"
+                            data-pagefind-meta={`pmid:${ref.data.pmid}`}
+                            aria-label={t("references.accessibility.pmidLink", {
+                              values: { title: ref.data.title },
+                            })}
+                          >
+                            {ref.data.pmid}
+                          </a>
+                        </div>
+                      )}
+
+                      {ref.data.isbn && (
+                        <div class="flex items-center gap-1">
+                          <span class="text-muted-foreground">ISBN:</span>
+                          <span
+                            class="text-muted-foreground font-mono"
+                            data-pagefind-meta={`isbn:${ref.data.isbn}`}
+                          >
+                            {ref.data.isbn}
+                          </span>
+                        </div>
+                      )}
+
+                      {ref.data.url && (
+                        <div class="flex items-center gap-1">
+                          <span class="text-muted-foreground">URL:</span>
+                          <a
+                            href={ref.data.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="break-all text-accent hover:text-accent/80 hover:underline"
+                            aria-label={t(
+                              "references.accessibility.externalLink",
+                              {
+                                values: { title: ref.data.title },
+                              }
+                            )}
+                          >
+                            {ref.data.url.replace(/^https?:\/\//, "")}
+                          </a>
+                        </div>
+                      )}
                     </div>
-                  )}
+
+                    {/* Keywords for search indexing */}
+                    {ref.data.keywords && ref.data.keywords.length > 0 && (
+                      <div
+                        class="sr-only"
+                        data-pagefind-meta={`keywords:${ref.data.keywords.join(",")}`}
+                      >
+                        {t("references.keywordLabel")}{" "}
+                        {ref.data.keywords.join(", ")}
+                      </div>
+                    )}
+
+                    {/* Abstract for search indexing */}
+                    {ref.data.abstract && (
+                      <div
+                        class="sr-only"
+                        data-pagefind-weight="6"
+                        data-pagefind-meta={`hasAbstract:true`}
+                      >
+                        {t("references.summaryLabel")} {ref.data.abstract}
+                      </div>
+                    )}
+                  </div>
                 </div>
+              </li>
+            ))}
+          </ol>
 
-                {/* Keywords for search indexing */}
-                {ref.data.keywords && ref.data.keywords.length > 0 && (
-                  <div
-                    class="sr-only"
-                    data-pagefind-meta={`keywords:${ref.data.keywords.join(",")}`}
-                  >
-                    {t("references.keywordLabel")}{" "}
-                    {ref.data.keywords.join(", ")}
-                  </div>
-                )}
-
-                {/* Abstract for search indexing */}
-                {ref.data.abstract && (
-                  <div
-                    class="sr-only"
-                    data-pagefind-weight="6"
-                    data-pagefind-meta={`hasAbstract:true`}
-                  >
-                    {t("references.summaryLabel")} {ref.data.abstract}
-                  </div>
-                )}
-              </div>
-            </div>
-          </li>
-        ))}
-      </ol>
-
-      {/* Scientific credibility indicator */}
-      <div class="text-muted-foreground mt-4 flex items-center gap-2 text-xs">
-        <svg
-          class="h-4 w-4 text-green-600"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <span data-pagefind-meta="scientificallyBacked:true">
-          {credibilityText}
-        </span>
-      </div>
+          {/* Scientific credibility indicator */}
+          <div class="text-muted-foreground mt-6 flex items-center gap-2 text-xs">
+            <svg
+              class="h-4 w-4 text-green-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span data-pagefind-meta="scientificallyBacked:true">
+              {credibilityText}
+            </span>
+          </div>
+        </div>
+      </Accordion>
     </section>
   )
 }
