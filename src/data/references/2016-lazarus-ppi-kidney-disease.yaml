@@ -1,0 +1,26 @@
+type: journal
+title: "Proton pump inhibitor use and the risk of chronic kidney disease"
+authors:
+  - "Lazarus, Benjamin"
+  - "Chen, Yingying"
+  - "Wilson, Francis Perry"
+  - "Sang, Yingying"
+  - "Chang, Alex R."
+  - "Coresh, Josef"
+  - "Grams, Morgan E."
+year: 2016
+journal: "JAMA Internal Medicine"
+volume: 176
+issue: 2
+pages: "238-246"
+doi: "10.1001/jamainternmed.2015.7193"
+url: "https://jamanetwork.com/journals/jamainternalmedicine/fullarticle/2481157"
+pmid: "26752337"
+keywords:
+  - proton pump inhibitors
+  - PPI
+  - chronic kidney disease
+  - nephrotoxicity
+  - long-term effects
+  - renal function
+abstract: "Large cohort study from Johns Hopkins and Yale universities demonstrating significantly increased risk of chronic kidney disease with long-term proton pump inhibitor use."

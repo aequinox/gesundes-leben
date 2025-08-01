@@ -1,0 +1,20 @@
+type: journal
+title: "Vitamin B12 deficiency"
+authors:
+  - "Stabler, Sally P."
+year: 2013
+journal: "New England Journal of Medicine"
+volume: 368
+issue: 2
+pages: "149-160"
+doi: "10.1056/NEJMcp1113996"
+url: "https://www.nejm.org/doi/full/10.1056/NEJMcp1113996"
+keywords:
+  - Vitamin B12
+  - Cobalamin
+  - megaloblastic anemia
+  - pernicious anemia
+  - neurological complications
+  - diagnosis
+  - treatment
+abstract: "Clinical review of vitamin B12 deficiency covering epidemiology, pathophysiology, clinical manifestations, diagnosis, and treatment. Emphasizes neurological complications and early detection."

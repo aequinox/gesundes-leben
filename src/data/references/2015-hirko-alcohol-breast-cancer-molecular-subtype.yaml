@@ -1,0 +1,21 @@
+type: journal
+title: "Alcohol consumption and risk of breast cancer by molecular subtype"
+authors:
+  - "Hirko, K. A."
+  - "Chen, W. Y."
+  - "Hankinson, S."
+  - "Willett, W."
+  - "Tamimi, R."
+  - "Eliassen, A."
+year: 2015
+journal: "Cancer Research"
+volume: 75
+pages: "1885-1885"
+doi: "10.1158/1538-7445.AM2015-1885"
+keywords:
+  - "alcohol consumption"
+  - "breast cancer risk"
+  - "molecular subtype"
+  - "epidemiology"
+  - "cancer prevention"
+abstract: "This study examines the association between alcohol consumption and breast cancer risk by molecular subtype, providing subtype-specific risk estimates."

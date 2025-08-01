@@ -56,3 +56,6 @@ xml/
 # Visionati cache files
 .visionati-cache.json
 *.visionati-cache.json
+
+# build and processing cache
+.cache/

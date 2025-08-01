@@ -1,0 +1,25 @@
+type: journal
+title: "Medication–Associated Phthalate Exposure and Childhood Cancer Incidence"
+authors:
+  - "Ahern, T. P."
+  - "Spector, L. G."
+  - "Damkier, P."
+  - "Öztürk Esen, B."
+  - "Ulrichsen, S. P."
+  - "Eriksen, K."
+  - "Lash, T. L."
+  - "Sørensen, H. T."
+  - "Cronin-Fenton, D. P."
+year: 2022
+journal: "JNCI: Journal of the National Cancer Institute"
+volume: 114
+issue: 6
+pages: "885-894"
+url: "https://doi.org/10.1093/jnci/djac045"
+doi: "10.1093/jnci/djac045"
+keywords:
+  - "phthalates"
+  - "childhood cancer"
+  - "medication exposure"
+  - "cancer incidence"
+abstract: "Large-scale study of 1.3 million Danish children showing association between phthalate exposure through medications and increased childhood cancer risk"

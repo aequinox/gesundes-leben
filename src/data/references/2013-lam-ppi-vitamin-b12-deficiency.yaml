@@ -1,0 +1,23 @@
+type: journal
+title: "Proton pump inhibitor and histamine 2 receptor antagonist use and vitamin B12 deficiency"
+authors:
+  - "Lam, Jameson R."
+  - "Schneider, Jennifer L."
+  - "Zhao, Wei"
+  - "Corley, Douglas A."
+year: 2013
+journal: "JAMA"
+volume: 310
+issue: 22
+pages: "2435-2442"
+doi: "10.1001/jama.2013.280490"
+url: "https://pubmed.ncbi.nlm.nih.gov/24327038/"
+pmid: "24327038"
+keywords:
+  - proton pump inhibitors
+  - PPI
+  - vitamin B12 deficiency
+  - nutrient malabsorption
+  - intrinsic factor
+  - cobalamin deficiency
+abstract: "Large-scale study examining the association between proton pump inhibitor use and vitamin B12 deficiency, demonstrating increased risk of B12 deficiency with long-term PPI therapy."

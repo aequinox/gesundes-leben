@@ -1,0 +1,15 @@
+type: "book"
+title: "Arzneimittel und Mikronährstoffe"
+authors: ["Gröber, Uwe"]
+year: 2020
+publisher: "Wissenschaftliche Verlagsgesellschaft Stuttgart"
+edition: "2. Auflage"
+keywords:
+  [
+    "arzneimittel",
+    "mikronährstoffe",
+    "medikamente",
+    "nährstoffe",
+    "interaktion",
+  ]
+abstract: "Fachbuch über Wechselwirkungen zwischen Arzneimitteln und Mikronährstoffen - umfassendes Nachschlagewerk für Therapeuten und Betroffene."

@@ -1,0 +1,14 @@
+type: journal
+title: "Penerapan Metode K-Nearest Neighbor untuk Mengklasifikasikan Penyakit Cardiovascular"
+authors:
+  - "Rahayu, N. K."
+  - "Rifai, N. A. k."
+year: 2025
+journal: "Bandung Conference Series: Statistics"
+keywords:
+  - "K-Nearest Neighbor"
+  - "cardiovascular disease"
+  - "classification"
+  - "machine learning"
+  - "medical diagnosis"
+abstract: "This study applies K-Nearest Neighbor method for classifying cardiovascular disease, exploring machine learning approaches in medical diagnosis."

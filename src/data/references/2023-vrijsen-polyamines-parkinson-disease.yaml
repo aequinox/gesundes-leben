@@ -1,0 +1,30 @@
+type: journal
+title: "Polyamines in Parkinson's disease: balancing between neurotoxicity and neuroprotection"
+authors:
+  - "Vrijsen, Stephanie"
+  - "Houdou, Maxime"
+  - "Cascalho, Anabela"
+  - "Eggermont, Sara"
+  - "Vangheluwe, Peter"
+  - "Beckers, Patrick"
+  - "Bagni, Claudia"
+  - "Sampaio-Marques, Belém"
+  - "Ludovico, Paula"
+  - "Van Den Bosch, Ludo"
+  - "Callewaert, Geert"
+  - "Annaert, Wim"
+year: 2023
+journal: "Annual Review of Biochemistry"
+volume: 92
+issue: 1
+pages: "435-464"
+url: "https://pubmed.ncbi.nlm.nih.gov/37018845/"
+pmid: "37018845"
+keywords:
+  - polyamines
+  - Parkinson's disease
+  - neurodegeneration
+  - neurotoxicity
+  - neuroprotection
+  - spermidine
+abstract: "Review examining the dual role of polyamines in Parkinson's disease, exploring both neurotoxic and neuroprotective effects."

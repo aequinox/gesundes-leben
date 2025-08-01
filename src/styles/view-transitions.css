@@ -1,0 +1,375 @@
+/* View Transitions Enhancements - Modern Astro View Transitions */
+
+@layer utilities {
+  /* View Transition Root Configuration */
+  html {
+    view-transition-name: root;
+  }
+
+  /* Enhanced Transition Duration System */
+  :root {
+    /* View transition timing tokens */
+    --vt-duration-fast: 200ms;
+    --vt-duration-normal: 350ms;
+    --vt-duration-slow: 500ms;
+
+    /* Enhanced easing curves for view transitions */
+    --vt-easing-enter: cubic-bezier(0.25, 0.1, 0.25, 1);
+    --vt-easing-exit: cubic-bezier(0.4, 0, 1, 1);
+    --vt-easing-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --vt-easing-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+    /* Container query breakpoints for responsive transitions */
+    --vt-container-sm: 640px;
+    --vt-container-md: 768px;
+    --vt-container-lg: 1024px;
+  }
+
+  /* Core View Transition Styles */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: var(--vt-duration-normal);
+    animation-timing-function: var(--vt-easing-enter);
+  }
+
+  /* Enhanced page transitions */
+  ::view-transition-old(main-content) {
+    animation: vt-slide-out-right var(--vt-duration-normal)
+      var(--vt-easing-exit);
+  }
+
+  ::view-transition-new(main-content) {
+    animation: vt-slide-in-left var(--vt-duration-normal) var(--vt-easing-enter);
+  }
+
+  /* Article filter transition */
+  ::view-transition-old(articles-filter) {
+    animation: vt-filter-out var(--vt-duration-normal) var(--vt-easing-exit);
+  }
+
+  ::view-transition-new(articles-filter) {
+    animation: vt-filter-in var(--vt-duration-normal) var(--vt-easing-enter);
+  }
+
+  /* Specific element transitions for better performance */
+  /* Hero images */
+  ::view-transition-old([transition-name*="heroImage"]) {
+    animation: vt-image-out var(--vt-duration-normal) var(--vt-easing-exit);
+  }
+  
+  ::view-transition-new([transition-name*="heroImage"]) {
+    animation: vt-image-in var(--vt-duration-normal) var(--vt-easing-spring);
+  }
+  
+  /* Titles and headings */
+  ::view-transition-old([transition-name*="title"]) {
+    animation: vt-title-out var(--vt-duration-fast) var(--vt-easing-exit);
+  }
+  
+  ::view-transition-new([transition-name*="title"]) {
+    animation: vt-title-in var(--vt-duration-fast) var(--vt-easing-bounce);
+  }
+  
+  /* Tags and badges */
+  ::view-transition-old([transition-name*="tag"]) {
+    animation: vt-tag-out var(--vt-duration-fast) var(--vt-easing-exit);
+  }
+  
+  ::view-transition-new([transition-name*="tag"]) {
+    animation: vt-tag-in var(--vt-duration-fast) var(--vt-easing-bounce);
+  }
+  
+  /* Default fallback for unmatched elements */
+  ::view-transition-old(*) {
+    animation: vt-fade-out var(--vt-duration-fast) var(--vt-easing-exit);
+  }
+
+  ::view-transition-new(*) {
+    animation: vt-fade-in var(--vt-duration-fast) var(--vt-easing-enter);
+  }
+}
+
+/* View Transition Keyframe Animations */
+@keyframes vt-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vt-image-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+    filter: brightness(0.8);
+  }
+}
+
+@keyframes vt-image-in {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+    filter: brightness(1.2);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes vt-slide-out-right {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(2rem);
+  }
+}
+
+@keyframes vt-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes vt-morph-out {
+  from {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    filter: blur(0px);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.95) rotate(-1deg);
+    filter: blur(1px);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8) rotate(-2deg);
+    filter: blur(4px);
+  }
+}
+
+@keyframes vt-morph-in {
+  from {
+    opacity: 0;
+    transform: scale(1.1) rotate(2deg);
+    filter: blur(4px);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05) rotate(1deg);
+    filter: blur(1px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    filter: blur(0px);
+  }
+}
+
+@keyframes vt-title-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+}
+
+@keyframes vt-title-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes vt-tag-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+@keyframes vt-tag-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes vt-filter-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-1rem) scaleY(0.8);
+  }
+}
+
+@keyframes vt-filter-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem) scaleY(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+@keyframes vt-category-out {
+  from {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.85) rotate(-3deg);
+  }
+}
+
+@keyframes vt-category-in {
+  from {
+    opacity: 0;
+    transform: scale(1.15) rotate(3deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05) rotate(1deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Progressive Enhancement - Only apply view transitions if supported */
+@supports (view-transition-name: none) {
+  /* Enhanced transitions for supported browsers */
+  html {
+    view-transition-name: root;
+  }
+
+  /* Smooth fallback animations for non-supporting browsers */
+  @supports not (view-transition-name: none) {
+    * {
+      transition: opacity var(--vt-duration-fast) var(--vt-easing-enter);
+    }
+  }
+}
+
+/* Performance Optimizations */
+@layer utilities {
+  /* GPU acceleration for view transition elements */
+  [style*="view-transition-name"] {
+    transform: translateZ(0);
+    will-change: transform, opacity;
+  }
+
+  /* Optimize transitions for specific elements */
+  .vt-optimize {
+    contain: layout style paint;
+    content-visibility: auto;
+  }
+  
+  /* Container queries for responsive transitions */
+  @container (min-width: 640px) {
+    ::view-transition-old(main-content),
+    ::view-transition-new(main-content) {
+      animation-duration: var(--vt-duration-slow);
+    }
+  }
+  
+  /* Staggered animations for lists */
+  .vt-stagger-children > * {
+    animation-delay: calc(var(--stagger-index, 0) * 50ms);
+  }
+}
+
+/* Enhanced Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  /* Respect user preferences completely */
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+    transition: opacity var(--vt-duration-fast) ease !important;
+  }
+  
+  /* Alternative visual feedback */
+  .vt-optimize {
+    transition: opacity var(--vt-duration-fast) ease;
+  }
+  
+  /* Disable all complex animations */
+  .vt-stagger-children > * {
+    animation-delay: 0ms !important;
+  }
+}
+
+/* Theme-aware optimizations */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Faster transitions in dark mode */
+    --vt-duration-fast: 150ms;
+    --vt-duration-normal: 300ms;
+    --vt-duration-slow: 450ms;
+  }
+}
+
+/* High refresh rate optimizations */
+@media (min-resolution: 120dpi) {
+  :root {
+    --vt-duration-fast: 150ms;
+    --vt-duration-normal: 250ms;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    /* Remove blur effects for high contrast */
+    filter: none !important;
+  }
+}
