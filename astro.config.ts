@@ -20,6 +20,15 @@ import { remarkPlugins } from "./src/plugins/remarkPlugins";
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,
+  // Output optimizations
+  output: "static",
+  // Build optimizations
+  build: {
+    format: "file",
+    inlineStylesheets: "auto",
+  },
+  // Compression
+  compressHTML: true,
   integrations: [
     robotsTxt({
       sitemap: seoConfig.sitemap.baseUrls,
@@ -71,6 +80,14 @@ export default defineConfig({
       cssCodeSplit: true,
       // Optimize chunk size
       chunkSizeWarningLimit: 1000,
+      // Enable module preload polyfill for better loading
+      modulePreload: {
+        polyfill: true,
+      },
+      // Enable minification
+      minify: "esbuild",
+      // Enable tree shaking
+      target: "es2022",
     },
   },
   image: {

@@ -180,8 +180,8 @@ const defaultWidths = {
 // Get widths from props or use defaults based on position
 const widths = Astro.props.widths || defaultWidths[finalPosition];
 
-// Default formats
-const formats = Astro.props.formats || ["webp"];
+// Default formats optimized for performance
+const formats = Astro.props.formats || ["avif", "webp"];
 
 // Default quality
 const quality = Astro.props.quality || 80;

@@ -33,9 +33,27 @@ const recentPostCount = Math.min(recentPosts.length, SITE.postPerIndex);
 
 // Count active social links for conditional rendering
 const socialCount = SOCIALS.filter(social => social.active).length;
+
+// Extract critical images for preloading (LCP optimization)
+const criticalImages = [];
+if (featuredPosts.length > 0 && featuredPosts[0].data.heroImage) {
+  criticalImages.push(featuredPosts[0].data.heroImage.src);
+}
+if (recentPosts.length > 0 && recentPosts[0].data.heroImage) {
+  criticalImages.push(recentPosts[0].data.heroImage.src);
+}
 ---
 
 <Layout>
+  <!-- Preload critical images for LCP optimization -->
+  <Fragment slot="head">
+    {
+      criticalImages.map(imgSrc => (
+        <link rel="preload" as="image" href={imgSrc} fetchpriority="high" />
+      ))
+    }
+  </Fragment>
+
   <Header />
 
   <main id="main-content" class="relative overflow-hidden" data-layout="index">

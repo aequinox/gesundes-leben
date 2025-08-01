@@ -50,28 +50,169 @@ const {
       modifiedTime={modDatetime}
       author={{ name: author }}
     />
+
+    <!-- Performance optimizations: Resource hints -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Critical CSS inlined for immediate rendering -->
+    <style is:inline>
+      /* Critical CSS - Above the fold content */
+      :root,
+      html[data-theme="light"] {
+        --background: oklch(98% 0.01 220deg);
+        --foreground: oklch(25% 0.03 260deg);
+        --accent: oklch(62% 0.17 215deg);
+        --card: oklch(99% 0.005 225deg);
+        --cardMuted: oklch(95% 0.01 220deg);
+        --muted: oklch(75% 0.015 240deg);
+        --border: oklch(85% 0.02 225deg);
+      }
+      html[data-theme="dark"] {
+        --background: oklch(12% 0.01 260deg);
+        --foreground: oklch(88% 0.02 220deg);
+        --accent: oklch(70% 0.18 215deg);
+        --card: oklch(15% 0.01 260deg);
+        --cardMuted: oklch(18% 0.015 260deg);
+        --muted: oklch(60% 0.02 220deg);
+        --border: oklch(25% 0.02 260deg);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        font-family: var(--font-body, "Poppins", system-ui, sans-serif);
+        scroll-behavior: smooth;
+      }
+      body {
+        background-color: oklch(var(--background));
+        color: oklch(var(--foreground));
+        margin: 0;
+        min-height: 100vh;
+        line-height: 1.6;
+      }
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        background: oklch(var(--background) / 0.95);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid oklch(var(--border));
+      }
+      #hero {
+        min-height: 400px;
+        padding: 2rem 1rem;
+      }
+      h1,
+      h2,
+      h3 {
+        font-weight: 700;
+        line-height: 1.2;
+        margin: 0 0 1rem 0;
+      }
+      h1 {
+        font-size: 2.5rem;
+      }
+      h2 {
+        font-size: 2rem;
+      }
+      .max-w-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
+      .card-image {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+    </style>
+
+    <!-- Font display optimization to prevent layout shift -->
+    <style>
+      @font-face {
+        font-family: "Poppins";
+        font-display: swap;
+        src: url("/src/assets/fonts/Poppins-400.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "Poppins";
+        font-display: swap;
+        src: url("/src/assets/fonts/Poppins-600.woff2") format("woff2");
+        font-weight: 600;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "Poppins";
+        font-display: swap;
+        src: url("/src/assets/fonts/Poppins-800.woff2") format("woff2");
+        font-weight: 800;
+        font-style: normal;
+      }
+    </style>
+
+    <!-- Preload full CSS asynchronously -->
+    <link
+      rel="preload"
+      href="/src/styles/global.css"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript><link rel="stylesheet" href="/src/styles/global.css" /></noscript>
+
+    <!-- Preload critical scripts -->
+    <link rel="modulepreload" href="/toggle-theme.js" />
+
+    <!-- Allow additional head content from pages -->
+    <slot name="head" />
+
     <ClientRouter />
     <script is:inline src="/toggle-theme.js"></script>
     <script>
-      // Lazy load view transition enhancements when needed
-      if (
-        "startViewTransition" in document ||
-        window.matchMedia("(prefers-reduced-motion: no-preference)").matches
-      ) {
-        import("@/utils/viewTransitionEnhancements")
-          .then(_module => {
-            // Module is auto-initialized on import
-            // eslint-disable-next-line no-console
-            console.log("View transition enhancements loaded");
-          })
-          .catch(error => {
-            // eslint-disable-next-line no-console
-            console.error(
-              "Failed to load view transition enhancements:",
-              error
-            );
-          });
-      }
+      // Defer view transition enhancements to after page load for better performance
+      document.addEventListener("DOMContentLoaded", () => {
+        // Use requestIdleCallback for non-critical enhancements
+        if ("requestIdleCallback" in window) {
+          requestIdleCallback(
+            () => {
+              if (
+                "startViewTransition" in document ||
+                window.matchMedia("(prefers-reduced-motion: no-preference)")
+                  .matches
+              ) {
+                import("@/utils/viewTransitionEnhancements")
+                  .then(_module => {
+                    // Module is auto-initialized on import
+                  })
+                  .catch(_error => {
+                    // Silently handle error - enhancements are optional
+                  });
+              }
+            },
+            { timeout: 2000 }
+          );
+        } else {
+          // Fallback for browsers without requestIdleCallback
+          setTimeout(() => {
+            if (
+              "startViewTransition" in document ||
+              window.matchMedia("(prefers-reduced-motion: no-preference)")
+                .matches
+            ) {
+              import("@/utils/viewTransitionEnhancements")
+                .then(_module => {
+                  // Module is auto-initialized on import
+                })
+                .catch(_error => {
+                  // Silently handle error - enhancements are optional
+                });
+            }
+          }, 1000);
+        }
+      });
     </script>
   </head>
   <body data-pagefind-body class="px-2 lg:px-12" data-astro-prefetch>
