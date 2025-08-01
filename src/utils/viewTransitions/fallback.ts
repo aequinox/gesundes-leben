@@ -3,6 +3,8 @@
  * Handles graceful degradation when view transitions fail or aren't supported
  */
 
+import { logger } from "@/utils/logger";
+
 export interface FallbackConfig {
   maxTransitionDuration: number;
   fallbackDelay: number;
@@ -27,7 +29,7 @@ export class FallbackHandler {
     this.addFallbackStyles();
 
     if (this.config.debug) {
-      console.log("FallbackHandler: Initialized with config", this.config);
+      logger.debug("FallbackHandler: Initialized with config", this.config);
     }
   }
 
@@ -49,16 +51,22 @@ export class FallbackHandler {
    */
   private setupErrorHandling(): void {
     // Listen for JavaScript errors during transitions
-    window.addEventListener("error", (event) => {
+    window.addEventListener("error", event => {
       if (this.isTransitionError(event)) {
-        this.handleTransitionError("JavaScript error during transition", event.error);
+        this.handleTransitionError(
+          "JavaScript error during transition",
+          event.error
+        );
       }
     });
 
     // Listen for unhandled promise rejections
-    window.addEventListener("unhandledrejection", (event) => {
+    window.addEventListener("unhandledrejection", event => {
       if (this.isTransitionError(event)) {
-        this.handleTransitionError("Promise rejection during transition", event.reason);
+        this.handleTransitionError(
+          "Promise rejection during transition",
+          event.reason
+        );
       }
     });
   }
@@ -90,7 +98,9 @@ export class FallbackHandler {
    */
   private handleTransitionTimeout(): void {
     if (this.config.debug) {
-      console.warn(`FallbackHandler: Transition timeout after ${this.config.maxTransitionDuration}ms`);
+      logger.warn(
+        `FallbackHandler: Transition timeout after ${this.config.maxTransitionDuration}ms`
+      );
     }
 
     this.triggerFallbackNavigation();
@@ -101,7 +111,7 @@ export class FallbackHandler {
    */
   private handleTransitionError(message: string, error?: unknown): void {
     if (this.config.debug) {
-      console.error(`FallbackHandler: ${message}`, error);
+      logger.error(`FallbackHandler: ${message}`, error);
     }
 
     this.triggerFallbackNavigation();
@@ -110,7 +120,9 @@ export class FallbackHandler {
   /**
    * Check if error is related to view transitions
    */
-  private isTransitionError(event: ErrorEvent | PromiseRejectionEvent): boolean {
+  private isTransitionError(
+    event: ErrorEvent | PromiseRejectionEvent
+  ): boolean {
     const message = "message" in event ? event.message : String(event.reason);
     return (
       message.includes("view-transition") ||
@@ -123,7 +135,9 @@ export class FallbackHandler {
    * Trigger fallback navigation
    */
   private triggerFallbackNavigation(): void {
-    if (!this.isEnabled) return;
+    if (!this.isEnabled) {
+      return;
+    }
 
     // Add fallback class to document
     document.documentElement.classList.add("vt-fallback");
@@ -134,9 +148,9 @@ export class FallbackHandler {
     // Force a page reload as fallback after delay
     setTimeout(() => {
       if (this.config.debug) {
-        console.log("FallbackHandler: Triggering fallback navigation");
+        logger.debug("FallbackHandler: Triggering fallback navigation");
       }
-      
+
       // Try to get the intended destination from current navigation
       const currentUrl = window.location.href;
       window.location.href = currentUrl;
@@ -202,7 +216,8 @@ export class FallbackHandler {
   } {
     return {
       viewTransitions: "startViewTransition" in document,
-      documentStartViewTransition: typeof document.startViewTransition === "function",
+      documentStartViewTransition:
+        typeof document.startViewTransition === "function",
       cssViewTransitions: CSS.supports("view-transition-name", "none"),
     };
   }
@@ -212,12 +227,14 @@ export class FallbackHandler {
    */
   public setupProgressiveEnhancement(): void {
     const support = FallbackHandler.checkSupport();
-    
+
     if (!support.viewTransitions) {
       document.documentElement.classList.add("no-view-transitions");
-      
+
       if (this.config.debug) {
-        console.log("FallbackHandler: View transitions not supported, using fallback mode");
+        logger.debug(
+          "FallbackHandler: View transitions not supported, using fallback mode"
+        );
       }
     }
 
@@ -253,10 +270,10 @@ export class FallbackHandler {
    */
   public setEnabled(enabled: boolean): void {
     this.isEnabled = enabled;
-    
+
     if (!enabled) {
       // Clear any active timeouts
-      this.fallbackTimeouts.forEach((timeoutId) => {
+      this.fallbackTimeouts.forEach(timeoutId => {
         clearTimeout(timeoutId);
       });
       this.fallbackTimeouts.clear();
@@ -267,7 +284,7 @@ export class FallbackHandler {
    * Cleanup resources
    */
   public cleanup(): void {
-    this.fallbackTimeouts.forEach((timeoutId) => {
+    this.fallbackTimeouts.forEach(timeoutId => {
       clearTimeout(timeoutId);
     });
     this.fallbackTimeouts.clear();

@@ -3,8 +3,10 @@
  * Main orchestrator class that coordinates all view transition modules
  */
 
-import type { ViewTransitionConfig } from "./config";
+import { logger } from "@/utils/logger";
+
 import { AccessibilityManager } from "./accessibility";
+import type { ViewTransitionConfig } from "./config";
 import { FallbackHandler } from "./fallback";
 import { MetricsCollector } from "./metrics";
 import { PreloadManager } from "./preloader";
@@ -46,7 +48,7 @@ export class ViewTransitionEnhancer {
   public init(): void {
     if (this.isInitialized) {
       if (this.config.debug) {
-        console.warn("ViewTransitionEnhancer: Already initialized");
+        logger.warn("ViewTransitionEnhancer: Already initialized");
       }
       return;
     }
@@ -61,7 +63,7 @@ export class ViewTransitionEnhancer {
 
       // Initialize modules
       this.accessibilityManager.init();
-      
+
       if (this.config.enablePerformanceMetrics) {
         this.metricsCollector.init();
       }
@@ -75,7 +77,7 @@ export class ViewTransitionEnhancer {
       this.isInitialized = true;
 
       if (this.config.debug) {
-        console.log("ViewTransitionEnhancer: Initialized successfully", {
+        logger.debug("ViewTransitionEnhancer: Initialized successfully", {
           config: this.config,
           modules: {
             accessibility: true,
@@ -86,7 +88,7 @@ export class ViewTransitionEnhancer {
         });
       }
     } catch (error) {
-      console.error("ViewTransitionEnhancer: Initialization failed:", error);
+      logger.error("ViewTransitionEnhancer: Initialization failed:", error);
       throw error;
     }
   }
@@ -96,11 +98,11 @@ export class ViewTransitionEnhancer {
    */
   private setupViewTransitions(): void {
     const hasViewTransitions = "startViewTransition" in document;
-    
+
     if (!hasViewTransitions) {
       document.documentElement.classList.add("no-view-transitions");
       if (this.config.debug) {
-        console.log("ViewTransitionEnhancer: View transitions not supported");
+        logger.debug("ViewTransitionEnhancer: View transitions not supported");
       }
       return;
     }
@@ -119,7 +121,7 @@ export class ViewTransitionEnhancer {
     // Handle before preparation
     document.addEventListener("astro:before-preparation", () => {
       if (this.config.debug) {
-        console.log("ViewTransitionEnhancer: Before preparation");
+        logger.debug("ViewTransitionEnhancer: Before preparation");
       }
     });
 
@@ -127,9 +129,9 @@ export class ViewTransitionEnhancer {
     document.addEventListener("astro:after-swap", () => {
       // Reapply dynamic durations after DOM changes
       this.applyDynamicDurations();
-      
+
       if (this.config.debug) {
-        console.log("ViewTransitionEnhancer: After swap");
+        logger.debug("ViewTransitionEnhancer: After swap");
       }
     });
   }
@@ -146,7 +148,10 @@ export class ViewTransitionEnhancer {
     root.style.setProperty("--vt-duration-slow", `${durations.slow}ms`);
 
     if (this.config.debug) {
-      console.log("ViewTransitionEnhancer: Applied dynamic durations", durations);
+      logger.debug(
+        "ViewTransitionEnhancer: Applied dynamic durations",
+        durations
+      );
     }
   }
 
@@ -165,7 +170,7 @@ export class ViewTransitionEnhancer {
     document.addEventListener("astro:before-preparation", () => {
       // Don't cleanup completely, just prepare for transition
       if (this.config.debug) {
-        console.log("ViewTransitionEnhancer: Preparing for transition");
+        logger.debug("ViewTransitionEnhancer: Preparing for transition");
       }
     });
   }
@@ -182,7 +187,10 @@ export class ViewTransitionEnhancer {
       this.accessibilityManager.updateConfig(newConfig.accessibility);
     }
 
-    if (newConfig.preloadStrategy && newConfig.preloadStrategy !== oldConfig.preloadStrategy) {
+    if (
+      newConfig.preloadStrategy &&
+      newConfig.preloadStrategy !== oldConfig.preloadStrategy
+    ) {
       this.preloadManager.updateStrategy(newConfig.preloadStrategy);
     }
 
@@ -199,7 +207,7 @@ export class ViewTransitionEnhancer {
     }
 
     if (this.config.debug) {
-      console.log("ViewTransitionEnhancer: Configuration updated", {
+      logger.debug("ViewTransitionEnhancer: Configuration updated", {
         old: oldConfig,
         new: this.config,
       });
@@ -249,7 +257,8 @@ export class ViewTransitionEnhancer {
       browser: {
         userAgent: navigator.userAgent,
         viewTransitions: "startViewTransition" in document,
-        reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+        reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)")
+          .matches,
       },
       performance: {
         metrics: this.metricsCollector.exportMetrics(),
@@ -266,11 +275,11 @@ export class ViewTransitionEnhancer {
     if (this.config.enablePerformanceMetrics) {
       this.metricsCollector.reset();
     }
-    
+
     this.preloadManager.clearCache();
-    
+
     if (this.config.debug) {
-      console.log("ViewTransitionEnhancer: Reset completed");
+      logger.debug("ViewTransitionEnhancer: Reset completed");
     }
   }
 
@@ -297,10 +306,10 @@ export class ViewTransitionEnhancer {
       this.isInitialized = false;
 
       if (this.config.debug) {
-        console.log("ViewTransitionEnhancer: Cleanup completed");
+        logger.debug("ViewTransitionEnhancer: Cleanup completed");
       }
     } catch (error) {
-      console.error("ViewTransitionEnhancer: Cleanup failed:", error);
+      logger.error("ViewTransitionEnhancer: Cleanup failed:", error);
     }
   }
 

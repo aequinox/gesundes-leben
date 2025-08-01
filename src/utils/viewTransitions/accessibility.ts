@@ -3,6 +3,8 @@
  * Handles accessibility features including screen reader support, focus management, and reduced motion
  */
 
+import { logger } from "@/utils/logger";
+
 import type { AccessibilityConfig } from "./config";
 
 export class AccessibilityManager {
@@ -27,7 +29,9 @@ export class AccessibilityManager {
    * Setup route change announcements for screen readers
    */
   private setupRouteAnnouncements(): void {
-    if (!this.config.announceRouteChanges) return;
+    if (!this.config.announceRouteChanges) {
+      return;
+    }
 
     document.addEventListener("astro:after-swap", () => {
       this.announceRouteChange();
@@ -40,17 +44,19 @@ export class AccessibilityManager {
   private announceRouteChange(): void {
     const title = document.title;
     const { routeAnnouncementLanguage } = this.config;
-    
+
     const announcements = {
       de: `Navigiert zu: ${title}`,
       en: `Navigated to: ${title}`,
     };
-    
+
     const announcement = announcements[routeAnnouncementLanguage];
 
     if (!announcement) {
       if (this.debug) {
-        console.warn(`Unsupported announcement language: ${routeAnnouncementLanguage}`);
+        logger.warn(
+          `Unsupported announcement language: ${routeAnnouncementLanguage}`
+        );
       }
       return;
     }
@@ -94,10 +100,14 @@ export class AccessibilityManager {
    * Setup enhanced reduced motion support
    */
   private setupReducedMotionSupport(): void {
-    if (!this.config.respectReducedMotion) return;
+    if (!this.config.respectReducedMotion) {
+      return;
+    }
 
-    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    
+    const reducedMotionQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
+
     const handleReducedMotion = (e: MediaQueryListEvent | MediaQueryList) => {
       if (e.matches) {
         this.enableReducedMotion();
@@ -108,7 +118,7 @@ export class AccessibilityManager {
 
     // Initial check
     handleReducedMotion(reducedMotionQuery);
-    
+
     // Listen for changes
     reducedMotionQuery.addEventListener("change", handleReducedMotion);
   }
@@ -121,9 +131,9 @@ export class AccessibilityManager {
     document.documentElement.style.setProperty("--vt-duration-normal", "1ms");
     document.documentElement.style.setProperty("--vt-duration-slow", "1ms");
     document.documentElement.classList.add("vt-reduced-motion");
-    
+
     if (this.debug) {
-      console.log("AccessibilityManager: Reduced motion enabled");
+      logger.debug("AccessibilityManager: Reduced motion enabled");
     }
   }
 
@@ -133,9 +143,9 @@ export class AccessibilityManager {
   private disableReducedMotion(): void {
     // Durations will be restored by the main enhancer's applyDynamicDurations method
     document.documentElement.classList.remove("vt-reduced-motion");
-    
+
     if (this.debug) {
-      console.log("AccessibilityManager: Reduced motion disabled");
+      logger.debug("AccessibilityManager: Reduced motion disabled");
     }
   }
 
@@ -157,18 +167,19 @@ export class AccessibilityManager {
    */
   private preserveFocus(): void {
     const activeElement = document.activeElement as HTMLElement;
-    
+
     if (activeElement && activeElement.id) {
       sessionStorage.setItem("vt-focus-id", activeElement.id);
     } else if (activeElement && activeElement.tagName) {
-      const elementIndex = Array.from(document.querySelectorAll(activeElement.tagName))
-        .indexOf(activeElement);
+      const elementIndex = Array.from(
+        document.querySelectorAll(activeElement.tagName)
+      ).indexOf(activeElement);
       sessionStorage.setItem("vt-focus-tag", activeElement.tagName);
       sessionStorage.setItem("vt-focus-index", elementIndex.toString());
     }
 
     if (this.debug) {
-      console.log("AccessibilityManager: Focus preserved", {
+      logger.debug("AccessibilityManager: Focus preserved", {
         element: activeElement?.tagName,
         id: activeElement?.id,
       });
@@ -208,7 +219,7 @@ export class AccessibilityManager {
       }
 
       if (this.debug) {
-        console.log("AccessibilityManager: Focus restoration", {
+        logger.debug("AccessibilityManager: Focus restoration", {
           restored: focusRestored,
           method: focusId ? "by-id" : focusTag ? "by-tag" : "none",
         });
@@ -232,7 +243,8 @@ export class AccessibilityManager {
     language: string;
   } {
     return {
-      reducedMotionEnabled: document.documentElement.classList.contains("vt-reduced-motion"),
+      reducedMotionEnabled:
+        document.documentElement.classList.contains("vt-reduced-motion"),
       announceRouteChanges: this.config.announceRouteChanges,
       language: this.config.routeAnnouncementLanguage,
     };

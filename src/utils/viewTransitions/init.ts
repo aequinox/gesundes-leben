@@ -3,26 +3,33 @@
  * Provides convenient initialization functions for the modular view transitions system
  */
 
-import { mergeConfig, validateConfig } from "./config";
-import type { ViewTransitionConfig } from "./config";
+import { logger } from "@/utils/logger";
+
+import {
+  mergeConfig,
+  validateConfig,
+  type ViewTransitionConfig,
+} from "./config";
 import { ViewTransitionEnhancer } from "./enhancer";
 
 /**
  * Initialize view transitions with configuration
  */
-export function initViewTransitions(config: ViewTransitionConfig = {}): ViewTransitionEnhancer {
+export function initViewTransitions(
+  config: ViewTransitionConfig = {}
+): ViewTransitionEnhancer {
   // Validate configuration
   const errors = validateConfig(config);
   if (errors.length > 0) {
-    // eslint-disable-next-line no-console
-    console.error("ViewTransitions: Configuration validation failed:", errors);
+    logger.error("ViewTransitions: Configuration validation failed:", errors);
     if (config.debug) {
       errors.forEach(error => {
-        // eslint-disable-next-line no-console
-        console.error(`  - ${error.field}: ${error.message} (${error.code})`);
+        logger.error(`  - ${error.field}: ${error.message} (${error.code})`);
       });
     }
-    throw new Error(`Invalid view transitions configuration: ${errors.map(e => e.message).join(", ")}`);
+    throw new Error(
+      `Invalid view transitions configuration: ${errors.map(e => e.message).join(", ")}`
+    );
   }
 
   // Merge with defaults
@@ -68,7 +75,9 @@ export function cleanupViewTransitions(): void {
 /**
  * Reinitialize view transitions with new configuration
  */
-export function reinitViewTransitions(config: ViewTransitionConfig = {}): ViewTransitionEnhancer {
+export function reinitViewTransitions(
+  config: ViewTransitionConfig = {}
+): ViewTransitionEnhancer {
   cleanupViewTransitions();
   return initViewTransitions(config);
 }

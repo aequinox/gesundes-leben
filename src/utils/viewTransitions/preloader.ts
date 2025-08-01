@@ -3,6 +3,8 @@
  * Handles intelligent preloading strategies for improved performance
  */
 
+import { logger } from "@/utils/logger";
+
 import type { PreloadStrategy } from "./config";
 
 export class PreloadManager {
@@ -30,7 +32,7 @@ export class PreloadManager {
         break;
       default:
         if (this.config.debug) {
-          console.warn(`Unknown preload strategy: ${this.config.strategy}`);
+          logger.warn(`Unknown preload strategy: ${this.config.strategy}`);
         }
     }
   }
@@ -42,7 +44,7 @@ export class PreloadManager {
     const prefetchOnHover = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       const link = target.closest("a");
-      
+
       if (link && this.isInternalLink(link)) {
         this.preloadPage(link.href);
       }
@@ -52,7 +54,7 @@ export class PreloadManager {
     document.addEventListener("mouseover", prefetchOnHover, { passive: true });
 
     if (this.config.debug) {
-      console.log("PreloadManager: Hover preloading initialized");
+      logger.debug("PreloadManager: Hover preloading initialized");
     }
   }
 
@@ -62,15 +64,17 @@ export class PreloadManager {
   private setupIntersectionPreloading(): void {
     if (!("IntersectionObserver" in window)) {
       if (this.config.debug) {
-        console.warn("PreloadManager: IntersectionObserver not supported, falling back to hover");
+        logger.warn(
+          "PreloadManager: IntersectionObserver not supported, falling back to hover"
+        );
       }
       this.setupHoverPreloading();
       return;
     }
 
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
+      entries => {
+        entries.forEach(entry => {
           if (entry.isIntersecting) {
             const link = entry.target as HTMLAnchorElement;
             if (this.isInternalLink(link)) {
@@ -87,14 +91,14 @@ export class PreloadManager {
     );
 
     // Observe all internal links
-    document.querySelectorAll("a").forEach((link) => {
+    document.querySelectorAll("a").forEach(link => {
       if (this.isInternalLink(link)) {
         observer.observe(link);
       }
     });
 
     if (this.config.debug) {
-      console.log("PreloadManager: Intersection preloading initialized");
+      logger.debug("PreloadManager: Intersection preloading initialized");
     }
   }
 
@@ -135,7 +139,7 @@ export class PreloadManager {
           "X-Purpose": "prefetch",
         },
         // Use low priority if supported
-        ...(("priority" in Request.prototype) && { priority: "low" }),
+        ...("priority" in Request.prototype && { priority: "low" }),
       });
 
       if (response.ok) {
@@ -146,12 +150,12 @@ export class PreloadManager {
         }
 
         if (this.config.debug) {
-          console.log(`PreloadManager: Successfully preloaded ${url}`);
+          logger.debug(`PreloadManager: Successfully preloaded ${url}`);
         }
       }
     } catch (error) {
       if (this.config.debug) {
-        console.warn(`PreloadManager: Failed to preload ${url}:`, error);
+        logger.warn(`PreloadManager: Failed to preload ${url}:`, error);
       }
       // Remove from preloaded set on failure so it can be retried
       this.preloadedUrls.delete(url);
@@ -189,16 +193,16 @@ export class PreloadManager {
    */
   public async clearCache(): Promise<void> {
     this.preloadedUrls.clear();
-    
+
     if ("caches" in window) {
       try {
         await caches.delete("view-transitions-preload");
         if (this.config.debug) {
-          console.log("PreloadManager: Cache cleared");
+          logger.debug("PreloadManager: Cache cleared");
         }
       } catch (error) {
         if (this.config.debug) {
-          console.warn("PreloadManager: Failed to clear cache:", error);
+          logger.warn("PreloadManager: Failed to clear cache:", error);
         }
       }
     }

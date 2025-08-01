@@ -98,9 +98,10 @@ references:
 
 import Image from "@/components/elements/Image.astro";
 import List from "@/components/sections/List.astro";
+import Blockquote from "@/components/elements/Blockquote.astro";
 import alkoholkonsumKategorienRisikostufenGesundheitInfografik from "./images/alkoholkonsum-kategorien-risikostufen-gesundheit-infografik.png";
 import kopfschmerzenMigrNeStressGesundheitSymptome from "./images/kopfschmerzen-migräne-stress-gesundheit-symptome.png";
-import alkoholKrebsrisikoFaktorenInfografikGesundheit from "./images/alkohol-krebsrisiko-faktoren-infografik-gesundheit.png";
+import alkoholKrebsrisikoFaktorenInfografikGesundheit from "./images/alkohol-krebsrisiko-faktoren-infografik.png";
 import kaloriengehaltAlkoholischeGetraenkeVergleichGesundheitErnaehrung from "./images/kaloriengehalt-alkoholische-getraenke-vergleich-gesundheit-ernaehrung.png";
 import kopfschmerzenStressMuedigkeitGesundheitSymptome from "./images/kopfschmerzen-stress-muedigkeit-gesundheit-symptome.jpg";
 
@@ -112,17 +113,17 @@ import kopfschmerzenStressMuedigkeitGesundheitSymptome from "./images/kopfschmer
 
 **Kurz & Knackig**
 
-<List
-  title="Kurz & Knackig – Die wichtigsten Erkenntnisse"
-  items={[
-    { content: "**Alkohol beeinflusst nahezu jedes Organ im Körper** und ist weltweit für Millionen Todesfälle verantwortlich, unter anderem durch mehr als 200 Krankheiten. Moderater Konsum wird oft als potenziell herzgesund dargestellt, doch neuere Studien zeigen, dass dieser Schutz möglicherweise überschätzt wird und besonders für **Frauen, jüngere Menschen oder Personen mit Vorerkrankungen kein sicherer Konsum existiert**." },
-    { content: "**Alkohol erhöht das Risiko für zahlreiche Krebsarten bereits bei geringen Mengen ohne sichere Schwelle.** Im Gehirn kann leichter bis mäßiger Konsum bei manchen das Demenzrisiko senken, bei genetisch vorbelasteten Personen (**APOE4-Träger**) jedoch erhöhen." },
-    { content: "Alkohol wirkt sich **ambivalent auf den Stoffwechsel aus**: Er kann die Insulinsensitivität verbessern, birgt aber durch Kaloriengehalt und Förderung von Gewichtszunahme auch Risiken." },
-    { content: "**Kater sind komplexe Vergiftungserscheinungen ohne wirksame Heilmittel; Prävention durch maßvollen Konsum ist der beste Schutz.**" },
-    { content: "Individuelle Faktoren wie **Genetik, Alter, Geschlecht und Gesundheitszustand** bestimmen stark die Wirkung von Alkohol." },
-    { content: "Für ein gesundes Leben empfiehlt sich daher ein **bewusster, maßvoller Umgang mit Alkohol**, der persönliche Risiken berücksichtigt, regelmäßige alkoholfreie Tage beinhaltet und im Zweifelsfall ganz auf Alkohol verzichtet." }
-  ]}
-/>
+- **Alkohol beeinflusst nahezu jedes Organ im Körper** und ist weltweit für Millionen Todesfälle verantwortlich, unter anderem durch mehr als 200 Krankheiten. Moderater Konsum wird oft als potenziell herzgesund dargestellt, doch neuere Studien zeigen, dass dieser Schutz möglicherweise überschätzt wird und besonders für **Frauen, jüngere Menschen oder Personen mit Vorerkrankungen kein sicherer Konsum existiert**.
+
+- **Alkohol erhöht das Risiko für zahlreiche Krebsarten bereits bei geringen Mengen ohne sichere Schwelle.** Im Gehirn kann leichter bis mäßiger Konsum bei manchen das Demenzrisiko senken, bei genetisch vorbelasteten Personen (**APOE4-Träger**) jedoch erhöhen.
+
+- Alkohol wirkt sich **ambivalent auf den Stoffwechsel aus**: Er kann die Insulinsensitivität verbessern, birgt aber durch Kaloriengehalt und Förderung von Gewichtszunahme auch Risiken.
+
+- **Kater sind komplexe Vergiftungserscheinungen ohne wirksame Heilmittel; Prävention durch maßvollen Konsum ist der beste Schutz.**
+
+- Individuelle Faktoren wie **Genetik, Alter, Geschlecht und Gesundheitszustand** bestimmen stark die Wirkung von Alkohol.
+
+- Für ein gesundes Leben empfiehlt sich daher ein **bewusster, maßvoller Umgang mit Alkohol**, der persönliche Risiken berücksichtigt, regelmäßige alkoholfreie Tage beinhaltet und im Zweifelsfall ganz auf Alkohol verzichtet.
 
 ## **Alkohol: Eine komplexe Wirkung auf Körper und Gesundheit**
 
@@ -162,16 +163,15 @@ Interessanterweise variiert die Definition eines „Standardgetränks“ interna
 
 Experten teilen den Alkoholkonsum typischerweise in folgende Kategorien ein:
 
-<List
-  title="Konsumkategorien"
-  items={[
-    { intro: "Gelegentliche Trinker", content: "Etwa ein Getränk pro Woche" },
-    { intro: "Leichte bis mäßige Trinker", content: "Bis zu zwei Getränke pro Tag" },
-    { intro: "Mäßige bis starke Trinker", content: "Etwa drei Getränke pro Tag" },
-    { intro: "Starke Trinker", content: "Mehr als drei Getränke pro Tag" },
-    { intro: "Rauschtrinken (Binge-Drinking)", content: "Fünf oder mehr Getränke bei einer Gelegenheit für Männer, vier oder mehr für Frauen" }
-  ]}
-/>
+1. **Gelegentliche Trinker**: Etwa ein Getränk pro Woche
+
+3. **Leichte bis mäßige Trinker**: Bis zu zwei Getränke pro Tag
+
+5. **Mäßige bis starke Trinker**: Etwa drei Getränke pro Tag
+
+7. **Starke Trinker**: Mehr als drei Getränke pro Tag
+
+9. **Rauschtrinken (Binge-Drinking)**: Fünf oder mehr Getränke bei einer Gelegenheit für Männer, vier oder mehr für Frauen
 
 <Image
   src={alkoholkonsumKategorienRisikostufenGesundheitInfografik}
@@ -181,14 +181,11 @@ Experten teilen den Alkoholkonsum typischerweise in folgende Kategorien ein:
 
 **Die Bundeszentrale für gesundheitliche Aufklärung (BZgA) empfiehlt als Richtwerte für einen risikoarmen Konsum:**
 
-<List
-  title="BZgA-Empfehlungen für risikoarmen Konsum"
-  items={[
-    { intro: "Für Frauen", content: "Nicht mehr als 12 Gramm reinen Alkohol pro Tag (etwa ein Standardgetränk)" },
-    { intro: "Für Männer", content: "Nicht mehr als 24 Gramm reinen Alkohol pro Tag (etwa zwei Standardgetränke)" },
-    { content: "Zusätzlich werden mindestens zwei alkoholfreie Tage pro Woche empfohlen" }
-  ]}
-/>
+- Für Frauen: Nicht mehr als 12 Gramm reinen Alkohol pro Tag (etwa ein Standardgetränk)
+
+- Für Männer: Nicht mehr als 24 Gramm reinen Alkohol pro Tag (etwa zwei Standardgetränke)
+
+- Zusätzlich werden mindestens zwei alkoholfreie Tage pro Woche empfohlen
 
 Diese Unterschiede zwischen den Geschlechtern basieren auf physiologischen Faktoren: Frauen haben im Durchschnitt einen höheren Körperfettanteil und weniger Körperwasser als Männer, wodurch der Alkohol im Blut konzentrierter bleibt. Zudem produzieren Frauen weniger des Enzyms Alkoholdehydrogenase, das für den Abbau von Alkohol verantwortlich ist.
 
@@ -216,14 +213,11 @@ Dein individuelles Trinkmuster ist möglicherweise wichtiger als die durchschnit
 
 Viele Menschen unterschätzen ihren Alkoholkonsum erheblich. Dies kann mehrere Gründe haben:
 
-<List
-  title="Gründe für unterschätzte Alkoholmengen"
-  items={[
-    { content: "Haushaltsübliche Portionen sind oft größer als Standardgetränke" },
-    { content: "Der Alkoholgehalt von Getränken variiert stark (besonders bei Craft-Bieren oder Cocktails)" },
-    { content: "Soziale Erwartungen können zu unbewusstem Mehrtrinken führen" }
-  ]}
-/>
+- Haushaltsübliche Portionen sind oft größer als Standardgetränke
+
+- Der Alkoholgehalt von Getränken variiert stark (besonders bei Craft-Bieren oder Cocktails)
+
+- Soziale Erwartungen können zu unbewusstem Mehrtrinken führen
 
 Ein Trinktagebuch zu führen – auch nur für ein paar Wochen – kann ein Augenöffner sein und dir helfen, dein tatsächliches Konsummuster zu erkennen. Apps oder einfache Notizen können dabei unterstützen, einen realistischen Überblick zu gewinnen.
 
@@ -231,15 +225,13 @@ Ein Trinktagebuch zu führen – auch nur für ein paar Wochen – kann ein Auge
 
 Neben der reinen Menge spielen auch andere Faktoren eine Rolle bei der Verträglichkeit von Alkohol:
 
-<List
-  title="Faktoren der individuellen Alkoholverträglichkeit"
-  items={[
-    { intro: "Alter", content: "Mit zunehmendem Alter verarbeitet der Körper Alkohol langsamer" },
-    { intro: "Gewicht und Körperzusammensetzung", content: "Körperfett- und Wasseranteil beeinflussen die Alkoholkonzentration im Blut" },
-    { intro: "Genetik", content: "Genetische Variationen beeinflussen, wie effizient dein Körper Alkohol abbaut" },
-    { intro: "Gesundheitszustand", content: "Leber- oder Nierenprobleme, bestimmte Medikamente und andere gesundheitliche Faktoren können die Alkoholverträglichkeit beeinflussen" }
-  ]}
-/>
+- **Alter**: Mit zunehmendem Alter verarbeitet der Körper Alkohol langsamer
+
+- **Gewicht und Körperzusammensetzung**: Körperfett- und Wasseranteil beeinflussen die Alkoholkonzentration im Blut
+
+- **Genetik**: Genetische Variationen beeinflussen, wie effizient dein Körper Alkohol abbaut
+
+- **Gesundheitszustand**: Leber- oder Nierenprobleme, bestimmte Medikamente und andere gesundheitliche Faktoren können die Alkoholverträglichkeit beeinflussen
 
 Während wir uns jetzt ein klareres Bild davon gemacht haben, was verschiedene Konsummengen bedeuten, wollen wir uns einem der am häufigsten diskutierten Themen im Zusammenhang mit Alkohol zuwenden: seinen Auswirkungen auf die Herzgesundheit. Hier stoßen wir auf eine Vielzahl widersprüchlicher Botschaften – von der Idee, dass ein Glas Rotwein gut für das Herz sei, bis zu neueren Studien, die selbst bei geringem Konsum Risiken aufzeigen.
 
@@ -311,25 +303,25 @@ Während die Debatte über Alkohol und Herzgesundheit weiterhin nuanciert bleibt
 
 Während bei Herzerkrankungen die Diskussion um Alkohol von widersprüchlichen Botschaften geprägt ist, sprechen die wissenschaftlichen Erkenntnisse bezüglich Alkohol und Krebs eine deutlich klarere Sprache. Hier gibt es keinen Raum für beruhigende Interpretationen – und das ist eine Wahrheit, mit der wir uns auseinandersetzen müssen.
 
-> Risiken beginnen beim ersten Tropfen.
->
-> — WHO ([aus dem Bericht zu Alkohol und Krebs](https://www.who.int/europe/de/news/item/28-12-2022-no-level-of-alcohol-consumption-is-safe-for-our-health))
+Risiken beginnen beim ersten Tropfen.
+
+WHO ([aus dem Bericht zu Alkohol und Krebs](https://www.who.int/europe/de/news/item/28-12-2022-no-level-of-alcohol-consumption-is-safe-for-our-health))
 
 ### Der etablierte Zusammenhang zwischen Alkohol und verschiedenen Krebsarten
 
 Epidemiologische Studien haben Alkohol unmissverständlich als Ursache für mehrere Krebsarten identifiziert. Alkoholkonsum wird mit einem erhöhten Risiko für folgende Krebsarten in Verbindung gebracht:
 
-<List
-  title="Alkoholassoziierte Krebsarten"
-  items={[
-    { content: "Mund- und Rachenkrebs" },
-    { content: "Kehlkopfkrebs" },
-    { content: "Speiseröhrenkrebs" },
-    { content: "Leberkrebs" },
-    { content: "Darmkrebs" },
-    { content: "Brustkrebs" }
-  ]}
-/>
+- Mund- und Rachenkrebs
+
+- Kehlkopfkrebs
+
+- Speiseröhrenkrebs
+
+- Leberkrebs
+
+- Darmkrebs
+
+- Brustkrebs
 
 Was besonders beunruhigend ist: Das Risiko steigt mit der Alkoholmenge an, ohne dass es eine erkennbare Schwelle gibt, unterhalb derer kein Risiko besteht. Mit anderen Worten: **Je mehr du trinkst, desto höher ist Dein Krebsrisiko – aber selbst geringe Mengen erhöhen das Risiko bereits.**
 
@@ -413,14 +405,11 @@ Das Gehirn reagiert in der Tat besonders empfindlich auf Alkohol. Die Beziehung 
 
 Da Alkohol sowohl wasser- als auch fettlöslich ist, kann er leicht die Blut-Hirn-Schranke überwinden und direkt auf das Gehirn einwirken. Dort beeinflusst er nahezu alle Hirnregionen und Neurotransmittersysteme:
 
-<List
-  title="Alkohols Einfluss auf Neurotransmitter"
-  items={[
-    { content: "Er verstärkt die Wirkung von GABA, dem wichtigsten hemmenden Neurotransmitter im Gehirn" },
-    { content: "Er hemmt die Wirkung von Glutamat, dem wichtigsten erregenden Neurotransmitter" },
-    { content: "Er beeinflusst Dopamin, Serotonin und andere Neurotransmitter, die mit Belohnung, Stimmung und Motivation zusammenhängen" }
-  ]}
-/>
+- Er verstärkt die Wirkung von GABA, dem wichtigsten hemmenden Neurotransmitter im Gehirn
+
+- Er hemmt die Wirkung von Glutamat, dem wichtigsten erregenden Neurotransmitter
+
+- Er beeinflusst Dopamin, Serotonin und andere Neurotransmitter, die mit Belohnung, Stimmung und Motivation zusammenhängen
 
 Diese akuten Effekte erklären, warum wir uns nach ein paar „Drinks“ zunächst entspannt und glücklich fühlen. Bei regelmäßigem Konsum treten jedoch problematische Anpassungen im Gehirn auf.
 
@@ -452,14 +441,11 @@ Während epidemiologische Studien auf potenzielle Vorteile eines mäßigen Konsu
 
 Selbst bei mäßigem Alkoholkonsum können strukturelle Veränderungen im Gehirn auftreten:
 
-<List
-  title="Strukturelle Gehirnveränderungen durch Alkohol"
-  items={[
-    { content: "Verringertes Gehirnvolumen" },
-    { content: "Beeinträchtigung der weißen Substanz (die Verbindungen zwischen verschiedenen Hirnregionen)" },
-    { content: "Veränderungen in Hirnregionen wie dem präfrontalen Kortex, dem Kleinhirn, dem Hippocampus und der Amygdala" }
-  ]}
-/>
+- Verringertes Gehirnvolumen
+
+- Beeinträchtigung der weißen Substanz (die Verbindungen zwischen verschiedenen Hirnregionen)
+
+- Veränderungen in Hirnregionen wie dem präfrontalen Kortex, dem Kleinhirn, dem Hippocampus und der Amygdala
 
 Diese strukturellen Veränderungen können durch mehrere Mechanismen entstehen:
 
@@ -479,14 +465,11 @@ APOE ist ein Gen, das Anweisungen für ein Protein liefert, das Fette im Körper
 
 Studien zeigen einen bedeutsamen Zusammenhang zwischen APOE4-Status und Alkoholkonsum:
 
-<List
-  title="APOE4-Gen und Alkoholkonsum"
-  items={[
-    { content: "Bei Trägern des APOE4-Allels scheint selbst leichter bis mäßiger Alkoholkonsum das Demenzrisiko zu erhöhen" },
-    { content: "APOE4-Träger, die mehrmals im Monat Alkohol konsumierten, hatten ein 3,6-fach höheres Risiko für Alzheimer-Krankheit als APOE4-Träger, die nie tranken" },
-    { content: "Bei Erwachsenen ohne APOE4-Allel war leichter bis mäßiger Alkoholkonsum hingegen mit einem niedrigeren Demenzrisiko verbunden" }
-  ]}
-/>
+- Bei Trägern des APOE4-Allels scheint selbst leichter bis mäßiger Alkoholkonsum das Demenzrisiko zu erhöhen
+
+- APOE4-Träger, die mehrmals im Monat Alkohol konsumierten, hatten ein 3,6-fach höheres Risiko für Alzheimer-Krankheit als APOE4-Träger, die nie tranken
+
+- Bei Erwachsenen ohne APOE4-Allel war leichter bis mäßiger Alkoholkonsum hingegen mit einem niedrigeren Demenzrisiko verbunden
 
 Eine Studie an älteren Erwachsenen (59–71 Jahre) fand, dass Erwachsene ohne APOE4-Allel, die zwei oder mehr alkoholische Getränke pro Tag konsumierten, ein 30–74 % niedrigeres Risiko für kognitiven Abbau hatten im Vergleich zu Nichttrinkern. **Bei Erwachsenen mit einer oder mehreren Kopien des APOE4-Allels war hingegen jede Menge Alkohol mit einem höheren Risiko für kognitiven Abbau verbunden.**
 
@@ -550,15 +533,13 @@ Mehrere Mechanismen könnten die potenzielle schützende Wirkung eines moderaten
 
 Ein wesentlicher Aspekt beim Zusammenhang zwischen Alkohol und metabolischer Gesundheit ist die Kalorienfrage. **Alkohol ist kalorienreich** – mit etwa 7 Kalorien pro Gramm liegt er zwischen Kohlenhydraten (4 Kalorien/g) und Fett (9 Kalorien/g):
 
-<List
-  title="Kaloriengehalt alkoholischer Getränke"
-  items={[
-    { content: "Ein Standardglas Bier (300 ml) enthält etwa 130–150 Kalorien" },
-    { content: "Ein Glas Wein (100 ml) enthält etwa 80–90 Kalorien" },
-    { content: "Ein einfacher Schnaps (40 ml) enthält etwa 90–110 Kalorien" },
-    { content: "Cocktails und Mixgetränke können leicht 200–500 Kalorien pro Getränk enthalten" }
-  ]}
-/>
+- Ein Standardglas Bier (300 ml) enthält etwa 130–150 Kalorien
+
+- Ein Glas Wein (100 ml) enthält etwa 80–90 Kalorien
+
+- Ein einfacher Schnaps (40 ml) enthält etwa 90–110 Kalorien
+
+- Cocktails und Mixgetränke können leicht 200–500 Kalorien pro Getränk enthalten
 
 <Image
   src={kaloriengehaltAlkoholischeGetraenkeVergleichGesundheitErnaehrung}
@@ -637,19 +618,21 @@ Was passiert also in deinem Körper, wenn du zu viel getrunken hast, und gibt es
 
 Ein Kater ist im Grunde eine **Mini-Vergiftung** – eine Sammlung von Symptomen, die auftreten, wenn der Alkoholspiegel im Blut nach einer Episode übermäßigen Trinkens zu sinken beginnt. Die typischen Symptome umfassen:
 
-<List
-  title="Typische Kater-Symptome"
-  items={[
-    { content: "Kopfschmerzen und Muskelschmerzen" },
-    { content: "Übelkeit, Erbrechen und Magenbeschwerden" },
-    { content: "Durst und Mundtrockenheit" },
-    { content: "Müdigkeit und Schwäche" },
-    { content: "Licht- und Geräuschempfindlichkeit" },
-    { content: "Schwindel und das Gefühl, dass sich der Raum dreht" },
-    { content: "Konzentrationsschwierigkeiten" },
-    { content: "Stimmungsschwankungen, Reizbarkeit und Angst" }
-  ]}
-/>
+- Kopfschmerzen und Muskelschmerzen
+
+- Übelkeit, Erbrechen und Magenbeschwerden
+
+- Durst und Mundtrockenheit
+
+- Müdigkeit und Schwäche
+
+- Licht- und Geräuschempfindlichkeit
+
+- Schwindel und das Gefühl, dass sich der Raum dreht
+
+- Konzentrationsschwierigkeiten
+
+- Stimmungsschwankungen, Reizbarkeit und Angst
 
 Diese Symptome beginnen typischerweise, wenn der Blutalkoholspiegel erheblich sinkt, oft am Morgen nach dem Trinken, und können bis zu 24 Stunden anhalten.
 

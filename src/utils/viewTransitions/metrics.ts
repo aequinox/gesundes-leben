@@ -3,6 +3,8 @@
  * Handles performance monitoring and metrics collection
  */
 
+import { logger } from "@/utils/logger";
+
 import type { TransitionMetrics } from "./config";
 
 export class MetricsCollector {
@@ -37,7 +39,9 @@ export class MetricsCollector {
         this.currentTransition.preparationDuration = duration;
 
         if (duration > 100 && this.debug) {
-          console.warn(`Slow view transition preparation: ${duration.toFixed(2)}ms`);
+          logger.warn(
+            `Slow view transition preparation: ${duration.toFixed(2)}ms`
+          );
         }
       }
     });
@@ -49,10 +53,15 @@ export class MetricsCollector {
     });
 
     document.addEventListener("astro:after-swap", () => {
-      if (this.currentTransition.timestamp && this.currentTransition.preparationDuration !== undefined) {
-        const totalDuration = performance.now() - this.currentTransition.timestamp;
-        const swapDuration = totalDuration - this.currentTransition.preparationDuration;
-        
+      if (
+        this.currentTransition.timestamp &&
+        this.currentTransition.preparationDuration !== undefined
+      ) {
+        const totalDuration =
+          performance.now() - this.currentTransition.timestamp;
+        const swapDuration =
+          totalDuration - this.currentTransition.preparationDuration;
+
         const metrics: TransitionMetrics = {
           preparationDuration: this.currentTransition.preparationDuration,
           swapDuration,
@@ -63,7 +72,7 @@ export class MetricsCollector {
         this.storeMetrics(metrics);
 
         if (this.debug) {
-          console.log("Transition metrics:", metrics);
+          logger.debug("Transition metrics:", metrics);
         }
       }
     });
@@ -102,11 +111,14 @@ export class MetricsCollector {
    */
   public getAverageMetrics(): Partial<TransitionMetrics> | null {
     const metrics = this.getMetrics();
-    if (metrics.length === 0) return null;
+    if (metrics.length === 0) {
+      return null;
+    }
 
     const totals = metrics.reduce(
       (acc, metric) => ({
-        preparationDuration: acc.preparationDuration + metric.preparationDuration,
+        preparationDuration:
+          acc.preparationDuration + metric.preparationDuration,
         swapDuration: acc.swapDuration + metric.swapDuration,
         totalDuration: acc.totalDuration + metric.totalDuration,
       }),
@@ -130,7 +142,7 @@ export class MetricsCollector {
     fastestTransition: number;
   } {
     const metrics = this.getMetrics();
-    
+
     if (metrics.length === 0) {
       return {
         totalTransitions: 0,
@@ -141,7 +153,8 @@ export class MetricsCollector {
     }
 
     const durations = metrics.map(m => m.totalDuration);
-    const averageTime = durations.reduce((sum, d) => sum + d, 0) / durations.length;
+    const averageTime =
+      durations.reduce((sum, d) => sum + d, 0) / durations.length;
     const slowestTransition = Math.max(...durations);
     const fastestTransition = Math.min(...durations);
 
@@ -165,10 +178,14 @@ export class MetricsCollector {
    * Export metrics as JSON
    */
   public exportMetrics(): string {
-    return JSON.stringify({
-      timestamp: Date.now(),
-      metrics: this.getMetrics(),
-      summary: this.getSummary(),
-    }, null, 2);
+    return JSON.stringify(
+      {
+        timestamp: Date.now(),
+        metrics: this.getMetrics(),
+        summary: this.getSummary(),
+      },
+      null,
+      2
+    );
   }
 }
