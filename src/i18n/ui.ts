@@ -471,6 +471,7 @@ export const ui: Record<
     "pagination.next": "Zur nächsten Seite",
     "pagination.prev": "Zurück",
     "pagination.currentPage": "Seite {current} von {total}",
+    "pagination.separator": "/",
 
     // References
     "references.title": "Quellen",
