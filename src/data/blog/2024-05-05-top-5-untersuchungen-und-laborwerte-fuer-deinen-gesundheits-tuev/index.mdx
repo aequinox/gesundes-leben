@@ -28,9 +28,14 @@ tags:
   - Osteoporose
   - Perspektive
   - Untersuchungen
-  - Vitamin D
-  - Vitamine
-  - Wirbelsäule
+references:
+  - 2016-vasquez-inflammation-mastery
+  - 2007-armstrong-vitamin-d-anxiety-depression-fibromyalgia
+  - 2001-huisman-vitamin-d-lupus-fibromyalgia
+  - 2003-al-faraj-vitamin-d-back-pain
+  - 2008-holick-vitamin-d-worldwide-problem
+  - 1999-vieth-vitamin-d-supplementation-safety
+  - 2004-vasquez-clinical-importance-vitamin-d
 favorites:
   Präbiotika: ["gasta", "fibraform-3-fach-komplex"]
   Darmuntersuchungen: ["gesundheitscheck-darm", "florastatus", "mikrobiom-plus"]
@@ -42,6 +47,15 @@ favorites:
 import Accordion from "@/components/sections/Accordion.astro";
 import Favorites from "@/components/sections/Favorites.astro";
 import Image from "@/components/elements/Image.astro";
+import perspektivenwechsel from "./images/perspektivenwechsel_1f67909d-bde6-471e-8922-b8f5117409bd.png";
+import microbiome from "./images/microbiome_fa7e6c37-48f5-499a-a807-b3ef5a297905.png";
+import vitaminD from "./images/vitamin_d_7c03fba2-9514-4916-8b34-848500105c6d.png";
+import happySkeleton from "./images/Complete_view_of_a_happy_lookin_human_skeleton_doing_702bd252-0dd4-4b5a-8d80-9fb438bfc59f.png";
+import hormones from "./images/hormones_in_the_human_body_and_their_effects_on_the__d5ee7eb8-717f-473a-bedb-f7538bce3973.png";
+import micronutrients from "./images/the_balance_of_Micronutrients_in_the_human_body_colo_3c1a8145-69d8-4ac4-8244-75a31da2daca.png";
+import investingHealth from "./images/investing_in_your_health_3cc9cde2-42b3-440c-bdd4-62ad4169e9f9.png";
+import sadResume from "./images/Trauriges_Resumee_4a825647-3d5b-4dd5-8805-017ab425621f.png";
+import setPriorities from "./images/set_your_priorities_for_your_self-empowered_future_a_286af3f0-518a-4c57-9498-7ea20e279c6d.png";
 
 ## Inhaltsverzeichnis
 
@@ -58,7 +72,7 @@ Seither lieben die Württemberger (und die Deutschen allgemein) ihre Autos über
 ## Perspektivenwechsel
 
 <Image
-  src="./images/perspektivenwechsel_1f67909d-bde6-471e-8922-b8f5117409bd.png"
+  src={perspektivenwechsel}
   alt="Perspektivenwechsel - Illustration zur Gesundheitsvorsorge"
   title="Bild KI generiert"
   position="left"
@@ -83,7 +97,7 @@ Wie ist das also mit der regelmäßigen Wartung? Wie soll das vor sich gehen und
 ### 1\. Darmflora
 
 <Image
-  src="./images/microbiome_fa7e6c37-48f5-499a-a807-b3ef5a297905.png"
+  src={microbiome}
   alt="Illustration des Mikrobioms und der Darmflora"
   title="Bild KI generiert"
   position="right"
@@ -115,7 +129,7 @@ Stell dir vor, es kommt jemand in die Praxis mit Symptomen wie anhaltender Müdi
 Um es noch besser zu verdeutlichen, hier ein (sehr kurzer!) Auszug an möglichen Symptomen bei Vitamin-D3-Mangel:
 
 <Image
-  src="./images/vitamin_d_7c03fba2-9514-4916-8b34-848500105c6d.png"
+  src={vitaminD}
   alt="Vitamin D - Mangelsymptome und Bedeutung für die Gesundheit"
   title="Bild KI generiert"
   position="left"
@@ -134,7 +148,7 @@ Prinzipiell bin ich ein Fan des einfachen Denkens: Deinen Vitamin-D3-Spiegel zu 
 Die Wirbelsäule ist die zentrale Säule unseres Körpers, die nicht nur Struktur bietet, sondern auch als Schutz für das Rückenmark dient. Die Rückenmarksnerven verlaufen im Wirbelkanal, der von den Wirbelkörpern umgeben ist, die das Rückenmark vor äußeren Einflüssen schützen.
 
 <Image
-  src="./images/Complete_view_of_a_happy_lookin_human_skeleton_doing_702bd252-0dd4-4b5a-8d80-9fb438bfc59f.png"
+  src={happySkeleton}
   alt="Fröhliches Skelett zur Veranschaulichung der Wirbelsäulen-Gesundheit"
   title="Bild KI generiert"
   position="right"
@@ -177,7 +191,7 @@ Hormone, wie das Thyroxin (Schilddrüsenhormon), Insulin (reguliert den Blutzuck
 - Knochenstoffwechsel
 
 <Image
-  src="./images/hormones_in_the_human_body_and_their_effects_on_the__d5ee7eb8-717f-473a-bedb-f7538bce3973.png"
+  src={hormones}
   alt="Hormone im menschlichen Körper und ihre Auswirkungen"
   title="Bild KI generiert"
   position="left"
@@ -212,7 +226,7 @@ Die Nahrung, die du aufnimmst, wird in deinem Magen zerlegt, dann in den Darm we
 Leider gibt es mehrere Haken, die dazu führen können, dass du nicht optimal mit Nährstoffen versorgt wirst:
 
 <Image
-  src="./images/the_balance_of_Micronutrients_in_the_human_body_colo_3c1a8145-69d8-4ac4-8244-75a31da2daca.png"
+  src={micronutrients}
   alt="Das Gleichgewicht der Mikronährstoffe im menschlichen Körper"
   title="Bild KI generiert"
   position="right"
@@ -239,7 +253,7 @@ Das ist der Grund, warum wir in unserer Praxis über die **Spektralanalyse per S
 ## Investitionen abwägen
 
 <Image
-  src="./images/investing_in_your_health_3cc9cde2-42b3-440c-bdd4-62ad4169e9f9.png"
+  src={investingHealth}
   alt="Investition in die eigene Gesundheit"
   title="Bild KI generiert"
   position="left"
@@ -260,7 +274,7 @@ Und 2021 publizierte Capital die Top Ten der von Eurostat ermittelten Konsumgüt
 ## Trauriges Resümee
 
 <Image
-  src="./images/Trauriges_Resumee_4a825647-3d5b-4dd5-8805-017ab425621f.png"
+  src={sadResume}
   alt="Trauriges Resümee der Gesundheitsproritäten"
   title="Bild KI generiert"
   position="right"
@@ -273,7 +287,7 @@ Denn was nützt ein Auto, oder ein tolles Outfit oder der abendliche Drink, wenn
 ## Setze deine eigenen Prioritäten
 
 <Image
-  src="./images/set_your_priorities_for_your_self-empowered_future_a_286af3f0-518a-4c57-9498-7ea20e279c6d.png"
+  src={setPriorities}
   alt="Setze deine eigenen Prioritäten für eine selbstbestimmte Zukunft"
   title="Bild KI generiert"
   position="left"

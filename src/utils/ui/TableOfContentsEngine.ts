@@ -31,12 +31,8 @@ export class TableOfContents {
     this.article = document.querySelector<HTMLElement>("#article");
     this.tocList = document.querySelector<HTMLUListElement>("#toc ul");
 
-    // Debug: Log article element
-    logger.debug("Article element:", this.article);
-
     // Try to find all headings in the document if article is not found
     if (!this.article) {
-      logger.debug("Article element not found, searching in document body");
       this.headings = Array.from(
         document.body.querySelectorAll("h1, h2, h3, h4") || []
       );
@@ -62,12 +58,6 @@ export class TableOfContents {
         this.headings = this.headings.slice(1);
       }
     }
-
-    // Debug: Log found headings
-    logger.debug("Found headings:", this.headings.length);
-    this.headings.forEach((h, i) => {
-      logger.debug("Heading", i, ":", h.tagName, "-", h.textContent);
-    });
 
     this.observer = new IntersectionObserver(
       (entries: IntersectionObserverEntry[]) => {
@@ -305,10 +295,6 @@ export class TableOfContents {
       return;
     }
 
-    // Debug: Log TOC list element
-    logger.debug("TOC list element:", this.tocList);
-    logger.debug("Headings length:", this.headings.length);
-
     // Clear existing TOC items if any
     while (this.tocList.firstChild) {
       this.tocList.removeChild(this.tocList.firstChild);
@@ -324,7 +310,6 @@ export class TableOfContents {
 
       const listItem = this.createListItem(heading);
       this.tocList?.appendChild(listItem);
-      logger.debug("Added TOC item for heading:", heading.textContent);
 
       // Only observe elements that exist in the DOM
       try {
@@ -338,9 +323,6 @@ export class TableOfContents {
         );
       }
     });
-
-    // Debug: Log final TOC content
-    logger.debug("Final TOC content:", this.tocList.innerHTML);
 
     // Add keyboard navigation for accessibility
     this.addKeyboardNavigation();

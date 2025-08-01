@@ -4,6 +4,7 @@ import ArticleFooter from "@/components/partials/ArticleFooter.astro";
 import ArticleHeader from "@/components/partials/ArticleHeader.astro";
 import ArticleProgressBar from "@/components/partials/ArticleProgressBar.astro";
 import ArticleSidebar from "@/components/partials/ArticleSidebar.astro";
+import References from "@/components/partials/References.astro";
 import Footer from "@/components/sections/Footer.astro";
 import Header from "@/components/sections/Header.astro";
 import { BreadcrumbSchema, HealthArticleSchema } from "@/components/seo";
@@ -115,11 +116,15 @@ const primaryCategory = categories?.[0] || "Gesundheit";
     >
       <ArticleHeader post={post as Post} />
       <ArticleContent post={post as Post} data-pagefind-weight="15" />
-      <ArticleFooter
-        post={post as Post}
-        references={references}
-        data-pagefind-weight="5"
-      />
+
+      {/* References component */}
+      {
+        references && references.length > 0 && (
+          <References referenceIds={references} />
+        )
+      }
+
+      <ArticleFooter post={post as Post} data-pagefind-weight="5" />
     </main>
 
     <!-- Table of Contents Sidebar - Excluded from search -->

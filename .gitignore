@@ -59,3 +59,5 @@ xml/
 
 # build and processing cache
 .cache/
+# Reference cache
+.cache/references/

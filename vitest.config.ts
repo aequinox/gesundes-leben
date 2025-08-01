@@ -59,6 +59,30 @@ export default defineConfig({
 
   define: {
     'import.meta.env.DEV': 'true',
-    'import.meta.env.PROD': 'false'
-  }
+    'import.meta.env.PROD': 'false',
+    'import.meta.env.MODE': '"test"'
+  },
+
+  // Handle Astro's virtual modules
+  plugins: [
+    {
+      name: 'astro-content-mock',
+      resolveId(id) {
+        if (id === 'astro:content') {
+          return id;
+        }
+        return null;
+      },
+      load(id) {
+        if (id === 'astro:content') {
+          return `
+            export const getCollection = () => Promise.resolve([]);
+            export const getEntry = () => Promise.resolve(null);
+            export const render = () => Promise.resolve({ Content: () => null, remarkPluginFrontmatter: {} });
+          `;
+        }
+        return null;
+      },
+    },
+  ]
 });

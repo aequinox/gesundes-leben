@@ -29,11 +29,8 @@ vi.mock("../logger", () => ({
   },
 }));
 
-// Mock import.meta.env
-Object.defineProperty(import.meta, "env", {
-  value: { DEV: true },
-  writable: true,
-});
+// Set default DEV mode for tests
+vi.stubEnv("DEV", "true");
 
 describe("safelyRender", () => {
   beforeEach(() => {
@@ -50,14 +47,11 @@ describe("safelyRender", () => {
   });
 
   it("should handle errors and return fallback in production", async () => {
-    // Set to production mode
-    Object.defineProperty(import.meta, "env", {
-      value: { DEV: false },
-      writable: true,
-    });
-
     const operation = vi.fn().mockRejectedValue(new Error("Test error"));
-    const config: SafeRenderConfig = { fallback: "fallback-value" };
+    const config: SafeRenderConfig = {
+      fallback: "fallback-value",
+      showDevErrors: false,
+    };
 
     const result = await safelyRender(operation, "Test failed", config);
 
@@ -112,33 +106,25 @@ describe("safelyExecute", () => {
   });
 
   it("should handle synchronous errors", () => {
-    // Set to production mode
-    Object.defineProperty(import.meta, "env", {
-      value: { DEV: false },
-      writable: true,
-    });
-
     const operation = vi.fn().mockImplementation(() => {
       throw new Error("Sync error");
     });
 
-    const result = safelyExecute(operation, "Sync operation failed");
+    const config: SafeRenderConfig = { showDevErrors: false };
+    const result = safelyExecute(operation, "Sync operation failed", config);
 
     expect(result).toBeNull();
   });
 
   it("should use custom fallback value", () => {
-    // Set to production mode
-    Object.defineProperty(import.meta, "env", {
-      value: { DEV: false },
-      writable: true,
-    });
-
     const operation = vi.fn().mockImplementation(() => {
       throw new Error("Sync error");
     });
 
-    const config: SafeRenderConfig = { fallback: "custom-fallback" };
+    const config: SafeRenderConfig = {
+      fallback: "custom-fallback",
+      showDevErrors: false,
+    };
     const result = safelyExecute(operation, "Sync operation failed", config);
 
     expect(result).toBe("custom-fallback");
@@ -160,14 +146,11 @@ describe("withErrorBoundary", () => {
   });
 
   it("should handle errors in wrapped function", async () => {
-    // Set to production mode
-    Object.defineProperty(import.meta, "env", {
-      value: { DEV: false },
-      writable: true,
-    });
-
     const originalFn = vi.fn().mockRejectedValue(new Error("Wrapped error"));
-    const config: SafeRenderConfig = { fallback: "wrapped-fallback" };
+    const config: SafeRenderConfig = {
+      fallback: "wrapped-fallback",
+      showDevErrors: false,
+    };
 
     const wrapperFactory = withErrorBoundary(config);
     const wrappedFn = wrapperFactory(originalFn, "Wrapped function failed");
@@ -192,15 +175,12 @@ describe("safelyRenderAll", () => {
   });
 
   it("should handle mixed success and failure results", async () => {
-    // Set to production mode
-    Object.defineProperty(import.meta, "env", {
-      value: { DEV: false },
-      writable: true,
-    });
-
     const operations = [
       { operation: vi.fn().mockResolvedValue("success") },
-      { operation: vi.fn().mockRejectedValue(new Error("failure")) },
+      {
+        operation: vi.fn().mockRejectedValue(new Error("failure")),
+        config: { showDevErrors: false },
+      },
       { operation: vi.fn().mockResolvedValue("another-success") },
     ];
 
@@ -234,12 +214,6 @@ describe("safeFetch", () => {
   });
 
   it("should handle HTTP error responses", async () => {
-    // Set to production mode
-    Object.defineProperty(import.meta, "env", {
-      value: { DEV: false },
-      writable: true,
-    });
-
     const mockResponse = {
       ok: false,
       status: 404,
@@ -248,7 +222,12 @@ describe("safeFetch", () => {
 
     (global.fetch as any).mockResolvedValue(mockResponse);
 
-    const result = await safeFetch("https://api.example.com/notfound");
+    const config: SafeRenderConfig = { showDevErrors: false };
+    const result = await safeFetch(
+      "https://api.example.com/notfound",
+      {},
+      config
+    );
 
     expect(result).toBeNull();
   });
@@ -287,28 +266,20 @@ describe("safeJsonParse", () => {
   });
 
   it("should handle invalid JSON", () => {
-    // Set to production mode
-    Object.defineProperty(import.meta, "env", {
-      value: { DEV: false },
-      writable: true,
-    });
-
     const invalidJson = '{"invalid": json}';
 
-    const result = safeJsonParse(invalidJson);
+    const config: SafeRenderConfig = { showDevErrors: false };
+    const result = safeJsonParse(invalidJson, config);
 
     expect(result).toBeNull();
   });
 
   it("should use custom fallback for invalid JSON", () => {
-    // Set to production mode
-    Object.defineProperty(import.meta, "env", {
-      value: { DEV: false },
-      writable: true,
-    });
-
     const invalidJson = '{"invalid": json}';
-    const config: SafeRenderConfig = { fallback: { error: "parsing failed" } };
+    const config: SafeRenderConfig = {
+      fallback: { error: "parsing failed" },
+      showDevErrors: false,
+    };
 
     const result = safeJsonParse(invalidJson, config);
 

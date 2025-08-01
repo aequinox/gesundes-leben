@@ -20,10 +20,7 @@
  * const primaryButton = buttonVariants.primary;
  * ```
  */
-import type { ColorVariant, SizeVariant, ValidationResult } from "@/types";
-import { logger } from "@/utils/logger";
-
-import { validateProps, type PropValidationSchema } from "./propValidation";
+import type { ColorVariant, SizeVariant } from "@/types";
 
 // === Generic Component Interfaces ===
 
@@ -83,246 +80,154 @@ export interface ContentComponent extends Record<string, unknown> {
 // === Component Factory Types ===
 
 /**
- * Configuration for component variants
+ * Configuration for creating component variants
  */
-export interface ComponentVariantConfig<T extends Record<string, unknown>> {
-  defaultProps: Partial<T>;
-  variants: Record<string, Partial<T>>;
-  validation?: PropValidationSchema<T>;
-}
-
-/**
- * Component factory result
- */
-export interface ComponentFactory<T extends Record<string, unknown>> {
-  /** Get props for a specific variant */
-  getVariant: (name: string, overrides?: Partial<T>) => T;
-  /** Validate props */
-  validate: (props: T) => ValidationResult & { validatedProps: T };
-  /** Get all available variant names */
-  getVariantNames: () => string[];
-  /** Get default props */
-  getDefaultProps: () => Partial<T>;
+export interface ComponentVariantConfig {
+  /** Component name for debugging */
+  name: string;
+  /** Base CSS classes */
+  baseClasses: string;
+  /** Variant configurations */
+  variants: Record<string, Record<string, string>>;
+  /** Default variant selections */
+  defaultVariants?: Record<string, string>;
+  /** Compound variants for combinations */
+  compoundVariants?: Array<{
+    [key: string]: string;
+    className: string;
+  }>;
 }
 
 // === Factory Functions ===
 
 /**
- * Create a component factory with variants and validation
+ * Create a component factory function that generates class names
  */
-export function createComponentFactory<T extends Record<string, unknown>>(
-  config: ComponentVariantConfig<T>
-): ComponentFactory<T> {
-  const { defaultProps, variants, validation } = config;
+export function createComponentFactory(
+  config: ComponentVariantConfig
+): (props: Record<string, unknown>) => { className: string } {
+  const {
+    name: _name,
+    baseClasses,
+    variants,
+    defaultVariants = {},
+    compoundVariants = [],
+  } = config;
 
-  return {
-    getVariant: (name: string, overrides: Partial<T> = {}) => {
-      const variantProps = variants[name] || {};
-      return {
-        ...defaultProps,
-        ...variantProps,
-        ...overrides,
-      } as T;
-    },
+  return (props: Record<string, unknown>) => {
+    let className = baseClasses;
 
-    validate: (props: T) => {
-      if (validation) {
-        return validateProps(props, validation);
+    // Apply variant classes
+    for (const [variantName, variantOptions] of Object.entries(variants)) {
+      const selectedOption =
+        (props[variantName] as string) || defaultVariants[variantName];
+      if (selectedOption && variantOptions[selectedOption]) {
+        className += ` ${variantOptions[selectedOption]}`;
       }
-      return {
-        isValid: true,
-        errors: [],
-        warnings: [],
-        validatedProps: props,
-      };
-    },
+    }
 
-    getVariantNames: () => Object.keys(variants),
+    // Apply compound variants
+    for (const compound of compoundVariants) {
+      const { className: compoundClassName, ...conditions } = compound;
+      const matches = Object.entries(conditions).every(
+        ([key, value]) => props[key] === value
+      );
+      if (matches) {
+        className += ` ${compoundClassName}`;
+      }
+    }
 
-    getDefaultProps: () => defaultProps,
+    return { className: className.trim() };
   };
 }
 
 /**
  * Create button component variants
  */
-export function createButtonVariants<T extends Record<string, unknown>>(
-  customVariants: Record<string, Partial<T>> = {}
+export function createButtonVariants(
+  customVariants: Record<string, Record<string, string>> = {}
 ) {
-  const defaultButtonVariants = {
-    primary: {
-      variant: "accent" as const,
-      size: "md" as const,
-      color: "primary" as const,
+  return {
+    size: {
+      sm: "btn-sm",
+      md: "btn-md",
+      lg: "btn-lg",
     },
-    secondary: {
-      variant: "outline" as const,
-      size: "md" as const,
-      color: "secondary" as const,
-    },
-    ghost: {
-      variant: "ghost" as const,
-      size: "md" as const,
-      color: "muted" as const,
-    },
-    small: {
-      variant: "default" as const,
-      size: "sm" as const,
-    },
-    large: {
-      variant: "accent" as const,
-      size: "lg" as const,
-    },
-    iconOnly: {
-      variant: "icon" as const,
-      size: "md" as const,
+    variant: {
+      primary: "btn-primary",
+      secondary: "btn-secondary",
+      outline: "btn-outline",
     },
     ...customVariants,
   };
-
-  return createComponentFactory<T>({
-    defaultProps: {
-      disabled: false,
-      loading: false,
-      variant: "default",
-      size: "md",
-    } as unknown as Partial<T>,
-    variants: defaultButtonVariants as unknown as Record<string, Partial<T>>,
-  });
 }
 
 /**
  * Create badge component variants
  */
-export function createBadgeVariants<T extends Record<string, unknown>>(
-  customVariants: Record<string, Partial<T>> = {}
+export function createBadgeVariants(
+  customVariants: Record<string, Record<string, string>> = {}
 ) {
-  const defaultBadgeVariants = {
-    default: {
-      variant: "default" as const,
-      size: "sm" as const,
+  return {
+    size: {
+      sm: "badge-sm",
+      md: "badge-md",
     },
-    success: {
-      variant: "success" as const,
-      size: "sm" as const,
-      color: "success" as const,
-    },
-    warning: {
-      variant: "warning" as const,
-      size: "sm" as const,
-      color: "warning" as const,
-    },
-    error: {
-      variant: "error" as const,
-      size: "sm" as const,
-      color: "error" as const,
-    },
-    info: {
-      variant: "info" as const,
-      size: "sm" as const,
-      color: "accent" as const,
-    },
-    large: {
-      variant: "default" as const,
-      size: "lg" as const,
+    variant: {
+      default: "badge-default",
+      primary: "badge-primary",
+      success: "badge-success",
     },
     ...customVariants,
   };
-
-  return createComponentFactory<T>({
-    defaultProps: {
-      variant: "default",
-      size: "sm",
-    } as unknown as Partial<T>,
-    variants: defaultBadgeVariants as unknown as Record<string, Partial<T>>,
-  });
 }
 
 /**
  * Create card component variants
  */
-export function createCardVariants<T extends Record<string, unknown>>(
-  customVariants: Record<string, Partial<T>> = {}
+export function createCardVariants(
+  customVariants: Record<string, Record<string, string>> = {}
 ) {
-  const defaultCardVariants = {
-    default: {
-      variant: "default" as const,
-      size: "md" as const,
+  return {
+    padding: {
+      none: "p-0",
+      sm: "p-2",
+      lg: "p-6",
     },
-    feature: {
-      variant: "feature" as const,
-      size: "lg" as const,
+    shadow: {
+      sm: "shadow-sm",
+      lg: "shadow-lg",
     },
-    compact: {
-      variant: "compact" as const,
-      size: "sm" as const,
-    },
-    hero: {
-      variant: "hero" as const,
-      size: "xl" as const,
-    },
-    outlined: {
-      variant: "outlined" as const,
-      size: "md" as const,
-    },
-    elevated: {
-      variant: "elevated" as const,
-      size: "md" as const,
+    variant: {
+      default: "card-default",
+      feature: "card-feature",
     },
     ...customVariants,
   };
-
-  return createComponentFactory<T>({
-    defaultProps: {
-      variant: "default",
-      size: "md",
-    } as unknown as Partial<T>,
-    variants: defaultCardVariants as unknown as Record<string, Partial<T>>,
-  });
 }
 
 /**
  * Create layout component variants
  */
-export function createLayoutVariants<T extends Record<string, unknown>>(
-  customVariants: Record<string, Partial<T>> = {}
+export function createLayoutVariants(
+  customVariants: Record<string, Record<string, string>> = {}
 ) {
-  const defaultLayoutVariants = {
-    stack: {
-      orientation: "vertical" as const,
-      gap: "md" as const,
-      align: "stretch" as const,
+  return {
+    container: {
+      none: "container-none",
+      sm: "container-sm",
+      lg: "container-lg",
     },
-    row: {
-      orientation: "horizontal" as const,
-      gap: "md" as const,
-      align: "center" as const,
+    spacing: {
+      none: "space-0",
+      md: "space-4",
     },
-    grid: {
-      gap: "lg" as const,
-      align: "start" as const,
-    },
-    centered: {
-      align: "center" as const,
-      justify: "center" as const,
-    },
-    spaceBetween: {
-      orientation: "horizontal" as const,
-      justify: "between" as const,
-      align: "center" as const,
+    direction: {
+      row: "flex-row",
+      col: "flex-col",
     },
     ...customVariants,
   };
-
-  return createComponentFactory<T>({
-    defaultProps: {
-      orientation: "vertical",
-      gap: "md",
-      align: "start",
-      justify: "start",
-    } as unknown as Partial<T>,
-    variants: defaultLayoutVariants as unknown as Record<string, Partial<T>>,
-  });
 }
 
 // === Component Composition Utilities ===
@@ -330,18 +235,19 @@ export function createLayoutVariants<T extends Record<string, unknown>>(
 /**
  * Compose multiple component configurations
  */
-export function composeComponents<T extends Record<string, unknown>>(
-  ...configs: Partial<ComponentVariantConfig<T>>[]
-): ComponentVariantConfig<T> {
-  const composed: ComponentVariantConfig<T> = {
-    defaultProps: {},
+export function composeComponents(
+  ...configs: Partial<ComponentVariantConfig>[]
+): ComponentVariantConfig {
+  const composed: ComponentVariantConfig = {
+    name: "ComposedComponent",
+    baseClasses: "",
     variants: {},
   };
 
   for (const config of configs) {
-    // Merge default props
-    if (config.defaultProps) {
-      Object.assign(composed.defaultProps, config.defaultProps);
+    // Merge base classes
+    if (config.baseClasses) {
+      composed.baseClasses += ` ${config.baseClasses}`;
     }
 
     // Merge variants
@@ -349,34 +255,36 @@ export function composeComponents<T extends Record<string, unknown>>(
       Object.assign(composed.variants, config.variants);
     }
 
-    // Use the last validation schema
-    if (config.validation) {
-      composed.validation = config.validation;
+    // Use the last name if provided
+    if (config.name) {
+      composed.name = config.name;
     }
   }
 
+  composed.baseClasses = composed.baseClasses.trim();
   return composed;
 }
 
 /**
  * Create a responsive component variant
  */
-export function createResponsiveVariant<T extends Record<string, unknown>>(
-  baseProps: Partial<T>,
-  breakpoints: {
-    sm?: Partial<T>;
-    md?: Partial<T>;
-    lg?: Partial<T>;
-    xl?: Partial<T>;
-  }
-): Partial<T> {
-  // This would be implemented based on your responsive system
-  // For now, return the base props merged with largest applicable breakpoint
-  const responsive = { ...baseProps };
+export function createResponsiveVariant(
+  baseVariants: Record<string, Record<string, string>>
+) {
+  const responsive: Record<string, Record<string, string>> = {
+    ...baseVariants,
+  };
 
-  // In a real implementation, you'd merge breakpoint-specific props
-  // based on current viewport or build-time optimization
-  Object.assign(responsive, breakpoints.lg || breakpoints.md || breakpoints.sm);
+  // Add responsive variants for each base variant
+  for (const [variantName, options] of Object.entries(baseVariants)) {
+    for (const [optionName, className] of Object.entries(options)) {
+      responsive[variantName] = {
+        ...responsive[variantName],
+        [`md:${optionName}`]: `md:${className}`,
+        [`lg:${optionName}`]: `lg:${className}`,
+      };
+    }
+  }
 
   return responsive;
 }
@@ -384,70 +292,43 @@ export function createResponsiveVariant<T extends Record<string, unknown>>(
 /**
  * Create theme-aware component variants
  */
-export function createThemeVariants<T extends Record<string, unknown>>(
-  lightTheme: Partial<T>,
-  darkTheme: Partial<T>
-): {
-  light: Partial<T>;
-  dark: Partial<T>;
-  auto: Partial<T>;
-} {
-  return {
-    light: lightTheme,
-    dark: darkTheme,
-    auto: lightTheme, // Default to light, would be dynamic in real implementation
-  };
+export function createThemeVariants(
+  baseVariants: Record<string, Record<string, string>>
+) {
+  const themed: Record<string, Record<string, string>> = {};
+
+  for (const [variantName, options] of Object.entries(baseVariants)) {
+    themed[variantName] = {};
+    for (const [optionName, className] of Object.entries(options)) {
+      themed[variantName][optionName] = `${className} dark:text-blue-400`;
+    }
+  }
+
+  return themed;
 }
 
 // === Higher-Order Component Utilities ===
 
 /**
- * Create a component with automatic validation
- */
-export function withValidation<T extends Record<string, unknown>>(
-  factory: ComponentFactory<T>,
-  componentName: string
-) {
-  return {
-    ...factory,
-    getVariant: (name: string, overrides: Partial<T> = {}) => {
-      const props = factory.getVariant(name, overrides);
-      const validation = factory.validate(props);
-
-      if (!validation.isValid && import.meta.env.DEV) {
-        logger.warn(
-          `Invalid props for ${componentName} variant "${name}":`,
-          validation.errors
-        );
-      }
-
-      return validation.validatedProps;
-    },
-  };
-}
-
-/**
  * Create a component with performance monitoring
  */
-export function withPerformanceMonitoring<T extends Record<string, unknown>>(
-  factory: ComponentFactory<T>,
+export function withPerformanceMonitoring(
+  factory: (props: Record<string, unknown>) => { className: string },
   componentName: string
 ) {
-  return {
-    ...factory,
-    getVariant: (name: string, overrides: Partial<T> = {}) => {
-      const start = performance.now();
-      const props = factory.getVariant(name, overrides);
-      const end = performance.now();
-
-      if (end - start > 5 && import.meta.env.DEV) {
-        logger.warn(
-          `Slow variant generation for ${componentName}.${name}: ${end - start}ms`
-        );
-      }
-
-      return props;
-    },
+  return (props: Record<string, unknown>) => {
+    if (typeof performance !== "undefined") {
+      performance.mark(`${componentName}-start`);
+      const result = factory(props);
+      performance.mark(`${componentName}-end`);
+      performance.measure(
+        componentName,
+        `${componentName}-start`,
+        `${componentName}-end`
+      );
+      return result;
+    }
+    return factory(props);
   };
 }
 
@@ -456,19 +337,39 @@ export function withPerformanceMonitoring<T extends Record<string, unknown>>(
 /**
  * Pre-configured button factory
  */
-export const buttonFactory = createButtonVariants();
+export const buttonFactory = createComponentFactory({
+  name: "Button",
+  baseClasses: "btn",
+  variants: createButtonVariants(),
+  defaultVariants: { size: "md", variant: "primary" },
+});
 
 /**
  * Pre-configured badge factory
  */
-export const badgeFactory = createBadgeVariants();
+export const badgeFactory = createComponentFactory({
+  name: "Badge",
+  baseClasses: "badge",
+  variants: createBadgeVariants(),
+  defaultVariants: { size: "sm", variant: "default" },
+});
 
 /**
  * Pre-configured card factory
  */
-export const cardFactory = createCardVariants();
+export const cardFactory = createComponentFactory({
+  name: "Card",
+  baseClasses: "card",
+  variants: createCardVariants(),
+  defaultVariants: { padding: "sm", shadow: "sm" },
+});
 
 /**
  * Pre-configured layout factory
  */
-export const layoutFactory = createLayoutVariants();
+export const layoutFactory = createComponentFactory({
+  name: "Layout",
+  baseClasses: "layout",
+  variants: createLayoutVariants(),
+  defaultVariants: { container: "sm", direction: "row" },
+});

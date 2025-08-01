@@ -5,7 +5,7 @@ import tseslint from "typescript-eslint";
 
 export default [
   {
-    files: ["**/*.{js,mjs,cjs,ts,jsx,tsx,astro}"],
+    files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
@@ -130,6 +130,15 @@ export default [
       "@typescript-eslint/no-explicit-any": "off",
       // Relax strict boolean expressions in tests
       "@typescript-eslint/strict-boolean-expressions": "off",
+    },
+  },
+  {
+    files: ["scripts/**/*.ts"],
+    rules: {
+      // Allow console in CLI scripts
+      "no-console": "off",
+      // Allow any in CLI scripts for flexibility
+      "@typescript-eslint/no-explicit-any": "warn",
     },
   },
   {

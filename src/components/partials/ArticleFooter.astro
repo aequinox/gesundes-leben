@@ -2,7 +2,6 @@
 import Button from "@/components/elements/Button.astro";
 import Hr from "@/components/elements/Hr.astro";
 import Tag from "@/components/elements/Tag.astro";
-import References from "@/components/partials/References.astro";
 import RelatedPosts from "@/components/partials/RelatedPosts.astro";
 import { getI18nStrings } from "@/config/i18n";
 import { slugify } from "@/utils/slugs";
@@ -12,10 +11,9 @@ import ShareLinks from "../ShareLinks.astro";
 
 interface Props {
   post: Post;
-  references?: string[];
 }
 
-const { post, references }: Props = Astro.props;
+const { post }: Props = Astro.props;
 const {
   data: { tags = [] },
 } = post;
@@ -24,13 +22,6 @@ const i18n = getI18nStrings("de");
 ---
 
 <Fragment>
-  {/* References */}
-  {
-    references && references.length > 0 && (
-      <References referenceIds={references} />
-    )
-  }
-
   <Hr variant="dots" />
 
   {/* Related Posts */}
