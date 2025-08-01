@@ -30,6 +30,7 @@ references:
 ---
 
 import Image from "@/components/elements/Image.astro";
+import Blockquote from "@/components/elements/Blockquote.astro";
 import burnoutErschoepfungMuedigkeitSyndromFrauTisch from "./images/burnout-erschoepfung-muedigkeit-syndrom-frau-tisch.jpg";
 import AuthorKaiProfileImage from "./images/autor-kai-profilbild-gesundheitsexperte.png";
 
@@ -140,20 +141,15 @@ Was kannst du also tun? 
 
 - Positive Gedanken (z.B. noch einmal darüber nachdenken, was am heutigen Tag alles gelungen ist, und wofür du dankbar sein kannst) Siehe auch ["Count your blessings"](https://gesundheit-in-tuebingen.de/count-your-blessings/) 
 
-<Image
-  src={AuthorKaiProfileImage}
-  alt="Kai Renner - Heilpraktiker und Gesundheitsexperte"
-  position="center"
-  style="polaroid"
-/>
-
-Der Therapeuten Tipp!
-
+<Blockquote 
+  author="Kai Renner"
+  role="Heilpraktiker, Biologe"
+  avatar="./images/autor-kai-profilbild-gesundheitsexperte.png"
+  label="💡 Der Therapeuten Tipp!"
+>
 Es ist angebracht, Melatonin nur nachts einzunehmen, ca. 1 bis 2 Stunden vor dem Schlafengehen, da es bei Einnahme morgens oder tagsüber zu Schläfrigkeit kommen kann, und der Tag-Nacht-Rhythmus durcheinander kommen könnte.  
 Melatonin war früher als Medikament eingestuft, und ist als solches verschreibungspflichtig. Als Nahrungsergänzungsmittel ist es frei verfügbar. Es gibt auch Apotheken, die Liposomen-Creme oder Kapseln auf Rezept herstellen. Sprich dazu deinen Arzt an.
-
-Kai Renner  
-Heilpraktiker, Biologe
+</Blockquote>
 
 ### Unsere Favoriten
 

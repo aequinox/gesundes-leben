@@ -1,27 +1,115 @@
-<div
-  class="relative my-8 rounded-xl bg-card/30 p-8 shadow-md backdrop-blur-sm transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:shadow-xl dark:bg-card/40"
-  style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03), inset 0 0 0 1px rgba(255, 255, 255, 0.1);"
->
-  <svg
-    class="absolute -top-4 left-6 size-16 rounded-full border border-accent bg-background p-2 text-accent shadow-md"
-    viewBox="0 0 16 16"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    aria-hidden="true"
-    style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);"
-  >
-    <path
-      d="M7.39762 10.3C7.39762 11.0733 7.14888 11.7 6.6514 12.18C6.15392 12.6333 5.52552 12.86 4.76621 12.86C3.84979 12.86 3.09047 12.5533 2.48825 11.94C1.91222 11.3266 1.62421 10.4467 1.62421 9.29999C1.62421 8.07332 1.96459 6.87332 2.64535 5.69999C3.35231 4.49999 4.33418 3.55332 5.59098 2.85999L6.4943 4.25999C5.81354 4.73999 5.26369 5.27332 4.84476 5.85999C4.45201 6.44666 4.19017 7.12666 4.05926 7.89999C4.29491 7.79332 4.56983 7.73999 4.88403 7.73999C5.61716 7.73999 6.21938 7.97999 6.69067 8.45999C7.16197 8.93999 7.39762 9.55333 7.39762 10.3ZM14.6242 10.3C14.6242 11.0733 14.3755 11.7 13.878 12.18C13.3805 12.6333 12.7521 12.86 11.9928 12.86C11.0764 12.86 10.3171 12.5533 9.71484 11.94C9.13881 11.3266 8.85079 10.4467 8.85079 9.29999C8.85079 8.07332 9.19117 6.87332 9.87194 5.69999C10.5789 4.49999 11.5608 3.55332 12.8176 2.85999L13.7209 4.25999C13.0401 4.73999 12.4903 5.27332 12.0713 5.85999C11.6786 6.44666 11.4168 7.12666 11.2858 7.89999C11.5215 7.79332 11.7964 7.73999 12.1106 7.73999C12.8437 7.73999 13.446 7.97999 13.9173 8.45999C14.3886 8.93999 14.6242 9.55333 14.6242 10.3Z"
-      fill="currentColor"></path>
-  </svg>
-  <blockquote class="-mb-8 ml-16" style="quotes: none;">
-    <p class="-mt-4">
-      <em class="flex leading-relaxed font-light sm:text-lg 2xl:text-xl">
-        <slot />
-      </em>
-    </p>
-  </blockquote>
-</div>
+---
+export interface Props {
+  author?: string;
+  role?: string;
+  avatar?: string;
+  label?: string;
+}
+
+const { author, role, avatar, label } = Astro.props;
+
+// Enhanced mode when author props are provided
+const isEnhanced = Boolean(author || role || avatar || label);
+---
+
+<>
+  {
+    isEnhanced ? (
+      <div
+        class="relative my-8 rounded-xl border border-emerald-200/50 bg-gradient-to-br from-emerald-50 to-teal-50 p-6 shadow-lg backdrop-blur-sm transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl dark:border-emerald-700/50 dark:from-emerald-900/20 dark:to-teal-900/20"
+        role="complementary"
+        aria-labelledby="therapist-tip-label"
+      >
+        {label && (
+          <div
+            id="therapist-tip-label"
+            class="absolute -top-3 left-6 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-md"
+          >
+            <span class="flex items-center gap-2">
+              <svg
+                class="size-4"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              {label}
+            </span>
+          </div>
+        )}
+
+        <div class="mt-6">
+          <blockquote
+            class="text-gray-700 dark:text-gray-300"
+            style="quotes: none;"
+          >
+            <p class="text-base leading-relaxed font-medium sm:text-lg">
+              <slot />
+            </p>
+          </blockquote>
+
+          {(author || role) && (
+            <div class="mt-6 flex items-center gap-4 border-t border-emerald-200/50 pt-4 dark:border-emerald-700/50">
+              {avatar && (
+                <img
+                  src={avatar}
+                  alt={
+                    author ? `${author} - Profilbild` : "Therapeut Profilbild"
+                  }
+                  class="size-12 rounded-full border-2 border-emerald-300 object-cover shadow-md dark:border-emerald-600"
+                  loading="lazy"
+                />
+              )}
+              <div class="flex-1">
+                {author && (
+                  <p class="font-semibold text-gray-900 dark:text-gray-100">
+                    {author}
+                  </p>
+                )}
+                {role && (
+                  <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                    {role}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    ) : (
+      <div
+        class="relative my-8 rounded-xl bg-card/30 p-8 shadow-md backdrop-blur-sm transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:shadow-xl dark:bg-card/40"
+        style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03), inset 0 0 0 1px rgba(255, 255, 255, 0.1);"
+      >
+        <svg
+          class="absolute -top-4 left-6 size-16 rounded-full border border-accent bg-background p-2 text-accent shadow-md"
+          viewBox="0 0 16 16"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+          style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);"
+        >
+          <path
+            d="M7.39762 10.3C7.39762 11.0733 7.14888 11.7 6.6514 12.18C6.15392 12.6333 5.52552 12.86 4.76621 12.86C3.84979 12.86 3.09047 12.5533 2.48825 11.94C1.91222 11.3266 1.62421 10.4467 1.62421 9.29999C1.62421 8.07332 1.96459 6.87332 2.64535 5.69999C3.35231 4.49999 4.33418 3.55332 5.59098 2.85999L6.4943 4.25999C5.81354 4.73999 5.26369 5.27332 4.84476 5.85999C4.45201 6.44666 4.19017 7.12666 4.05926 7.89999C4.29491 7.79332 4.56983 7.73999 4.88403 7.73999C5.61716 7.73999 6.21938 7.97999 6.69067 8.45999C7.16197 8.93999 7.39762 9.55333 7.39762 10.3ZM14.6242 10.3C14.6242 11.0733 14.3755 11.7 13.878 12.18C13.3805 12.6333 12.7521 12.86 11.9928 12.86C11.0764 12.86 10.3171 12.5533 9.71484 11.94C9.13881 11.3266 8.85079 10.4467 8.85079 9.29999C8.85079 8.07332 9.19117 6.87332 9.87194 5.69999C10.5789 4.49999 11.5608 3.55332 12.8176 2.85999L13.7209 4.25999C13.0401 4.73999 12.4903 5.27332 12.0713 5.85999C11.6786 6.44666 11.4168 7.12666 11.2858 7.89999C11.5215 7.79332 11.7964 7.73999 12.1106 7.73999C12.8437 7.73999 13.446 7.97999 13.9173 8.45999C14.3886 8.93999 14.6242 9.55333 14.6242 10.3Z"
+            fill="currentColor"
+          />
+        </svg>
+        <blockquote class="-mb-8 ml-16" style="quotes: none;">
+          <p class="-mt-4">
+            <em class="flex leading-relaxed font-light sm:text-lg 2xl:text-xl">
+              <slot />
+            </em>
+          </p>
+        </blockquote>
+      </div>
+    )
+  }
+</>
 
 <style>
   /* Remove quotes from blockquote */
