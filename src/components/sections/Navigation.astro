@@ -429,8 +429,12 @@ const ACTIONS = actionItems;
       // Determine scroll direction
       this.scrollDirection = scrollDelta > 0 ? "down" : "up";
 
+      // Always show navbar when at the top of the page
+      if (currentScrollY <= 0) {
+        this.nav.style.transform = "translateY(0)";
+      }
       // Hide navbar when scrolling down past threshold
-      if (
+      else if (
         this.scrollDirection === "down" &&
         currentScrollY > this.hideThreshold
       ) {
