@@ -17,4 +17,8 @@
         "**/node_modules": true,
         "**/dist": true,
     },
+    "files.associations": {
+        "*.css": "tailwindcss",
+        "*.scss": "tailwindcss"
+    }
 }
