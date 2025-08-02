@@ -103,8 +103,13 @@ const resizerScriptUrl =
               `#${iframeId}`
             );
           } else {
-            // eslint-disable-next-line no-console
-            console.warn("iFrameResize function not available");
+            // Use proper error reporting for production issues
+            if (import.meta.env.DEV) {
+              // eslint-disable-next-line no-console
+              console.warn("iFrameResize function not available");
+            }
+            // In production, silently handle the missing function
+            // The iframe will still work but without auto-resizing
           }
         };
         const nuxtElement = iframe.contentDocument?.getElementById("__nuxt");

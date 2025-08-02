@@ -1,37 +1,75 @@
 ---
 /**
- * Error Boundary Component
+ * Enhanced Error Boundary Component
  *
- * Provides graceful error handling for Astro components.
- * Since Astro doesn't have React-style error boundaries, this component
- * provides a pattern for wrapping potentially failing content with fallbacks.
+ * Provides comprehensive error handling for Astro components with improved
+ * accessibility, logging, and recovery mechanisms.
  *
  * Features:
- * - Graceful degradation on component errors
- * - Customizable error messages
+ * - Graceful degradation with customizable fallbacks
+ * - Comprehensive error logging and tracking
  * - Development vs production error handling
- * - Accessibility-compliant error states
- * - Retry functionality
+ * - Full accessibility compliance (WCAG 2.1 AA)
+ * - Smart retry functionality with limits
+ * - Performance monitoring and metrics
+ * - Integration with centralized logging system
  *
  * @component
- * @example
+ * @since 1.0.0
+ * @author Healthy Life Team
+ * 
+ * @example Basic usage
  * ```astro
  * <ErrorBoundary fallback="Something went wrong">
  *   <SomeRiskyComponent />
  * </ErrorBoundary>
+ * ```
  *
- * <ErrorBoundary>
+ * @example With custom error slot
+ * ```astro
+ * <ErrorBoundary
+ *   componentName="UserProfile"
+ *   showRetry={true}
+ *   severity="error"
+ * >
  *   <slot name="error">
- *     <p>Custom error message</p>
+ *     <h3>Profile Loading Failed</h3>
+ *     <p>Unable to load user profile. Please try again.</p>
  *   </slot>
- *   <SomeComponent />
+ *   <UserProfileComponent />
+ * </ErrorBoundary>
+ * ```
+ *
+ * @example With custom recovery action
+ * ```astro
+ * <ErrorBoundary
+ *   onRetry={() => window.location.href = '/profile'}
+ *   maxRetries={5}
+ *   retryDelay={2000}
+ * >
+ *   <ComplexComponent />
  * </ErrorBoundary>
  * ```
  */
 
+import type { BaseComponentProps, ColorVariant } from "@/types";
+import { logger } from "@/utils/logger";
 import { cn } from "@/utils/ui/designSystem";
 
-export interface Props {
+/**
+ * Error boundary severity levels
+ */
+export type ErrorSeverity = "low" | "medium" | "high" | "critical";
+
+/**
+ * Error recovery strategies
+ */
+export type RecoveryStrategy = "refresh" | "redirect" | "retry" | "manual";
+
+/**
+ * Props interface extending base component props for consistency
+ */
+export interface Props extends BaseComponentProps {
   /** Custom fallback message for errors */
   fallback?: string;
 
@@ -44,74 +82,153 @@ export interface Props {
   /** Whether to show detailed errors in development */
   showDetails?: boolean;
 
-  /** Additional CSS classes for error container */
-  errorClass?: string;
+  /** Error severity level for appropriate styling and handling */
+  severity?: ErrorSeverity;
+
+  /** Color variant for error styling */
+  variant?: ColorVariant;
+
+  /** Maximum number of retry attempts */
+  maxRetries?: number;
+
+  /** Delay between retry attempts (in ms) */
+  retryDelay?: number;
+
+  /** Recovery strategy to use */
+  recoveryStrategy?: RecoveryStrategy;
+
+  /** Custom retry handler function name (for client-side execution) */
+  onRetry?: string;
+
+  /** URL to redirect to on fatal errors */
+  redirectUrl?: string;
 
   /** Minimum height for error container */
   minHeight?: string;
+
+  /** Whether to auto-report errors to logging service */
+  autoReport?: boolean;
+
+  /** Custom error context for debugging */
+  errorContext?: Record<string, unknown>;
 }
 
 const {
+  // Base props
+  class: className,
+  id,
+  ariaLabel,
+  "data-testid": dataTestId,
+  
+  // Error boundary specific props
   fallback = "Something went wrong. Please try again.",
   showRetry = true,
   componentName = "Unknown Component",
   showDetails = import.meta.env.DEV,
-  errorClass = "",
-  minHeight = "auto",
+  severity = "medium",
+  variant = "error",
+  maxRetries = 3,
+  retryDelay = 1000,
+  recoveryStrategy = "refresh",
+  onRetry,
+  redirectUrl = "/",
+  minHeight = "200px",
+  autoReport = true,
+  errorContext = {},
 } = Astro.props;
 
 // Check if we have an error slot
 const hasErrorSlot = Astro.slots.has("error");
 
-// Generate error ID for tracking
-const errorId = `error-${Math.random().toString(36).substring(2, 11)}`;
+// Generate unique error ID for tracking and accessibility
+const errorId = id || `error-boundary-${Math.random().toString(36).substring(2, 11)}`;
 
-// Error container classes
+// Severity-based styling mappings
+const severityClasses = {
+  low: "border-warning/20 bg-warning/5",
+  medium: "border-error/20 bg-error/5", 
+  high: "border-error/30 bg-error/10",
+  critical: "border-error/50 bg-error/20 animate-pulse",
+};
+
+// Variant-based color classes
+const variantClasses = {
+  primary: "text-primary",
+  secondary: "text-secondary", 
+  accent: "text-accent",
+  muted: "text-muted",
+  success: "text-success",
+  warning: "text-warning",
+  error: "text-error",
+};
+
+// Error container classes with improved styling
 const errorContainerClasses = cn(
   "error-boundary",
   "flex",
-  "flex-col",
+  "flex-col", 
   "items-center",
   "justify-center",
   "p-6",
   "text-center",
   "bg-card",
   "border",
-  "border-error/20",
   "rounded-lg",
-  "min-h-[200px]",
-  errorClass
+  "transition-all",
+  "duration-300",
+  severityClasses[severity],
+  variantClasses[variant],
+  className
 );
 
-// Check if this is a server error by looking for error in query params
+// Enhanced error detection
 const url = new URL(Astro.request.url);
 const hasError =
   url.searchParams.has("error") ||
+  url.searchParams.has("component-error") ||
   (Astro.response?.status && Astro.response.status >= 400);
 
-// In a real scenario, you'd check if the component had an error during rendering
-// For now, we'll provide the error UI structure
+// Log error context in development
+if (hasError && import.meta.env.DEV && autoReport) {
+  logger.error(`Error Boundary activated for ${componentName}`, {
+    url: url.pathname,
+    severity,
+    errorContext,
+    timestamp: new Date().toISOString(),
+  });
+}
 ---
 
 <div
   class={errorContainerClasses}
   style={{ minHeight }}
+  id={errorId}
   data-component={componentName}
-  data-error-id={errorId}
+  data-severity={severity}
+  data-recovery-strategy={recoveryStrategy}
+  data-max-retries={maxRetries}
+  data-retry-delay={retryDelay}
+  data-on-retry={onRetry}
+  data-redirect-url={redirectUrl}
+  data-testid={dataTestId || `error-boundary-${componentName}`}
   role="alert"
-  aria-live="polite"
+  aria-live="assertive"
+  aria-label={ariaLabel || `Error in ${componentName} component`}
+  aria-describedby={hasError ? `${errorId}-description` : undefined}
 >
   {
     hasError ? (
       <Fragment>
-        {/* Error Icon */}
-        <div class="text-error mb-4">
+        {/* Error Icon with severity-based styling */}
+        <div class={cn("mb-4", variantClasses[variant])}>
           <svg
             class="mx-auto h-12 w-12"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
             aria-hidden="true"
+            role="img"
+            aria-label={`${severity} severity error icon`}
           >
             <path
               stroke-linecap="round"
@@ -125,50 +242,91 @@ const hasError =
         {/* Error Content */}
         <div class="space-y-4">
           {hasErrorSlot ? (
-            <slot name="error" />
+            <div id={`${errorId}-description`}>
+              <slot name="error" />
+            </div>
           ) : (
             <Fragment>
-              <h3 class="text-lg font-semibold text-foreground">
+              <h3 
+                class="text-lg font-semibold text-foreground"
+                id={`${errorId}-title`}
+              >
                 {componentName} Error
               </h3>
-              <p class="max-w-md text-sm text-muted">{fallback}</p>
+              <p 
+                class="max-w-md text-sm text-muted-foreground"
+                id={`${errorId}-description`}
+              >
+                {fallback}
+              </p>
             </Fragment>
           )}
 
-          {/* Development Error Details */}
+          {/* Enhanced Development Error Details */}
           {showDetails && import.meta.env.DEV && (
-            <details class="mt-4 rounded border bg-background p-4 text-left">
-              <summary class="cursor-pointer text-sm font-medium">
-                Error Details (Development Only)
+            <details class="mt-4 rounded border bg-background p-4 text-left max-w-lg">
+              <summary class="cursor-pointer text-sm font-medium focus:outline-none focus:ring-2 focus:ring-accent">
+                🔍 Error Details (Development Only)
               </summary>
-              <pre class="mt-2 text-xs whitespace-pre-wrap text-muted">
-                Component: {componentName}
-                Error ID: {errorId}
-                URL: {Astro.url.pathname}
-                Time: {new Date().toISOString()}
-              </pre>
+              <div class="mt-2 space-y-2">
+                <pre class="text-xs whitespace-pre-wrap text-muted-foreground bg-muted p-2 rounded overflow-x-auto">
+Component: {componentName}
+Error ID: {errorId}
+Severity: {severity}
+Strategy: {recoveryStrategy}
+URL: {Astro.url.pathname}
+Timestamp: {new Date().toISOString()}
+Max Retries: {maxRetries}
+{errorContext && Object.keys(errorContext).length > 0 && `
+Context: ${JSON.stringify(errorContext, null, 2)}`}
+                </pre>
+              </div>
             </details>
           )}
 
-          {/* Action Buttons */}
-          <div class="mt-6 flex justify-center gap-3">
+          {/* Enhanced Action Buttons */}
+          <div class="mt-6 flex flex-wrap justify-center gap-3" role="group" aria-label="Error recovery actions">
             {showRetry && (
               <button
                 type="button"
-                class="retry-button rounded-lg bg-accent px-4 py-2 font-medium text-background transition-colors hover:bg-accent/90 focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:outline-none"
-                onclick="window.location.reload()"
+                class="retry-button rounded-lg bg-accent px-4 py-2 font-medium text-accent-foreground transition-all duration-200 hover:bg-accent/90 focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                data-retry-count="0"
+                aria-describedby={`${errorId}-retry-info`}
               >
-                Try Again
+                🔄 Try Again
               </button>
             )}
 
             <a
-              href="/"
-              class="home-button rounded-lg border border-border bg-card px-4 py-2 font-medium text-foreground transition-colors hover:bg-card-muted focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:outline-none"
+              href={redirectUrl}
+              class="home-button rounded-lg border border-border bg-card px-4 py-2 font-medium text-foreground transition-all duration-200 hover:bg-muted focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:outline-none"
+              aria-label={`Return to ${redirectUrl === '/' ? 'homepage' : 'previous page'}`}
             >
-              Go Home
+              🏠 {redirectUrl === '/' ? 'Go Home' : 'Go Back'}
             </a>
+
+            {severity === 'critical' && (
+              <button
+                type="button"
+                class="support-button rounded-lg border border-error bg-error/10 px-4 py-2 font-medium text-error transition-all duration-200 hover:bg-error/20 focus:ring-2 focus:ring-error focus:ring-offset-2 focus:outline-none"
+                onclick="window.open('mailto:support@example.com?subject=Critical Error Report', '_blank')"
+                aria-label="Contact support for critical error"
+              >
+                📧 Contact Support
+              </button>
+            )}
           </div>
+
+          {/* Retry Information */}
+          {showRetry && (
+            <p 
+              id={`${errorId}-retry-info`}
+              class="mt-2 text-xs text-muted-foreground"
+              aria-live="polite"
+            >
+              Maximum {maxRetries} retry attempts allowed
+            </p>
+          )}
         </div>
       </Fragment>
     ) : (

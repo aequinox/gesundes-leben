@@ -59,8 +59,14 @@ if (typeof window !== "undefined") {
         },
       });
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("ViewTransitionEnhancer: Failed to initialize:", error);
+      // Use logger for better error handling and development debugging
+      import("./logger").then(({ logger }) => {
+        logger.error("ViewTransitionEnhancer: Failed to initialize:", error);
+      }).catch(() => {
+        // Fallback if logger import fails
+        // eslint-disable-next-line no-console
+        console.error("ViewTransitionEnhancer: Failed to initialize:", error);
+      });
     }
   };
 

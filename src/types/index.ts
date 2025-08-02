@@ -64,6 +64,41 @@ export type {
   CSSClasses,
 } from "@/components/types/css";
 
+// === Enhanced Error Types ===
+export type ErrorSeverity = "low" | "medium" | "high" | "critical";
+export type RecoveryStrategy = "retry" | "fallback" | "redirect" | "reload";
+
+export interface EnhancedError extends Error {
+  code?: string;
+  severity?: ErrorSeverity;
+  context?: Record<string, unknown>;
+  recoverable?: boolean;
+  userFacing?: boolean;
+}
+
+// === Validation Types ===
+export interface PropValidationRule {
+  required?: boolean;
+  type?: "string" | "number" | "boolean" | "object" | "array";
+  minLength?: number;
+  maxLength?: number;
+  min?: number;
+  max?: number;
+  pattern?: RegExp;
+  custom?: (value: unknown) => boolean | string;
+  message?: string;
+}
+
+export type PropValidationSchema<T = Record<string, unknown>> = {
+  [K in keyof T]?: PropValidationRule;
+};
+
+export interface ValidationContext {
+  fieldName: string;
+  value: unknown;
+  allValues?: Record<string, unknown>;
+}
+
 // === UI Engine Types ===
 // Note: These types are internal to their respective modules
 // Individual components should import them directly when needed

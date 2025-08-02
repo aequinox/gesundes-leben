@@ -1,29 +1,135 @@
 ---
-export interface Props {
+/**
+ * Enhanced Blockquote Component
+ *
+ * A flexible, accessible blockquote component that supports both simple quotes
+ * and enhanced therapist tips with author attribution and visual styling.
+ *
+ * Features:
+ * - Dual modes: simple blockquote and enhanced therapist tip
+ * - Full accessibility compliance with proper ARIA attributes
+ * - Responsive design with hover effects
+ * - Avatar and author attribution support
+ * - Customizable labels and roles
+ * - Theme-aware styling with dark mode support
+ * - Professional healthcare-focused design
+ *
+ * @component
+ * @since 1.0.0
+ * @author Healthy Life Team
+ * 
+ * @example Simple blockquote
+ * ```astro
+ * <Blockquote>
+ *   This is a simple quote without attribution.
+ * </Blockquote>
+ * ```
+ *
+ * @example Therapist tip with full attribution
+ * ```astro
+ * <Blockquote
+ *   author="Dr. Sarah Johnson"
+ *   role="Klinische Psychologin"
+ *   avatar="/images/therapists/dr-johnson.jpg"
+ *   label="Therapeuten Tipp"
+ *   class="my-12"
+ * >
+ *   Mindfulness practices can significantly reduce anxiety symptoms 
+ *   when practiced consistently for just 10 minutes daily.
+ * </Blockquote>
+ * ```
+ *
+ * @example Expert advice without avatar
+ * ```astro
+ * <Blockquote
+ *   author="Prof. Michael Weber"
+ *   role="Ernährungswissenschaftler"
+ *   label="Experten Rat"
+ * >
+ *   A balanced diet should include a variety of colorful vegetables
+ *   to ensure optimal nutrient intake.
+ * </Blockquote>
+ * ```
+ */
+
+import type { BaseComponentProps } from "@/types";
+
+/**
+ * Blockquote component props interface
+ */
+export interface Props extends BaseComponentProps {
+  /** Author's name for attribution */
   author?: string;
+  
+  /** Professional role or title */
   role?: string;
+  
+  /** URL to author's avatar image */
   avatar?: string;
+  
+  /** Category label (e.g., "Therapeuten Tipp", "Experten Rat") */
   label?: string;
+  
+  /** Quote source or context */
+  cite?: string;
+  
+  /** Visual variant for different styling */
+  variant?: "default" | "professional" | "highlight" | "minimal";
+  
+  /** Size variant */
+  size?: "sm" | "md" | "lg";
 }
 
-const { author, role, avatar, label } = Astro.props;
+const { 
+  // Base props
+  class: className,
+  id,
+  "data-testid": dataTestId,
+  
+  // Blockquote specific props
+  author, 
+  role, 
+  avatar, 
+  label,
+  cite,
+  variant: _variant = "default",
+  size = "md",
+} = Astro.props;
 
 // Enhanced mode when author props are provided
 const isEnhanced = Boolean(author || role || avatar || label);
+
+// Generate unique ID for accessibility
+const blockquoteId = id || `blockquote-${Math.random().toString(36).substring(2, 11)}`;
+
+// Size-based styling
+const sizeClasses = {
+  sm: "text-sm sm:text-base p-4 my-4",
+  md: "text-base sm:text-lg p-6 my-8", 
+  lg: "text-lg sm:text-xl p-8 my-12",
+};
+
+// Build CSS classes
+const baseClasses = sizeClasses[size];
 ---
 
 <>
   {
     isEnhanced ? (
       <div
-        class="relative my-8 rounded-xl border border-emerald-200/50 bg-gradient-to-br from-emerald-50 to-teal-50 p-6 shadow-lg backdrop-blur-sm transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl dark:border-emerald-700/50 dark:from-emerald-900/20 dark:to-teal-900/20"
+        class={`relative rounded-xl border border-emerald-200/50 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-lg backdrop-blur-sm transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl dark:border-emerald-700/50 dark:from-emerald-900/20 dark:to-teal-900/20 ${baseClasses} ${className || ""}`}
+        id={blockquoteId}
+        data-testid={dataTestId || "enhanced-blockquote"}
         role="complementary"
-        aria-labelledby="therapist-tip-label"
+        aria-labelledby={label ? `${blockquoteId}-label` : undefined}
+        aria-describedby={`${blockquoteId}-content`}
       >
         {label && (
           <div
-            id="therapist-tip-label"
+            id={`${blockquoteId}-label`}
             class="absolute -top-3 left-6 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-md"
+            role="banner"
+            aria-label={`Quote category: ${label}`}
           >
             <span class="flex items-center gap-2">
               <svg
@@ -45,10 +151,12 @@ const isEnhanced = Boolean(author || role || avatar || label);
 
         <div class="mt-6">
           <blockquote
+            id={`${blockquoteId}-content`}
             class="text-gray-700 dark:text-gray-300"
             style="quotes: none;"
+            cite={cite}
           >
-            <p class="text-base leading-relaxed font-medium sm:text-lg">
+            <p class="leading-relaxed font-medium">
               <slot />
             </p>
           </blockquote>
@@ -83,7 +191,9 @@ const isEnhanced = Boolean(author || role || avatar || label);
       </div>
     ) : (
       <div
-        class="relative my-8 rounded-xl bg-card/30 p-8 shadow-md backdrop-blur-sm transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:shadow-xl dark:bg-card/40"
+        class={`relative rounded-xl bg-card/30 shadow-md backdrop-blur-sm transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:shadow-xl dark:bg-card/40 ${baseClasses} ${className || ""}`}
+        id={blockquoteId}
+        data-testid={dataTestId || "simple-blockquote"}
         style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03), inset 0 0 0 1px rgba(255, 255, 255, 0.1);"
       >
         <svg
@@ -99,9 +209,14 @@ const isEnhanced = Boolean(author || role || avatar || label);
             fill="currentColor"
           />
         </svg>
-        <blockquote class="-mb-8 ml-16" style="quotes: none;">
+        <blockquote 
+          class="-mb-8 ml-16" 
+          style="quotes: none;"
+          cite={cite}
+          id={`${blockquoteId}-content`}
+        >
           <p class="-mt-4">
-            <em class="flex leading-relaxed font-light sm:text-lg 2xl:text-xl">
+            <em class="flex leading-relaxed font-light">
               <slot />
             </em>
           </p>

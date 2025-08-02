@@ -1,22 +1,69 @@
 ---
 /**
- * Button Component (Refactored)
+ * Enhanced Button Component
  *
- * A clean, accessible button component following Single Responsibility Principle.
- * Orchestrates smaller, focused components for specific responsibilities.
+ * A comprehensive, accessible button component with full WCAG 2.1 AA compliance.
+ * Supports both button and link behaviors with consistent styling and interaction patterns.
  *
- * Single Responsibility: Component composition and prop management
+ * Features:
+ * - Full accessibility compliance with ARIA attributes
+ * - Keyboard navigation support
+ * - Loading states with appropriate announcements
+ * - Icon integration with proper labeling
+ * - Responsive design and theme support
+ * - Focus management and screen reader optimization
  *
  * @component
- * @example
+ * @since 1.0.0
+ * @author Healthy Life Team
+ * 
+ * @example Basic button
  * ```astro
- * <Button>Click me</Button>
- * <Button href="/about" variant="accent">Learn more</Button>
- * <Button type="submit" loading={isSubmitting}>Submit</Button>
+ * <Button variant="primary" size="md">
+ *   Click me
+ * </Button>
+ * ```
+ *
+ * @example Link button with icon
+ * ```astro
+ * <Button 
+ *   href="/about" 
+ *   variant="accent" 
+ *   icon="arrow-right"
+ *   iconPosition="end"
+ *   ariaLabel="Learn more about our services"
+ * >
+ *   Learn more
+ * </Button>
+ * ```
+ *
+ * @example Loading state
+ * ```astro
+ * <Button 
+ *   type="submit" 
+ *   loading={isSubmitting}
+ *   loadingText="Submitting..."
+ *   disabled={isSubmitting}
+ * >
+ *   Submit Form
+ * </Button>
+ * ```
+ *
+ * @example Icon-only button
+ * ```astro
+ * <Button 
+ *   icon="close"
+ *   variant="ghost"
+ *   size="sm"
+ *   ariaLabel="Close dialog"
+ *   title="Close"
+ * />
  * ```
  */
 
 import type { HTMLAttributes } from "astro/types";
+
+import type { InteractiveComponentProps } from "@/types";
 
 import BaseButton from "./button/BaseButton.astro";
 import BaseLink from "./button/BaseLink.astro";
@@ -28,38 +75,72 @@ import {
   type ButtonVariant,
 } from "./button/ButtonVariants";
 
-export interface Props extends HTMLAttributes<"button" | "a"> {
+/**
+ * Enhanced button component props with full accessibility support
+ */
+export interface Props extends InteractiveComponentProps, HTMLAttributes<"button" | "a"> {
   /** Link destination URL (makes this a link instead of button) */
   href?: string;
+  
   /** Visual style variant */
   variant?: ButtonVariant;
+  
   /** Size variant */
   size?: ButtonSize;
+  
   /** Shape variant */
   shape?: ButtonShape;
+  
   /** Button/link text content */
   text?: string;
+  
   /** Icon identifier from astro-icon */
   icon?: string;
+  
   /** Icon position relative to text */
   iconPosition?: "start" | "end";
+  
   /** HTML button type */
   type?: "button" | "submit" | "reset";
-  /** Whether the button is disabled */
-  disabled?: boolean;
+  
   /** Whether to open link in new tab */
   newTab?: boolean;
+  
   /** Whether to use full width */
   fullWidth?: boolean;
-  /** Whether to show loading state */
-  loading?: boolean;
-  /** Additional CSS classes */
-  class?: string;
-  /** Accessible label */
-  ariaLabel?: string;
+  
+  /** Loading text to display when loading */
+  loadingText?: string;
+  
+  /** Custom tooltip text */
+  title?: string;
+  
+  /** Button purpose for analytics tracking */
+  purpose?: "navigation" | "action" | "submit" | "cancel" | "destructive";
+  
+  /** ARIA pressed state for toggle buttons */
+  "aria-pressed"?: boolean | "true" | "false";
+  
+  /** ARIA haspopup for buttons that open menus/dialogs */
+  "aria-haspopup"?: boolean | "true" | "false" | "menu" | "listbox" | "tree" | "grid" | "dialog";
 }
 
 const {
+  // Base props
+  class: className = "",
+  id,
+  disabled = false,
+  loading = false,
+  ariaLabel,
+  "data-testid": dataTestId,
+  role,
+  "aria-expanded": ariaExpanded,
+  "aria-controls": ariaControls,
+  "aria-describedby": ariaDescribedby,
+  "aria-pressed": ariaPressed,
+  "aria-haspopup": ariaHaspopup,
+  
+  // Button specific props
   href,
   variant = "default",
   size = "md",
@@ -68,12 +149,12 @@ const {
   icon,
   iconPosition = "start",
   type = "button",
-  disabled = false,
   newTab = false,
   fullWidth = false,
-  loading = false,
-  class: className = "",
-  ariaLabel,
+  loadingText = "Loading...",
+  title,
+  purpose = "action",
+  
   ...rest
 } = Astro.props;
 
@@ -84,6 +165,16 @@ const isLink = Boolean(href) && !disabled;
 const slotContent = await Astro.slots.render("default");
 const hasSlotContent = Boolean(slotContent.trim());
 const hasTextContent = Boolean(text || hasSlotContent);
+const isIconOnly = Boolean(icon) && !hasTextContent;
+
+// Generate unique ID if not provided
+const buttonId = id || `button-${Math.random().toString(36).substring(2, 11)}`;
+
+// Determine appropriate ARIA label
+const effectiveAriaLabel = ariaLabel || (isIconOnly ? title : undefined);
+
+// Build appropriate title attribute
+const effectiveTitle = title || (isIconOnly ? effectiveAriaLabel : undefined);
 
 // Build CSS classes
 const buttonClasses = buildButtonClasses({
@@ -96,30 +187,80 @@ const buttonClasses = buildButtonClasses({
   className,
 });
 
-// Common props for both button and link
+// Enhanced common props with full accessibility support
 const commonProps = {
   class: buttonClasses,
-  ariaLabel,
+  id: buttonId,
+  "aria-label": effectiveAriaLabel,
+  "aria-describedby": ariaDescribedby,
+  "aria-expanded": ariaExpanded,
+  "aria-controls": ariaControls,
+  "aria-pressed": ariaPressed,
+  "aria-haspopup": ariaHaspopup,
+  "data-testid": dataTestId || `button-${purpose}`,
+  "data-purpose": purpose,
+  title: effectiveTitle,
+  role: role || (isLink ? "button" : undefined),
   ...rest,
 };
+
+// Loading state announcements
+const loadingAnnouncement = loading ? loadingText : undefined;
 ---
 
 {
   isLink ? (
     <BaseLink href={href} newTab={newTab} disabled={disabled} {...commonProps}>
+      {/* Loading state announcement for screen readers */}
+      {loading && (
+        <span class="sr-only" aria-live="polite" aria-atomic="true">
+          {loadingAnnouncement}
+        </span>
+      )}
+      
+      {/* Start icon */}
       {icon && iconPosition === "start" && (
-        <ButtonIcon icon={icon} position="start" hasText={hasTextContent} />
+        <ButtonIcon 
+          icon={loading ? "loader" : icon} 
+          position="start" 
+          hasText={hasTextContent}
+          class={loading ? "animate-spin" : ""}
+          aria-hidden={!isIconOnly}
+        />
       )}
 
-      {text && <span>{text}</span>}
-      {hasSlotContent && <slot />}
+      {/* Text content */}
+      {text && (
+        <span class={loading ? "opacity-75" : ""}>
+          {loading && !icon ? loadingText : text}
+        </span>
+      )}
+      {hasSlotContent && (
+        <span class={loading ? "opacity-75" : ""}>
+          <slot />
+        </span>
+      )}
 
+      {/* End icon */}
       {icon && iconPosition === "end" && (
-        <ButtonIcon icon={icon} position="end" hasText={hasTextContent} />
+        <ButtonIcon 
+          icon={loading ? "loader" : icon} 
+          position="end" 
+          hasText={hasTextContent}
+          class={loading ? "animate-spin" : ""}
+          aria-hidden={!isIconOnly}
+        />
       )}
 
-      {icon && !hasTextContent && (
-        <ButtonIcon icon={icon} position="only" hasText={false} />
+      {/* Icon-only button */}
+      {isIconOnly && (
+        <ButtonIcon 
+          icon={loading ? "loader" : icon} 
+          position="only" 
+          hasText={false}
+          class={loading ? "animate-spin" : ""}
+          aria-hidden="false"
+        />
       )}
     </BaseLink>
   ) : (
@@ -129,19 +270,56 @@ const commonProps = {
       loading={loading}
       {...commonProps}
     >
+      {/* Loading state announcement for screen readers */}
+      {loading && (
+        <span class="sr-only" aria-live="polite" aria-atomic="true">
+          {loadingAnnouncement}
+        </span>
+      )}
+      
+      {/* Start icon */}
       {icon && iconPosition === "start" && (
-        <ButtonIcon icon={icon} position="start" hasText={hasTextContent} />
+        <ButtonIcon 
+          icon={loading ? "loader" : icon} 
+          position="start" 
+          hasText={hasTextContent}
+          class={loading ? "animate-spin" : ""}
+          aria-hidden={!isIconOnly}
+        />
       )}
 
-      {text && <span>{text}</span>}
-      {hasSlotContent && <slot />}
+      {/* Text content */}
+      {text && (
+        <span class={loading ? "opacity-75" : ""}>
+          {loading && !icon ? loadingText : text}
+        </span>
+      )}
+      {hasSlotContent && (
+        <span class={loading ? "opacity-75" : ""}>
+          <slot />
+        </span>
+      )}
 
+      {/* End icon */}
       {icon && iconPosition === "end" && (
-        <ButtonIcon icon={icon} position="end" hasText={hasTextContent} />
+        <ButtonIcon 
+          icon={loading ? "loader" : icon} 
+          position="end" 
+          hasText={hasTextContent}
+          class={loading ? "animate-spin" : ""}
+          aria-hidden={!isIconOnly}
+        />
       )}
 
-      {icon && !hasTextContent && (
-        <ButtonIcon icon={icon} position="only" hasText={false} />
+      {/* Icon-only button */}
+      {isIconOnly && (
+        <ButtonIcon 
+          icon={loading ? "loader" : icon} 
+          position="only" 
+          hasText={false}
+          class={loading ? "animate-spin" : ""}
+          aria-hidden="false"
+        />
       )}
     </BaseButton>
   )

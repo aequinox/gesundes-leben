@@ -67,11 +67,11 @@
      */
     "skipLibCheck": true,
     /**
-     * Enable stricter type checking for better code quality (disabled for gradual migration)
+     * Enable stricter type checking for better code quality
      *
      * @see https://www.typescriptlang.org/tsconfig#exactOptionalPropertyTypes
      */
-    "exactOptionalPropertyTypes": false,
+    "exactOptionalPropertyTypes": true,
     /**
      * Error on unreachable code patterns
      *
@@ -79,17 +79,47 @@
      */
     "allowUnreachableCode": false,
     /**
-     * Error on unused local variables (disabled for scripts and tests)
+     * Error on unused local variables for better code quality
      *
      * @see https://www.typescriptlang.org/tsconfig#noUnusedLocals
      */
-    "noUnusedLocals": false,
+    "noUnusedLocals": true,
     /**
-     * Error on unused function parameters (disabled for scripts and tests)
+     * Error on unused function parameters for cleaner code
      *
      * @see https://www.typescriptlang.org/tsconfig#noUnusedParameters
      */
-    "noUnusedParameters": false,
+    "noUnusedParameters": true,
+    /**
+     * Enable all strict mode checks for maximum type safety
+     *
+     * @see https://www.typescriptlang.org/tsconfig#strict
+     */
+    "strict": true,
+    /**
+     * Enable additional strict checks beyond basic strict mode
+     *
+     * @see https://www.typescriptlang.org/tsconfig#noUncheckedIndexedAccess
+     */
+    "noUncheckedIndexedAccess": true,
+    /**
+     * Enable strict function types for better type safety
+     *
+     * @see https://www.typescriptlang.org/tsconfig#strictFunctionTypes
+     */
+    "strictFunctionTypes": true,
+    /**
+     * Require consistent return statements in functions
+     *
+     * @see https://www.typescriptlang.org/tsconfig#noImplicitReturns
+     */
+    "noImplicitReturns": true,
+    /**
+     * Error when switch statements don't handle all cases
+     *
+     * @see https://www.typescriptlang.org/tsconfig#noFallthroughCasesInSwitch
+     */
+    "noFallthroughCasesInSwitch": true,
     /**
      * Don't emit JavaScript files (Astro handles compilation)
      *

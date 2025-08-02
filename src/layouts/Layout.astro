@@ -62,15 +62,24 @@ const {
         import("@/utils/viewTransitionEnhancements")
           .then(_module => {
             // Module is auto-initialized on import
-            // eslint-disable-next-line no-console
-            console.log("View transition enhancements loaded");
+            // Use logger in development only
+            if (import.meta.env.DEV) {
+              import("@/utils/logger").then(({ logger }) => {
+                logger.debug("View transition enhancements loaded successfully");
+              });
+            }
           })
           .catch(error => {
-            // eslint-disable-next-line no-console
-            console.error(
-              "Failed to load view transition enhancements:",
-              error
-            );
+            // Always log errors but use logger when available
+            if (import.meta.env.DEV) {
+              import("@/utils/logger").then(({ logger }) => {
+                logger.error("Failed to load view transition enhancements:", error);
+              });
+            } else {
+              // Fallback for production - minimal error tracking
+              // eslint-disable-next-line no-console
+              console.error("Module load error:", error.message);
+            }
           });
       }
     </script>

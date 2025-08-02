@@ -62,6 +62,9 @@ import type { ImageMetadata } from "astro";
 
 import { Image as AstroImage, Picture } from "astro:assets";
 
+import { logger } from "@/utils/logger";
+import { validateProps, commonRules, urlValidator } from "@/utils/propValidation";
+
 type Props = {
   /** Image source URL or metadata */
   src: string | ImageMetadata;
@@ -97,6 +100,35 @@ type Props = {
   invert?: boolean;
 };
 
+// Define validation schema for Image component props
+const imageValidationSchema = {
+  src: { required: true, validator: (value: unknown) => {
+    if (typeof value === 'string') {
+      return value.startsWith('http') ? urlValidator(value) : value.length > 0;
+    }
+    return typeof value === 'object' && value !== null;
+  }},
+  alt: { ...commonRules.requiredString, message: "Alt text is required for accessibility" },
+  title: commonRules.optionalString,
+  aspectRatio: { type: "string" as const, oneOf: ["auto", "square", "video", "portrait", "ultrawide"] },
+  loading: { type: "string" as const, oneOf: ["lazy", "eager"] },
+  style: { type: "string" as const, oneOf: ["default", "polaroid", "bordered", "floating", "glass"] },
+  effect: { type: "string" as const, oneOf: ["none", "zoom", "parallax", "tilt"] },
+  position: { type: "string" as const, oneOf: ["left", "right", "center", "full"] },
+  quality: { type: "number" as const, min: 1, max: 100 },
+  invert: commonRules.optionalBoolean,
+};
+
+// Validate props in development
+const validation = validateProps(Astro.props, imageValidationSchema, {
+  componentName: "Image",
+  throwOnError: import.meta.env.DEV,
+});
+
+if (!validation.isValid && import.meta.env.DEV) {
+  logger.error("Image component validation failed:", validation.errors);
+}
+
 const {
   src: srcProp,
   alt,
@@ -107,7 +139,7 @@ const {
   effect = "none",
   position = "center",
   invert = false,
-}: Props = Astro.props;
+}: Props = validation.validatedProps;
 
 // Parse position and other controls from title if provided (legacy support)
 let finalPosition = position;
