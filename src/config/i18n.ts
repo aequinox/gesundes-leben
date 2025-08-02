@@ -569,7 +569,7 @@ export function getTranslation(
   language: SupportedLanguage = "de",
   fallback?: string
 ): string {
-  return t(key, { language, fallback });
+  return t(key, { language, ...(fallback !== undefined && { fallback }) });
 }
 
 /**

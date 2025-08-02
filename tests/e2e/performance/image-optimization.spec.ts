@@ -8,6 +8,22 @@ import {
   waitForPageLoad
 } from '../utils/test-helpers';
 
+// Type declarations for browser APIs
+declare global {
+  interface Window {
+    layoutShifts: number[];
+  }
+  
+  interface PerformanceEntry {
+    hadRecentInput?: boolean;
+    value?: number;
+  }
+}
+
+/* eslint-disable no-await-in-loop */
+// E2E tests often require sequential await operations for proper testing
+// Disabling this rule for the entire file as parallel execution would break test logic
+
 test.describe('Image Optimization', () => {
   test.describe('Image Format and Compression', () => {
     test('should use modern image formats where supported', async ({ page }) => {
@@ -97,11 +113,11 @@ test.describe('Image Optimization', () => {
             const imageSize = buffer.length;
             
             // Get image dimensions
-            const dimensions = await img.evaluate(el => ({
+            const dimensions = await img.evaluate((el: HTMLImageElement) => ({
               width: el.naturalWidth,
               height: el.naturalHeight,
-              displayWidth: el.offsetWidth,
-              displayHeight: el.offsetHeight
+              displayWidth: (el as HTMLElement).offsetWidth,
+              displayHeight: (el as HTMLElement).offsetHeight
             }));
             
             // Calculate compression ratio (bytes per pixel)
@@ -172,7 +188,7 @@ test.describe('Image Optimization', () => {
           const img = responsiveImages.first();
           
           // Get actual image being used
-          const currentSrc = await img.evaluate(el => el.currentSrc || el.src);
+          const currentSrc = await img.evaluate((el: HTMLImageElement) => el.currentSrc || el.src);
           
           if (currentSrc) {
             // Get image dimensions
@@ -180,7 +196,7 @@ test.describe('Image Optimization', () => {
             const buffer = await response.body();
             const imageSize = buffer.length;
             
-            const displayWidth = await img.evaluate(el => el.offsetWidth);
+            const displayWidth = await img.evaluate((el: HTMLElement) => el.offsetWidth);
             
             // Smaller viewports should generally use smaller images
             if (viewport.width <= 768) {
@@ -188,7 +204,7 @@ test.describe('Image Optimization', () => {
             }
             
             // Image should not be dramatically oversized for display
-            const naturalWidth = await img.evaluate(el => el.naturalWidth);
+            const naturalWidth = await img.evaluate((el: HTMLImageElement) => el.naturalWidth);
             
             if (naturalWidth > 0 && displayWidth > 0) {
               const oversizeRatio = naturalWidth / (displayWidth * 2); // Allow 2x for retina
@@ -234,7 +250,6 @@ test.describe('Image Optimization', () => {
       if (imageCount > 1) {
         // Check for lazy loading attributes
         const lazyImages = await page.locator('img[loading="lazy"]').count();
-        const _eagerImages = await page.locator('img[loading="eager"]').count();
         
         // Should have at least some lazy-loaded images
         if (imageCount > 3) {
@@ -284,7 +299,7 @@ test.describe('Image Optimization', () => {
         new PerformanceObserver((entryList) => {
           const entries = entryList.getEntries();
           entries.forEach(entry => {
-            if (!entry.hadRecentInput) {
+            if (!entry.hadRecentInput && entry.value !== undefined) {
               window.layoutShifts.push(entry.value);
             }
           });
@@ -298,7 +313,7 @@ test.describe('Image Optimization', () => {
       }, { timeout: 10000 });
       
       const layoutShifts = await page.evaluate(() => window.layoutShifts);
-      const totalShift = layoutShifts.reduce((sum, shift) => sum + shift, 0);
+      const totalShift = layoutShifts.reduce((sum: number, shift: number) => sum + shift, 0);
       
       // Images should not cause significant layout shifts
       expect(totalShift).toBeLessThan(0.1);
@@ -320,8 +335,8 @@ test.describe('Image Optimization', () => {
           
           // Image should have dimensions specified
           const hasDimensions = 
-            (width && height) ||
-            (style && (style.includes('width') || style.includes('height'))) ||
+            (width && height) ??
+            (style && (style.includes('width') || style.includes('height'))) ??
             await img.evaluate(el => {
               const computed = window.getComputedStyle(el);
               return computed.width !== 'auto' || computed.height !== 'auto';
@@ -391,10 +406,10 @@ test.describe('Image Optimization', () => {
             // Blog images should be optimized
             expect(imageSize).toBeLessThan(400 * 1024); // 400KB max
             
-            const dimensions = await img.evaluate(el => ({
+            const dimensions = await img.evaluate((el: HTMLImageElement) => ({
               naturalWidth: el.naturalWidth,
               naturalHeight: el.naturalHeight,
-              displayWidth: el.offsetWidth
+              displayWidth: (el as HTMLElement).offsetWidth
             }));
             
             // Should not be dramatically oversized
@@ -418,16 +433,22 @@ test.describe('Image Optimization', () => {
         const jsonContent = await structuredData.textContent();
         
         if (jsonContent) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const data = JSON.parse(jsonContent);
           
           // Check for image properties in structured data
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           if (data.image || data['@type'] === 'ImageObject') {
-            expect(data.image || data.url).toBeTruthy();
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            expect(data.image ?? data.url).toBeTruthy();
             
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             if (data.image) {
               // Should have proper image schema
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
               if (typeof data.image === 'object') {
-                expect(data.image.url || data.image['@id']).toBeTruthy();
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                expect(data.image.url ?? data.image['@id']).toBeTruthy();
               }
             }
           }
@@ -464,7 +485,7 @@ test.describe('Image Optimization', () => {
             const type = await source.getAttribute('type');
             const srcset = await source.getAttribute('srcset');
             
-            expect(media || type).toBeTruthy();
+            expect(media ?? type).toBeTruthy();
             expect(srcset).toBeTruthy();
           }
         }

@@ -145,7 +145,16 @@ export default [
   },
   {
     files: ["**/*.{ts,tsx}"],
-    excludes: ["**/*.astro"],
+    ignores: ["**/*.astro"],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+        project: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
     rules: {
       // Additional strict TypeScript rules for .ts/.tsx files only (excluding Astro)
       "@typescript-eslint/strict-boolean-expressions": "warn",

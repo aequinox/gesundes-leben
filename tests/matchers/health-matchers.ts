@@ -553,7 +553,7 @@ const accessibilityMatchers = {
     let previousLevel = 0;
     
     headings.forEach((heading, index) => {
-      const level = parseInt(heading.tagName[1]);
+      const level = parseInt(heading.tagName[1] as string);
       if (level > previousLevel + 1) {
         issues.push(`Heading hierarchy skip at heading ${index + 1}: ${heading.tagName} after h${previousLevel}`);
       }

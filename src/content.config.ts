@@ -17,7 +17,7 @@ const PATHS: Record<string, string> = {
 };
 
 const authors = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: PATHS.authors }),
+  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: PATHS.authors as string }),
   schema: ({ image }) =>
     z.object({
       name: z.string().min(1, "Name cannot be empty"),
@@ -27,7 +27,7 @@ const authors = defineCollection({
 });
 
 const blog = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: PATHS.blog }),
+  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: PATHS.blog as string }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),
@@ -60,7 +60,7 @@ const blog = defineCollection({
 });
 
 const glossary = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: PATHS.glossary }),
+  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: PATHS.glossary as string }),
   schema: z.object({
     title: z.string().min(1, "Title cannot be empty"),
     author: z.union([z.string(), reference("authors")]).default(SITE.author),
@@ -70,7 +70,7 @@ const glossary = defineCollection({
 });
 
 const favorites = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.yaml", base: PATHS.favorites }),
+  loader: glob({ pattern: "**/[^_]*.yaml", base: PATHS.favorites as string }),
   schema: z.object({
     name: z.string().min(1, "Name cannot be empty"),
     manufacturer: z.string().min(1, "Manufacturer cannot be empty"),
@@ -83,7 +83,7 @@ const favorites = defineCollection({
 });
 
 const references = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.yaml", base: PATHS.references }),
+  loader: glob({ pattern: "**/[^_]*.yaml", base: PATHS.references as string }),
   schema: z.object({
     type: z.enum(["journal", "website", "book", "report", "other"]),
     title: z.string().min(1, "Title cannot be empty"),
