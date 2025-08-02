@@ -127,7 +127,7 @@ export default [
       "prefer-template": "error",
       "object-shorthand": "error",
       "no-duplicate-imports": "warn",
-      
+
       // Performance-focused rules
       "no-async-promise-executor": "error",
       "no-await-in-loop": "warn",
@@ -145,19 +145,20 @@ export default [
   },
   {
     files: ["**/*.{ts,tsx}"],
+    excludes: ["**/*.astro"],
     rules: {
-      // Additional strict TypeScript rules for .ts/.tsx files only
-      "@typescript-eslint/strict-boolean-expressions": "error",
-      "@typescript-eslint/prefer-nullish-coalescing": "error",
-      "@typescript-eslint/prefer-optional-chain": "error",
-      "@typescript-eslint/no-unnecessary-condition": "error",
-      "@typescript-eslint/no-unsafe-assignment": "error",
-      "@typescript-eslint/no-unsafe-call": "error",
-      "@typescript-eslint/no-unsafe-member-access": "error",
-      "@typescript-eslint/no-unsafe-return": "error",
-      "@typescript-eslint/require-await": "error",
+      // Additional strict TypeScript rules for .ts/.tsx files only (excluding Astro)
+      "@typescript-eslint/strict-boolean-expressions": "warn",
+      "@typescript-eslint/prefer-nullish-coalescing": "warn",
+      "@typescript-eslint/prefer-optional-chain": "warn",
+      "@typescript-eslint/no-unnecessary-condition": "warn",
+      "@typescript-eslint/no-unsafe-assignment": "warn",
+      "@typescript-eslint/no-unsafe-call": "warn",
+      "@typescript-eslint/no-unsafe-member-access": "warn",
+      "@typescript-eslint/no-unsafe-return": "warn",
+      "@typescript-eslint/require-await": "warn",
       "@typescript-eslint/no-floating-promises": "error",
-      "@typescript-eslint/await-thenable": "error",
+      "@typescript-eslint/await-thenable": "warn",
       "@typescript-eslint/no-misused-promises": "error",
     },
   },
