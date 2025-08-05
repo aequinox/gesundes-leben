@@ -206,6 +206,48 @@ export interface UITranslations {
 
   // Tags
   "tags.description": string;
+
+  // Internal Linking & Topic Clusters
+  "cluster.articles": string;
+  "cluster.categories": string;
+  "cluster.minutesReadTime": string;
+  "cluster.comprehensiveGuide": string;
+  "cluster.tip": string;
+  "cluster.startWithGuide": string;
+  "cluster.toCompleteGuide": string;
+  "cluster.discoverDescription": string;
+  "cluster.allArticlesScientific": string;
+  "cluster.partOfSeries": string;
+  "cluster.belongsToSeries": string;
+  "cluster.stronglyRelated": string;
+  "cluster.discoverMore": string;
+  "cluster.allArticlesFor": string;
+  "cluster.comprehensiveUnderstanding": string;
+  "cluster.relatedArticles": string;
+  "cluster.furtherInformation": string;
+  "cluster.mightAlsoInterest": string;
+  "cluster.general": string;
+
+  // Content Series
+  "series.part": string;
+  "series.of": string;
+  "series.previousArticle": string;
+  "series.nextArticle": string;
+  "series.firstArticle": string;
+  "series.lastArticle": string;
+  "series.allArticlesInSeries": string;
+  "series.youAreHere": string;
+  "series.tipReadAll": string;
+  "series.completeUnderstanding": string;
+  "series.before": string;
+  "series.next": string;
+
+  // Pillar Navigation
+  "pillar.completeGuide": string;
+  "pillar.comprehensiveGuide": string;
+  "pillar.article": string;
+  "pillar.tipBestLearning": string;
+  "pillar.readAllArticles": string;
 }
 
 export const ui: Record<
@@ -417,6 +459,54 @@ export const ui: Record<
     "tag.searchPlaceholder": "Search tags...",
     "tag.post": "post",
     "tag.posts": "posts",
+
+    // Internal Linking & Topic Clusters
+    "cluster.articles": "Articles",
+    "cluster.categories": "Categories",
+    "cluster.minutesReadTime": "Min Reading Time",
+    "cluster.comprehensiveGuide": "Comprehensive Guide",
+    "cluster.tip": "Tip:",
+    "cluster.startWithGuide":
+      "Start with the guide and work your way through the related articles.",
+    "cluster.toCompleteGuide": "To Complete Guide",
+    "cluster.discoverDescription": "Discover comprehensive information about",
+    "cluster.allArticlesScientific":
+      "All articles are scientifically based and practice-oriented.",
+    "cluster.partOfSeries": "Part of the {name} series",
+    "cluster.belongsToSeries":
+      "These articles belong to our comprehensive series about {name}.",
+    "cluster.stronglyRelated": "Strongly Related",
+    "cluster.discoverMore": "💡 Discover more:",
+    "cluster.allArticlesFor":
+      "All articles about {name} for comprehensive understanding",
+    "cluster.comprehensiveUnderstanding": "comprehensive understanding",
+    "cluster.relatedArticles": "Related Articles",
+    "cluster.furtherInformation": "Further Information",
+    "cluster.mightAlsoInterest": "This might also interest you",
+    "cluster.general": "General",
+
+    // Content Series
+    "series.part": "Part",
+    "series.of": "of",
+    "series.previousArticle": "← Previous Article",
+    "series.nextArticle": "Next Article →",
+    "series.firstArticle": "← First Article",
+    "series.lastArticle": "Last Article →",
+    "series.allArticlesInSeries": "All Articles in This Series",
+    "series.youAreHere": "You are here",
+    "series.tipReadAll":
+      "💡 Tip: Read all articles in this series for complete understanding of the topic.",
+    "series.completeUnderstanding": "complete understanding",
+    "series.before": "Before:",
+    "series.next": "Next:",
+
+    // Pillar Navigation
+    "pillar.completeGuide": "Complete Guide",
+    "pillar.comprehensiveGuide": "Comprehensive Guide:",
+    "pillar.article": "Article {current} of {total}",
+    "pillar.tipBestLearning":
+      "💡 Tip: For the best learning outcome, we recommend reading all articles",
+    "pillar.readAllArticles": "read all articles",
   },
 
   de: {
@@ -615,7 +705,7 @@ export const ui: Record<
 
     // Tags
     "tags.description":
-      "Entdecken Sie Artikel, die nach spezifischen Themen und Motiven gruppiert sind.",
+      "Entdecke Artikel, die nach spezifischen Themen und Motiven gruppiert sind.",
     "tag.popularTags": "Beliebte Tags",
     "tag.popularTagsDescription":
       "Unsere am häufigsten verwendeten Themen, um relevante Inhalte zu finden",
@@ -625,6 +715,54 @@ export const ui: Record<
     "tag.searchPlaceholder": "Tags durchsuchen...",
     "tag.post": "Artikel",
     "tag.posts": "Artikel",
+
+    // Internal Linking & Topic Clusters
+    "cluster.articles": "Artikel",
+    "cluster.categories": "Kategorien",
+    "cluster.minutesReadTime": "Min Lesezeit",
+    "cluster.comprehensiveGuide": "Umfassender Leitfaden",
+    "cluster.tip": "Tipp:",
+    "cluster.startWithGuide":
+      "Beginne mit dem Leitfaden und arbeite dich durch die verwandten Artikel.",
+    "cluster.toCompleteGuide": "Zum kompletten Leitfaden",
+    "cluster.discoverDescription": "Entdecke umfassende Informationen zu",
+    "cluster.allArticlesScientific":
+      "Alle Artikel sind wissenschaftlich fundiert und praxisorientiert.",
+    "cluster.partOfSeries": "Teil der {name} Serie",
+    "cluster.belongsToSeries":
+      "Diese Artikel gehören zu unserer umfassenden Serie über {name}.",
+    "cluster.stronglyRelated": "Stark verwandt",
+    "cluster.discoverMore": "💡 Entdecke mehr:",
+    "cluster.allArticlesFor":
+      "Alle Artikel zu {name} für ein umfassendes Verständnis",
+    "cluster.comprehensiveUnderstanding": "umfassendes Verständnis",
+    "cluster.relatedArticles": "Verwandte Artikel",
+    "cluster.furtherInformation": "Weiterführende Informationen",
+    "cluster.mightAlsoInterest": "Das könnte dich auch interessieren",
+    "cluster.general": "Allgemein",
+
+    // Content Series
+    "series.part": "Teil",
+    "series.of": "von",
+    "series.previousArticle": "← Vorheriger Artikel",
+    "series.nextArticle": "Nächster Artikel →",
+    "series.firstArticle": "← Erster Artikel",
+    "series.lastArticle": "Letzter Artikel →",
+    "series.allArticlesInSeries": "Alle Artikel dieser Serie",
+    "series.youAreHere": "Du bist hier",
+    "series.tipReadAll":
+      "💡 Tipp: Lies alle Artikel dieser Serie für ein vollständiges Verständnis des Themas.",
+    "series.completeUnderstanding": "vollständiges Verständnis",
+    "series.before": "Vorher:",
+    "series.next": "Als nächstes:",
+
+    // Pillar Navigation
+    "pillar.completeGuide": "Kompletter Leitfaden",
+    "pillar.comprehensiveGuide": "Umfassender Leitfaden:",
+    "pillar.article": "Artikel {current} von {total}",
+    "pillar.tipBestLearning":
+      "💡 Tipp: Für das beste Lernergebnis empfehlen wir, alle Artikel",
+    "pillar.readAllArticles": "alle Artikel zu lesen",
   },
 };
 

@@ -18,6 +18,7 @@
 
 import InternalLink from "@/components/elements/InternalLink.astro";
 import Card from "@/components/sections/Card.astro";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { analyzeTopicClusters, TOPIC_CLUSTERS } from "@/utils/internal-linking";
 import { processAllPosts } from "@/utils/posts";
 import type { Post } from "@/utils/types";
@@ -45,6 +46,10 @@ const {
   highlightPillar = true,
   groupByCategory = false,
 } = Astro.props;
+
+// Get translations
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 
 // Get cluster information
 const clusterInfo = TOPIC_CLUSTERS[clusterId];
@@ -80,7 +85,7 @@ let groupedPosts: Record<string, Post[]> = {};
 if (groupByCategory) {
   groupedPosts = nonPillarPosts.reduce(
     (groups, post) => {
-      const primaryCategory = post.data.categories?.[0] || "Allgemein";
+      const primaryCategory = post.data.categories?.[0] || t("cluster.general");
       if (!groups[primaryCategory]) {
         groups[primaryCategory] = [];
       }
@@ -123,15 +128,15 @@ const stats = {
           <div class="topic-cluster__stats">
             <div class="stat">
               <span class="stat__number">{stats.totalPosts}</span>
-              <span class="stat__label">Artikel</span>
+              <span class="stat__label">{t("cluster.articles")}</span>
             </div>
             <div class="stat">
               <span class="stat__number">{stats.categories.length}</span>
-              <span class="stat__label">Kategorien</span>
+              <span class="stat__label">{t("cluster.categories")}</span>
             </div>
             <div class="stat">
               <span class="stat__number">~{stats.averageReadTime}</span>
-              <span class="stat__label">Min Lesezeit</span>
+              <span class="stat__label">{t("cluster.minutesReadTime")}</span>
             </div>
           </div>
         )
@@ -139,9 +144,8 @@ const stats = {
     </div>
 
     <p class="topic-cluster__description">
-      Entdecken Sie umfassende Informationen zu {
-        clusterInfo.name.toLowerCase()
-      }. Alle Artikel sind wissenschaftlich fundiert und praxisorientiert.
+      {t("cluster.discoverDescription")}
+      {clusterInfo.name.toLowerCase()}. {t("cluster.allArticlesScientific")}
     </p>
   </header>
 
@@ -151,7 +155,7 @@ const stats = {
       <section class="topic-cluster__pillar">
         <h3 class="pillar-section__title">
           <span class="pillar-icon">🎯</span>
-          Umfassender Leitfaden
+          {t("cluster.comprehensiveGuide")}
         </h3>
 
         <div class="pillar-post">
@@ -229,15 +233,15 @@ const stats = {
   <footer class="topic-cluster__footer">
     <div class="topic-cluster__navigation">
       <p class="navigation-hint">
-        <strong>Tipp:</strong> Beginnen Sie mit dem Leitfaden und arbeiten Sie sich
-        durch die verwandten Artikel.
+        <strong>{t("cluster.tip")}</strong>
+        {t("cluster.startWithGuide")}
       </p>
 
       {
         pillarPost && !highlightPillar && (
           <InternalLink
             to={`/posts/${pillarPost.slug}`}
-            anchor="Zum kompletten Leitfaden"
+            anchor={t("cluster.toCompleteGuide")}
             variant="button"
             context="strong"
             placement="navigation"

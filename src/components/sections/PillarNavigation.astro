@@ -18,6 +18,7 @@
  */
 
 import InternalLink from "@/components/elements/InternalLink.astro";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import {
   analyzeTopicClusters,
   identifyTopicCluster,
@@ -46,6 +47,10 @@ const {
   maxSupportingPosts = 8,
   showDescriptions = false,
 } = Astro.props;
+
+// Get translations
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 
 // Auto-detect cluster if not provided
 const detectedCluster = clusterId || identifyTopicCluster(currentPost);
@@ -102,7 +107,7 @@ const displayPosts = supportingPosts
 // Group posts by category for better organization
 const groupedPosts = displayPosts.reduce(
   (groups, post) => {
-    const primaryCategory = post.data.categories?.[0] || "Allgemein";
+    const primaryCategory = post.data.categories?.[0] || t("cluster.general");
     if (!groups[primaryCategory]) {
       groups[primaryCategory] = [];
     }
@@ -136,7 +141,10 @@ const groupedPosts = displayPosts.reduce(
             />
           </div>
           <span class="progress-text">
-            Artikel {progressData.current} von {progressData.total}
+            {t("pillar.article", {
+              current: progressData.current,
+              total: progressData.total,
+            })}
           </span>
         </div>
       )
@@ -149,7 +157,7 @@ const groupedPosts = displayPosts.reduce(
       <section class="pillar-navigation__pillar">
         <h3 class="pillar-navigation__section-title">
           <span class="section-icon">🎯</span>
-          Kompletter Leitfaden
+          {t("pillar.completeGuide")}
         </h3>
 
         <div class="pillar-post-card">
@@ -160,7 +168,7 @@ const groupedPosts = displayPosts.reduce(
             context="strong"
             placement="navigation"
             icon="health"
-            title={`Umfassender Leitfaden: ${pillarPost.data.title}`}
+            title={`${t("pillar.comprehensiveGuide")} ${pillarPost.data.title}`}
           />
 
           {showDescriptions && pillarPost.data.description && (
@@ -179,7 +187,7 @@ const groupedPosts = displayPosts.reduce(
       <section class="pillar-navigation__supporting">
         <h3 class="pillar-navigation__section-title">
           <span class="section-icon">📖</span>
-          Verwandte Artikel
+          {t("cluster.relatedArticles")}
         </h3>
 
         <div class="supporting-posts">
@@ -218,8 +226,9 @@ const groupedPosts = displayPosts.reduce(
   <footer class="pillar-navigation__footer">
     <div class="pillar-navigation__cta">
       <p class="cta-text">
-        <strong>Tipp:</strong> Für das beste Lernergebnis empfehlen wir, alle Artikel
-        in diesem Themenbereich zu lesen.
+        <strong>{t("cluster.tip")}</strong>
+        {t("pillar.tipBestLearning")}
+        {t("pillar.readAllArticles")}.
       </p>
     </div>
   </footer>

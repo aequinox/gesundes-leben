@@ -18,8 +18,12 @@
 
 import Card from "@/components/sections/Card.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import {
+  analyzeContentRelationships,
+  identifyTopicCluster,
+  TOPIC_CLUSTERS,
+} from "@/utils/internal-linking";
 import { getRelatedPosts, processAllPosts } from "@/utils/posts";
-import { analyzeContentRelationships, identifyTopicCluster, TOPIC_CLUSTERS } from "@/utils/internal-linking";
 import type { Post } from "@/utils/types";
 
 interface Props {
@@ -35,12 +39,12 @@ interface Props {
   showDebugInfo?: boolean;
 }
 
-const { 
-  post, 
-  maxPosts = 3, 
+const {
+  post,
+  maxPosts = 3,
   animationType = "fade-up",
   useAdvancedAnalysis = true,
-  showDebugInfo = false 
+  showDebugInfo = false,
 }: Props = Astro.props;
 
 // Get translations
@@ -53,16 +57,20 @@ const sortedPosts = await processAllPosts({ includeDrafts: false });
 // Get related posts using enhanced algorithm
 let relatedPosts: Post[] = [];
 let relationshipData: Array<{
-  targetPost: Post;  
+  targetPost: Post;
   score: number;
   matchReasons: string[];
   suggestedAnchorText: string[];
-  linkingContext: 'strong' | 'moderate' | 'weak';
+  linkingContext: "strong" | "moderate" | "weak";
 }> = [];
 
 if (useAdvancedAnalysis) {
   // Use advanced content relationship analysis
-  const relationships = analyzeContentRelationships(post, sortedPosts, maxPosts);
+  const relationships = analyzeContentRelationships(
+    post,
+    sortedPosts,
+    maxPosts
+  );
   relatedPosts = relationships.map(rel => rel.targetPost);
   relationshipData = relationships;
 } else {
@@ -87,30 +95,41 @@ const noRelatedPostsMessage = t("post.noRelatedPosts");
   <div class="related-posts-header">
     <h2 id="related-posts-heading" class="related-posts-heading">
       {t("post.relatedPosts")}
-      {clusterInfo && (
-        <span class="cluster-badge" title={`Teil der ${clusterInfo.name} Serie`}>
-          📚 {clusterInfo.name}
-        </span>
-      )}
+      {
+        clusterInfo && (
+          <span
+            class="cluster-badge"
+            title={t("cluster.partOfSeries", { name: clusterInfo.name })}
+          >
+            📚 {clusterInfo.name}
+          </span>
+        )
+      }
     </h2>
-    
+
     {/* Cluster context information */}
-    {clusterInfo && useAdvancedAnalysis && (
-      <p class="cluster-context">
-        Diese Artikel gehören zu unserer umfassenden Serie über {clusterInfo.name.toLowerCase()}.
-      </p>
-    )}
+    {
+      clusterInfo && useAdvancedAnalysis && (
+        <p class="cluster-context">
+          {t("cluster.belongsToSeries", {
+            name: clusterInfo.name.toLowerCase(),
+          })}
+        </p>
+      )
+    }
   </div>
 
   {
     relatedPosts.length > 0 ? (
       <div class="related-posts-grid">
         {relatedPosts.map((relatedPost, index) => {
-          const relationship = useAdvancedAnalysis ? relationshipData[index] : null;
-          
+          const relationship = useAdvancedAnalysis
+            ? relationshipData[index]
+            : null;
+
           return (
             <div
-              class={`related-post-item ${relationship ? `related-post-item--${relationship.linkingContext}` : ''}`}
+              class={`related-post-item ${relationship ? `related-post-item--${relationship.linkingContext}` : ""}`}
               style={`--animation-order: ${index};`}
               data-aos="fade-up"
               data-aos-delay={index * 100}
@@ -127,21 +146,23 @@ const noRelatedPostsMessage = t("post.noRelatedPosts");
                 withCategories={true}
                 maxCategories={2}
               />
-              
+
               {/* Enhanced relationship indicators */}
-              {relationship && relationship.linkingContext === 'strong' && (
+              {relationship && relationship.linkingContext === "strong" && (
                 <div class="relationship-indicator">
-                  <span class="relationship-badge">Stark verwandt</span>
+                  <span class="relationship-badge">
+                    {t("cluster.stronglyRelated")}
+                  </span>
                 </div>
               )}
-              
+
               {/* Dev mode: Show relationship debugging */}
               {showDebugInfo && import.meta.env.DEV && relationship && (
                 <div class="relationship-debug">
                   <small>
-                    Score: {relationship.score} | 
-                    Context: {relationship.linkingContext} |
-                    Reasons: {relationship.matchReasons.slice(0, 2).join(', ')}
+                    Score: {relationship.score} | Context:{" "}
+                    {relationship.linkingContext} | Reasons:{" "}
+                    {relationship.matchReasons.slice(0, 2).join(", ")}
                   </small>
                 </div>
               )}
@@ -157,16 +178,18 @@ const noRelatedPostsMessage = t("post.noRelatedPosts");
   }
 
   {/* Enhanced footer with cluster navigation */}
-  {clusterInfo && useAdvancedAnalysis && (
-    <footer class="related-posts-footer">
-      <div class="cluster-navigation">
-        <p class="cluster-cta">
-          <strong>💡 Entdecken Sie mehr:</strong> 
-          Alle Artikel zu {clusterInfo.name} für ein umfassendes Verständnis
-        </p>
-      </div>
-    </footer>
-  )}
+  {
+    clusterInfo && useAdvancedAnalysis && (
+      <footer class="related-posts-footer">
+        <div class="cluster-navigation">
+          <p class="cluster-cta">
+            {t("cluster.discoverMore")}
+            {t("cluster.allArticlesFor", { name: clusterInfo.name })}
+          </p>
+        </div>
+      </footer>
+    )
+  }
 </section>
 
 <style>
@@ -187,12 +210,12 @@ const noRelatedPostsMessage = t("post.noRelatedPosts");
   }
 
   .cluster-badge {
-    @apply inline-flex items-center gap-1 px-3 py-1 text-sm font-medium bg-accent/10 text-accent rounded-full border border-accent/20;
+    @apply inline-flex items-center gap-1 rounded-full border border-accent/20 bg-accent/10 px-3 py-1 text-sm font-medium text-accent;
     font-size: 0.875rem;
   }
 
   .cluster-context {
-    @apply text-sm text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl;
+    @apply max-w-2xl text-sm leading-relaxed text-gray-600 dark:text-gray-400;
   }
 
   .related-posts-icon {
@@ -213,7 +236,7 @@ const noRelatedPostsMessage = t("post.noRelatedPosts");
 
   /* Animation for staggered items */
   .related-post-item {
-    @apply m-0 opacity-0 relative;
+    @apply relative m-0 opacity-0;
     transform: translateY(20px);
     animation: fadeInStaggered 0.5s ease-out forwards;
     animation-delay: calc(var(--animation-order, 0) * 100ms + 200ms);
@@ -228,11 +251,11 @@ const noRelatedPostsMessage = t("post.noRelatedPosts");
 
   /* Relationship context styling */
   .related-post-item--strong {
-    @apply ring-2 ring-accent/20 rounded-lg;
+    @apply rounded-lg ring-2 ring-accent/20;
   }
 
   .related-post-item--moderate {
-    @apply ring-1 ring-accent/10 rounded-lg;
+    @apply rounded-lg ring-1 ring-accent/10;
   }
 
   .related-post-item--weak {
@@ -245,17 +268,17 @@ const noRelatedPostsMessage = t("post.noRelatedPosts");
   }
 
   .relationship-badge {
-    @apply px-2 py-1 text-xs font-medium bg-accent text-white rounded-md shadow-sm;
+    @apply rounded-md bg-accent px-2 py-1 text-xs font-medium text-white shadow-sm;
   }
 
   /* Debug information (dev mode only) */
   .relationship-debug {
-    @apply mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded text-xs text-gray-600 dark:text-gray-400 border border-dashed border-gray-300 dark:border-gray-600;
+    @apply mt-2 rounded border border-dashed border-gray-300 bg-gray-100 p-2 text-xs text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400;
   }
 
   /* Footer styling */
   .related-posts-footer {
-    @apply mt-6 pt-4 border-t border-border/30;
+    @apply mt-6 border-t border-border/30 pt-4;
   }
 
   .cluster-navigation {
@@ -263,7 +286,7 @@ const noRelatedPostsMessage = t("post.noRelatedPosts");
   }
 
   .cluster-cta {
-    @apply text-sm text-gray-600 dark:text-gray-400 leading-relaxed p-3 bg-accent/5 rounded-lg border border-accent/10;
+    @apply rounded-lg border border-accent/10 bg-accent/5 p-3 text-sm leading-relaxed text-gray-600 dark:text-gray-400;
   }
 
   /* Responsive adjustments */

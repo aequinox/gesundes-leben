@@ -17,6 +17,7 @@
  */
 
 import InternalLink from "@/components/elements/InternalLink.astro";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { analyzeContentRelationships } from "@/utils/internal-linking";
 import { processAllPosts } from "@/utils/posts";
 import type { Post } from "@/utils/types";
@@ -45,6 +46,10 @@ const {
   showScores = false,
 } = Astro.props;
 
+// Get translations
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
 // Fetch all posts for relationship analysis (with slug property)
 const sortedPosts = await processAllPosts({ includeDrafts: false });
 
@@ -60,9 +65,9 @@ const meaningfulRelationships = relationships.filter(rel => rel.score >= 5);
 
 // Default titles based on placement
 const defaultTitles = {
-  inline: "Verwandte Artikel",
-  sidebar: "Weiterführende Informationen",
-  footer: "Das könnte Sie auch interessieren",
+  inline: t("cluster.relatedArticles"),
+  sidebar: t("cluster.furtherInformation"),
+  footer: t("cluster.mightAlsoInterest"),
 };
 
 const sectionTitle = title || defaultTitles[placement];
@@ -83,7 +88,7 @@ if (meaningfulRelationships.length === 0) {
 
   <div class="contextual-links__container">
     {
-      meaningfulRelationships.map((relationship) => {
+      meaningfulRelationships.map(relationship => {
         const {
           targetPost,
           suggestedAnchorText,
@@ -110,8 +115,14 @@ if (meaningfulRelationships.length === 0) {
               anchor={anchorText}
               variant={linkVariant}
               context={linkingContext}
-              placement={placement === "inline" ? "content" : (placement === "footer" ? "content" : placement)}
-              icon={linkingContext === "strong" ? "related" : undefined}
+              placement={
+                placement === "inline"
+                  ? "content"
+                  : placement === "footer"
+                    ? "content"
+                    : placement
+              }
+              icon={linkingContext === "strong" ? "related" : ""}
               title={`${targetPost.data.title} - ${matchReasons.join(", ")}`}
             />
 
@@ -137,7 +148,7 @@ if (meaningfulRelationships.length === 0) {
   }
 
   .contextual-links__title {
-    @apply mb-3 text-lg font-semibold text-gray-900 dark:text-gray-100;
+    @apply mb-3 text-lg font-semibold text-foreground;
   }
 
   .contextual-links__container {

@@ -5,22 +5,24 @@ import { defaultLang, ui, type Languages, type TranslationKey } from "./ui";
 /**
  * Type for supported languages in the application
  */
-export type SupportedLanguage = Languages;
+type SupportedLanguage = Languages;
 
 /**
  * Configuration for showing default language in URL
  */
-export const showDefaultLang = false;
+const showDefaultLang = false;
 
 /**
  * Extracts the language code from the URL
  * @param url - The current URL object
  * @returns The language code if supported, otherwise returns the default language
  */
-export function getLangFromUrl(url: URL): SupportedLanguage {
+function getLangFromUrl(url: URL): SupportedLanguage {
   try {
     const [, lang] = url.pathname.split("/");
-    return isValidLanguage(lang ?? "") ? (lang as SupportedLanguage) : defaultLang;
+    return isValidLanguage(lang ?? "")
+      ? (lang as SupportedLanguage)
+      : defaultLang;
   } catch (error) {
     logger.error("Error extracting language from URL:", error);
     return defaultLang;
@@ -43,22 +45,40 @@ function getTranslationValue(
 /**
  * Creates a translation function for the specified language
  * @param lang - The language to use for translations
- * @returns A type-safe translation function
+ * @returns A type-safe translation function with parameter interpolation support
  */
-export function useTranslations(lang: SupportedLanguage) {
-  return function translate(key: TranslationKey): string {
+function useTranslations(lang: SupportedLanguage) {
+  return function translate(
+    key: TranslationKey,
+    params?: Record<string, string | number>
+  ): string {
     try {
       const langTranslations = ui[lang];
       const defaultTranslations = ui[defaultLang];
-      
-      const value =
-        (langTranslations !== undefined ? getTranslationValue(langTranslations, key) : undefined) ??
-        (defaultTranslations !== undefined ? getTranslationValue(defaultTranslations, key) : undefined);
+
+      let value =
+        (langTranslations !== undefined
+          ? getTranslationValue(langTranslations, key)
+          : undefined) ??
+        (defaultTranslations !== undefined
+          ? getTranslationValue(defaultTranslations, key)
+          : undefined);
 
       if (value === undefined) {
         logger.warn("Translation missing for key", key, "in language", lang);
         return key;
       }
+
+      // Handle parameter interpolation
+      if (params) {
+        for (const [paramKey, paramValue] of Object.entries(params)) {
+          value = value.replace(
+            new RegExp(`\\{${paramKey}\\}`, "g"),
+            String(paramValue)
+          );
+        }
+      }
+
       return value;
     } catch (error) {
       logger.error("Translation error for key", key, ":", error);
@@ -72,7 +92,7 @@ export function useTranslations(lang: SupportedLanguage) {
  * @param lang - The language to use for path translation
  * @returns A function that translates paths according to the language
  */
-export function useTranslatedPath(lang: SupportedLanguage) {
+function useTranslatedPath(lang: SupportedLanguage) {
   return function translatePath(
     path: string,
     targetLang: SupportedLanguage = lang
@@ -81,7 +101,7 @@ export function useTranslatedPath(lang: SupportedLanguage) {
       path = `/${path}`;
     }
 
-    return showDefaultLang === false && targetLang === defaultLang
+    return !showDefaultLang && targetLang === defaultLang
       ? path
       : `/${targetLang}${path}`;
   };
@@ -92,6 +112,16 @@ export function useTranslatedPath(lang: SupportedLanguage) {
  * @param lang - The language code to validate
  * @returns boolean indicating if the language is supported
  */
-export function isValidLanguage(lang: string): lang is SupportedLanguage {
+function isValidLanguage(lang: string): lang is SupportedLanguage {
   return Object.keys(ui).includes(lang);
 }
+
+// Export all functions and types at the end of the file
+export type { SupportedLanguage };
+export {
+  showDefaultLang,
+  getLangFromUrl,
+  useTranslations,
+  useTranslatedPath,
+  isValidLanguage,
+};
