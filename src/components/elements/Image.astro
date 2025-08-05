@@ -62,8 +62,12 @@ import type { ImageMetadata } from "astro";
 
 import { Image as AstroImage, Picture } from "astro:assets";
 
-import { logger } from "@/utils/logger";
-import { validateProps, commonRules, urlValidator } from "@/utils/propValidation";
+// Import validation utilities
+import {
+  commonRules,
+  urlValidator,
+  validateProps,
+} from "@/utils/propValidation";
 
 type Props = {
   /** Image source URL or metadata */
@@ -102,32 +106,63 @@ type Props = {
 
 // Define validation schema for Image component props
 const imageValidationSchema = {
-  src: { required: true, validator: (value: unknown) => {
-    if (typeof value === 'string') {
-      return value.startsWith('http') ? urlValidator(value) : value.length > 0;
-    }
-    return typeof value === 'object' && value !== null;
-  }},
-  alt: { ...commonRules.requiredString, message: "Alt text is required for accessibility" },
+  src: {
+    required: true,
+    validator: (value: unknown) => {
+      // Allow strings (URLs or relative paths)
+      if (typeof value === "string") {
+        if (value.length === 0) {
+          return "src cannot be an empty string";
+        }
+        return value.startsWith("http") ? urlValidator(value) : true;
+      }
+
+      // Allow image objects (imported assets and SVG imports)
+      if (typeof value === "object" && value !== null) {
+        return true;
+      }
+
+      // Allow undefined/null to be caught by required validation
+      if (value === undefined || value === null) {
+        return "src is required";
+      }
+
+      return `Invalid src type: expected string or object, got ${typeof value}`;
+    },
+  },
+  alt: {
+    ...commonRules.requiredString,
+    message: "Alt text is required for accessibility",
+  },
   title: commonRules.optionalString,
-  aspectRatio: { type: "string" as const, oneOf: ["auto", "square", "video", "portrait", "ultrawide"] },
+  aspectRatio: {
+    type: "string" as const,
+    oneOf: ["auto", "square", "video", "portrait", "ultrawide"],
+  },
   loading: { type: "string" as const, oneOf: ["lazy", "eager"] },
-  style: { type: "string" as const, oneOf: ["default", "polaroid", "bordered", "floating", "glass"] },
-  effect: { type: "string" as const, oneOf: ["none", "zoom", "parallax", "tilt"] },
-  position: { type: "string" as const, oneOf: ["left", "right", "center", "full"] },
+  style: {
+    type: "string" as const,
+    oneOf: ["default", "polaroid", "bordered", "floating", "glass"],
+  },
+  effect: {
+    type: "string" as const,
+    oneOf: ["none", "zoom", "parallax", "tilt"],
+  },
+  position: {
+    type: "string" as const,
+    oneOf: ["left", "right", "center", "full"],
+  },
   quality: { type: "number" as const, min: 1, max: 100 },
   invert: commonRules.optionalBoolean,
 };
 
-// Validate props in development
-const validation = validateProps(Astro.props, imageValidationSchema, {
-  componentName: "Image",
-  throwOnError: import.meta.env.DEV,
-});
-
-if (!validation.isValid && import.meta.env.DEV) {
-  logger.error("Image component validation failed:", validation.errors);
-}
+// Validate props in development only
+const validation = import.meta.env.DEV
+  ? validateProps(Astro.props, imageValidationSchema, {
+      componentName: "Image",
+      strict: false, // Don't throw, just warn
+    })
+  : { isValid: true, validatedProps: Astro.props };
 
 const {
   src: srcProp,
@@ -139,7 +174,7 @@ const {
   effect = "none",
   position = "center",
   invert = false,
-}: Props = validation.validatedProps;
+} = validation.validatedProps;
 
 // Parse position and other controls from title if provided (legacy support)
 let finalPosition = position;
@@ -184,13 +219,34 @@ if (title) {
   }
 }
 
-// Determine if we're using a string URL or an ImageMetadata object
+// Define type for SVG imports
+interface SvgImport {
+  src: string;
+  [key: string]: unknown;
+}
+
+// Type guard for SVG imports
+function isSvgImport(value: unknown): value is SvgImport {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "src" in value &&
+    typeof (value as SvgImport).src === "string" &&
+    (value as SvgImport).src.endsWith(".svg")
+  );
+}
+
+// Determine if we're using a string URL, SVG import, or an ImageMetadata object
 const isStringSource = typeof srcProp === "string";
+const isSvgSource = isSvgImport(srcProp);
 let stringSource = "";
 
 if (isStringSource) {
   // Use the string directly for the fallback case
   stringSource = srcProp as string;
+} else if (isSvgSource) {
+  // Handle SVG imports which return an object with a src property
+  stringSource = srcProp.src;
 }
 
 // Determine animation based on position
@@ -318,14 +374,14 @@ if (!isStringSource && !width && !height) {
       : undefined}
   >
     {
-      isStringSource ? (
+      isStringSource || isSvgSource ? (
         stringSource.startsWith("http") ? (
           // For remote images, use the AstroImage component with remote optimization
           <AstroImage
             src={stringSource}
             alt={alt}
-            width={width || 800}
-            height={height || 600}
+            width={width ?? 800}
+            height={height ?? 600}
             loading={loading}
             densities={densities}
             sizes={sizes}
@@ -387,8 +443,8 @@ if (!isStringSource && !width && !height) {
         <AstroImage
           src={srcProp as ImageMetadata}
           alt={alt}
-          width={width}
-          height={height}
+          {...(width && { width })}
+          {...(height && { height })}
           densities={densities}
           sizes={sizes}
           quality={quality}

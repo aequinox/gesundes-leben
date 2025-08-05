@@ -1,0 +1,89 @@
+---
+/**
+ * GlossaryAutoLinker Component
+ *
+ * Automatically processes content to add glossary links for health and medical terms.
+ * This component processes MDX content and replaces key terms with InternalLink components
+ * pointing to glossary definitions.
+ */
+
+import {
+  getGlossaryStats,
+  processGlossaryLinks,
+} from "@/utils/glossary-linking";
+
+interface Props {
+  content: string;
+  maxLinks?: number;
+  minTermLength?: number;
+  showStats?: boolean;
+  className?: string;
+}
+
+const {
+  content,
+  maxLinks = 5,
+  minTermLength = 4,
+  showStats = false,
+  className = "",
+} = Astro.props;
+
+// Process the content to add glossary links
+const processedContent = processGlossaryLinks(content, maxLinks, minTermLength);
+
+// Get statistics if requested
+const stats = showStats ? getGlossaryStats(content) : null;
+---
+
+<div class={`glossary-auto-linker ${className}`}>
+  <!-- Processed content with glossary links -->
+  <div class="prose prose-lg max-w-none" set:html={processedContent} />
+
+  <!-- Optional statistics display -->
+  {
+    showStats && stats && (
+      <div class="bg-base-200 mt-6 rounded-lg p-4 text-sm">
+        <h4 class="text-base-content/80 mb-2 font-semibold">
+          Glossar-Statistiken
+        </h4>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <span class="text-base-content/60">Gefundene Begriffe:</span>
+            <span class="ml-2 font-medium">{stats.totalTerms}</span>
+          </div>
+          <div>
+            <span class="text-base-content/60">Kategorien:</span>
+            <span class="ml-2 font-medium">
+              {Object.keys(stats.termsByCategory).length}
+            </span>
+          </div>
+        </div>
+
+        {stats.topTerms.length > 0 && (
+          <div class="mt-3">
+            <div class="text-base-content/60 mb-1 text-xs">
+              Häufigste Begriffe:
+            </div>
+            <div class="flex flex-wrap gap-1">
+              {stats.topTerms.slice(0, 5).map(term => (
+                <span class="rounded bg-accent/10 px-2 py-1 text-xs text-accent">
+                  {term.term} ({term.count})
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .glossary-auto-linker .glossary-link {
+    @apply underline decoration-accent/50 decoration-dotted transition-all duration-200 hover:decoration-accent hover:decoration-solid;
+  }
+
+  .glossary-auto-linker .glossary-link:hover {
+    @apply rounded bg-accent/5 px-1 text-accent;
+  }
+</style>

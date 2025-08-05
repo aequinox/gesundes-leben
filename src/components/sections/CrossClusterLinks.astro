@@ -1,0 +1,175 @@
+---
+import InternalLink from "@/components/elements/InternalLink.astro";
+import {
+  TOPIC_CLUSTERS,
+  analyzeContentRelationships,
+} from "@/utils/internal-linking";
+import type { Post } from "@/utils/types";
+
+interface Props {
+  currentPost: Post;
+  allPosts: Post[];
+  maxLinks?: number;
+  className?: string;
+}
+
+const { currentPost, allPosts, maxLinks = 3, className = "" } = Astro.props;
+
+// Find current post's primary cluster
+const currentCategories = currentPost.data.categories || [];
+const currentTags = currentPost.data.tags || [];
+
+let currentCluster = "wellness"; // default fallback
+let maxOverlap = 0;
+
+// Find the cluster with the most overlap
+for (const [clusterName, cluster] of Object.entries(TOPIC_CLUSTERS)) {
+  const categoryOverlap = currentCategories.filter(cat =>
+    cluster.categories.includes(cat)
+  ).length;
+  const tagOverlap = currentTags.filter(tag =>
+    cluster.keywords.includes(tag.toLowerCase())
+  ).length;
+
+  const totalOverlap = categoryOverlap + tagOverlap;
+  if (totalOverlap > maxOverlap) {
+    maxOverlap = totalOverlap;
+    currentCluster = clusterName;
+  }
+}
+
+// Get cross-cluster relationships
+const crossClusterRelationships = {
+  nutrition: ["wellness", "wissenschaftliches", "organsysteme"],
+  wellness: ["nutrition", "psychology", "organsysteme"],
+  psychology: ["wellness", "nutrition"],
+  wissenschaftliches: ["nutrition", "organsysteme", "wellness"],
+  organsysteme: ["nutrition", "wissenschaftliches", "wellness"],
+};
+
+const relatedClusters = crossClusterRelationships[currentCluster] || [];
+
+// Find best posts from related clusters
+const crossClusterPosts = [];
+
+for (const clusterName of relatedClusters) {
+  if (!TOPIC_CLUSTERS[clusterName]) {
+    continue;
+  }
+
+  const cluster = TOPIC_CLUSTERS[clusterName];
+  const clusterPosts = allPosts.filter(post => {
+    if (post.id === currentPost.id || post.data.draft) {
+      return false;
+    }
+
+    const postCategories = post.data.categories || [];
+    const postTags = post.data.tags || [];
+
+    // Check if post belongs to this cluster
+    const categoryMatch = postCategories.some(cat => {
+      return cluster.categories.includes(cat);
+    });
+    const tagMatch = postTags.some(tag => {
+      return cluster.keywords.includes(tag.toLowerCase());
+    });
+
+    return categoryMatch || tagMatch;
+  });
+
+  // Get the best posts from this cluster
+  const relationships = analyzeContentRelationships(currentPost, clusterPosts);
+  const topPosts = relationships
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 1) // Take top 1 from each cluster
+    .map(rel => ({
+      ...rel,
+      cluster: clusterName,
+      clusterTitle: cluster.name,
+    }));
+
+  crossClusterPosts.push(...topPosts);
+}
+
+// Sort by relationship score and limit
+const finalLinks = crossClusterPosts
+  .sort((a, b) => b.score - a.score)
+  .slice(0, maxLinks);
+
+// Only show if we have good quality cross-cluster links
+const hasQualityLinks = finalLinks.length > 0 && finalLinks[0]?.score > 0.3;
+---
+
+{
+  hasQualityLinks && (
+    <section class={`cross-cluster-links ${className}`}>
+      <div class="to-primary/5 rounded-lg border border-accent/20 bg-gradient-to-r from-accent/5 p-6">
+        <h3 class="mb-4 flex items-center text-lg font-semibold text-accent">
+          <svg
+            class="mr-2 h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+            />
+          </svg>
+          Verwandte Themen aus anderen Bereichen
+        </h3>
+
+        <div class="space-y-3">
+          {finalLinks.map(link => (
+            <div class="flex items-start space-x-3">
+              <div class="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-accent/60" />
+              <div class="flex-1">
+                <InternalLink
+                  to={`/posts/${link.targetPost.slug}/`}
+                  anchor={link.targetPost.data.title}
+                  variant="subtle"
+                  context="moderate"
+                  class="text-base font-medium transition-colors hover:text-accent"
+                />
+                <p class="text-base-content/70 mt-1 text-sm">
+                  Aus dem Bereich{" "}
+                  <span class="font-medium text-accent/80">
+                    {link.clusterTitle}
+                  </span>
+                  {link.targetPost.data.categories &&
+                    link.targetPost.data.categories.length > 0 && (
+                      <span class="text-accent/60">
+                        {" "}
+                        •{" "}
+                        {link.targetPost.data.categories.slice(0, 2).join(", ")}
+                      </span>
+                    )}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div class="text-base-content/60 mt-4 border-t border-accent/10 pt-3 text-xs">
+          Thematisch verwandte Artikel aus verschiedenen Gesundheitsbereichen
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .cross-cluster-links {
+    @apply my-8;
+  }
+
+  .cross-cluster-links h3 {
+    @apply text-accent;
+  }
+
+  .cross-cluster-links .space-y-3 > div:hover {
+    @apply translate-x-1 transform transition-transform duration-200;
+  }
+</style>

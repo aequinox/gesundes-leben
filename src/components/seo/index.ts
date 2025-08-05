@@ -6,8 +6,13 @@
  * for the German health blog.
  */
 
-// Note: Astro components cannot be imported in TypeScript compilation
-// These exports are available at runtime in Astro environments
+// Main SEO Component
+export { default as SEO } from "./SEO.astro";
+
+// Schema Components
+export { default as BreadcrumbSchema } from "./BreadcrumbSchema.astro";
+export { default as HealthArticleSchema } from "./HealthArticleSchema.astro";
+export { default as WebsiteSchema } from "./WebsiteSchema.astro";
 
 // Types
 export type {
