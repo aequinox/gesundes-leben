@@ -92,8 +92,14 @@ function analyzeContentRelationships(
 ): ContentRelationship[] {
   const relationships: ContentRelationship[] = [];
 
-  // Remove source post from candidates
-  const filteredCandidates = candidatePosts.filter(post => post.id !== sourcePost.id);
+  // Remove source post from candidates and filter out any undefined posts
+  const filteredCandidates = candidatePosts.filter(post => 
+    post && 
+    post.id && 
+    sourcePost && 
+    sourcePost.id && 
+    post.id !== sourcePost.id
+  );
 
   for (const candidatePost of filteredCandidates) {
     const relationship = calculateContentRelationship(sourcePost, candidatePost);
