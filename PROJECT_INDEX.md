@@ -254,8 +254,8 @@ SITE_TITLE="Healthy Life Blog"
 NODE_ENV=development
 NODE_OPTIONS=--max-old-space-size=8192
 
-# Analytics (optional)
-GA_TRACKING_ID=GA-XXXXXXXXX
+# Analytics (optional - uncomment and replace with actual tracking ID)
+# GA_TRACKING_ID=your-tracking-id-here
 ```
 
 ### 📦 Dependencies Overview
