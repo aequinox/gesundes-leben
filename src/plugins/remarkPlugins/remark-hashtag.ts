@@ -118,6 +118,10 @@ const processTextPart = (
 
   const hashtag = hashtagMatch[1];
 
+  if (!hashtag) {
+    return { type: "text", value: part };
+  }
+
   if (isExcludedHashtag(hashtag, options.excludedTags)) {
     return createStyledHashtag(hashtag, options.hashtagClass);
   }
@@ -169,6 +173,7 @@ export const remarkHashtag: Plugin<[HashtagOptions?], Root> = (
           parent.children.splice(index, 1, ...newNodes);
           return index + newNodes.length;
         }
+        return;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         return;
