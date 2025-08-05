@@ -75,6 +75,22 @@ const templates: Record<ReferenceType, Partial<ReferenceData>> = {
     keywords: [],
     abstract: "",
   },
+  report: {
+    // Add properties for report type here
+    type: "report",
+    title: "",
+    authors: [],
+    year: new Date().getFullYear(),
+    // Add other properties as needed
+  },
+  other: {
+    // Add properties for other type here
+    type: "other",
+    title: "",
+    authors: [],
+    year: new Date().getFullYear(),
+    // Add other properties as needed
+  },
 };
 
 // Interactive prompts
@@ -467,7 +483,7 @@ async function main() {
   const command = args[0];
   
   // Parse options
-  const options: Record<string, string | number> = {};
+  const options: Record<string, string | number | boolean> = {};
   for (let i = 1; i < args.length; i++) {
     if (args[i].startsWith("--")) {
       const key = args[i].slice(2);
@@ -539,7 +555,7 @@ async function main() {
         break;
         
       case "help":
-      case undefined:
+      case command:
         showHelp();
         break;
         
