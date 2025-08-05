@@ -1,5 +1,3 @@
-import { logger } from "../logger";
-
 /**
  * Creates a table of contents (TOC) from headings in an article.
  */
@@ -34,11 +32,11 @@ export class TableOfContents {
     // Try to find all headings in the document if article is not found
     if (!this.article) {
       this.headings = Array.from(
-        document.body.querySelectorAll("h1, h2, h3, h4") || []
+        document.body.querySelectorAll("h1, h2, h3, h4")
       );
     } else {
       this.headings = Array.from(
-        this.article.querySelectorAll("h1, h2, h3, h4") || []
+        this.article.querySelectorAll("h1, h2, h3, h4")
       );
     }
 
@@ -46,16 +44,18 @@ export class TableOfContents {
     if (this.headings.length > 0) {
       const firstHeading = this.headings[0];
 
-      // Check if the first heading is an H1 with the text "Inhaltsverzeichnis"
-      const isTocHeading =
-        (firstHeading.tagName === "H1" || firstHeading.tagName === "H2") &&
-        /inhaltsverzeichnis/i.test(
-          (firstHeading.textContent || "").trim().toLowerCase()
-        );
+      // Check if the first heading exists and is an H1 with the text "Inhaltsverzeichnis"
+      if (firstHeading) {
+        const isTocHeading =
+          (firstHeading.tagName === "H1" || firstHeading.tagName === "H2") &&
+          /inhaltsverzeichnis/i.test(
+            (firstHeading.textContent || "").trim().toLowerCase()
+          );
 
-      if (isTocHeading) {
-        // Remove the first heading from the list
-        this.headings = this.headings.slice(1);
+        if (isTocHeading) {
+          // Remove the first heading from the list
+          this.headings = this.headings.slice(1);
+        }
       }
     }
 
@@ -161,11 +161,12 @@ export class TableOfContents {
     const textNodes = Array.from(heading.childNodes)
       .filter(node => node.nodeType === Node.TEXT_NODE)
       .map(node => node.textContent?.trim())
-      .filter(text => text) // Filter out empty strings
+      .filter((text): text is string => Boolean(text))
       .join(" ");
 
     // If there's direct text content, use it; otherwise fall back to textContent
-    const linkText = textNodes || heading.textContent?.trim() || "";
+    const linkText =
+      textNodes || (heading.textContent ? heading.textContent.trim() : "");
 
     // Ensure the link has an accessible name (inner text)
     link.textContent = linkText;
@@ -184,8 +185,9 @@ export class TableOfContents {
     // Add smooth scrolling behavior with error handling
     link.addEventListener("click", e => {
       e.preventDefault();
-      const targetId = link.getAttribute("href")?.substring(1);
-      if (targetId) {
+      const href = link.getAttribute("href");
+      if (href !== null && href.length > 1) {
+        const targetId = href.substring(1);
         const targetElement = document.getElementById(targetId);
         if (targetElement) {
           try {
@@ -215,7 +217,7 @@ export class TableOfContents {
             // Remove the tabindex after a short delay to prevent leaving
             // non-interactive elements permanently in the tab order
             setTimeout(() => {
-              if (hadTabIndex && oldTabIndex) {
+              if (hadTabIndex && oldTabIndex !== null) {
                 targetElement.setAttribute("tabindex", oldTabIndex);
               } else {
                 targetElement.removeAttribute("tabindex");
@@ -232,14 +234,15 @@ export class TableOfContents {
 
             // Update selected state in TOC
             this.setSelectedLinkById(targetId);
-          } catch (error) {
-            logger.error("Error navigating to section", targetId, ":", error);
+          } catch {
             // Fallback to standard navigation if smooth scroll fails
             window.location.hash = targetId;
           }
         } else {
-          logger.warn("Target element with ID", targetId, "not found");
+          // Target element not found - fail silently
         }
+      } else {
+        // Invalid href - fail silently
       }
     });
 
@@ -266,7 +269,7 @@ export class TableOfContents {
       h4: "24px",
     };
 
-    if (indentationMap[headingLevel]) {
+    if (indentationMap[headingLevel] !== undefined) {
       listItem.style.marginLeft = indentationMap[headingLevel];
       listItem.style.paddingLeft = "0px";
     }
@@ -291,7 +294,6 @@ export class TableOfContents {
   private initialize(): void {
     // Check if the TOC list element and headings exist
     if (!this.tocList || !this.headings.length) {
-      logger.warn("TOC list or headings not found, returning early");
       return;
     }
 
@@ -304,7 +306,9 @@ export class TableOfContents {
     this.headings.forEach((heading, index) => {
       // Generate an ID if the heading doesn't have one
       if (!heading.id) {
-        const headingText = heading.textContent?.trim() || `heading-${index}`;
+        const headingText =
+          (heading.textContent ? heading.textContent.trim() : "") ||
+          `heading-${index}`;
         heading.id = this.generateSafeId(headingText);
       }
 
@@ -314,13 +318,8 @@ export class TableOfContents {
       // Only observe elements that exist in the DOM
       try {
         this.observer.observe(heading);
-      } catch (error) {
-        logger.error(
-          "Failed to observe heading:",
-          heading.id,
-          ". Error:",
-          error
-        );
+      } catch {
+        // Failed to observe heading - continue with next
       }
     });
 
@@ -344,16 +343,22 @@ export class TableOfContents {
   private getAccessibleName(element: HTMLElement): string {
     // Check for aria-label
     const ariaLabel = element.getAttribute("aria-label");
-    if (ariaLabel) {
+    if (ariaLabel !== null && ariaLabel.length > 0) {
       return ariaLabel;
     }
 
     // Check for aria-labelledby
     const ariaLabelledBy = element.getAttribute("aria-labelledby");
-    if (ariaLabelledBy) {
+    if (ariaLabelledBy !== null && ariaLabelledBy.length > 0) {
       const labelElement = document.getElementById(ariaLabelledBy);
-      if (labelElement && labelElement.textContent) {
-        return labelElement.textContent.trim();
+      const labelText = labelElement?.textContent;
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (
+        labelText !== null &&
+        labelText !== undefined &&
+        labelText.trim().length > 0
+      ) {
+        return labelText.trim();
       }
     }
 
@@ -361,7 +366,7 @@ export class TableOfContents {
     const img = element.querySelector("img");
     if (img) {
       const altText = img.getAttribute("alt");
-      if (altText) {
+      if (altText !== null && altText.length > 0) {
         return altText;
       }
     }
@@ -370,13 +375,19 @@ export class TableOfContents {
     const svg = element.querySelector("svg");
     if (svg) {
       const titleElement = svg.querySelector("title");
-      if (titleElement && titleElement.textContent) {
-        return titleElement.textContent.trim();
+      const titleText = titleElement?.textContent;
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (
+        titleText !== null &&
+        titleText !== undefined &&
+        titleText.trim().length > 0
+      ) {
+        return titleText.trim();
       }
     }
 
     // Fall back to inner text
-    return element.textContent?.trim() || "section";
+    return (element.textContent ? element.textContent.trim() : "") || "section";
   }
 
   /**
