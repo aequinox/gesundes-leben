@@ -19,6 +19,7 @@
 import InternalLink from "@/components/elements/InternalLink.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { analyzeContentRelationships } from "@/utils/internal-linking";
+// Dynamic import for analytics used in client-side script
 import { processAllPosts } from "@/utils/posts";
 import type { Post } from "@/utils/types";
 
@@ -72,6 +73,13 @@ const defaultTitles = {
 
 const sectionTitle = title || defaultTitles[placement];
 
+// Generate session ID for tracking
+const sessionId = `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 15)}`;
+
+// Get current page info for analytics
+const currentPath = Astro.url.pathname;
+const currentSlug = currentPath.split("/").pop() || "unknown";
+
 // Don't render if no meaningful relationships found
 if (meaningfulRelationships.length === 0) {
   return null;
@@ -81,6 +89,9 @@ if (meaningfulRelationships.length === 0) {
 <section
   class={`contextual-links contextual-links--${variant} contextual-links--${placement}`}
   aria-labelledby="contextual-links-heading"
+  data-contextual-links
+  data-current-post={currentSlug}
+  data-session-id={sessionId}
 >
   <h3 id="contextual-links-heading" class="contextual-links__title">
     {sectionTitle}
@@ -111,8 +122,7 @@ if (meaningfulRelationships.length === 0) {
         return (
           <div class="contextual-links__item">
             <InternalLink
-              to={`/posts/${targetPost.slug}`}
-              anchor={anchorText}
+              href={`/posts/${targetPost.slug}`}
               variant={linkVariant}
               context={linkingContext}
               placement={
@@ -124,7 +134,9 @@ if (meaningfulRelationships.length === 0) {
               }
               icon={linkingContext === "strong" ? "related" : ""}
               title={`${targetPost.data.title} - ${matchReasons.join(", ")}`}
-            />
+            >
+              {anchorText}
+            </InternalLink>
 
             {/* Dev mode: Show relationship scores and reasons */}
             {showScores && import.meta.env.DEV && (
@@ -142,6 +154,7 @@ if (meaningfulRelationships.length === 0) {
 </section>
 
 <style>
+  @reference "@/styles/global.css";
   /* Base contextual links styles */
   .contextual-links {
     @apply mt-6 mb-4;
@@ -161,11 +174,13 @@ if (meaningfulRelationships.length === 0) {
 
   /* Variant: Simple */
   .contextual-links--simple {
-    @apply border-l-2 border-accent/30 pl-4;
+    @apply border-l-2 pl-4;
+    border-color: oklch(var(--color-accent, 0.5 0.15 250) / 0.3);
   }
 
   .contextual-links--simple .contextual-links__title {
-    @apply text-base font-medium text-accent;
+    @apply text-base font-medium;
+    color: oklch(var(--color-accent, 0.5 0.15 250));
   }
 
   /* Variant: Boxed */
@@ -175,7 +190,8 @@ if (meaningfulRelationships.length === 0) {
   }
 
   .contextual-links--boxed .contextual-links__title {
-    @apply mb-4 text-accent;
+    @apply mb-4;
+    color: oklch(var(--color-accent, 0.5 0.15 250));
   }
 
   .contextual-links--boxed .contextual-links__container {
@@ -184,11 +200,18 @@ if (meaningfulRelationships.length === 0) {
 
   /* Variant: Highlighted */
   .contextual-links--highlighted {
-    @apply rounded-xl border border-accent/20 bg-gradient-to-r from-accent/10 via-accent/5 to-transparent p-4;
+    @apply rounded-xl border p-4;
+    border-color: oklch(var(--color-accent, 0.5 0.15 250) / 0.2);
+    background: linear-gradient(to right, 
+      oklch(var(--color-accent, 0.5 0.15 250) / 0.1), 
+      oklch(var(--color-accent, 0.5 0.15 250) / 0.05), 
+      transparent
+    );
   }
 
   .contextual-links--highlighted .contextual-links__title {
-    @apply text-accent-dark flex items-center gap-2 font-semibold;
+    @apply flex items-center gap-2 font-semibold;
+    color: oklch(var(--color-accent, 0.5 0.15 250) / 0.9);
   }
 
   .contextual-links--highlighted .contextual-links__title::before {
@@ -289,3 +312,105 @@ if (meaningfulRelationships.length === 0) {
     }
   }
 </style>
+
+<script>
+  /**
+   * Track contextual link interactions and performance
+   */
+
+  // Track contextual link clicks
+  document.addEventListener("click", async (event) => {
+    const target = event.target as HTMLElement;
+    const link = target.closest(".internal-link") as HTMLAnchorElement;
+    const contextualSection = target.closest(
+      "[data-contextual-links]"
+    ) as HTMLElement;
+
+    if (link && contextualSection) {
+      const linkText = link.textContent?.trim() || "";
+      const currentPost = contextualSection.dataset.currentPost || "unknown";
+      const sessionId = contextualSection.dataset.sessionId;
+
+      // Extract target post from href
+      const href = link.getAttribute("href") || "";
+      const targetPost = href.split("/").pop() || "unknown";
+
+      const clickEvent = {
+        linkType: "contextual" as const,
+        sourcePost: currentPost,
+        targetPost,
+        linkText,
+        variant: link.dataset.variant || "inline",
+        context: link.dataset.context || "moderate",
+        timestamp: Date.now(),
+        sessionId,
+      };
+
+      // Dynamically import and track the click
+      try {
+        const { trackLinkClick } = await import("@/utils/internal-linking-analytics");
+        trackLinkClick(clickEvent);
+      } catch (error) {
+        console.warn("Failed to load analytics:", error);
+      }
+
+      // Log for development
+      if (import.meta.env.DEV) {
+        console.log("Contextual link clicked:", clickEvent);
+      }
+    }
+  });
+
+  // Track contextual links section visibility for engagement metrics
+  document.addEventListener("DOMContentLoaded", () => {
+    const contextualSections = document.querySelectorAll(
+      "[data-contextual-links]"
+    );
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        entries => {
+          entries.forEach(async (entry) => {
+            if (entry.isIntersecting) {
+              const section = entry.target as HTMLElement;
+              const currentPost = section.dataset.currentPost || "unknown";
+              const sessionId = section.dataset.sessionId;
+
+              // Track section view for engagement analysis
+              const viewEvent = {
+                linkType: "contextual" as const,
+                sourcePost: currentPost,
+                targetPost: "section-view",
+                linkText: "contextual_section_viewed",
+                variant: "view",
+                context: "engagement",
+                timestamp: Date.now(),
+                sessionId,
+              };
+
+              // Dynamically import and track the view
+              try {
+                const { trackLinkClick } = await import("@/utils/internal-linking-analytics");
+                trackLinkClick(viewEvent);
+              } catch (error) {
+                console.warn("Failed to load analytics:", error);
+              }
+
+              if (import.meta.env.DEV) {
+                console.log("Contextual links section viewed:", viewEvent);
+              }
+
+              // Only track once per section
+              observer.unobserve(section);
+            }
+          });
+        },
+        {
+          threshold: 0.5, // Track when 50% of section is visible
+        }
+      );
+
+      contextualSections.forEach(section => observer.observe(section));
+    }
+  });
+</script>

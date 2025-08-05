@@ -19,13 +19,13 @@ const { currentPost, allPosts, maxLinks = 3, className = "" } = Astro.props;
 const currentCategories = currentPost.data.categories || [];
 const currentTags = currentPost.data.tags || [];
 
-let currentCluster = "wellness"; // default fallback
+let currentCluster = "mentale-gesundheit"; // default fallback
 let maxOverlap = 0;
 
 // Find the cluster with the most overlap
 for (const [clusterName, cluster] of Object.entries(TOPIC_CLUSTERS)) {
   const categoryOverlap = currentCategories.filter(cat =>
-    cluster.categories.includes(cat)
+    cluster.supportingCategories.includes(cat)
   ).length;
   const tagOverlap = currentTags.filter(tag =>
     cluster.keywords.includes(tag.toLowerCase())
@@ -39,18 +39,26 @@ for (const [clusterName, cluster] of Object.entries(TOPIC_CLUSTERS)) {
 }
 
 // Get cross-cluster relationships
-const crossClusterRelationships = {
-  nutrition: ["wellness", "wissenschaftliches", "organsysteme"],
-  wellness: ["nutrition", "psychology", "organsysteme"],
-  psychology: ["wellness", "nutrition"],
-  wissenschaftliches: ["nutrition", "organsysteme", "wellness"],
-  organsysteme: ["nutrition", "wissenschaftliches", "wellness"],
+const crossClusterRelationships: Record<string, string[]> = {
+  'mentale-gesundheit': ['ernaehrung-nahrungsergaenzung', 'darm-mikrobiom'],
+  'ernaehrung-nahrungsergaenzung': ['immunsystem-gesundheit', 'vitamine-mineralstoffe', 'darm-mikrobiom'],
+  'immunsystem-gesundheit': ['ernaehrung-nahrungsergaenzung', 'vitamine-mineralstoffe'],
+  'darm-mikrobiom': ['ernaehrung-nahrungsergaenzung', 'mentale-gesundheit'],
+  'vitamine-mineralstoffe': ['ernaehrung-nahrungsergaenzung', 'immunsystem-gesundheit'],
 };
 
 const relatedClusters = crossClusterRelationships[currentCluster] || [];
 
 // Find best posts from related clusters
-const crossClusterPosts = [];
+const crossClusterPosts: Array<{
+  targetPost: Post;
+  score: number;
+  suggestedAnchorText: string[];
+  linkingContext: string;
+  matchReasons: string[];
+  cluster: string;
+  clusterTitle: string;
+}> = [];
 
 for (const clusterName of relatedClusters) {
   if (!TOPIC_CLUSTERS[clusterName]) {
@@ -59,7 +67,8 @@ for (const clusterName of relatedClusters) {
 
   const cluster = TOPIC_CLUSTERS[clusterName];
   const clusterPosts = allPosts.filter(post => {
-    if (post.id === currentPost.id || post.data.draft) {
+    if (!post || !post.id || !currentPost || !currentPost.id || 
+        post.id === currentPost.id || post.data.draft) {
       return false;
     }
 
@@ -68,7 +77,7 @@ for (const clusterName of relatedClusters) {
 
     // Check if post belongs to this cluster
     const categoryMatch = postCategories.some(cat => {
-      return cluster.categories.includes(cat);
+      return cluster.supportingCategories.includes(cat);
     });
     const tagMatch = postTags.some(tag => {
       return cluster.keywords.includes(tag.toLowerCase());
@@ -97,7 +106,7 @@ const finalLinks = crossClusterPosts
   .slice(0, maxLinks);
 
 // Only show if we have good quality cross-cluster links
-const hasQualityLinks = finalLinks.length > 0 && finalLinks[0]?.score > 0.3;
+const hasQualityLinks = finalLinks.length > 0 && finalLinks[0] && finalLinks[0].score > 0.3;
 ---
 
 {
@@ -127,12 +136,13 @@ const hasQualityLinks = finalLinks.length > 0 && finalLinks[0]?.score > 0.3;
               <div class="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-accent/60" />
               <div class="flex-1">
                 <InternalLink
-                  to={`/posts/${link.targetPost.slug}/`}
-                  anchor={link.targetPost.data.title}
+                  href={`/posts/${link.targetPost.slug}/`}
                   variant="subtle"
                   context="moderate"
                   class="text-base font-medium transition-colors hover:text-accent"
-                />
+                >
+                  {link.targetPost.data.title}
+                </InternalLink>
                 <p class="text-base-content/70 mt-1 text-sm">
                   Aus dem Bereich{" "}
                   <span class="font-medium text-accent/80">
@@ -161,6 +171,7 @@ const hasQualityLinks = finalLinks.length > 0 && finalLinks[0]?.score > 0.3;
 }
 
 <style>
+  @reference "@/styles/global.css";
   .cross-cluster-links {
     @apply my-8;
   }

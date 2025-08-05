@@ -10,23 +10,20 @@
  * @example
  * ```astro
  * <InternalLink
- *   to="/posts/vitamin-d-mangel"
- *   anchor="Vitamin D Mangel erkennen"
+ *   href="/posts/vitamin-d-mangel"
+ *   variant="inline"
  *   context="strong"
- *   trackClick={true}
- * />
+ * >
+ *   Vitamin D Mangel erkennen
+ * </InternalLink>
  * ```
  */
 
-// Unused imports removed to fix ESLint errors
-// import { slugifyStr } from "@/utils/slugs";
-// import { logger } from "@/utils/logger";
+// Dynamic import for analytics used in client-side script
 
 export interface Props {
-  /** Target post slug or full path */
-  to: string;
-  /** Anchor text for the link */
-  anchor: string;
+  /** Target URL or post slug */
+  href: string;
   /** Visual style variant */
   variant?: "inline" | "button" | "highlight" | "subtle";
   /** Relationship strength for styling */
@@ -46,8 +43,7 @@ export interface Props {
 }
 
 const {
-  to,
-  anchor,
+  href,
   variant = "inline",
   context = "moderate",
   external = false,
@@ -59,15 +55,26 @@ const {
 } = Astro.props;
 
 // Ensure proper URL formatting
-const href = to.startsWith("/") ? to : `/posts/${to}`;
+const finalHref = href.startsWith("/") ? href : `/posts/${href}`;
+
+// Get current page info for analytics
+const currentPath = Astro.url.pathname;
+const currentSlug = currentPath.split("/").pop() || "unknown";
+const targetSlug = finalHref.split("/").pop() || "unknown";
+
+// Generate session ID for tracking
+const sessionId = `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 15)}`;
 
 // Generate tracking attributes for analytics
 const trackingAttributes = trackClick
   ? {
-      "data-track-event": "internal-link-click",
-      "data-track-source": placement,
-      "data-track-target": to,
-      "data-track-context": context,
+      "data-link-type": "internal",
+      "data-source-post": currentSlug,
+      "data-target-post": targetSlug,
+      "data-variant": variant,
+      "data-context": context,
+      "data-placement": placement,
+      "data-session-id": sessionId,
     }
   : {};
 
@@ -118,9 +125,9 @@ const iconSymbol = icon && iconMap[icon] ? iconMap[icon] : null;
 ---
 
 <a
-  href={href}
+  href={finalHref}
   class={linkClasses}
-  title={title || anchor}
+  title={title}
   target={external ? "_blank" : undefined}
   rel={external ? "noopener noreferrer" : undefined}
   {...trackingAttributes}
@@ -132,7 +139,7 @@ const iconSymbol = icon && iconMap[icon] ? iconMap[icon] : null;
       </span>
     )
   }
-  <span class="internal-link__text">{anchor}</span>
+  <span class="internal-link__text"><slot /></span>
   {
     variant === "button" && (
       <span class="internal-link__arrow" aria-hidden="true">
@@ -143,55 +150,73 @@ const iconSymbol = icon && iconMap[icon] ? iconMap[icon] : null;
 </a>
 
 <style>
+  @reference "@/styles/global.css";
   /* Base internal link styles */
   .internal-link {
-    @apply relative inline-flex items-center gap-1 text-accent transition-all duration-200 ease-out;
+    @apply relative inline-flex items-center transition-all duration-200;
     text-decoration: none;
+    gap: 0.25rem;
+    color: oklch(var(--color-accent, 0.5 0.15 250));
+    transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 
     /* Hover animations */
     &:hover {
-      @apply text-accent-hover;
+      color: oklch(var(--color-accent-hover, 0.4 0.2 250));
       transform: translateX(1px);
     }
 
     &:focus {
-      @apply rounded-sm outline-2 outline-offset-2 outline-accent;
+      @apply rounded-sm outline-2 outline-offset-2;
+      outline-color: oklch(var(--color-accent, 0.5 0.15 250));
     }
   }
 
   /* Variant styles */
   .internal-link--inline {
-    @apply underline decoration-accent/30 underline-offset-2;
+    @apply underline underline-offset-2;
+    text-decoration-color: oklch(var(--color-accent, 0.5 0.15 250) / 0.3);
 
     &:hover {
-      @apply decoration-accent/60;
+      text-decoration-color: oklch(var(--color-accent, 0.5 0.15 250) / 0.6);
       text-decoration-thickness: 2px;
     }
   }
 
   .internal-link--button {
-    @apply rounded-lg bg-accent/10 px-3 py-2 font-medium no-underline hover:bg-accent/20;
-    border: 1px solid oklch(var(--color-accent) / 0.2);
+    @apply rounded-lg px-3 py-2 font-medium no-underline;
+    background-color: oklch(var(--color-accent, 0.5 0.15 250) / 0.1);
+    border: 1px solid oklch(var(--color-accent, 0.5 0.15 250) / 0.2);
 
     &:hover {
-      border-color: oklch(var(--color-accent) / 0.4);
+      background-color: oklch(var(--color-accent, 0.5 0.15 250) / 0.2);
+      border-color: oklch(var(--color-accent, 0.5 0.15 250) / 0.4);
       transform: translateY(-1px);
     }
   }
 
   .internal-link--highlight {
-    @apply rounded-md bg-gradient-to-r from-accent/20 to-accent/10 px-2 py-1 font-medium no-underline;
+    @apply rounded-md px-2 py-1 font-medium no-underline;
+    background: linear-gradient(to right, 
+      oklch(var(--color-accent, 0.5 0.15 250) / 0.2), 
+      oklch(var(--color-accent, 0.5 0.15 250) / 0.1)
+    );
 
     &:hover {
-      @apply from-accent/30 to-accent/20;
+      background: linear-gradient(to right, 
+        oklch(var(--color-accent, 0.5 0.15 250) / 0.3), 
+        oklch(var(--color-accent, 0.5 0.15 250) / 0.2)
+      );
     }
   }
 
   .internal-link--subtle {
-    @apply text-muted underline decoration-muted/40 decoration-dotted hover:text-foreground;
+    @apply underline decoration-dotted;
+    color: oklch(var(--color-text-muted, 0.6 0.05 250));
+    text-decoration-color: oklch(var(--color-text-muted, 0.6 0.05 250) / 0.4);
 
     &:hover {
-      @apply decoration-foreground/60;
+      color: oklch(var(--color-foreground, 0.2 0.05 250));
+      text-decoration-color: oklch(var(--color-foreground, 0.2 0.05 250) / 0.6);
     }
   }
 
@@ -218,15 +243,20 @@ const iconSymbol = icon && iconMap[icon] ? iconMap[icon] : null;
 
   /* Placement-specific styles */
   .internal-link--in-content {
-    @apply text-inherit;
+    color: inherit;
 
     &.internal-link--inline {
-      @apply text-accent;
+      color: oklch(var(--color-accent, 0.5 0.15 250));
     }
   }
 
   .internal-link--in-sidebar {
-    @apply text-sm text-muted hover:text-accent;
+    @apply text-sm font-medium;
+    color: oklch(var(--color-text-muted, 0.6 0.05 250));
+
+    &:hover {
+      color: oklch(var(--color-accent, 0.5 0.15 250));
+    }
   }
 
   .internal-link--in-nav {
@@ -312,58 +342,36 @@ const iconSymbol = icon && iconMap[icon] ? iconMap[icon] : null;
    * Internal Link Analytics and Performance Tracking
    */
 
-  // Track internal link clicks for SEO analysis
-  document.addEventListener("click", event => {
+  // Track internal link clicks for comprehensive analytics
+  document.addEventListener("click", async (event) => {
     const target = event.target as HTMLElement;
     const link = target.closest(".internal-link") as HTMLAnchorElement;
 
-    if (link && link.dataset.trackEvent) {
-      const trackingData = {
-        event: link.dataset.trackEvent,
-        source: link.dataset.trackSource,
-        target: link.dataset.trackTarget,
-        context: link.dataset.trackContext,
-        anchor: link.textContent?.trim(),
+    if (link && link.dataset.linkType) {
+      const linkText = link.textContent?.trim() || "";
+      
+      const clickEvent = {
+        linkType: link.dataset.linkType as 'internal',
+        sourcePost: link.dataset.sourcePost || 'unknown',
+        targetPost: link.dataset.targetPost || 'unknown',
+        linkText,
+        variant: link.dataset.variant || 'inline',
+        context: link.dataset.context || 'moderate',
         timestamp: Date.now(),
+        sessionId: link.dataset.sessionId,
       };
+
+      // Dynamically import and use the analytics system
+      try {
+        const { trackLinkClick } = await import("@/utils/internal-linking-analytics");
+        trackLinkClick(clickEvent);
+      } catch (error) {
+        console.warn("Failed to load analytics:", error);
+      }
 
       // Log for development
       if (import.meta.env.DEV) {
-        console.log("Internal link clicked:", trackingData);
-      }
-
-      // Send to analytics (implement your preferred analytics solution)
-      if (
-        typeof window !== "undefined" &&
-        "gtag" in window &&
-        typeof (window as any).gtag === "function"
-      ) {
-        (window as any).gtag("event", "internal_link_click", {
-          source_page: window.location.pathname,
-          target_page: trackingData.target,
-          link_context: trackingData.context,
-          link_placement: trackingData.source,
-        });
-      }
-
-      // Store in localStorage for internal analysis
-      try {
-        const storedClicks = JSON.parse(
-          localStorage.getItem("internal_link_clicks") || "[]"
-        );
-        storedClicks.push(trackingData);
-
-        // Keep only last 100 clicks to prevent storage bloat
-        if (storedClicks.length > 100) {
-          storedClicks.splice(0, storedClicks.length - 100);
-        }
-
-        localStorage.setItem(
-          "internal_link_clicks",
-          JSON.stringify(storedClicks)
-        );
-      } catch (error) {
-        console.warn("Could not store internal link click data:", error);
+        console.log("Internal link clicked:", clickEvent);
       }
     }
   });
