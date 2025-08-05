@@ -288,8 +288,8 @@ describe("Edge Cases and Error Handling", () => {
       expect(
         cn(
           "valid-class",
-          false && "false-class",
-          true && "true-class",
+          ...(false ? ["false-class"] : []),
+          ...(true ? ["true-class"] : []),
           null,
           undefined,
           false,

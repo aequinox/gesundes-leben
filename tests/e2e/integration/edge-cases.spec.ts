@@ -206,7 +206,9 @@ test.describe('Edge Cases and Error Handling', () => {
     test('should handle slow loading content gracefully', async ({ page }) => {
       // Throttle network to simulate slow connection
       await page.route('**/*', async route => {
-        await new Promise(resolve => setTimeout(resolve, 100)); // Add 100ms delay
+        await new Promise<void>(resolve => {
+          setTimeout(() => resolve(), 100); // Add 100ms delay
+        });
         await route.continue();
       });
       

@@ -225,7 +225,7 @@ describe("Edge Cases", () => {
 
     it("should handle special object types", () => {
       expect(getSrcUrl(new Date())).toContain("202"); // Contains year
-      expect(getSrcUrl(new RegExp("test"))).toBe("/test/");
+      expect(getSrcUrl(/test/)).toBe("/test/");
     });
   });
 
