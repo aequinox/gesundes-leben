@@ -6,7 +6,7 @@ import type { Post } from "./types";
 /**
  * Configuration options for slug generation
  */
-export type SlugifyOptions = {
+type SlugifyOptions = {
   readonly replacement: string;
   readonly remove?: RegExp;
   readonly lower: boolean;
@@ -43,8 +43,8 @@ const DEFAULT_OPTIONS: SlugifyOptions = {
  * @throws {Error} If the post object is invalid or missing a title.
  * @returns The slug for the blog post.
  */
-export const getPostSlug = (post: Post): string => {
-  if (!post || !post.data || !post.data.title) {
+const getPostSlug = (post: Post): string => {
+  if (!post?.data?.title) {
     throw new Error("Invalid post object or missing title");
   }
 
@@ -88,7 +88,7 @@ const slugifyAll = (
 /**
  * Generic slugify function that handles both single strings and arrays
  */
-export const slugify = <T extends SlugifyInput>(
+const slugify = <T extends SlugifyInput>(
   value: T,
   options: Partial<SlugifyOptions> = {}
 ): SlugifyOutput<T> => {
@@ -97,3 +97,7 @@ export const slugify = <T extends SlugifyInput>(
   }
   return slugifyStr(value as string, options) as SlugifyOutput<T>;
 };
+
+// Export all functions at the end of the file
+export type { SlugifyOptions };
+export { getPostSlug, slugify };

@@ -12,7 +12,7 @@
  */
 import type { CollectionEntry } from "astro:content";
 
-export interface GermanSEOConfig {
+interface GermanSEOConfig {
   /** Target German regions */
   regions: ("DE" | "AT" | "CH")[];
   /** German health authority compliance */
@@ -33,7 +33,7 @@ const DEFAULT_CONFIG: GermanSEOConfig = {
 /**
  * German SEO optimization utilities
  */
-export class GermanSEOOptimizer {
+class GermanSEOOptimizer {
   private config: GermanSEOConfig;
 
   constructor(config: Partial<GermanSEOConfig> = {}) {
@@ -142,7 +142,7 @@ export class GermanSEOOptimizer {
 
     // Add regional context if missing
     const hasRegionalContext = targetRegions.some(region =>
-      this.regionKeywords[region].some(keyword =>
+      (this.regionKeywords[region] ?? []).some(keyword =>
         title.toLowerCase().includes(keyword)
       )
     );
@@ -154,7 +154,7 @@ export class GermanSEOOptimizer {
 
     // Ensure health keyword presence
     const categoryKeywords =
-      this.healthKeywordMap[category.toLowerCase()] || [];
+      this.healthKeywordMap[category.toLowerCase()] ?? [];
     const hasHealthKeyword = categoryKeywords.some(keyword =>
       title.toLowerCase().includes(keyword)
     );
@@ -247,7 +247,7 @@ export class GermanSEOOptimizer {
 
     // Add category-specific German keywords
     const categoryKeywords =
-      this.healthKeywordMap[category.toLowerCase()] || [];
+      this.healthKeywordMap[category.toLowerCase()] ?? [];
     categoryKeywords.forEach(keyword => germanKeywords.add(keyword));
 
     // Extract German compound words
@@ -258,7 +258,7 @@ export class GermanSEOOptimizer {
 
     // Add regional keywords
     this.config.regions.forEach(region => {
-      const regionKeywords = this.regionKeywords[region] || [];
+      const regionKeywords = this.regionKeywords[region] ?? [];
       regionKeywords
         .slice(0, 2)
         .forEach(keyword => germanKeywords.add(keyword));
@@ -468,9 +468,9 @@ export class GermanSEOOptimizer {
     if (this.config.healthCompliance && data.categories.includes("Ernährung")) {
       const hasDisclaimer =
         data.description.includes("medizinische beratung") ||
-        (content && content.includes("medizinische beratung"));
+        content?.includes("medizinische beratung");
 
-      if (!hasDisclaimer) {
+      if (!(hasDisclaimer ?? false)) {
         score -= 10;
         issues.push("Missing German health compliance disclaimer");
         recommendations.push(
@@ -490,4 +490,8 @@ export class GermanSEOOptimizer {
 /**
  * Create singleton instance for global use
  */
-export const germanSEOOptimizer = new GermanSEOOptimizer();
+const germanSEOOptimizer = new GermanSEOOptimizer();
+
+// Export types and classes at the end of the file
+export type { GermanSEOConfig };
+export { GermanSEOOptimizer, germanSEOOptimizer };

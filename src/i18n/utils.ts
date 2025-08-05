@@ -20,7 +20,7 @@ export const showDefaultLang = false;
 export function getLangFromUrl(url: URL): SupportedLanguage {
   try {
     const [, lang] = url.pathname.split("/");
-    return isValidLanguage(lang) ? lang : defaultLang;
+    return isValidLanguage(lang ?? "") ? (lang as SupportedLanguage) : defaultLang;
   } catch (error) {
     logger.error("Error extracting language from URL:", error);
     return defaultLang;
@@ -48,9 +48,12 @@ function getTranslationValue(
 export function useTranslations(lang: SupportedLanguage) {
   return function translate(key: TranslationKey): string {
     try {
+      const langTranslations = ui[lang];
+      const defaultTranslations = ui[defaultLang];
+      
       const value =
-        getTranslationValue(ui[lang], key) ??
-        getTranslationValue(ui[defaultLang], key);
+        (langTranslations !== undefined ? getTranslationValue(langTranslations, key) : undefined) ??
+        (defaultTranslations !== undefined ? getTranslationValue(defaultTranslations, key) : undefined);
 
       if (value === undefined) {
         logger.warn("Translation missing for key", key, "in language", lang);
@@ -78,7 +81,7 @@ export function useTranslatedPath(lang: SupportedLanguage) {
       path = `/${path}`;
     }
 
-    return !showDefaultLang && targetLang === defaultLang
+    return showDefaultLang === false && targetLang === defaultLang
       ? path
       : `/${targetLang}${path}`;
   };

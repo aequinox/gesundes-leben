@@ -15,7 +15,7 @@ import type { CollectionEntry } from "astro:content";
 import { germanSEOOptimizer } from "./german-seo-optimization";
 import { seoPerformanceOptimizer } from "./performance-optimization";
 
-export interface SEOAuditResult {
+interface SEOAuditResult {
   /** Overall SEO score (0-100) */
   overallScore: number;
   /** Individual audit scores */
@@ -37,7 +37,7 @@ export interface SEOAuditResult {
   strengths: string[];
 }
 
-export interface AuditConfig {
+interface AuditConfig {
   /** Enable German language-specific audits */
   germanOptimization: boolean;
   /** Enable health content compliance audits */
@@ -61,7 +61,7 @@ const DEFAULT_AUDIT_CONFIG: AuditConfig = {
 /**
  * Comprehensive SEO audit engine
  */
-export class SEOAuditor {
+class SEOAuditor {
   private config: AuditConfig;
 
   constructor(config: Partial<AuditConfig> = {}) {
@@ -406,7 +406,7 @@ export class SEOAuditor {
     const hasDisclaimer =
       data.description.includes("medizinische beratung") ||
       data.description.includes("arzt") ||
-      (content && content.includes("medizinische beratung"));
+      (content?.includes("medizinische beratung"));
 
     if (!hasDisclaimer) {
       score -= 20;
@@ -616,4 +616,8 @@ ${result.recommendations
 /**
  * Create singleton instance for global use
  */
-export const seoAuditor = new SEOAuditor();
+const seoAuditor = new SEOAuditor();
+
+// Export types and classes at the end of the file
+export type { SEOAuditResult, AuditConfig };
+export { SEOAuditor, seoAuditor };

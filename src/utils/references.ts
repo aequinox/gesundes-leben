@@ -2,6 +2,15 @@ import { existsSync } from "node:fs";
 import { writeFile, readFile, mkdir } from "node:fs/promises";
 import { join, dirname } from "node:path";
 
+import { parse, stringify } from "yaml";
+
+import { logger } from "@/utils/logger";
+import {
+  withCache,
+  CacheKeys,
+  invalidateReferenceCache,
+} from "@/utils/referenceCache";
+
 // Conditional import for Astro context
 let getCollection:
   | ((name: string) => Promise<Array<{ id: string; data: ReferenceData }>>)
@@ -12,14 +21,6 @@ try {
 } catch {
   // Running outside Astro context, will use fallback
 }
-import { parse, stringify } from "yaml";
-
-import { logger } from "@/utils/logger";
-import {
-  withCache,
-  CacheKeys,
-  invalidateReferenceCache,
-} from "@/utils/referenceCache";
 
 // Types based on the content schema
 export type ReferenceType = "journal" | "website" | "book" | "report" | "other";
@@ -101,7 +102,7 @@ export async function getAllReferences(): Promise<Reference[]> {
   return withCache(CacheKeys.allReferences(), async () => {
     try {
       // Try Astro's getCollection first
-      if (getCollection) {
+      if (getCollection !== null) {
         const referencesCollection = await getCollection("references");
         return referencesCollection.map(entry => ({
           id: entry.id,
@@ -114,7 +115,7 @@ export async function getAllReferences(): Promise<Reference[]> {
     } catch (error) {
       logger.error("Failed to load references:", error);
       // If Astro method fails, try fallback
-      if (getCollection) {
+      if (getCollection !== null) {
         logger.info("Trying fallback method...");
         try {
           return await readReferencesFromFiles();
@@ -146,7 +147,7 @@ export async function getReferencesByIds(ids: string[]): Promise<Reference[]> {
  */
 export async function getReferenceById(id: string): Promise<Reference | null> {
   const references = await getReferencesByIds([id]);
-  return references[0] || null;
+  return references[0] ?? null;
 }
 
 /**
@@ -169,20 +170,20 @@ export async function searchReferences(
   const allReferences = await getAllReferences();
 
   let filtered = allReferences.filter(ref => {
-    if (options.type && ref.type !== options.type) {
+    if (options.type !== undefined && ref.type !== options.type) {
       return false;
     }
-    if (options.year && ref.year !== options.year) {
+    if (options.year !== undefined && ref.year !== options.year) {
       return false;
     }
-    if (options.journal && ref.journal !== options.journal) {
+    if (options.journal !== undefined && ref.journal !== options.journal) {
       return false;
     }
-    if (options.doi && ref.doi !== options.doi) {
+    if (options.doi !== undefined && ref.doi !== options.doi) {
       return false;
     }
 
-    if (options.title) {
+    if (options.title !== undefined) {
       const titleMatch = ref.title
         .toLowerCase()
         .includes(options.title.toLowerCase());
@@ -191,7 +192,7 @@ export async function searchReferences(
       }
     }
 
-    if (options.authors && options.authors.length > 0) {
+    if (options.authors !== undefined && options.authors.length > 0) {
       const authorMatch = options.authors.some(searchAuthor =>
         ref.authors.some(refAuthor =>
           refAuthor.toLowerCase().includes(searchAuthor.toLowerCase())
@@ -202,8 +203,8 @@ export async function searchReferences(
       }
     }
 
-    if (options.keywords && options.keywords.length > 0) {
-      if (!ref.keywords || ref.keywords.length === 0) {
+    if (options.keywords !== undefined && options.keywords.length > 0) {
+      if (ref.keywords === undefined || ref.keywords.length === 0) {
         return false;
       }
       const keywordMatch = options.keywords.some(searchKeyword =>
@@ -219,7 +220,7 @@ export async function searchReferences(
     return true;
   });
 
-  if (options.limit && options.limit > 0) {
+  if (options.limit !== undefined && options.limit > 0) {
     filtered = filtered.slice(0, options.limit);
   }
 
@@ -278,9 +279,9 @@ export async function getReferenceStats(): Promise<ReferenceStats> {
     // Count keywords
     const keywordCounts = new Map<string, number>();
     allReferences.forEach(ref => {
-      if (ref.keywords) {
+      if (ref.keywords !== undefined) {
         ref.keywords.forEach(keyword => {
-          keywordCounts.set(keyword, (keywordCounts.get(keyword) || 0) + 1);
+          keywordCounts.set(keyword, (keywordCounts.get(keyword) ?? 0) + 1);
         });
       }
     });
@@ -294,7 +295,7 @@ export async function getReferenceStats(): Promise<ReferenceStats> {
     const authorCounts = new Map<string, number>();
     allReferences.forEach(ref => {
       ref.authors.forEach(author => {
-        authorCounts.set(author, (authorCounts.get(author) || 0) + 1);
+        authorCounts.set(author, (authorCounts.get(author) ?? 0) + 1);
       });
     });
 
@@ -458,7 +459,7 @@ export async function deleteReference(id: string): Promise<void> {
 export function generateReferenceId(data: ReferenceData): string {
   const year = data.year;
   const firstAuthor =
-    data.authors[0]?.toLowerCase().replace(/[^a-z]/g, "") || "";
+    data.authors[0]?.toLowerCase().replace(/[^a-z]/g, "") ?? "";
   const titleWords = data.title
     .toLowerCase()
     .replace(/[^a-z\s]/g, "")
@@ -484,7 +485,7 @@ export function validateReferenceData(
   const errors: ValidationError[] = [];
 
   // Required fields
-  if (!data.type) {
+  if (data.type === undefined) {
     errors.push({ field: "type", message: "Type is required" });
   } else if (
     !["journal", "website", "book", "report", "other"].includes(data.type)
@@ -496,21 +497,21 @@ export function validateReferenceData(
     });
   }
 
-  if (!data.title || data.title.trim().length === 0) {
+  if (data.title === undefined || data.title.trim().length === 0) {
     errors.push({
       field: "title",
       message: "Title is required and cannot be empty",
     });
   }
 
-  if (!data.authors || data.authors.length === 0) {
+  if (data.authors === undefined || data.authors.length === 0) {
     errors.push({
       field: "authors",
       message: "At least one author is required",
     });
   }
 
-  if (!data.year) {
+  if (data.year === undefined) {
     errors.push({ field: "year", message: "Year is required" });
   } else if (data.year < 1900 || data.year > new Date().getFullYear() + 1) {
     errors.push({
@@ -520,14 +521,14 @@ export function validateReferenceData(
   }
 
   // Type-specific validation
-  if (data.type === "journal" && !data.journal) {
+  if (data.type === "journal" && data.journal === undefined) {
     errors.push({
       field: "journal",
       message: "Journal name is required for journal articles",
     });
   }
 
-  if (data.type === "book" && !data.publisher) {
+  if (data.type === "book" && data.publisher === undefined) {
     errors.push({
       field: "publisher",
       message: "Publisher is required for books",
@@ -535,7 +536,7 @@ export function validateReferenceData(
   }
 
   // URL validation
-  if (data.url) {
+  if (data.url !== undefined) {
     try {
       new URL(data.url);
     } catch {
@@ -544,7 +545,7 @@ export function validateReferenceData(
   }
 
   // DOI validation
-  if (data.doi && !data.doi.match(/^10\.\d{4,}\/.+/)) {
+  if (data.doi !== undefined && !data.doi.match(/^10\.\d{4,}\/.+/)) {
     errors.push({
       field: "doi",
       message: "DOI must start with '10.' followed by publisher and suffix",
@@ -588,7 +589,7 @@ export async function findDuplicateReferences(): Promise<
   // Group by DOI
   const doiGroups = new Map<string, Reference[]>();
   allReferences
-    .filter(ref => ref.doi)
+    .filter(ref => ref.doi !== undefined)
     .forEach(ref => {
       const doi = ref.doi!.toLowerCase();
       if (!doiGroups.has(doi)) {

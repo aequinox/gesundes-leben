@@ -9,35 +9,6 @@
  */
 
 // Re-export everything from the modular architecture
-export type {
-  ViewTransitionConfig,
-  TransitionMetrics,
-  ValidationError,
-  PreloadStrategy,
-  TransitionType,
-  AccessibilityConfig,
-  ViewTransitionDurations,
-} from "./viewTransitions/config";
-
-export {
-  ViewTransitionEnhancer,
-  AccessibilityManager,
-  MetricsCollector,
-  PreloadManager,
-  FallbackHandler,
-  initViewTransitions,
-  getViewTransitionsInstance,
-  cleanupViewTransitions,
-  reinitViewTransitions,
-  DEFAULT_CONFIG,
-  VALIDATION_RULES,
-  validateConfig,
-  mergeConfig,
-} from "./viewTransitions";
-
-// Maintain backward compatibility for the main class
-export { ViewTransitionEnhancer as default } from "./viewTransitions/enhancer";
-
 // Backward compatibility: provide a default initialization
 // that uses the new modular architecture
 import { initViewTransitions, type ViewTransitionEnhancer } from "./viewTransitions";
@@ -85,3 +56,34 @@ if (typeof window !== "undefined") {
     }
   });
 }
+
+// Export types at the end of the file
+export type {
+  ViewTransitionConfig,
+  TransitionMetrics,
+  ValidationError,
+  PreloadStrategy,
+  TransitionType,
+  AccessibilityConfig,
+  ViewTransitionDurations,
+} from "./viewTransitions/config";
+
+// Export functions at the end of the file
+export {
+  ViewTransitionEnhancer,
+  AccessibilityManager,
+  MetricsCollector,
+  PreloadManager,
+  FallbackHandler,
+  initViewTransitions,
+  getViewTransitionsInstance,
+  cleanupViewTransitions,
+  reinitViewTransitions,
+  DEFAULT_CONFIG,
+  VALIDATION_RULES,
+  validateConfig,
+  mergeConfig,
+} from "./viewTransitions";
+
+// Maintain backward compatibility for the main class
+export { ViewTransitionEnhancer as default } from "./viewTransitions/enhancer";

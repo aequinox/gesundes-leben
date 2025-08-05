@@ -125,7 +125,9 @@ export class ErrorTracker {
         error.message.includes("NetworkError"),
       recover: async () => {
         logger.info("Attempting network error recovery with retry...");
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise<void>(resolve => {
+          setTimeout(() => resolve(), 1000);
+        });
       },
       description: "Network connectivity retry",
     });
@@ -222,7 +224,7 @@ export class ErrorTracker {
     );
 
     // Attempt recovery
-    this.attemptRecovery(error, {
+    void this.attemptRecovery(error, {
       error,
       errorInfo: { componentStack: error.stack || "unknown" },
       retry: () => this.retryOperation(componentName, error),
@@ -244,7 +246,7 @@ export class ErrorTracker {
     }
 
     let sessionId = sessionStorage.getItem("error-tracker-session");
-    if (!sessionId) {
+    if (sessionId === null) {
       sessionId = `session-${Date.now()}-${Math.random().toString(36).substring(2)}`;
       sessionStorage.setItem("error-tracker-session", sessionId);
     }
@@ -336,7 +338,7 @@ export class ErrorTracker {
 
     const errorsByComponent = this.errorHistory.reduce(
       (acc, error) => {
-        acc[error.componentName] = (acc[error.componentName] || 0) + 1;
+        acc[error.componentName] = (acc[error.componentName] ?? 0) + 1;
         return acc;
       },
       {} as Record<string, number>
@@ -344,8 +346,8 @@ export class ErrorTracker {
 
     const commonErrorTypes = this.errorHistory.reduce(
       (acc, error) => {
-        const errorType = error.error.name || "UnknownError";
-        acc[errorType] = (acc[errorType] || 0) + 1;
+        const errorType = error.error.name ?? "UnknownError";
+        acc[errorType] = (acc[errorType] ?? 0) + 1;
         return acc;
       },
       {} as Record<string, number>
@@ -384,13 +386,13 @@ export function createErrorBoundary<T extends Record<string, unknown>>(
       const errorInstance =
         error instanceof Error ? error : new Error(String(error));
 
-      tracker.reportError(Component.name || "Anonymous", errorInstance, {
+      tracker.reportError(Component.name ?? "Anonymous", errorInstance, {
         props: props as Record<string, unknown>,
       });
 
-      if (config.onError) {
+      if (config.onError !== undefined) {
         const errorInfo: ErrorInfo = {
-          componentName: Component.name || "Anonymous",
+          componentName: Component.name ?? "Anonymous",
           error: errorInstance,
           timestamp: new Date(),
           url: typeof window !== "undefined" ? window.location.href : "unknown",
@@ -405,7 +407,7 @@ export function createErrorBoundary<T extends Record<string, unknown>>(
       if (typeof config.fallback === "function") {
         return config.fallback();
       }
-      return config.fallback || "Component failed to render";
+      return config.fallback ?? "Component failed to render";
     }
   };
 }
