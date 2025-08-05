@@ -245,15 +245,22 @@ export function getRobotPolicies(): RobotPolicy[] {
     seoConfig.robots.environmentSpecific.development.userAgent !== ""
   ) {
     const devPolicy = seoConfig.robots.environmentSpecific.development;
-    return [
-      {
-        userAgent: devPolicy.userAgent as string,
-        allow: devPolicy.allow,
-        disallow: devPolicy.disallow,
-        crawlDelay: devPolicy.crawlDelay,
-        sitemap: seoConfig.sitemap.baseUrls,
-      },
-    ];
+    const policy: RobotPolicy = {
+      userAgent: devPolicy.userAgent as string,
+      sitemap: seoConfig.sitemap.baseUrls,
+    };
+
+    if (devPolicy.allow !== undefined) {
+      policy.allow = devPolicy.allow;
+    }
+    if (devPolicy.disallow !== undefined) {
+      policy.disallow = devPolicy.disallow;
+    }
+    if (devPolicy.crawlDelay !== undefined) {
+      policy.crawlDelay = devPolicy.crawlDelay;
+    }
+
+    return [policy];
   }
 
   return basePolicy.map(policy => ({
