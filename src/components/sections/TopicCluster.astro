@@ -1,0 +1,464 @@
+---
+/**
+ * TopicCluster Component
+ *
+ * Displays a comprehensive topic cluster with organized content navigation.
+ * Creates hub-and-spoke linking patterns for improved SEO and user experience.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <TopicCluster
+ *   clusterId="darm-mikrobiom"
+ *   layout="grid"
+ *   showStats={true}
+ * />
+ * ```
+ */
+
+import { getCollection } from "astro:content";
+
+import InternalLink from "@/components/elements/InternalLink.astro";
+import Card from "@/components/sections/Card.astro";
+import { analyzeTopicClusters, TOPIC_CLUSTERS } from "@/utils/internal-linking";
+import { getSortedPosts } from "@/utils/posts";
+import type { Post } from "@/utils/types";
+
+export interface Props {
+  /** Topic cluster to display */
+  clusterId: keyof typeof TOPIC_CLUSTERS;
+  /** Layout style for the cluster */
+  layout?: "grid" | "list" | "hub";
+  /** Maximum posts to display */
+  maxPosts?: number;
+  /** Whether to show cluster statistics */
+  showStats?: boolean;
+  /** Whether to show pillar post prominently */
+  highlightPillar?: boolean;
+  /** Whether to group by categories */
+  groupByCategory?: boolean;
+}
+
+const {
+  clusterId,
+  layout = "grid",
+  maxPosts = 12,
+  showStats = true,
+  highlightPillar = true,
+  groupByCategory = false,
+} = Astro.props;
+
+// Get cluster information
+const clusterInfo = TOPIC_CLUSTERS[clusterId];
+
+if (!clusterInfo) {
+  // console.warn(`Unknown cluster ID: ${clusterId}`);
+  return null;
+}
+
+// Fetch all posts and analyze clusters
+const allPosts = await getCollection("blog");
+const sortedPosts = getSortedPosts(allPosts);
+const clusterAnalyses = analyzeTopicClusters(sortedPosts);
+
+// Find current cluster analysis
+const clusterAnalysis = clusterAnalyses.find(
+  cluster => cluster.clusterId === clusterId
+);
+
+if (!clusterAnalysis || clusterAnalysis.posts.length === 0) {
+  return null;
+}
+
+const { pillarPost, supportingPosts, posts: allClusterPosts } = clusterAnalysis;
+
+// Organize posts for display
+const _displayPosts = allClusterPosts.slice(0, maxPosts);
+const nonPillarPosts = supportingPosts.slice(
+  0,
+  maxPosts - (pillarPost ? 1 : 0)
+);
+
+// Group by category if requested
+let groupedPosts: Record<string, Post[]> = {};
+if (groupByCategory) {
+  groupedPosts = nonPillarPosts.reduce(
+    (groups, post) => {
+      const primaryCategory = post.data.categories?.[0] || "Allgemein";
+      if (!groups[primaryCategory]) {
+        groups[primaryCategory] = [];
+      }
+      groups[primaryCategory].push(post);
+      return groups;
+    },
+    {} as Record<string, Post[]>
+  );
+}
+
+// Calculate cluster statistics
+const stats = {
+  totalPosts: allClusterPosts.length,
+  categories: [
+    ...new Set(allClusterPosts.flatMap(post => post.data.categories || [])),
+  ],
+  averageReadTime: Math.round(
+    allClusterPosts.reduce(
+      (total, post) => total + (post.data.readingTime?.minutes || 5),
+      0
+    ) / allClusterPosts.length
+  ),
+};
+---
+
+<section
+  class={`topic-cluster topic-cluster--${layout}`}
+  data-cluster={clusterId}
+  aria-labelledby="topic-cluster-heading"
+>
+  {/* Cluster Header */}
+  <header class="topic-cluster__header">
+    <div class="topic-cluster__title-group">
+      <h2 id="topic-cluster-heading" class="topic-cluster__title">
+        {clusterInfo.name}
+      </h2>
+
+      {
+        showStats && (
+          <div class="topic-cluster__stats">
+            <div class="stat">
+              <span class="stat__number">{stats.totalPosts}</span>
+              <span class="stat__label">Artikel</span>
+            </div>
+            <div class="stat">
+              <span class="stat__number">{stats.categories.length}</span>
+              <span class="stat__label">Kategorien</span>
+            </div>
+            <div class="stat">
+              <span class="stat__number">~{stats.averageReadTime}</span>
+              <span class="stat__label">Min Lesezeit</span>
+            </div>
+          </div>
+        )
+      }
+    </div>
+
+    <p class="topic-cluster__description">
+      Entdecken Sie umfassende Informationen zu {
+        clusterInfo.name.toLowerCase()
+      }. Alle Artikel sind wissenschaftlich fundiert und praxisorientiert.
+    </p>
+  </header>
+
+  {/* Pillar Post (if exists and should be highlighted) */}
+  {
+    pillarPost && highlightPillar && (
+      <section class="topic-cluster__pillar">
+        <h3 class="pillar-section__title">
+          <span class="pillar-icon">🎯</span>
+          Umfassender Leitfaden
+        </h3>
+
+        <div class="pillar-post">
+          <Card
+            post={pillarPost}
+            size="large"
+            withHeroImage={true}
+            withMeta={true}
+            withDescription={true}
+            withReadMore={true}
+            withCategories={true}
+            featured={true}
+          />
+        </div>
+      </section>
+    )
+  }
+
+  {/* Content Grid/List */}
+  <section class="topic-cluster__content">
+    {
+      groupByCategory ? (
+        /* Grouped by Category Layout */
+        <div class="topic-cluster__grouped">
+          {Object.entries(groupedPosts).map(([category, posts]) => (
+            <div class="category-group">
+              <h3 class="category-group__title">{category}</h3>
+
+              <div
+                class={`category-group__posts category-group__posts--${layout}`}
+              >
+                {posts.map(post => (
+                  <div class="category-group__post">
+                    <Card
+                      post={post}
+                      size={layout === "list" ? "small" : "medium"}
+                      withHeroImage={layout !== "list"}
+                      withMeta={true}
+                      withDescription={layout !== "list"}
+                      withReadMore={true}
+                      withCategories={false}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        /* Standard Grid/List Layout */
+        <div class={`topic-cluster__posts topic-cluster__posts--${layout}`}>
+          {nonPillarPosts.map((post, index) => (
+            <div
+              class="topic-cluster__post"
+              style={`--animation-delay: ${index * 100}ms`}
+            >
+              <Card
+                post={post}
+                size={layout === "list" ? "small" : "medium"}
+                withHeroImage={layout !== "list"}
+                withMeta={true}
+                withDescription={layout !== "list"}
+                withReadMore={true}
+                withCategories={true}
+                maxCategories={2}
+              />
+            </div>
+          ))}
+        </div>
+      )
+    }
+  </section>
+
+  {/* Cluster Footer with Navigation */}
+  <footer class="topic-cluster__footer">
+    <div class="topic-cluster__navigation">
+      <p class="navigation-hint">
+        <strong>Tipp:</strong> Beginnen Sie mit dem Leitfaden und arbeiten Sie sich
+        durch die verwandten Artikel.
+      </p>
+
+      {
+        pillarPost && !highlightPillar && (
+          <InternalLink
+            to={`/posts/${pillarPost.slug}`}
+            anchor="Zum kompletten Leitfaden"
+            variant="button"
+            context="strong"
+            placement="navigation"
+            icon="arrow-right"
+          />
+        )
+      }
+    </div>
+  </footer>
+</section>
+
+<style>
+  /* Base topic cluster styles */
+  .topic-cluster {
+    @apply w-full max-w-none;
+  }
+
+  /* Header styles */
+  .topic-cluster__header {
+    @apply mb-8 text-center;
+  }
+
+  .topic-cluster__title-group {
+    @apply mb-4;
+  }
+
+  .topic-cluster__title {
+    @apply mb-4 text-3xl font-bold text-gray-900 md:text-4xl dark:text-gray-100;
+    background: linear-gradient(
+      135deg,
+      oklch(var(--color-accent)),
+      oklch(var(--color-accent-hover))
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .topic-cluster__stats {
+    @apply flex justify-center gap-6 md:gap-8;
+  }
+
+  .stat {
+    @apply text-center;
+  }
+
+  .stat__number {
+    @apply block text-2xl font-bold text-accent;
+  }
+
+  .stat__label {
+    @apply text-sm tracking-wide text-gray-600 uppercase dark:text-gray-400;
+  }
+
+  .topic-cluster__description {
+    @apply mx-auto max-w-2xl text-lg leading-relaxed text-gray-600 dark:text-gray-400;
+  }
+
+  /* Pillar post section */
+  .topic-cluster__pillar {
+    @apply mb-10;
+  }
+
+  .pillar-section__title {
+    @apply mb-6 flex items-center justify-center gap-2 text-xl font-semibold text-gray-900 dark:text-gray-100;
+  }
+
+  .pillar-icon {
+    @apply text-2xl;
+  }
+
+  .pillar-post {
+    @apply mx-auto max-w-4xl;
+  }
+
+  /* Content section */
+  .topic-cluster__content {
+    @apply mb-8;
+  }
+
+  /* Grid layout */
+  .topic-cluster__posts--grid {
+    @apply grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .topic-cluster__post {
+    @apply translate-y-4 transform opacity-0;
+    animation: fadeInUp 0.6s ease-out forwards;
+    animation-delay: var(--animation-delay, 0ms);
+  }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* List layout */
+  .topic-cluster__posts--list {
+    @apply space-y-4;
+  }
+
+  /* Hub layout (featured post + grid) */
+  .topic-cluster--hub .topic-cluster__posts--grid {
+    @apply lg:grid-cols-2;
+  }
+
+  /* Grouped layout */
+  .topic-cluster__grouped {
+    @apply space-y-10;
+  }
+
+  .category-group {
+    @apply rounded-xl border border-border/30 bg-card/30 p-6;
+    backdrop-filter: blur(8px);
+  }
+
+  .category-group__title {
+    @apply mb-6 border-b border-accent/20 pb-2 text-xl font-semibold text-accent;
+  }
+
+  .category-group__posts--grid {
+    @apply grid grid-cols-1 gap-4 md:grid-cols-2;
+  }
+
+  .category-group__posts--list {
+    @apply space-y-3;
+  }
+
+  /* Footer styles */
+  .topic-cluster__footer {
+    @apply border-t border-border/30 pt-8;
+  }
+
+  .topic-cluster__navigation {
+    @apply space-y-4 text-center;
+  }
+
+  .navigation-hint {
+    @apply leading-relaxed text-gray-600 dark:text-gray-400;
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .topic-cluster__title {
+      @apply text-2xl;
+    }
+
+    .topic-cluster__stats {
+      @apply gap-4;
+    }
+
+    .stat__number {
+      @apply text-xl;
+    }
+
+    .topic-cluster__posts--grid {
+      @apply grid-cols-1;
+    }
+
+    .category-group {
+      @apply p-4;
+    }
+
+    .category-group__posts--grid {
+      @apply grid-cols-1;
+    }
+  }
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .topic-cluster__title {
+      @apply text-accent;
+      -webkit-text-fill-color: unset;
+      background-clip: unset;
+    }
+
+    .category-group {
+      @apply border-2 border-accent;
+    }
+  }
+
+  /* Dark mode optimizations */
+  @media (prefers-color-scheme: dark) {
+    .category-group {
+      @apply bg-card/20;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .topic-cluster__post {
+      animation: none;
+      @apply transform-none opacity-100;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .topic-cluster {
+      @apply bg-white;
+    }
+
+    .topic-cluster__title {
+      @apply text-black;
+      -webkit-text-fill-color: unset;
+      background-clip: unset;
+    }
+
+    .topic-cluster__stats,
+    .pillar-icon {
+      display: none;
+    }
+
+    .category-group {
+      @apply border border-gray-300 bg-white;
+    }
+  }
+</style>

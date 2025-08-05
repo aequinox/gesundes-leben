@@ -1,0 +1,405 @@
+---
+/**
+ * PillarNavigation Component
+ *
+ * Creates comprehensive navigation for pillar pages and topic clusters.
+ * Displays related content in an organized, SEO-friendly structure that helps
+ * users discover related articles and improves internal linking.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <PillarNavigation
+ *   currentPost={post}
+ *   clusterId="darm-mikrobiom"
+ *   showProgress={true}
+ * />
+ * ```
+ */
+
+import { getCollection } from "astro:content";
+
+import InternalLink from "@/components/elements/InternalLink.astro";
+import {
+  analyzeTopicClusters,
+  identifyTopicCluster,
+  TOPIC_CLUSTERS,
+} from "@/utils/internal-linking";
+import { getSortedPosts } from "@/utils/posts";
+import type { Post } from "@/utils/types";
+
+export interface Props {
+  /** Current post for context */
+  currentPost: Post;
+  /** Specific cluster ID to display (auto-detected if not provided) */
+  clusterId?: keyof typeof TOPIC_CLUSTERS;
+  /** Whether to show reading progress indicator */
+  showProgress?: boolean;
+  /** Maximum supporting posts to display */
+  maxSupportingPosts?: number;
+  /** Whether to show post descriptions */
+  showDescriptions?: boolean;
+}
+
+const {
+  currentPost,
+  clusterId,
+  showProgress = true,
+  maxSupportingPosts = 8,
+  showDescriptions = false,
+} = Astro.props;
+
+// Auto-detect cluster if not provided
+const detectedCluster = clusterId || identifyTopicCluster(currentPost);
+
+if (!detectedCluster) {
+  // Don't render if post doesn't belong to a cluster
+  return null;
+}
+
+// Get cluster information
+const clusterInfo = TOPIC_CLUSTERS[detectedCluster];
+const clusterName = clusterInfo.name;
+
+// Fetch all posts and analyze clusters
+const allPosts = await getCollection("blog");
+const sortedPosts = getSortedPosts(allPosts);
+const clusterAnalyses = analyzeTopicClusters(sortedPosts);
+
+// Find current cluster analysis
+const currentClusterAnalysis = clusterAnalyses.find(
+  cluster => cluster.clusterId === detectedCluster
+);
+
+if (!currentClusterAnalysis || currentClusterAnalysis.posts.length <= 1) {
+  // Don't render if cluster has too few posts
+  return null;
+}
+
+const { pillarPost, supportingPosts } = currentClusterAnalysis;
+
+// Determine if current post is the pillar post
+const isCurrentPillar = currentPost.slug === pillarPost?.slug;
+
+// Calculate reading progress if enabled
+let progressData = null;
+if (showProgress && pillarPost) {
+  const totalPosts = currentClusterAnalysis.posts.length;
+  const currentIndex = currentClusterAnalysis.posts.findIndex(
+    post => post.id === currentPost.id
+  );
+  const progressPercentage = ((currentIndex + 1) / totalPosts) * 100;
+
+  progressData = {
+    current: currentIndex + 1,
+    total: totalPosts,
+    percentage: Math.round(progressPercentage),
+  };
+}
+
+// Organize supporting posts for display
+const displayPosts = supportingPosts
+  .filter(post => post.id !== currentPost.id) // Remove current post
+  .slice(0, maxSupportingPosts);
+
+// Group posts by category for better organization
+const groupedPosts = displayPosts.reduce(
+  (groups, post) => {
+    const primaryCategory = post.data.categories?.[0] || "Allgemein";
+    if (!groups[primaryCategory]) {
+      groups[primaryCategory] = [];
+    }
+    groups[primaryCategory].push(post);
+    return groups;
+  },
+  {} as Record<string, Post[]>
+);
+---
+
+<nav
+  class="pillar-navigation"
+  aria-labelledby="pillar-navigation-heading"
+  data-cluster={detectedCluster}
+>
+  {/* Header with cluster information */}
+  <header class="pillar-navigation__header">
+    <h2 id="pillar-navigation-heading" class="pillar-navigation__title">
+      <span class="pillar-navigation__icon">📚</span>
+      {clusterName}
+    </h2>
+
+    {
+      progressData && (
+        <div class="pillar-navigation__progress">
+          <div class="progress-bar">
+            <div
+              class="progress-bar__fill"
+              style={`width: ${progressData.percentage}%`}
+              aria-hidden="true"
+            />
+          </div>
+          <span class="progress-text">
+            Artikel {progressData.current} von {progressData.total}
+          </span>
+        </div>
+      )
+    }
+  </header>
+
+  {/* Pillar post section (if exists and not current) */}
+  {
+    pillarPost && !isCurrentPillar && (
+      <section class="pillar-navigation__pillar">
+        <h3 class="pillar-navigation__section-title">
+          <span class="section-icon">🎯</span>
+          Kompletter Leitfaden
+        </h3>
+
+        <div class="pillar-post-card">
+          <InternalLink
+            to={`/posts/${pillarPost.slug}`}
+            anchor={pillarPost.data.title}
+            variant="button"
+            context="strong"
+            placement="navigation"
+            icon="health"
+            title={`Umfassender Leitfaden: ${pillarPost.data.title}`}
+          />
+
+          {showDescriptions && pillarPost.data.description && (
+            <p class="pillar-post-card__description">
+              {pillarPost.data.description}
+            </p>
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  {/* Supporting posts by category */}
+  {
+    Object.entries(groupedPosts).length > 0 && (
+      <section class="pillar-navigation__supporting">
+        <h3 class="pillar-navigation__section-title">
+          <span class="section-icon">📖</span>
+          Verwandte Artikel
+        </h3>
+
+        <div class="supporting-posts">
+          {Object.entries(groupedPosts).map(([category, posts]) => (
+            <div class="supporting-posts__group">
+              <h4 class="supporting-posts__category">{category}</h4>
+
+              <ul class="supporting-posts__list">
+                {posts.map(post => (
+                  <li class="supporting-posts__item">
+                    <InternalLink
+                      to={`/posts/${post.slug}`}
+                      anchor={post.data.title}
+                      variant="inline"
+                      context="moderate"
+                      placement="navigation"
+                      title={`${post.data.title} - ${category}`}
+                    />
+
+                    {showDescriptions && post.data.description && (
+                      <p class="supporting-posts__description">
+                        {post.data.description}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {/* Call to action for comprehensive learning */}
+  <footer class="pillar-navigation__footer">
+    <div class="pillar-navigation__cta">
+      <p class="cta-text">
+        <strong>Tipp:</strong> Für das beste Lernergebnis empfehlen wir, alle Artikel
+        in diesem Themenbereich zu lesen.
+      </p>
+    </div>
+  </footer>
+</nav>
+
+<style>
+  /* Base pillar navigation styles */
+  .pillar-navigation {
+    @apply rounded-xl border border-border/30 bg-gradient-to-br from-card/80 to-card/40 p-6 shadow-sm;
+    backdrop-filter: blur(8px);
+  }
+
+  /* Header styles */
+  .pillar-navigation__header {
+    @apply mb-6 border-b border-border/30 pb-4;
+  }
+
+  .pillar-navigation__title {
+    @apply mb-3 flex items-center gap-3 text-xl font-bold text-gray-900 dark:text-gray-100;
+  }
+
+  .pillar-navigation__icon {
+    @apply text-2xl opacity-80;
+  }
+
+  /* Progress indicator */
+  .pillar-navigation__progress {
+    @apply flex items-center gap-3;
+  }
+
+  .progress-bar {
+    @apply h-2 flex-1 overflow-hidden rounded-full bg-border/30;
+  }
+
+  .progress-bar__fill {
+    @apply to-accent-hover h-full bg-gradient-to-r from-accent transition-all duration-500 ease-out;
+  }
+
+  .progress-text {
+    @apply text-sm font-medium whitespace-nowrap text-gray-600 dark:text-gray-400;
+  }
+
+  /* Section styles */
+  .pillar-navigation__section-title {
+    @apply mb-4 flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-gray-100;
+  }
+
+  .section-icon {
+    @apply text-lg opacity-70;
+  }
+
+  /* Pillar post section */
+  .pillar-navigation__pillar {
+    @apply mb-6;
+  }
+
+  .pillar-post-card {
+    @apply rounded-lg border border-accent/20 bg-accent/5 p-4;
+  }
+
+  .pillar-post-card__description {
+    @apply mt-2 text-sm leading-relaxed text-gray-600 dark:text-gray-400;
+  }
+
+  /* Supporting posts section */
+  .pillar-navigation__supporting {
+    @apply mb-6;
+  }
+
+  .supporting-posts {
+    @apply space-y-5;
+  }
+
+  .supporting-posts__group {
+    @apply rounded-lg border border-border/20 bg-card/30 p-4;
+  }
+
+  .supporting-posts__category {
+    @apply mb-3 text-base font-semibold text-accent;
+  }
+
+  .supporting-posts__list {
+    @apply m-0 list-none space-y-2 p-0;
+  }
+
+  .supporting-posts__item {
+    @apply flex flex-col;
+  }
+
+  .supporting-posts__description {
+    @apply mt-1 ml-4 text-xs leading-relaxed text-gray-600 dark:text-gray-400;
+  }
+
+  /* Footer / CTA section */
+  .pillar-navigation__footer {
+    @apply border-t border-border/30 pt-4;
+  }
+
+  .pillar-navigation__cta {
+    @apply rounded-lg border border-accent/15 bg-accent/8 p-3;
+  }
+
+  .cta-text {
+    @apply m-0 text-sm leading-relaxed text-gray-900 dark:text-gray-100;
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .pillar-navigation {
+      @apply p-4;
+    }
+
+    .pillar-navigation__title {
+      @apply text-lg;
+    }
+
+    .pillar-navigation__progress {
+      @apply flex-col gap-2;
+    }
+
+    .progress-text {
+      @apply text-center;
+    }
+
+    .supporting-posts__group {
+      @apply p-3;
+    }
+  }
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .pillar-navigation {
+      @apply border-2 border-accent;
+    }
+
+    .pillar-post-card {
+      @apply border-2 border-accent;
+    }
+
+    .supporting-posts__group {
+      @apply border-text-base border;
+    }
+  }
+
+  /* Dark mode optimizations */
+  @media (prefers-color-scheme: dark) {
+    .pillar-navigation {
+      @apply from-card/60 to-card/20;
+    }
+
+    .pillar-post-card {
+      @apply bg-accent/8;
+    }
+
+    .supporting-posts__group {
+      @apply bg-card/20;
+    }
+
+    .pillar-navigation__cta {
+      @apply bg-accent/6;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .pillar-navigation {
+      @apply border border-gray-300 bg-white shadow-none;
+    }
+
+    .pillar-navigation__progress,
+    .pillar-navigation__icon,
+    .section-icon {
+      display: none;
+    }
+
+    .pillar-navigation__title {
+      @apply text-black;
+    }
+  }
+</style>

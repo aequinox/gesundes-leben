@@ -48,6 +48,31 @@ export {
   type GroupKey,
 } from "./posts";
 
+// === Internal Linking & SEO ===
+export {
+  TOPIC_CLUSTERS,
+  LINKING_WEIGHTS,
+  analyzeContentRelationships,
+  identifyTopicCluster,
+  analyzeTopicClusters,
+  findCrossClusterLinkingOpportunities,
+  generateInternalLinkingReport,
+  type ContentRelationship,
+  type TopicClusterAnalysis,
+} from "./internal-linking";
+
+export {
+  LinkAnalytics,
+  linkAnalytics,
+  trackLinkClick,
+  getLinkPerformanceMetrics,
+  generateInternalLinkingReport as generateAnalyticsReport,
+  type LinkClickData,
+  type LinkPerformanceMetrics,
+  type InternalLinkAudit,
+  type SEOLinkAnalysis,
+} from "./link-analytics";
+
 export { getAuthors, getAuthorById, type AuthorData } from "./authors";
 
 // === Text Processing ===

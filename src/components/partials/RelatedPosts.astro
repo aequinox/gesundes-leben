@@ -2,8 +2,8 @@
 /**
  * RelatedPosts Component
  *
- * A sophisticated component for displaying related blog posts based on tags, categories, and groups.
- * Uses a scoring algorithm to find the most relevant posts.
+ * Enhanced component for displaying related blog posts with intelligent content analysis.
+ * Uses advanced scoring algorithm based on content relationships, topic clusters, and SEO optimization.
  *
  * @component
  * @example
@@ -11,16 +11,17 @@
  * <RelatedPosts
  *   post={post}
  *   maxPosts={3}
+ *   useAdvancedAnalysis={true}
  * />
  * ```
  */
 
 import { getCollection } from "astro:content";
 
-// import { postService } from "@/services/content/PostService";
 import Card from "@/components/sections/Card.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { getRelatedPosts, getSortedPosts } from "@/utils/posts";
+import { analyzeContentRelationships, identifyTopicCluster, TOPIC_CLUSTERS } from "@/utils/internal-linking";
 import type { Post } from "@/utils/types";
 
 interface Props {
@@ -30,9 +31,19 @@ interface Props {
   maxPosts?: number;
   /** Animation type for data-aos attribute */
   animationType?: string;
+  /** Whether to use advanced content analysis */
+  useAdvancedAnalysis?: boolean;
+  /** Whether to show relationship scores in dev mode */
+  showDebugInfo?: boolean;
 }
 
-const { post, maxPosts = 3, animationType = "fade-up" }: Props = Astro.props;
+const { 
+  post, 
+  maxPosts = 3, 
+  animationType = "fade-up",
+  useAdvancedAnalysis = true,
+  showDebugInfo = false 
+}: Props = Astro.props;
 
 // Get translations
 const lang = getLangFromUrl(Astro.url);
@@ -41,11 +52,30 @@ const t = useTranslations(lang);
 // Fetch all posts
 const posts = await getCollection("blog");
 const sortedPosts = getSortedPosts(posts);
-// const allPosts = await postService.getAllPosts();
-// const sortedPosts = await postService.getSortedPosts(allPosts);
 
-// Get related posts using our algorithm
-const relatedPosts = getRelatedPosts(post, sortedPosts, maxPosts);
+// Get related posts using enhanced algorithm
+let relatedPosts: Post[] = [];
+let relationshipData: Array<{
+  targetPost: Post;  
+  score: number;
+  matchReasons: string[];
+  suggestedAnchorText: string[];
+  linkingContext: 'strong' | 'moderate' | 'weak';
+}> = [];
+
+if (useAdvancedAnalysis) {
+  // Use advanced content relationship analysis
+  const relationships = analyzeContentRelationships(post, sortedPosts, maxPosts);
+  relatedPosts = relationships.map(rel => rel.targetPost);
+  relationshipData = relationships;
+} else {
+  // Fallback to original algorithm
+  relatedPosts = getRelatedPosts(post, sortedPosts, maxPosts);
+}
+
+// Get topic cluster information for context
+const currentCluster = identifyTopicCluster(post);
+const clusterInfo = currentCluster ? TOPIC_CLUSTERS[currentCluster] : null;
 
 // No related posts message from i18n
 const noRelatedPostsMessage = t("post.noRelatedPosts");
@@ -55,36 +85,72 @@ const noRelatedPostsMessage = t("post.noRelatedPosts");
   class="related-posts-section"
   aria-labelledby="related-posts-heading"
   data-aos={animationType}
+  data-cluster={currentCluster}
 >
   <div class="related-posts-header">
     <h2 id="related-posts-heading" class="related-posts-heading">
       {t("post.relatedPosts")}
+      {clusterInfo && (
+        <span class="cluster-badge" title={`Teil der ${clusterInfo.name} Serie`}>
+          📚 {clusterInfo.name}
+        </span>
+      )}
     </h2>
+    
+    {/* Cluster context information */}
+    {clusterInfo && useAdvancedAnalysis && (
+      <p class="cluster-context">
+        Diese Artikel gehören zu unserer umfassenden Serie über {clusterInfo.name.toLowerCase()}.
+      </p>
+    )}
   </div>
 
   {
     relatedPosts.length > 0 ? (
       <div class="related-posts-grid">
-        {relatedPosts.map((relatedPost, index) => (
-          <div
-            class="related-post-item"
-            style={`--animation-order: ${index};`}
-            data-aos="fade-up"
-            data-aos-delay={index * 100}
-          >
-            <Card
-              post={relatedPost}
-              size="small"
-              withHeroImage={true}
-              loading="lazy"
-              withMeta={false}
-              withDescription={true}
-              withReadMore={true}
-              withCategories={true}
-              maxCategories={2}
-            />
-          </div>
-        ))}
+        {relatedPosts.map((relatedPost, index) => {
+          const relationship = useAdvancedAnalysis ? relationshipData[index] : null;
+          
+          return (
+            <div
+              class={`related-post-item ${relationship ? `related-post-item--${relationship.linkingContext}` : ''}`}
+              style={`--animation-order: ${index};`}
+              data-aos="fade-up"
+              data-aos-delay={index * 100}
+              data-relationship-score={relationship?.score}
+            >
+              <Card
+                post={relatedPost}
+                size="small"
+                withHeroImage={true}
+                loading="lazy"
+                withMeta={false}
+                withDescription={true}
+                withReadMore={true}
+                withCategories={true}
+                maxCategories={2}
+              />
+              
+              {/* Enhanced relationship indicators */}
+              {relationship && relationship.linkingContext === 'strong' && (
+                <div class="relationship-indicator">
+                  <span class="relationship-badge">Stark verwandt</span>
+                </div>
+              )}
+              
+              {/* Dev mode: Show relationship debugging */}
+              {showDebugInfo && import.meta.env.DEV && relationship && (
+                <div class="relationship-debug">
+                  <small>
+                    Score: {relationship.score} | 
+                    Context: {relationship.linkingContext} |
+                    Reasons: {relationship.matchReasons.slice(0, 2).join(', ')}
+                  </small>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     ) : (
       <div class="related-posts-empty">
@@ -92,6 +158,18 @@ const noRelatedPostsMessage = t("post.noRelatedPosts");
       </div>
     )
   }
+
+  {/* Enhanced footer with cluster navigation */}
+  {clusterInfo && useAdvancedAnalysis && (
+    <footer class="related-posts-footer">
+      <div class="cluster-navigation">
+        <p class="cluster-cta">
+          <strong>💡 Entdecken Sie mehr:</strong> 
+          Alle Artikel zu {clusterInfo.name} für ein umfassendes Verständnis
+        </p>
+      </div>
+    </footer>
+  )}
 </section>
 
 <style>
@@ -104,11 +182,20 @@ const noRelatedPostsMessage = t("post.noRelatedPosts");
 
   /* Header styling */
   .related-posts-header {
-    @apply relative mb-4 flex flex-col;
+    @apply relative mb-6 flex flex-col;
   }
 
   .related-posts-heading {
-    @apply relative mb-2 items-center gap-2 text-2xl font-semibold text-accent md:text-3xl;
+    @apply relative mb-3 flex flex-wrap items-center gap-3 text-2xl font-semibold text-accent md:text-3xl;
+  }
+
+  .cluster-badge {
+    @apply inline-flex items-center gap-1 px-3 py-1 text-sm font-medium bg-accent/10 text-accent rounded-full border border-accent/20;
+    font-size: 0.875rem;
+  }
+
+  .cluster-context {
+    @apply text-sm text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl;
   }
 
   .related-posts-icon {
@@ -129,7 +216,7 @@ const noRelatedPostsMessage = t("post.noRelatedPosts");
 
   /* Animation for staggered items */
   .related-post-item {
-    @apply m-0 opacity-0;
+    @apply m-0 opacity-0 relative;
     transform: translateY(20px);
     animation: fadeInStaggered 0.5s ease-out forwards;
     animation-delay: calc(var(--animation-order, 0) * 100ms + 200ms);
@@ -140,6 +227,46 @@ const noRelatedPostsMessage = t("post.noRelatedPosts");
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  /* Relationship context styling */
+  .related-post-item--strong {
+    @apply ring-2 ring-accent/20 rounded-lg;
+  }
+
+  .related-post-item--moderate {
+    @apply ring-1 ring-accent/10 rounded-lg;
+  }
+
+  .related-post-item--weak {
+    @apply opacity-90;
+  }
+
+  /* Relationship indicators */
+  .relationship-indicator {
+    @apply absolute top-2 right-2 z-10;
+  }
+
+  .relationship-badge {
+    @apply px-2 py-1 text-xs font-medium bg-accent text-white rounded-md shadow-sm;
+  }
+
+  /* Debug information (dev mode only) */
+  .relationship-debug {
+    @apply mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded text-xs text-gray-600 dark:text-gray-400 border border-dashed border-gray-300 dark:border-gray-600;
+  }
+
+  /* Footer styling */
+  .related-posts-footer {
+    @apply mt-6 pt-4 border-t border-border/30;
+  }
+
+  .cluster-navigation {
+    @apply text-center;
+  }
+
+  .cluster-cta {
+    @apply text-sm text-gray-600 dark:text-gray-400 leading-relaxed p-3 bg-accent/5 rounded-lg border border-accent/10;
   }
 
   /* Responsive adjustments */

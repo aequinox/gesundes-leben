@@ -32,6 +32,8 @@ export default [
       "@typescript-eslint/no-floating-promises": "off",
       "@typescript-eslint/await-thenable": "off",
       "@typescript-eslint/no-misused-promises": "off",
+      // Disable import/exports-last for Astro files (conflicts with component patterns)
+      "import/exports-last": "off",
     },
   },
   ...tseslint.configs.recommended,
@@ -205,6 +207,15 @@ export default [
       "no-console": "off",
       // Allow any in CLI scripts for flexibility
       "@typescript-eslint/no-explicit-any": "warn",
+    },
+  },
+  // Additional Astro-specific overrides that come last
+  {
+    files: ["**/*.astro"],
+    rules: {
+      // Override any rules that conflict with Astro component patterns
+      "import/exports-last": "off",
+      "no-console": "warn", // Allow console in Astro components for development
     },
   },
   {

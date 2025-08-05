@@ -1,0 +1,283 @@
+---
+/**
+ * ContextualLinks Component
+ *
+ * Displays intelligent contextual link suggestions within article content.
+ * Uses content analysis to suggest relevant internal links with varied anchor text.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <ContextualLinks
+ *   currentPost={post}
+ *   maxLinks={3}
+ *   placement="inline"
+ * />
+ * ```
+ */
+
+import { getCollection } from "astro:content";
+
+import InternalLink from "@/components/elements/InternalLink.astro";
+import { analyzeContentRelationships } from "@/utils/internal-linking";
+import { getSortedPosts } from "@/utils/posts";
+import type { Post } from "@/utils/types";
+
+export interface Props {
+  /** Current post for context analysis */
+  currentPost: Post;
+  /** Maximum number of links to display */
+  maxLinks?: number;
+  /** Where the links are placed */
+  placement?: "inline" | "sidebar" | "footer";
+  /** Visual style of the container */
+  variant?: "simple" | "boxed" | "highlighted";
+  /** Custom title for the section */
+  title?: string;
+  /** Whether to show relationship scores (dev mode) */
+  showScores?: boolean;
+}
+
+const {
+  currentPost,
+  maxLinks = 3,
+  placement = "inline",
+  variant = "simple",
+  title,
+  showScores = false,
+} = Astro.props;
+
+// Fetch all posts for relationship analysis
+const allPosts = await getCollection("blog");
+const sortedPosts = getSortedPosts(allPosts);
+
+// Analyze content relationships
+const relationships = analyzeContentRelationships(
+  currentPost,
+  sortedPosts,
+  maxLinks
+);
+
+// Filter only meaningful relationships
+const meaningfulRelationships = relationships.filter(rel => rel.score >= 5);
+
+// Default titles based on placement
+const defaultTitles = {
+  inline: "Verwandte Artikel",
+  sidebar: "Weiterführende Informationen",
+  footer: "Das könnte Sie auch interessieren",
+};
+
+const sectionTitle = title || defaultTitles[placement];
+
+// Don't render if no meaningful relationships found
+if (meaningfulRelationships.length === 0) {
+  return null;
+}
+---
+
+<section
+  class={`contextual-links contextual-links--${variant} contextual-links--${placement}`}
+  aria-labelledby="contextual-links-heading"
+>
+  <h3 id="contextual-links-heading" class="contextual-links__title">
+    {sectionTitle}
+  </h3>
+
+  <div class="contextual-links__container">
+    {
+      meaningfulRelationships.map((relationship) => {
+        const {
+          targetPost,
+          suggestedAnchorText,
+          linkingContext,
+          score,
+          matchReasons,
+        } = relationship;
+
+        // Choose best anchor text (first suggestion is usually best)
+        const anchorText = suggestedAnchorText[0] || targetPost.data.title;
+
+        // Determine link variant based on context strength
+        const linkVariant =
+          placement === "inline"
+            ? "inline"
+            : linkingContext === "strong"
+              ? "highlight"
+              : "subtle";
+
+        return (
+          <div class="contextual-links__item">
+            <InternalLink
+              to={`/posts/${targetPost.slug}`}
+              anchor={anchorText}
+              variant={linkVariant}
+              context={linkingContext}
+              placement={placement === "inline" ? "content" : (placement === "footer" ? "content" : placement)}
+              icon={linkingContext === "strong" ? "related" : undefined}
+              title={`${targetPost.data.title} - ${matchReasons.join(", ")}`}
+            />
+
+            {/* Dev mode: Show relationship scores and reasons */}
+            {showScores && import.meta.env.DEV && (
+              <div class="contextual-links__debug">
+                <small>
+                  Score: {score} | {matchReasons.join(", ")}
+                </small>
+              </div>
+            )}
+          </div>
+        );
+      })
+    }
+  </div>
+</section>
+
+<style>
+  /* Base contextual links styles */
+  .contextual-links {
+    @apply mt-6 mb-4;
+  }
+
+  .contextual-links__title {
+    @apply mb-3 text-lg font-semibold text-gray-900 dark:text-gray-100;
+  }
+
+  .contextual-links__container {
+    @apply space-y-2;
+  }
+
+  .contextual-links__item {
+    @apply flex items-start;
+  }
+
+  /* Variant: Simple */
+  .contextual-links--simple {
+    @apply border-l-2 border-accent/30 pl-4;
+  }
+
+  .contextual-links--simple .contextual-links__title {
+    @apply text-base font-medium text-accent;
+  }
+
+  /* Variant: Boxed */
+  .contextual-links--boxed {
+    @apply rounded-lg border border-border/50 bg-card/30 p-4;
+    backdrop-filter: blur(8px);
+  }
+
+  .contextual-links--boxed .contextual-links__title {
+    @apply mb-4 text-accent;
+  }
+
+  .contextual-links--boxed .contextual-links__container {
+    @apply space-y-3;
+  }
+
+  /* Variant: Highlighted */
+  .contextual-links--highlighted {
+    @apply rounded-xl border border-accent/20 bg-gradient-to-r from-accent/10 via-accent/5 to-transparent p-4;
+  }
+
+  .contextual-links--highlighted .contextual-links__title {
+    @apply text-accent-dark flex items-center gap-2 font-semibold;
+  }
+
+  .contextual-links--highlighted .contextual-links__title::before {
+    content: "🔗";
+    @apply opacity-60;
+  }
+
+  /* Placement: Inline (within content) */
+  .contextual-links--inline {
+    @apply my-8;
+  }
+
+  .contextual-links--inline .contextual-links__container {
+    @apply flex flex-wrap gap-3;
+  }
+
+  .contextual-links--inline .contextual-links__item {
+    @apply flex-shrink-0;
+  }
+
+  /* Placement: Sidebar */
+  .contextual-links--sidebar {
+    @apply text-sm;
+  }
+
+  .contextual-links--sidebar .contextual-links__title {
+    @apply mb-2 text-sm font-medium;
+  }
+
+  .contextual-links--sidebar .contextual-links__container {
+    @apply space-y-1.5;
+  }
+
+  /* Placement: Footer */
+  .contextual-links--footer {
+    @apply mt-8 border-t border-border/30 pt-6;
+  }
+
+  .contextual-links--footer .contextual-links__container {
+    @apply grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3;
+  }
+
+  /* Debug information (dev mode only) */
+  .contextual-links__debug {
+    @apply ml-2 text-xs opacity-60;
+    color: oklch(var(--color-text-muted));
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .contextual-links--inline .contextual-links__container {
+      @apply flex-col gap-2;
+    }
+
+    .contextual-links--footer .contextual-links__container {
+      @apply grid-cols-1;
+    }
+  }
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .contextual-links--boxed {
+      @apply border-2 border-accent;
+    }
+
+    .contextual-links--highlighted {
+      @apply border-2 border-accent bg-accent/20;
+    }
+
+    .contextual-links--simple {
+      @apply border-l-4;
+    }
+  }
+
+  /* Dark mode optimizations */
+  @media (prefers-color-scheme: dark) {
+    .contextual-links--boxed {
+      @apply bg-card/20;
+    }
+
+    .contextual-links--highlighted {
+      @apply from-accent/8 to-transparent;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .contextual-links {
+      @apply mb-4 border border-gray-300 p-3;
+    }
+
+    .contextual-links__title {
+      @apply font-bold text-black;
+    }
+
+    .contextual-links__debug {
+      display: none;
+    }
+  }
+</style>

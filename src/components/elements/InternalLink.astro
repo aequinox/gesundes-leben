@@ -1,0 +1,367 @@
+---
+/**
+ * InternalLink Component
+ *
+ * Intelligent internal linking component with SEO optimization.
+ * Provides contextual link suggestions, proper anchor text variation,
+ * and performance tracking for internal link building.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <InternalLink
+ *   to="/posts/vitamin-d-mangel"
+ *   anchor="Vitamin D Mangel erkennen"
+ *   context="strong"
+ *   trackClick={true}
+ * />
+ * ```
+ */
+
+// Unused imports removed to fix ESLint errors
+// import { slugifyStr } from "@/utils/slugs";
+// import { logger } from "@/utils/logger";
+
+export interface Props {
+  /** Target post slug or full path */
+  to: string;
+  /** Anchor text for the link */
+  anchor: string;
+  /** Visual style variant */
+  variant?: 'inline' | 'button' | 'highlight' | 'subtle';
+  /** Relationship strength for styling */
+  context?: 'strong' | 'moderate' | 'weak';
+  /** Whether to open in new tab */
+  external?: boolean;
+  /** Whether to track click analytics */
+  trackClick?: boolean;
+  /** Additional CSS classes */
+  class?: string;
+  /** Icon to display with link */
+  icon?: string;
+  /** Tooltip text */
+  title?: string;
+  /** Whether link is within content or in sidebar */
+  placement?: 'content' | 'sidebar' | 'navigation';
+}
+
+const {
+  to,
+  anchor,
+  variant = 'inline',
+  context = 'moderate',
+  external = false,
+  trackClick = true,
+  class: additionalClasses = '',
+  icon,
+  title,
+  placement = 'content'
+} = Astro.props;
+
+// Ensure proper URL formatting
+const href = to.startsWith('/') ? to : `/posts/${to}`;
+
+// Generate tracking attributes for analytics
+const trackingAttributes = trackClick ? {
+  'data-track-event': 'internal-link-click',
+  'data-track-source': placement,
+  'data-track-target': to,
+  'data-track-context': context
+} : {};
+
+// Build CSS classes based on variant and context
+const baseClasses = 'internal-link';
+const variantClasses = {
+  'inline': 'internal-link--inline',
+  'button': 'internal-link--button',  
+  'highlight': 'internal-link--highlight',
+  'subtle': 'internal-link--subtle'
+};
+
+const contextClasses = {
+  'strong': 'internal-link--strong',
+  'moderate': 'internal-link--moderate', 
+  'weak': 'internal-link--weak'
+};
+
+const placementClasses = {
+  'content': 'internal-link--in-content',
+  'sidebar': 'internal-link--in-sidebar',
+  'navigation': 'internal-link--in-nav'
+};
+
+const linkClasses = [
+  baseClasses,
+  variantClasses[variant],
+  contextClasses[context],
+  placementClasses[placement],
+  additionalClasses
+].filter(Boolean).join(' ');
+
+// Icon component mapping
+const iconMap: Record<string, string> = {
+  'arrow-right': '→',
+  'external': '↗',
+  'related': '🔗',
+  'info': 'ℹ',
+  'health': '🏥',
+  'nutrition': '🥗',
+  'mental': '🧠',
+  'vitamin': '💊'
+};
+
+const iconSymbol = icon && iconMap[icon] ? iconMap[icon] : null;
+---
+
+<a
+  href={href}
+  class={linkClasses}
+  title={title || `Mehr erfahren: ${anchor}`}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener noreferrer' : undefined}
+  {...trackingAttributes}
+>
+  {iconSymbol && <span class="internal-link__icon" aria-hidden="true">{iconSymbol}</span>}
+  <span class="internal-link__text">{anchor}</span>
+  {variant === 'button' && <span class="internal-link__arrow" aria-hidden="true">→</span>}
+</a>
+
+<style>
+  /* Base internal link styles */
+  .internal-link {
+    @apply relative inline-flex items-center gap-1 text-accent transition-all duration-200 ease-out;
+    text-decoration: none;
+    
+    /* Hover animations */
+    &:hover {
+      @apply text-accent-hover;
+      transform: translateX(1px);
+    }
+    
+    &:focus {
+      @apply outline-2 outline-offset-2 outline-accent rounded-sm;
+    }
+  }
+
+  /* Variant styles */
+  .internal-link--inline {
+    @apply underline decoration-accent/30 underline-offset-2;
+    
+    &:hover {
+      @apply decoration-accent/60;
+      text-decoration-thickness: 2px;
+    }
+  }
+
+  .internal-link--button {
+    @apply px-3 py-2 rounded-lg bg-accent/10 hover:bg-accent/20 font-medium no-underline;
+    border: 1px solid oklch(var(--color-accent) / 0.2);
+    
+    &:hover {
+      border-color: oklch(var(--color-accent) / 0.4);
+      transform: translateY(-1px);
+    }
+  }
+
+  .internal-link--highlight {
+    @apply px-2 py-1 rounded-md bg-gradient-to-r from-accent/20 to-accent/10 font-medium no-underline;
+    
+    &:hover {
+      @apply from-accent/30 to-accent/20;
+    }
+  }
+
+  .internal-link--subtle {
+    @apply text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 underline decoration-dotted decoration-gray-400/40;
+    
+    &:hover {
+      @apply decoration-gray-900/60;
+    }
+  }
+
+  /* Context strength styles */
+  .internal-link--strong {
+    @apply font-semibold;
+    
+    &.internal-link--inline {
+      text-decoration-thickness: 2px;
+    }
+  }
+
+  .internal-link--moderate {
+    @apply font-medium;
+  }
+
+  .internal-link--weak {
+    @apply font-normal opacity-90;
+    
+    &:hover {
+      @apply opacity-100;
+    }
+  }
+
+  /* Placement-specific styles */
+  .internal-link--in-content {
+    @apply text-inherit;
+    
+    &.internal-link--inline {
+      @apply text-accent;
+    }
+  }
+
+  .internal-link--in-sidebar {
+    @apply text-sm text-gray-600 dark:text-gray-400 hover:text-accent;
+  }
+
+  .internal-link--in-nav {
+    @apply text-base font-medium;
+  }
+
+  /* Icon styles */
+  .internal-link__icon {
+    @apply text-sm opacity-70;
+  }
+
+  .internal-link__text {
+    @apply flex-1;
+  }
+
+  .internal-link__arrow {
+    @apply text-sm opacity-60 transition-transform duration-200;
+  }
+
+  .internal-link--button:hover .internal-link__arrow {
+    transform: translateX(2px);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .internal-link--button {
+      @apply px-2 py-1.5 text-sm;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .internal-link {
+      @apply underline;
+    }
+    
+    .internal-link--button {
+      @apply border-2;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .internal-link {
+      transition: none;
+      
+      &:hover {
+        transform: none;
+      }
+    }
+    
+    .internal-link--button:hover {
+      transform: none;
+    }
+  }
+
+  /* Dark mode optimizations */
+  @media (prefers-color-scheme: dark) {
+    .internal-link--highlight {
+      @apply from-accent/15 to-accent/8;
+      
+      &:hover {
+        @apply from-accent/25 to-accent/15;
+      }
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .internal-link {
+      @apply text-black underline;
+    }
+    
+    .internal-link__arrow,
+    .internal-link__icon {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Internal Link Analytics and Performance Tracking
+   */
+  
+  // Track internal link clicks for SEO analysis
+  document.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement;
+    const link = target.closest('.internal-link') as HTMLAnchorElement;
+    
+    if (link && link.dataset.trackEvent) {
+      const trackingData = {
+        event: link.dataset.trackEvent,
+        source: link.dataset.trackSource,
+        target: link.dataset.trackTarget,
+        context: link.dataset.trackContext,
+        anchor: link.textContent?.trim(),
+        timestamp: Date.now()
+      };
+      
+      // Log for development
+      if (import.meta.env.DEV) {
+        console.log('Internal link clicked:', trackingData);
+      }
+      
+      // Send to analytics (implement your preferred analytics solution)
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'internal_link_click', {
+          'source_page': window.location.pathname,
+          'target_page': trackingData.target,
+          'link_context': trackingData.context,
+          'link_placement': trackingData.source
+        });
+      }
+      
+      // Store in localStorage for internal analysis
+      try {
+        const storedClicks = JSON.parse(localStorage.getItem('internal_link_clicks') || '[]');
+        storedClicks.push(trackingData);
+        
+        // Keep only last 100 clicks to prevent storage bloat
+        if (storedClicks.length > 100) {
+          storedClicks.splice(0, storedClicks.length - 100);
+        }
+        
+        localStorage.setItem('internal_link_clicks', JSON.stringify(storedClicks));
+      } catch (error) {
+        console.warn('Could not store internal link click data:', error);
+      }
+    }
+  });
+
+  // Preload linked pages on hover for better performance
+  document.addEventListener('mouseover', (event) => {
+    const target = event.target as HTMLElement;
+    const link = target.closest('.internal-link') as HTMLAnchorElement;
+    
+    if (link && link.href && !link.dataset.preloaded) {
+      // Mark as preloaded to avoid duplicate prefetching
+      link.dataset.preloaded = 'true';
+      
+      // Create preload link element
+      const preloadLink = document.createElement('link');
+      preloadLink.rel = 'prefetch';
+      preloadLink.href = link.href;
+      document.head.appendChild(preloadLink);
+      
+      // Remove preload link after a delay to clean up
+      setTimeout(() => {
+        document.head.removeChild(preloadLink);
+      }, 5000);
+    }
+  });
+</script>
