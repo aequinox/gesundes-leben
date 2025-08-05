@@ -14,7 +14,7 @@ export function generateSessionId(): string {
 }
 
 export interface LinkClickEvent {
-  linkType: 'internal' | 'contextual' | 'glossary' | 'cross-cluster';
+  linkType: "internal" | "contextual" | "glossary" | "cross-cluster";
   sourcePost: string;
   targetPost: string;
   linkText: string;
@@ -52,8 +52,12 @@ export interface ContentAnalytics {
  */
 export function trackLinkClick(event: LinkClickEvent): void {
   // Send to analytics service (Google Analytics, Matomo, etc.)
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'internal_link_click', {
+  if (
+    typeof window !== "undefined" &&
+    "gtag" in window &&
+    typeof window.gtag === "function"
+  ) {
+    window.gtag("event", "internal_link_click", {
       link_type: event.linkType,
       source_post: event.sourcePost,
       target_post: event.targetPost,
@@ -64,33 +68,55 @@ export function trackLinkClick(event: LinkClickEvent): void {
         dimension1: event.linkType,
         dimension2: event.sourcePost,
         dimension3: event.targetPost,
-      }
+      },
     });
+  }
+
+  // Only proceed if we're in a browser environment
+  if (typeof window === "undefined") {
+    return;
   }
 
   // Store in local analytics database
   const analyticsData = getLocalAnalytics();
   analyticsData.linkClicks.push(event);
-  
+
   // Maintain data size (keep last 1000 events)
   if (analyticsData.linkClicks.length > 1000) {
     analyticsData.linkClicks = analyticsData.linkClicks.slice(-1000);
   }
-  
-  localStorage.setItem('internal_linking_analytics', JSON.stringify(analyticsData));
+
+  localStorage.setItem(
+    "internal_linking_analytics",
+    JSON.stringify(analyticsData)
+  );
 }
 
 /**
  * Get local analytics data from localStorage
  */
 function getLocalAnalytics(): { linkClicks: LinkClickEvent[] } {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return { linkClicks: [] };
   }
-  
+
   try {
-    const data = localStorage.getItem('internal_linking_analytics');
-    return data ? JSON.parse(data) : { linkClicks: [] };
+    const data = localStorage.getItem("internal_linking_analytics");
+    if (data !== null) {
+      const parsed = JSON.parse(data) as unknown;
+      // Validate the parsed data structure
+      if (
+        parsed !== null &&
+        typeof parsed === "object" &&
+        "linkClicks" in parsed
+      ) {
+        const result = parsed as { linkClicks: LinkClickEvent[] };
+        if (Array.isArray(result.linkClicks)) {
+          return result;
+        }
+      }
+    }
+    return { linkClicks: [] };
   } catch {
     return { linkClicks: [] };
   }
@@ -108,26 +134,34 @@ export function calculateLinkMetrics(
   let relevantClicks = analyticsData.linkClicks;
 
   // Filter by source post
-  if (sourcePost) {
-    relevantClicks = relevantClicks.filter(click => click.sourcePost === sourcePost);
+  if (sourcePost !== null && sourcePost !== undefined) {
+    relevantClicks = relevantClicks.filter(
+      click => click.sourcePost === sourcePost
+    );
   }
 
   // Filter by target post
-  if (targetPost) {
-    relevantClicks = relevantClicks.filter(click => click.targetPost === targetPost);
+  if (targetPost !== null && targetPost !== undefined) {
+    relevantClicks = relevantClicks.filter(
+      click => click.targetPost === targetPost
+    );
   }
 
   // Filter by timeframe
-  if (timeframe) {
+  if (timeframe !== null && timeframe !== undefined) {
     relevantClicks = relevantClicks.filter(
-      click => click.timestamp >= timeframe.start && click.timestamp <= timeframe.end
+      click =>
+        click.timestamp >= timeframe.start && click.timestamp <= timeframe.end
     );
   }
 
   const totalClicks = relevantClicks.length;
-  const uniqueClicks = new Set(relevantClicks.map(click => 
-    `${click.userId || click.sessionId}-${click.sourcePost}-${click.targetPost}`
-  )).size;
+  const uniqueClicks = new Set(
+    relevantClicks.map(
+      click =>
+        `${click.userId ?? click.sessionId ?? "anonymous"}-${click.sourcePost}-${click.targetPost}`
+    )
+  ).size;
 
   // Calculate basic metrics (would need server-side data for full accuracy)
   return {
@@ -135,7 +169,7 @@ export function calculateLinkMetrics(
     uniqueClicks,
     clickThroughRate: totalClicks > 0 ? (uniqueClicks / totalClicks) * 100 : 0,
     averageTimeOnTarget: 0, // Would need server-side tracking
-    bounceRate: 0, // Would need server-side tracking  
+    bounceRate: 0, // Would need server-side tracking
     conversionRate: 0, // Would need conversion goals defined
   };
 }
@@ -145,7 +179,7 @@ export function calculateLinkMetrics(
  */
 export function generateContentAnalytics(postSlug: string): ContentAnalytics {
   const analyticsData = getLocalAnalytics();
-  
+
   // Count outbound clicks (links from this post)
   const outboundClicks = analyticsData.linkClicks.filter(
     click => click.sourcePost === postSlug
@@ -159,22 +193,28 @@ export function generateContentAnalytics(postSlug: string): ContentAnalytics {
   // Get top linked posts from this post
   const outboundTargets = analyticsData.linkClicks
     .filter(click => click.sourcePost === postSlug)
-    .reduce((acc, click) => {
-      acc[click.targetPost] = (acc[click.targetPost] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    .reduce(
+      (acc, click) => {
+        acc[click.targetPost] = (acc[click.targetPost] ?? 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
   const topLinkedPosts = Object.entries(outboundTargets)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5)
     .map(([slug, clicks]) => ({
       slug,
-      title: slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      title: slug.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase()),
       clicks,
     }));
 
   // Calculate engagement score (basic algorithm)
-  const engagementScore = Math.min(100, (outboundClicks * 2 + inboundClicks) / 10);
+  const engagementScore = Math.min(
+    100,
+    (outboundClicks * 2 + inboundClicks) / 10
+  );
 
   return {
     postSlug,
@@ -189,53 +229,71 @@ export function generateContentAnalytics(postSlug: string): ContentAnalytics {
 /**
  * Get analytics dashboard data
  */
-export function getAnalyticsDashboard(timeframe?: { start: number; end: number }) {
+export function getAnalyticsDashboard(timeframe?: {
+  start: number;
+  end: number;
+}) {
   const analyticsData = getLocalAnalytics();
   let clicks = analyticsData.linkClicks;
 
-  if (timeframe) {
+  if (timeframe !== null && timeframe !== undefined) {
     clicks = clicks.filter(
-      click => click.timestamp >= timeframe.start && click.timestamp <= timeframe.end
+      click =>
+        click.timestamp >= timeframe.start && click.timestamp <= timeframe.end
     );
   }
 
   // Group by link type
-  const clicksByType = clicks.reduce((acc, click) => {
-    acc[click.linkType] = (acc[click.linkType] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const clicksByType = clicks.reduce(
+    (acc, click) => {
+      acc[click.linkType] = (acc[click.linkType] ?? 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   // Group by variant
-  const clicksByVariant = clicks.reduce((acc, click) => {
-    acc[click.variant] = (acc[click.variant] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const clicksByVariant = clicks.reduce(
+    (acc, click) => {
+      acc[click.variant] = (acc[click.variant] ?? 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   // Most popular source posts
   const topSources = Object.entries(
-    clicks.reduce((acc, click) => {
-      acc[click.sourcePost] = (acc[click.sourcePost] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>)
+    clicks.reduce(
+      (acc, click) => {
+        acc[click.sourcePost] = (acc[click.sourcePost] ?? 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    )
   )
     .sort(([, a], [, b]) => b - a)
     .slice(0, 10)
-    .map(([post, clicks]) => ({ post, clicks }));
+    .map(([post, clickCount]) => ({ post, clicks: clickCount }));
 
   // Most popular target posts
   const topTargets = Object.entries(
-    clicks.reduce((acc, click) => {
-      acc[click.targetPost] = (acc[click.targetPost] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>)
+    clicks.reduce(
+      (acc, click) => {
+        acc[click.targetPost] = (acc[click.targetPost] ?? 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    )
   )
     .sort(([, a], [, b]) => b - a)
     .slice(0, 10)
-    .map(([post, clicks]) => ({ post, clicks }));
+    .map(([post, clickCount]) => ({ post, clicks: clickCount }));
 
   return {
     totalClicks: clicks.length,
-    uniqueSessions: new Set(clicks.map(click => click.sessionId)).size,
+    uniqueSessions: new Set(
+      clicks.map(click => click.sessionId).filter(Boolean)
+    ).size,
     clicksByType,
     clicksByVariant,
     topSources,
@@ -247,55 +305,64 @@ export function getAnalyticsDashboard(timeframe?: { start: number; end: number }
 /**
  * Group clicks by day for trend analysis
  */
-function groupClicksByDay(clicks: LinkClickEvent[]): Array<{ date: string; clicks: number }> {
-  const dailyGroups = clicks.reduce((acc, click) => {
-    const date = new Date(click.timestamp).toISOString().split('T')[0];
-    acc[date] = (acc[date] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+function groupClicksByDay(
+  clicks: LinkClickEvent[]
+): Array<{ date: string; clicks: number }> {
+  const dailyGroups = clicks.reduce(
+    (acc, click) => {
+      const date = new Date(click.timestamp).toISOString().split("T")[0];
+      if (date !== null && date !== undefined && date !== "") {
+        acc[date] = (acc[date] ?? 0) + 1;
+      }
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   return Object.entries(dailyGroups)
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, clicks]) => ({ date, clicks }));
+    .map(([date, clickCount]) => ({ date, clicks: clickCount }));
 }
 
 /**
  * Export analytics data for external analysis
  */
-export function exportAnalyticsData(format: 'json' | 'csv' = 'json'): string {
+export function exportAnalyticsData(format: "json" | "csv" = "json"): string {
   const data = getLocalAnalytics();
-  
-  if (format === 'csv') {
+
+  if (format === "csv") {
     const headers = [
-      'timestamp',
-      'linkType', 
-      'sourcePost',
-      'targetPost',
-      'linkText',
-      'variant',
-      'context',
-      'userId',
-      'sessionId'
+      "timestamp",
+      "linkType",
+      "sourcePost",
+      "targetPost",
+      "linkText",
+      "variant",
+      "context",
+      "userId",
+      "sessionId",
     ];
-    
+
     const csvData = [
-      headers.join(','),
-      ...data.linkClicks.map(click => [
-        click.timestamp,
-        click.linkType,
-        click.sourcePost,
-        click.targetPost,
-        `"${click.linkText.replace(/"/g, '""')}"`,
-        click.variant,
-        click.context,
-        click.userId || '',
-        click.sessionId || ''
-      ].join(','))
-    ].join('\n');
-    
+      headers.join(","),
+      ...data.linkClicks.map(click =>
+        [
+          click.timestamp,
+          click.linkType,
+          click.sourcePost,
+          click.targetPost,
+          `"${click.linkText.replace(/"/g, '""')}"`,
+          click.variant,
+          click.context,
+          click.userId ?? "",
+          click.sessionId ?? "",
+        ].join(",")
+      ),
+    ].join("\n");
+
     return csvData;
   }
-  
+
   return JSON.stringify(data, null, 2);
 }
 
@@ -303,7 +370,7 @@ export function exportAnalyticsData(format: 'json' | 'csv' = 'json'): string {
  * Clear analytics data (for privacy compliance)
  */
 export function clearAnalyticsData(): void {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('internal_linking_analytics');
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("internal_linking_analytics");
   }
 }
