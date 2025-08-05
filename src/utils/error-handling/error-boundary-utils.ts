@@ -63,7 +63,7 @@ export class ErrorTracker {
   private maxHistorySize = 100;
   private recoveryStrategies: ErrorRecoveryStrategy[] = [];
 
-  constructor(private config: { maxHistorySize?: number } = {}) {
+  constructor(config: { maxHistorySize?: number } = {}) {
     this.maxHistorySize = config.maxHistorySize ?? 100;
     this.setupGlobalErrorHandlers();
     this.registerDefaultRecoveryStrategies();
