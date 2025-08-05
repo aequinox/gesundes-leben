@@ -4,7 +4,7 @@ import { SITE } from "@/config";
 
 import { handleAsync } from "./errors";
 import { logger } from "./logger";
-import { slugify } from "./slugs";
+import { slugify, getPostSlug } from "./slugs";
 import type { Category, Post, Tag } from "./types";
 
 /**
@@ -17,6 +17,18 @@ export interface ProcessPostsOptions {
   sortDirection?: "asc" | "desc";
   /** Maximum number of posts to return */
   maxPosts?: number;
+}
+
+/**
+ * Adds slug property to posts using getPostSlug function
+ * @param posts - Array of raw collection entries
+ * @returns Array of posts with slug property added
+ */
+const addSlugsToPosts = (posts: import("astro:content").CollectionEntry<"blog">[]): Post[] => {
+  return posts.map(post => ({
+    ...post,
+    slug: getPostSlug(post)
+  })) as Post[];
 }
 
 /**
@@ -43,7 +55,7 @@ export const getAllPosts = async (includeDrafts = false): Promise<Post[]> => {
       // In development mode, include all posts
       if (includeDrafts || import.meta.env.DEV) {
         logger.log("Returning all posts (dev mode or includeDrafts=true)");
-        return allPosts;
+        return addSlugsToPosts(allPosts);
       }
 
       const now = Date.now();
@@ -87,7 +99,7 @@ export const getAllPosts = async (includeDrafts = false): Promise<Post[]> => {
       });
 
       logger.log("Filtered posts count:", filteredPosts.length);
-      return filteredPosts;
+      return addSlugsToPosts(filteredPosts);
     } catch (e) {
       logger.error("Error in getAllPosts:", e);
       return [];

@@ -16,12 +16,10 @@
  * ```
  */
 
-import { getCollection } from "astro:content";
-
 import InternalLink from "@/components/elements/InternalLink.astro";
 import Card from "@/components/sections/Card.astro";
 import { analyzeTopicClusters, TOPIC_CLUSTERS } from "@/utils/internal-linking";
-import { getSortedPosts } from "@/utils/posts";
+import { processAllPosts } from "@/utils/posts";
 import type { Post } from "@/utils/types";
 
 export interface Props {
@@ -56,9 +54,8 @@ if (!clusterInfo) {
   return null;
 }
 
-// Fetch all posts and analyze clusters
-const allPosts = await getCollection("blog");
-const sortedPosts = getSortedPosts(allPosts);
+// Fetch all posts and analyze clusters (with slug property)
+const sortedPosts = await processAllPosts({ includeDrafts: false });
 const clusterAnalyses = analyzeTopicClusters(sortedPosts);
 
 // Find current cluster analysis

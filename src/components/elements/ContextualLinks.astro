@@ -16,11 +16,9 @@
  * ```
  */
 
-import { getCollection } from "astro:content";
-
 import InternalLink from "@/components/elements/InternalLink.astro";
 import { analyzeContentRelationships } from "@/utils/internal-linking";
-import { getSortedPosts } from "@/utils/posts";
+import { processAllPosts } from "@/utils/posts";
 import type { Post } from "@/utils/types";
 
 export interface Props {
@@ -47,9 +45,8 @@ const {
   showScores = false,
 } = Astro.props;
 
-// Fetch all posts for relationship analysis
-const allPosts = await getCollection("blog");
-const sortedPosts = getSortedPosts(allPosts);
+// Fetch all posts for relationship analysis (with slug property)
+const sortedPosts = await processAllPosts({ includeDrafts: false });
 
 // Analyze content relationships
 const relationships = analyzeContentRelationships(

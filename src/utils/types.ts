@@ -1,6 +1,13 @@
 import type { CollectionEntry } from "astro:content";
 
-export type Post = CollectionEntry<"blog">;
+// Base collection entry type
+type BasePost = CollectionEntry<"blog">;
+
+// Extended Post type with computed slug property
+export type Post = BasePost & {
+  slug: string;
+};
+
 export type Author = CollectionEntry<"authors">;
 
 /**

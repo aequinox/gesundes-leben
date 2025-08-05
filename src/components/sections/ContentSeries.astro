@@ -16,8 +16,7 @@
  * ```
  */
 
-import { getCollection } from "astro:content";
-import { getSortedPosts } from "@/utils/posts";
+import { processAllPosts } from "@/utils/posts";
 import InternalLink from "@/components/elements/InternalLink.astro";
 import type { Post } from "@/utils/types";
 
@@ -42,9 +41,8 @@ const {
   seriesTitle
 } = Astro.props;
 
-// Fetch all posts
-const allPosts = await getCollection("blog");
-const sortedPosts = getSortedPosts(allPosts);
+// Fetch all posts (with slug property)
+const sortedPosts = await processAllPosts({ includeDrafts: false });
 
 // Define known content series based on content analysis
 const CONTENT_SERIES = {

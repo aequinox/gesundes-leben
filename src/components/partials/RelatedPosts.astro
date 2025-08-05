@@ -16,11 +16,9 @@
  * ```
  */
 
-import { getCollection } from "astro:content";
-
 import Card from "@/components/sections/Card.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
-import { getRelatedPosts, getSortedPosts } from "@/utils/posts";
+import { getRelatedPosts, processAllPosts } from "@/utils/posts";
 import { analyzeContentRelationships, identifyTopicCluster, TOPIC_CLUSTERS } from "@/utils/internal-linking";
 import type { Post } from "@/utils/types";
 
@@ -49,9 +47,8 @@ const {
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-// Fetch all posts
-const posts = await getCollection("blog");
-const sortedPosts = getSortedPosts(posts);
+// Fetch all posts (with slug property)
+const sortedPosts = await processAllPosts({ includeDrafts: false });
 
 // Get related posts using enhanced algorithm
 let relatedPosts: Post[] = [];
