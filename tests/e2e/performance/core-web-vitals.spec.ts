@@ -255,7 +255,9 @@ test.describe('Core Web Vitals Performance', () => {
     test('should meet Core Web Vitals on mobile', async ({ page }) => {
       // Simulate slower mobile connection
       await page.route('**/*', async route => {
-        await new Promise(resolve => setTimeout(resolve, 100)); // Add delay
+        await new Promise<void>(resolve => {
+          setTimeout(() => resolve(), 100); // Add delay
+        });
         await route.continue();
       });
       
@@ -390,7 +392,9 @@ test.describe('Core Web Vitals Performance', () => {
     test('should handle slow network conditions gracefully', async ({ page }) => {
       // Simulate slow 3G connection
       await page.route('**/*', async route => {
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise<void>(resolve => {
+          setTimeout(() => resolve(), 200);
+        });
         await route.continue();
       });
       

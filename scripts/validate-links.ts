@@ -47,7 +47,7 @@ async function validateAllLinks(options: {
   console.log("");
 
   const references = await getAllReferences();
-  const referencesWithLinks = references.filter(ref => ref.url || ref.doi || ref.pmid);
+  const referencesWithLinks = references.filter(ref => ref.url !== undefined || ref.doi !== undefined || ref.pmid !== undefined);
 
   console.log(`📊 Found ${references.length} references total`);
   console.log(`🔗 ${referencesWithLinks.length} references have links to validate`);
@@ -70,7 +70,7 @@ async function validateAllLinks(options: {
       const linkResults = await validateReferenceLinks(links, { timeout });
       
       const hasIssues = Object.values(linkResults).some(result => 
-        result && !result.valid
+        result !== undefined && !result.valid
       );
 
       completed++;
@@ -133,27 +133,27 @@ function displaySummary(results: LinkValidationResult[]) {
   const errorCounts: Record<string, number> = {};
 
   results.forEach(result => {
-    if (result.results.url) {
+    if (result.results.url !== undefined) {
       totalUrls++;
       if (result.results.url.valid) {validUrls++;}
-      else if (result.results.url.error) {
-        errorCounts[result.results.url.error] = (errorCounts[result.results.url.error] || 0) + 1;
+      else if (result.results.url.error !== undefined) {
+        errorCounts[result.results.url.error] = (errorCounts[result.results.url.error] ?? 0) + 1;
       }
     }
     
-    if (result.results.doi) {
+    if (result.results.doi !== undefined) {
       totalDois++;
       if (result.results.doi.valid) {validDois++;}
-      else if (result.results.doi.error) {
-        errorCounts[result.results.doi.error] = (errorCounts[result.results.doi.error] || 0) + 1;
+      else if (result.results.doi.error !== undefined) {
+        errorCounts[result.results.doi.error] = (errorCounts[result.results.doi.error] ?? 0) + 1;
       }
     }
     
-    if (result.results.pmid) {
+    if (result.results.pmid !== undefined) {
       totalPmids++;
       if (result.results.pmid.valid) {validPmids++;}
-      else if (result.results.pmid.error) {
-        errorCounts[result.results.pmid.error] = (errorCounts[result.results.pmid.error] || 0) + 1;
+      else if (result.results.pmid.error !== undefined) {
+        errorCounts[result.results.pmid.error] = (errorCounts[result.results.pmid.error] ?? 0) + 1;
       }
     }
   });
@@ -199,16 +199,16 @@ function displaySummary(results: LinkValidationResult[]) {
       console.log(`\n📄 ${colorize(ref.referenceId, "cyan")}`);
       console.log(`   ${ref.referenceTitle}`);
       
-      if (ref.results.url && !ref.results.url.valid) {
-        console.log(`   🌐 URL Error: ${colorize(ref.results.url.error || "Unknown", "red")}`);
+      if (ref.results.url !== undefined && !ref.results.url.valid) {
+        console.log(`   🌐 URL Error: ${colorize(ref.results.url.error ?? "Unknown", "red")}`);
       }
       
-      if (ref.results.doi && !ref.results.doi.valid) {
-        console.log(`   📄 DOI Error: ${colorize(ref.results.doi.error || "Unknown", "red")}`);
+      if (ref.results.doi !== undefined && !ref.results.doi.valid) {
+        console.log(`   📄 DOI Error: ${colorize(ref.results.doi.error ?? "Unknown", "red")}`);
       }
       
-      if (ref.results.pmid && !ref.results.pmid.valid) {
-        console.log(`   🧬 PMID Error: ${colorize(ref.results.pmid.error || "Unknown", "red")}`);
+      if (ref.results.pmid !== undefined && !ref.results.pmid.valid) {
+        console.log(`   🧬 PMID Error: ${colorize(ref.results.pmid.error ?? "Unknown", "red")}`);
       }
     });
   }

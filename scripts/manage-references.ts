@@ -114,7 +114,7 @@ async function listReferences(options: { type?: ReferenceType; limit?: number } 
     filtered = references.filter(ref => ref.type === options.type);
   }
 
-  if (options.limit) {
+  if (options.limit !== undefined) {
     filtered = filtered.slice(0, options.limit);
   }
 
@@ -125,7 +125,7 @@ async function listReferences(options: { type?: ReferenceType; limit?: number } 
     console.log(`${typeIcon} ${colorize(ref.id, "cyan")}`);
     console.log(`   ${colorize(ref.title, "bright")} (${ref.year})`);
     console.log(`   ${authorsStr}`);
-    if (ref.journal) {console.log(`   ${colorize(ref.journal, "magenta")}`);}
+    if (ref.journal !== undefined) {console.log(`   ${colorize(ref.journal, "magenta")}`);}
     console.log("");
   });
 
@@ -135,7 +135,7 @@ async function listReferences(options: { type?: ReferenceType; limit?: number } 
 async function showReference(id: string) {
   const ref = await getReferenceById(id);
   
-  if (!ref) {
+  if (ref === null) {
     console.log(colorize(`❌ Reference not found: ${id}`, "red"));
     return;
   }
@@ -150,23 +150,23 @@ async function showReference(id: string) {
   console.log(colorize("Authors:", "blue"), ref.authors.join(", "));
   console.log(colorize("Year:", "blue"), ref.year);
   
-  if (ref.journal) {console.log(colorize("Journal:", "blue"), ref.journal);}
-  if (ref.volume) {console.log(colorize("Volume:", "blue"), ref.volume);}
-  if (ref.issue) {console.log(colorize("Issue:", "blue"), ref.issue);}
-  if (ref.pages) {console.log(colorize("Pages:", "blue"), ref.pages);}
-  if (ref.doi) {console.log(colorize("DOI:", "blue"), ref.doi);}
-  if (ref.publisher) {console.log(colorize("Publisher:", "blue"), ref.publisher);}
-  if (ref.location) {console.log(colorize("Location:", "blue"), ref.location);}
-  if (ref.edition) {console.log(colorize("Edition:", "blue"), ref.edition);}
-  if (ref.isbn) {console.log(colorize("ISBN:", "blue"), ref.isbn);}
-  if (ref.url) {console.log(colorize("URL:", "blue"), ref.url);}
-  if (ref.pmid) {console.log(colorize("PMID:", "blue"), ref.pmid);}
+  if (ref.journal !== undefined) {console.log(colorize("Journal:", "blue"), ref.journal);}
+  if (ref.volume !== undefined) {console.log(colorize("Volume:", "blue"), ref.volume);}
+  if (ref.issue !== undefined) {console.log(colorize("Issue:", "blue"), ref.issue);}
+  if (ref.pages !== undefined) {console.log(colorize("Pages:", "blue"), ref.pages);}
+  if (ref.doi !== undefined) {console.log(colorize("DOI:", "blue"), ref.doi);}
+  if (ref.publisher !== undefined) {console.log(colorize("Publisher:", "blue"), ref.publisher);}
+  if (ref.location !== undefined) {console.log(colorize("Location:", "blue"), ref.location);}
+  if (ref.edition !== undefined) {console.log(colorize("Edition:", "blue"), ref.edition);}
+  if (ref.isbn !== undefined) {console.log(colorize("ISBN:", "blue"), ref.isbn);}
+  if (ref.url !== undefined) {console.log(colorize("URL:", "blue"), ref.url);}
+  if (ref.pmid !== undefined) {console.log(colorize("PMID:", "blue"), ref.pmid);}
   
-  if (ref.keywords && ref.keywords.length > 0) {
+  if (ref.keywords !== undefined && ref.keywords.length > 0) {
     console.log(colorize("Keywords:", "blue"), ref.keywords.join(", "));
   }
   
-  if (ref.abstract) {
+  if (ref.abstract !== undefined) {
     console.log(colorize("Abstract:", "blue"));
     console.log(`   ${ref.abstract}`);
   }
@@ -178,7 +178,7 @@ async function searchReferencesCommand(query: string, options: { type?: Referenc
 
   const searchOptions: ReferenceSearchOptions = {
     title: query,
-    limit: options.limit || 10,
+    limit: options.limit ?? 10,
   };
 
   if (options.type) {
@@ -232,7 +232,7 @@ async function addReference(type?: ReferenceType) {
   }
 
   data.authors = await promptArray("Authors");
-  if (!data.authors || data.authors.length === 0) {
+  if (data.authors === undefined || data.authors.length === 0) {
     console.log(colorize("❌ At least one author is required", "red"));
     return;
   }
@@ -265,7 +265,7 @@ async function addReference(type?: ReferenceType) {
   console.log(colorize(`Generated ID: ${id}`, "blue"));
 
   const customId = await prompt(`Use custom ID? (current: ${id}):`);
-  const finalId = customId || id;
+  const finalId = customId ?? id;
 
   // Validate data
   const errors = validateReferenceData(data as ReferenceData);
@@ -393,7 +393,7 @@ async function exportReferences(format: "json" | "csv" | "bibtex" = "json") {
         let value = ref[header as keyof typeof ref];
         if (Array.isArray(value)) {value = value.join("; ");}
         if (typeof value === "string") {value = `"${value.replace(/"/g, '""')}"`;}
-        return value || "";
+        return value ?? "";
       });
       csvRows.push(row.join(","));
     });
@@ -409,13 +409,13 @@ async function exportReferences(format: "json" | "csv" | "bibtex" = "json") {
       entry += `  author = {${authors}},\n`;
       entry += `  year = {${ref.year}},\n`;
       
-      if (ref.journal) {entry += `  journal = {${ref.journal}},\n`;}
-      if (ref.volume) {entry += `  volume = {${ref.volume}},\n`;}
-      if (ref.issue) {entry += `  number = {${ref.issue}},\n`;}
-      if (ref.pages) {entry += `  pages = {${ref.pages}},\n`;}
-      if (ref.doi) {entry += `  doi = {${ref.doi}},\n`;}
-      if (ref.publisher) {entry += `  publisher = {${ref.publisher}},\n`;}
-      if (ref.url) {entry += `  url = {${ref.url}},\n`;}
+      if (ref.journal !== undefined) {entry += `  journal = {${ref.journal}},\n`;}
+      if (ref.volume !== undefined) {entry += `  volume = {${ref.volume}},\n`;}
+      if (ref.issue !== undefined) {entry += `  number = {${ref.issue}},\n`;}
+      if (ref.pages !== undefined) {entry += `  pages = {${ref.pages}},\n`;}
+      if (ref.doi !== undefined) {entry += `  doi = {${ref.doi}},\n`;}
+      if (ref.publisher !== undefined) {entry += `  publisher = {${ref.publisher}},\n`;}
+      if (ref.url !== undefined) {entry += `  url = {${ref.url}},\n`;}
       
       entry += "}";
       return entry;

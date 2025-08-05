@@ -4,7 +4,7 @@ import type { CacheService } from "./cache.js";
 import { XmlConversionError } from "./errors.js";
 import { xmlLogger } from "./logger.js";
 
-export interface VisionatiConfig {
+interface VisionatiConfig {
   apiKey: string;
   baseUrl?: string;
   backend?: string;
@@ -15,7 +15,7 @@ export interface VisionatiConfig {
   retryAttempts?: number;
 }
 
-export interface VisionatiResponse {
+interface VisionatiResponse {
   description: string;
   filename: string;
   originalUrl: string;
@@ -33,7 +33,7 @@ interface QueuedRequest {
  * Visionati API service for generating AI-powered alt texts and filenames
  * Optimized for German health blog content with proper error handling and rate limiting
  */
-export class VisionatiService {
+class VisionatiService {
   private apiKey: string;
   private baseUrl: string;
   private backend: string;
@@ -241,7 +241,7 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
       );
     } finally {
       this.activeRequests--;
-      this.processQueue();
+      void this.processQueue();
     }
   }
 
@@ -591,7 +591,9 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
    * @private
    */
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise<void>(resolve => {
+      setTimeout(() => resolve(), ms);
+    });
   }
 
   /**
@@ -800,3 +802,7 @@ Format: [Alt-Text] @ [seo-dateiname-ohne-extension.jpg]`;
     xmlLogger.debug("🔄 Visionati service reset");
   }
 }
+
+// Export types and classes at the end of the file
+export type { VisionatiConfig, VisionatiResponse };
+export { VisionatiService };

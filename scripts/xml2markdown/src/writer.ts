@@ -374,20 +374,22 @@ async function processPayloadsPromise<T>(
   const promises = payloads.map(
     payload =>
       new Promise((resolve, reject) => {
-        setTimeout(async () => {
-          try {
-            const data = await Promise.resolve(loadFunc(payload.item));
-            await writeFile(payload.destinationPath, data);
-            logger.success(`${chalk.green("[OK]")} ${payload.name}`);
-            resolve(undefined);
-          } catch (error) {
-            logger.error(
-              `${chalk.red("[FAILED]")} ${payload.name} ${chalk.red(
-                `(${(error as Error).toString()})`
-              )}`
-            );
-            reject(error);
-          }
+        setTimeout(() => {
+          void (async () => {
+            try {
+              const data = await Promise.resolve(loadFunc(payload.item));
+              await writeFile(payload.destinationPath, data);
+              logger.success(`${chalk.green("[OK]")} ${payload.name}`);
+              resolve(undefined);
+            } catch (error) {
+              logger.error(
+                `${chalk.red("[FAILED]")} ${payload.name} ${chalk.red(
+                  `(${(error as Error).toString()})`
+                )}`
+              );
+              reject(error);
+            }
+          })();
         }, payload.delay);
       })
   );
