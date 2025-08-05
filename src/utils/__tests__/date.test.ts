@@ -1,5 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+// Import the mocked LOCALE for test usage
+import { LOCALE } from "@/config";
+
+import { clearDateFormatterCache, createSafeDate, formatDate } from "../date";
+
+// Type definitions for testing
+interface MockCallData {
+  locale: string;
+  options: Intl.DateTimeFormatOptions;
+}
+
 // Use mocked LOCALE from vitest setup
 vi.mock("@/config", () => ({
   LOCALE: {
@@ -10,11 +21,6 @@ vi.mock("@/config", () => ({
     title: "Healthy Life Test",
   },
 }));
-
-// Import the mocked LOCALE for test usage
-import { LOCALE } from "@/config";
-
-import { clearDateFormatterCache, createSafeDate, formatDate } from "../date";
 
 describe("date utilities", () => {
   const testDate = new Date("2025-01-15");
@@ -63,7 +69,10 @@ describe("date utilities", () => {
 
     it("should format Date object", () => {
       // Mock Intl.DateTimeFormat to return predictable results
-      Intl.DateTimeFormat = function (_locale: any, _options: any) {
+      Intl.DateTimeFormat = function (
+        _locale?: string | string[],
+        _options?: Intl.DateTimeFormatOptions
+      ) {
         return {
           format: (date: Date) => {
             const year = date.getFullYear();
@@ -91,7 +100,7 @@ describe("date utilities", () => {
           formatRange: () => "",
           formatRangeToParts: () => [],
         } as unknown as Intl.DateTimeFormat;
-      } as any;
+      } as unknown as typeof Intl.DateTimeFormat;
 
       const result = formatDate(testDate);
       expect(result).toBe("Jan 15, 2025");
@@ -99,11 +108,14 @@ describe("date utilities", () => {
 
     it("should format timestamp", () => {
       // Simple mock that returns expected format
-      Intl.DateTimeFormat = function () {
+      Intl.DateTimeFormat = function (
+        _locale?: string | string[],
+        _options?: Intl.DateTimeFormatOptions
+      ) {
         return {
           format: () => "Jan 15, 2025",
         } as unknown as Intl.DateTimeFormat;
-      } as any;
+      } as unknown as typeof Intl.DateTimeFormat;
 
       const result = formatDate(testTimestamp);
       expect(result).toBe("Jan 15, 2025");
@@ -111,11 +123,14 @@ describe("date utilities", () => {
 
     it("should format date string", () => {
       // Simple mock that returns expected format
-      Intl.DateTimeFormat = function () {
+      Intl.DateTimeFormat = function (
+        _locale?: string | string[],
+        _options?: Intl.DateTimeFormatOptions
+      ) {
         return {
           format: () => "Jan 15, 2025",
         } as unknown as Intl.DateTimeFormat;
-      } as any;
+      } as unknown as typeof Intl.DateTimeFormat;
 
       const result = formatDate(testDateString);
       expect(result).toBe("Jan 15, 2025");
@@ -123,9 +138,12 @@ describe("date utilities", () => {
 
     it("should throw error when formatting fails", () => {
       const mockError = new Error("Formatting error");
-      Intl.DateTimeFormat = function () {
+      Intl.DateTimeFormat = function (
+        _locale?: string | string[],
+        _options?: Intl.DateTimeFormatOptions
+      ) {
         throw mockError;
-      } as any;
+      } as unknown as typeof Intl.DateTimeFormat;
 
       expect(() => formatDate(testDate)).toThrow(
         "Failed to format date: Formatting error"
@@ -133,19 +151,26 @@ describe("date utilities", () => {
     });
 
     it("should use first locale from config", () => {
-      let calledWith: any = null;
+      let calledWith: MockCallData | null = null;
 
-      Intl.DateTimeFormat = function (locale: any, options: any) {
-        calledWith = { locale, options };
+      Intl.DateTimeFormat = function (
+        locale?: string | string[],
+        options?: Intl.DateTimeFormatOptions
+      ) {
+        calledWith = {
+          locale:
+            typeof locale === "string" ? locale : (locale?.[0] ?? "en-US"),
+          options: options ?? {},
+        };
         return {
           format: () => "Jan 15, 2025",
         } as unknown as Intl.DateTimeFormat;
-      } as any;
+      } as unknown as typeof Intl.DateTimeFormat;
 
       formatDate(testDate);
 
-      expect(calledWith?.locale).toBe("de-DE");
-      expect(calledWith?.options).toEqual(
+      expect(calledWith!.locale).toBe("de-DE");
+      expect(calledWith!.options).toEqual(
         expect.objectContaining({
           year: "numeric",
           month: "short",
@@ -155,47 +180,61 @@ describe("date utilities", () => {
     });
 
     it("should fallback to en-US if no locales configured", () => {
-      let calledWith: any = null;
+      let calledWith: MockCallData | null = null;
 
       // Mock empty langTag array
       const originalLangTag = LOCALE.langTag;
-      (LOCALE as any).langTag = [];
+      (LOCALE as { langTag: any }).langTag = [];
 
-      Intl.DateTimeFormat = function (locale: any, options: any) {
-        calledWith = { locale, options };
+      Intl.DateTimeFormat = function (
+        locale?: string | string[],
+        options?: Intl.DateTimeFormatOptions
+      ) {
+        calledWith = {
+          locale:
+            typeof locale === "string" ? locale : (locale?.[0] ?? "en-US"),
+          options: options ?? {},
+        };
         return {
           format: () => "Jan 15, 2025",
         } as unknown as Intl.DateTimeFormat;
-      } as any;
+      } as unknown as typeof Intl.DateTimeFormat;
 
       formatDate(testDate);
 
-      expect(calledWith?.locale).toBe("en-US");
+      expect(calledWith!.locale).toBe("en-US");
 
       // Restore original
-      (LOCALE as any).langTag = originalLangTag;
+      (LOCALE as { langTag: any }).langTag = originalLangTag;
     });
 
     it("should handle string langTag configuration", () => {
-      let calledWith: any = null;
+      let calledWith: MockCallData | null = null;
 
       // Mock string langTag
       const originalLangTag = LOCALE.langTag;
-      (LOCALE as any).langTag = "de-DE";
+      (LOCALE as { langTag: any }).langTag = "de-DE";
 
-      Intl.DateTimeFormat = function (locale: any, options: any) {
-        calledWith = { locale, options };
+      Intl.DateTimeFormat = function (
+        locale?: string | string[],
+        options?: Intl.DateTimeFormatOptions
+      ) {
+        calledWith = {
+          locale:
+            typeof locale === "string" ? locale : (locale?.[0] ?? "en-US"),
+          options: options ?? {},
+        };
         return {
           format: () => "15. Jan 2025",
-        } as any;
-      } as any;
+        } as unknown as Intl.DateTimeFormat;
+      } as unknown as typeof Intl.DateTimeFormat;
 
       formatDate(testDate);
 
-      expect(calledWith?.locale).toBe("de-DE");
+      expect(calledWith!.locale).toBe("de-DE");
 
       // Restore original
-      (LOCALE as any).langTag = originalLangTag;
+      (LOCALE as { langTag: any }).langTag = originalLangTag;
     });
   });
 

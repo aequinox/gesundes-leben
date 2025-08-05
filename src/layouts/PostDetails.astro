@@ -65,12 +65,12 @@ const layoutProps: LayoutProps = {
   author: authorEntry?.data.name || SITE.author,
   heroImage,
   description,
-  keywords,
-  tags,
-  categories,
+  ...(keywords && { keywords }),
+  ...(tags && { tags }),
+  ...(categories && { categories }),
   pubDatetime,
-  modDatetime,
-  canonicalURL,
+  ...(modDatetime && { modDatetime }),
+  ...(canonicalURL && { canonicalURL }),
   ogImage: ogUrl,
   scrollSmooth: true,
 };
@@ -92,7 +92,7 @@ const primaryCategory = categories?.[0] || "Gesundheit";
     description={description}
     url={new URL(Astro.url.pathname, Astro.url.origin).href}
     datePublished={pubDatetime}
-    dateModified={modDatetime}
+    {...modDatetime && { dateModified: modDatetime }}
     author={{
       name: authorEntry?.data.name || SITE.author,
       expertise: "Health and Wellness Writing",
