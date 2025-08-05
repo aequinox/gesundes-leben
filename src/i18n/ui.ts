@@ -73,6 +73,7 @@ export interface UITranslations {
   "pagination.next": string;
   "pagination.prev": string;
   "pagination.currentPage": string;
+  "pagination.separator": string;
 
   // References
   "references.title": string;
@@ -265,6 +266,7 @@ export const ui: Record<
     "pagination.next": "Go to next page",
     "pagination.prev": "Previous",
     "pagination.currentPage": "Page {current} of {total}",
+    "pagination.separator": "/",
 
     // References
     "references.title": "Sources",

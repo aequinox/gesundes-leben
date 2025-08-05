@@ -562,7 +562,7 @@ if (import.meta.main) {
   process.stdin.resume();
   process.stdin.setEncoding("utf8");
   
-  main().finally(() => {
+  void main().finally(() => {
     process.stdin.pause();
   });
 }

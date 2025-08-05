@@ -278,5 +278,5 @@ Examples:
 }
 
 if (import.meta.main) {
-  main();
+  void main();
 }
