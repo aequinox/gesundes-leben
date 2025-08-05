@@ -129,7 +129,7 @@ export default [
       "prefer-template": "error",
       "object-shorthand": "error",
       "no-duplicate-imports": "warn",
-
+      "import/exports-last": "off",
       // Performance-focused rules
       "no-async-promise-executor": "error",
       "no-await-in-loop": "warn",

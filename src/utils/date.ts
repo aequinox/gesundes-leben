@@ -72,7 +72,7 @@ const resolveLocale = (): string => {
   }
 
   if (Array.isArray(LOCALE.langTag) && LOCALE.langTag.length > 0) {
-    return LOCALE.langTag[0];
+    return LOCALE.langTag[0] as string;
   }
 
   // Fallback to default locale
