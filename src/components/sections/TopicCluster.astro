@@ -69,8 +69,7 @@ if (!clusterAnalysis || clusterAnalysis.posts.length === 0) {
 
 const { pillarPost, supportingPosts, posts: allClusterPosts } = clusterAnalysis;
 
-// Organize posts for display
-const _displayPosts = allClusterPosts.slice(0, maxPosts);
+// Note: displayPosts removed as it's not used - using nonPillarPosts instead
 const nonPillarPosts = supportingPosts.slice(
   0,
   maxPosts - (pillarPost ? 1 : 0)
@@ -100,7 +99,7 @@ const stats = {
   ],
   averageReadTime: Math.round(
     allClusterPosts.reduce(
-      (total, post) => total + (post.data.readingTime?.minutes || 5),
+      (total, post) => total + (post.data.readingTime || 5),
       0
     ) / allClusterPosts.length
   ),
@@ -158,7 +157,7 @@ const stats = {
         <div class="pillar-post">
           <Card
             post={pillarPost}
-            size="large"
+            size="normal"
             withHeroImage={true}
             withMeta={true}
             withDescription={true}
@@ -188,7 +187,7 @@ const stats = {
                   <div class="category-group__post">
                     <Card
                       post={post}
-                      size={layout === "list" ? "small" : "medium"}
+                      size={layout === "list" ? "small" : "normal"}
                       withHeroImage={layout !== "list"}
                       withMeta={true}
                       withDescription={layout !== "list"}
@@ -211,7 +210,7 @@ const stats = {
             >
               <Card
                 post={post}
-                size={layout === "list" ? "small" : "medium"}
+                size={layout === "list" ? "small" : "normal"}
                 withHeroImage={layout !== "list"}
                 withMeta={true}
                 withDescription={layout !== "list"}
