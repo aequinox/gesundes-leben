@@ -24,13 +24,15 @@ async function validateInternalLinking() {
     let postsWithClusters = 0;
     
     for (const post of posts.slice(0, 10)) { // Test first 10 posts
-      const categories = post.data.categories || [];
-      const keywords = post.data.keywords || [];
+      const categories = post.data?.categories ?? [];
+      const keywords = post.data?.keywords ?? [];
       
       let hasCluster = false;
       for (const cluster of Object.values(TOPIC_CLUSTERS)) {
-        const categoryMatch = categories.some(cat => cluster.categories.includes(cat));
-        const keywordMatch = keywords.some(kw => cluster.keywords.includes(kw.toLowerCase()));
+        const categoryMatch = Array.isArray(categories) && Array.isArray(cluster.categories) ? 
+          categories.some(cat => cluster.categories.includes(cat)) : false;
+        const keywordMatch = Array.isArray(keywords) && Array.isArray(cluster.keywords) ?
+          keywords.some(kw => cluster.keywords.includes(kw.toLowerCase())) : false;
         if (categoryMatch || keywordMatch) {
           hasCluster = true;
           break;

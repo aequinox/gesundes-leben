@@ -248,7 +248,7 @@ async function addReference(type?: ReferenceType) {
   }
 
   data.authors = await promptArray("Authors");
-  if (data.authors === undefined || data.authors.length === 0) {
+  if (data.authors.length === 0) {
     console.log(colorize("❌ At least one author is required", "red"));
     return;
   }
@@ -281,7 +281,7 @@ async function addReference(type?: ReferenceType) {
   console.log(colorize(`Generated ID: ${id}`, "blue"));
 
   const customId = await prompt(`Use custom ID? (current: ${id}):`);
-  const finalId = customId ?? id;
+  const finalId = customId || id;
 
   // Validate data
   const errors = validateReferenceData(data as ReferenceData);
@@ -415,7 +415,7 @@ async function exportReferences(format: "json" | "csv" | "bibtex" = "json") {
     });
     
     content = csvRows.join("\n");
-  } else if (format === "bibtex") {
+  } else {
     const bibtexEntries = references.map(ref => {
       const type = ref.type === "journal" ? "article" : ref.type === "book" ? "book" : "misc";
       const authors = ref.authors.join(" and ");
@@ -438,8 +438,6 @@ async function exportReferences(format: "json" | "csv" | "bibtex" = "json") {
     });
     
     content = bibtexEntries.join("\n\n");
-  } else {
-    throw new Error(`Unsupported format: ${format}`);
   }
   
   await writeFile(filename, content, "utf8");

@@ -143,8 +143,8 @@ describe("createButtonVariants", () => {
 
     expect(variants.size).toHaveProperty("xs");
     expect(variants.size).toHaveProperty("xl");
-    expect(variants.type).toHaveProperty("success");
-    expect(variants.type).toHaveProperty("warning");
+    expect(variants.variant).toHaveProperty("primary");
+    expect(variants.variant).toHaveProperty("secondary");
   });
 });
 
@@ -239,8 +239,8 @@ describe("createThemeVariants", () => {
 
     expect(themed.color).toHaveProperty("primary");
     expect(themed.color).toHaveProperty("secondary");
-    expect(themed.color.primary).toContain("text-blue-500");
-    expect(themed.color.primary).toContain("dark:text-blue-400");
+    expect(themed.color?.primary).toContain("text-blue-500");
+    expect(themed.color?.primary).toContain("dark:text-blue-400");
   });
 });
 

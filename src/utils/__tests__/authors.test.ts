@@ -74,9 +74,9 @@ describe("Authors utilities", () => {
     it("should return authors with German names and specialties", async () => {
       const authors = await getAllAuthors();
 
-      const germanAuthor = authors.find(a => a.id === "dr-mueller");
-      expect(germanAuthor?.data.name).toBe("Dr. Sarah Müller");
-      expect(germanAuthor?.data.specialties).toContain("Ernährung");
+      const germanAuthor = authors.find(a => a.id === "kai-renner");
+      expect(germanAuthor?.data.name).toBe("Kai Renner");
+      expect(germanAuthor?.data.bio).toContain("Homöopath");
     });
   });
 
