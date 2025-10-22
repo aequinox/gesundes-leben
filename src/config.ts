@@ -78,7 +78,7 @@ export interface LocaleConfig {
 export const SITE: SiteConfig = {
   website: "https://gesundes-leben.vision/",
   author: "kai-renner",
-  profile: "https://satnaing.dev/",
+  profile: "https://gesundes-leben.vision/ueber-uns",
   desc: "Dein vertrauenswürdiger Ratgeber für Gesundheit, Ernährung und Wellness. Entdecke evidenzbasierte Artikel, praktische Tipps und Expertenwissen für ein gesünderes Leben.",
   title: "Gesundes Leben",
   ogImage: "gesundes-leben-og.jpg",

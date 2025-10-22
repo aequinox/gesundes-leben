@@ -47,55 +47,55 @@ export interface SocialObject {
  * Social media platform configurations
  */
 export const SOCIALS: readonly SocialObject[] = [
-  {
-    name: "Github",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: `${SITE.title} on Github`,
-    icon: "tabler:brand-github",
-    active: true,
-  },
-  {
-    name: "X",
-    href: "https://x.com/username",
-    linkTitle: `${SITE.title} on X`,
-    icon: "tabler:brand-x",
-    active: true,
-  },
+  // {
+  //   name: "Github",
+  //   href: "https://github.com/aequinox/gesundes-leben",
+  //   linkTitle: `${SITE.title} on Github`,
+  //   icon: "tabler:brand-github",
+  //   active: true,
+  // },
+  // {
+  //   name: "X",
+  //   href: "https://x.com/username",
+  //   linkTitle: `${SITE.title} on X`,
+  //   icon: "tabler:brand-x",
+  //   active: true,
+  // },
   {
     name: "LinkedIn",
-    href: "https://www.linkedin.com/in/username/",
-    linkTitle: `${SITE.title} on LinkedIn`,
+    href: "https://www.linkedin.com/in/kai-renner-0a6b1a17a/",
+    linkTitle: `${SITE.title} auf LinkedIn`,
     icon: "tabler:brand-linkedin",
     active: true,
   },
-  {
-    name: "Mail",
-    href: "mailto:yourmail@gmail.com",
-    linkTitle: `Send an email to ${SITE.title}`,
-    icon: "tabler:mail",
-    active: true,
-  },
+  // {
+  //   name: "Mail",
+  //   href: "mailto:yourmail@gmail.com",
+  //   linkTitle: `Send an email to ${SITE.title}`,
+  //   icon: "tabler:mail",
+  //   active: true,
+  // },
   {
     name: "Instagram",
-    href: "https://instagram.com/username",
-    linkTitle: `${SITE.title} on Instagram`,
+    href: "https://instagram.com/vision.gesundes.leben",
+    linkTitle: `${SITE.title} auf Instagram`,
     icon: "tabler:brand-instagram",
     active: false,
   },
-  {
-    name: "YouTube",
-    href: "https://youtube.com/@username",
-    linkTitle: `${SITE.title} on YouTube`,
-    icon: "tabler:brand-youtube",
-    active: false,
-  },
-  {
-    name: "Facebook",
-    href: "https://facebook.com/username",
-    linkTitle: `${SITE.title} on Facebook`,
-    icon: "tabler:brand-facebook",
-    active: false,
-  },
+  // {
+  //   name: "YouTube",
+  //   href: "https://youtube.com/@username",
+  //   linkTitle: `${SITE.title} on YouTube`,
+  //   icon: "tabler:brand-youtube",
+  //   active: false,
+  // },
+  // {
+  //   name: "Facebook",
+  //   href: "https://facebook.com/username",
+  //   linkTitle: `${SITE.title} on Facebook`,
+  //   icon: "tabler:brand-facebook",
+  //   active: false,
+  // },
 ] as const;
 
 /**
