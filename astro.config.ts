@@ -22,7 +22,7 @@ export default defineConfig({
   site: SITE.website,
   // Output optimizations
   output: "static",
-  trailingSlash: "never",
+  trailingSlash: "always",
   // Build optimizations
   build: {
     format: "file",
