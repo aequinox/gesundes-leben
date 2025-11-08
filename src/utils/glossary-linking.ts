@@ -1,9 +1,16 @@
 /**
  * Glossary Auto-linking Utility
  * Automatically detects and links health and medical terms to glossary definitions
+ *
+ * Refactored to use shared linking utilities from src/utils/linking/
+ * - Uses MatchingEngine for pattern matching and overlap prevention
+ * - Uses helper functions for data aggregation and analysis
  */
 
 // import type { CollectionEntry } from "astro:content";
+import type { Match, Pattern } from "./linking/types";
+import { MatchingEngine } from "./linking/scoring";
+import { countBy, topN } from "./linking/helpers";
 
 // Health and medical terms with their glossary IDs and variations
 export const GLOSSARY_TERMS: Record<
@@ -190,62 +197,58 @@ export interface GlossaryMatch {
 }
 
 /**
- * Find glossary terms in content text
+ * Convert GLOSSARY_TERMS to Pattern[] format for MatchingEngine
  */
-export function findGlossaryTerms(content: string): GlossaryMatch[] {
-  const matches: GlossaryMatch[] = [];
-  const processedContent = content.toLowerCase();
+function convertToPatterns(): Pattern[] {
+  const patterns: Pattern[] = [];
 
-  // Track processed positions to avoid overlapping matches
-  const processedPositions = new Set<number>();
-
-  // Sort terms by priority (highest first) to prefer important terms
-  const sortedTerms = Object.entries(GLOSSARY_TERMS).sort(
-    ([, a], [, b]) => b.priority - a.priority
-  );
-
-  for (const [_key, termData] of sortedTerms) {
+  for (const [_key, termData] of Object.entries(GLOSSARY_TERMS)) {
     for (const variation of termData.variations) {
-      const regex = new RegExp(
-        `\\b${variation.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
-        "gi"
-      );
-      let match;
-
-      while ((match = regex.exec(processedContent)) !== null) {
-        const startIndex = match.index;
-        const endIndex = startIndex + match[0].length;
-
-        // Check for overlaps with existing matches
-        let hasOverlap = false;
-        for (let i = startIndex; i < endIndex; i++) {
-          if (processedPositions.has(i)) {
-            hasOverlap = true;
-            break;
-          }
-        }
-
-        if (!hasOverlap) {
-          matches.push({
-            term: match[0],
-            glossaryId: termData.id,
-            startIndex,
-            endIndex,
-            priority: termData.priority,
-            category: termData.category,
-          });
-
-          // Mark positions as processed
-          for (let i = startIndex; i < endIndex; i++) {
-            processedPositions.add(i);
-          }
-        }
-      }
+      // Escape special regex characters for word boundary matching
+      const escapedVariation = variation.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      patterns.push({
+        term: termData.id, // Store the glossary ID as the term for later lookup
+        regex: `\\b${escapedVariation}\\b`,
+        priority: termData.priority,
+        category: termData.category,
+      });
     }
   }
 
-  // Sort matches by position
-  return matches.sort((a, b) => a.startIndex - b.startIndex);
+  return patterns;
+}
+
+// Create a singleton MatchingEngine instance
+const matchingEngine = new MatchingEngine();
+
+// Convert glossary terms to patterns once
+const glossaryPatterns = convertToPatterns();
+
+/**
+ * Find glossary terms in content text
+ * Refactored to use MatchingEngine for pattern matching and overlap prevention
+ */
+export function findGlossaryTerms(content: string): GlossaryMatch[] {
+  // Use MatchingEngine to find and process matches
+  const rawMatches = matchingEngine.findMatches(content, glossaryPatterns);
+
+  // Prevent overlapping matches (keeps higher priority)
+  const nonOverlapping = matchingEngine.preventOverlaps(rawMatches);
+
+  // Convert Match[] to GlossaryMatch[] format
+  return nonOverlapping.map((match): GlossaryMatch => {
+    const glossaryId = match.term; // We stored the glossary ID in the term field
+    const actualTerm = content.substring(match.startIndex, match.endIndex);
+
+    return {
+      term: actualTerm,
+      glossaryId,
+      startIndex: match.startIndex,
+      endIndex: match.endIndex,
+      priority: match.priority,
+      category: match.category || "unknown",
+    };
+  });
 }
 
 /**
@@ -331,6 +334,7 @@ export function processGlossaryLinks(
 
 /**
  * Get glossary term statistics for analytics
+ * Refactored to use helper functions from linking utilities
  */
 export function getGlossaryStats(content: string): {
   totalTerms: number;
@@ -338,28 +342,29 @@ export function getGlossaryStats(content: string): {
   topTerms: Array<{ term: string; count: number; category: string }>;
 } {
   const matches = findGlossaryTerms(content);
-  const termsByCategory: Record<string, number> = {};
-  const termCounts: Record<string, number> = {};
 
-  for (const match of matches) {
-    const category = GLOSSARY_TERMS[match.glossaryId]?.category || "unknown";
-    termsByCategory[category] = (termsByCategory[category] || 0) + 1;
-    termCounts[match.term] = (termCounts[match.term] || 0) + 1;
-  }
+  // Use countBy helper to count terms by category
+  const termsByCategory = countBy(
+    matches,
+    (match) => GLOSSARY_TERMS[match.glossaryId]?.category || "unknown"
+  );
 
-  const topTerms = Object.entries(termCounts)
-    .map(([term, count]) => {
-      const matchData = Object.values(GLOSSARY_TERMS).find(t =>
-        t.variations.some(v => v.toLowerCase() === term.toLowerCase())
-      );
-      return {
-        term,
-        count,
-        category: matchData?.category || "unknown",
-      };
-    })
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 10);
+  // Use countBy helper to count term occurrences
+  const termCounts = countBy(matches, (match) => match.term);
+
+  // Use topN helper to get top 10 terms with their metadata
+  const termsWithMetadata = Object.entries(termCounts).map(([term, count]) => {
+    const matchData = Object.values(GLOSSARY_TERMS).find((t) =>
+      t.variations.some((v) => v.toLowerCase() === term.toLowerCase())
+    );
+    return {
+      term,
+      count,
+      category: matchData?.category || "unknown",
+    };
+  });
+
+  const topTerms = topN(termsWithMetadata, 10, (item) => item.count);
 
   return {
     totalTerms: matches.length,
