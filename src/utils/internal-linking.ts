@@ -9,6 +9,8 @@
 import type { Post, Category, Tag } from "./types";
 import { slugify } from "./slugs";
 import { logger } from "./logger";
+import { LinkScorer, type MatchType } from "./linking/scoring";
+import { topN, unique } from "./linking/helpers";
 
 /**
  * Topic clusters identified from content audit
@@ -48,16 +50,19 @@ const TOPIC_CLUSTERS = {
 
 /**
  * Content relationship scoring weights for internal linking
+ * Using shared LinkScorer from linking/scoring module
  */
-const LINKING_WEIGHTS = {
-  EXACT_KEYWORD_MATCH: 10,
-  PARTIAL_KEYWORD_MATCH: 6,
-  CATEGORY_MATCH: 5,
-  TAG_MATCH: 4,
-  CLUSTER_MATCH: 3,
-  AUTHOR_MATCH: 1,
-  RECENCY_BONUS: 2
-} as const;
+const linkScorer = new LinkScorer({
+  "exact-keyword": 10,
+  "partial-keyword": 6,
+  category: 5,
+  tag: 4,
+  cluster: 3,
+  author: 1,
+});
+
+// Additional weight for recency bonus (not in standard scorer)
+const RECENCY_BONUS = 2;
 
 /**
  * Interface for content relationship analysis
@@ -109,10 +114,8 @@ function analyzeContentRelationships(
     }
   }
 
-  // Sort by score and return top suggestions
-  return relationships
-    .sort((a, b) => b.score - a.score)
-    .slice(0, maxSuggestions);
+  // Sort by score and return top suggestions using helper
+  return topN(relationships, maxSuggestions, (rel) => rel.score);
 }
 
 /**
@@ -139,31 +142,31 @@ function calculateContentRelationship(
   // 1. Keyword matching (highest priority)
   for (const keyword of sourceKeywords) {
     const keywordLower = keyword.toLowerCase();
-    
+
     // Exact keyword match in target
-    if (targetKeywords.some(k => k.toLowerCase() === keywordLower) || 
+    if (targetKeywords.some(k => k.toLowerCase() === keywordLower) ||
         targetTitle.includes(keywordLower)) {
-      score += LINKING_WEIGHTS.EXACT_KEYWORD_MATCH;
+      score += linkScorer.scoreMatch("exact-keyword");
       matchReasons.push(`Exact keyword match: ${keyword}`);
       suggestedAnchorText.push(keyword);
     }
-    
+
     // Partial keyword match
-    else if (targetTitle.includes(keywordLower.split(' ')[0]) || 
+    else if (targetTitle.includes(keywordLower.split(' ')[0]) ||
              targetKeywords.some(k => k.toLowerCase().includes(keywordLower.split(' ')[0]))) {
-      score += LINKING_WEIGHTS.PARTIAL_KEYWORD_MATCH;
+      score += linkScorer.scoreMatch("partial-keyword");
       matchReasons.push(`Partial keyword match: ${keyword}`);
     }
   }
 
   // 2. Category matching
-  const sharedCategories = sourceCategories.filter((cat: Category) => 
+  const sharedCategories = sourceCategories.filter((cat: Category) =>
     targetCategories.includes(cat)
   );
   if (sharedCategories.length > 0) {
-    score += sharedCategories.length * LINKING_WEIGHTS.CATEGORY_MATCH;
+    score += linkScorer.scoreMatch("category", sharedCategories.length);
     matchReasons.push(`Shared categories: ${sharedCategories.join(', ')}`);
-    
+
     // Add category-based anchor text suggestions
     sharedCategories.forEach(category => {
       suggestedAnchorText.push(getCategoryAnchorText(category as string));
@@ -171,32 +174,32 @@ function calculateContentRelationship(
   }
 
   // 3. Tag matching
-  const sharedTags = sourceTags.filter((tag: Tag) => 
+  const sharedTags = sourceTags.filter((tag: Tag) =>
     targetTags.includes(tag)
   );
   if (sharedTags.length > 0) {
-    score += sharedTags.length * LINKING_WEIGHTS.TAG_MATCH;
+    score += linkScorer.scoreMatch("tag", sharedTags.length);
     matchReasons.push(`Shared tags: ${sharedTags.join(', ')}`);
   }
 
   // 4. Topic cluster matching
   const sourceCluster = identifyTopicCluster(sourcePost);
   const targetCluster = identifyTopicCluster(targetPost);
-  
+
   if (sourceCluster && targetCluster && sourceCluster === targetCluster) {
-    score += LINKING_WEIGHTS.CLUSTER_MATCH;
+    score += linkScorer.scoreMatch("cluster");
     matchReasons.push(`Same topic cluster: ${TOPIC_CLUSTERS[sourceCluster].name}`);
   }
-  
+
   // Cross-cluster bonus for related topics (e.g., gut health → mental health)
   if (sourceCluster && targetCluster && areRelatedClusters(sourceCluster, targetCluster)) {
-    score += LINKING_WEIGHTS.CLUSTER_MATCH / 2;
+    score += linkScorer.scoreMatch("cluster") / 2;
     matchReasons.push(`Related topic clusters`);
   }
 
   // 5. Author matching (small bonus)
   if (sourcePost.data.author === targetPost.data.author) {
-    score += LINKING_WEIGHTS.AUTHOR_MATCH;
+    score += linkScorer.scoreMatch("author");
     matchReasons.push('Same author');
   }
 
@@ -204,9 +207,9 @@ function calculateContentRelationship(
   const targetDate = new Date(targetPost.data.pubDatetime);
   const oneYearAgo = new Date();
   oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-  
+
   if (targetDate > oneYearAgo) {
-    score += LINKING_WEIGHTS.RECENCY_BONUS;
+    score += RECENCY_BONUS;
     matchReasons.push('Recent content');
   }
 
@@ -215,16 +218,14 @@ function calculateContentRelationship(
     suggestedAnchorText.push(...generateSmartAnchorText(targetPost));
   }
 
-  // Determine linking context strength
-  let linkingContext: 'strong' | 'moderate' | 'weak' = 'weak';
-  if (score >= 15) linkingContext = 'strong';
-  else if (score >= 8) linkingContext = 'moderate';
+  // Determine linking context strength using shared LinkScorer
+  const linkingContext = linkScorer.getLinkingContext(score);
 
   return {
     targetPost,
     score,
     matchReasons,
-    suggestedAnchorText: [...new Set(suggestedAnchorText)], // Remove duplicates
+    suggestedAnchorText: unique(suggestedAnchorText), // Remove duplicates using helper
     linkingContext
   };
 }
@@ -411,7 +412,8 @@ function findCrossClusterLinkingOpportunities(
     }
   }
 
-  return crossClusterLinks.sort((a, b) => b.score - a.score);
+  // Sort by score using topN (no limit, but sorted)
+  return topN(crossClusterLinks, crossClusterLinks.length, (rel) => rel.score);
 }
 
 /**
