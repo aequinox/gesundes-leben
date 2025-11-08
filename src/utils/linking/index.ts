@@ -30,5 +30,21 @@ export {
 // Helper utilities
 export * from "./helpers";
 
+// Analytics
+export {
+  LinkAnalyticsService,
+  LinkAnalytics,
+  linkAnalytics,
+  trackLinkClick,
+  generateSessionId,
+} from "./analytics";
+
+export type {
+  ExtendedLinkClickEvent,
+  ContentAnalytics,
+  InternalLinkAudit,
+  SEOLinkAnalysis,
+} from "./analytics";
+
 // Types
 export type * from "./types";
