@@ -9,7 +9,7 @@
 import imageKai from "@/assets/images/about/Portrait-Kai-1-GIT-round-1-300x300.png";
 import imageSandra from "@/assets/images/about/Portrait-Sandra-1.1-GIT-round-1-300x300.png";
 import Hr from "@/components/elements/Hr.astro";
-import VisionImage from "@/components/elements/VisionImage.astro";
+import Image from "@/components/elements/Image.astro";
 import Footer from "@/components/sections/Footer.astro";
 import Header from "@/components/sections/Header.astro";
 import PageHero from "@/components/sections/PageHero.astro";
@@ -153,10 +153,11 @@ const pageDescription =
                 <div
                   class="founder-avatar h-40 w-40 overflow-hidden rounded-full shadow-elevation-medium"
                 >
-                  <VisionImage
+                  <Image
                     src={imageSandra}
                     alt="Portrait von Sandra Pfeiffer"
-                    class="h-full w-full rounded-full object-cover transition-transform duration-300 hover:scale-105"
+                    rounded="full"
+                    class="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
                   />
                 </div>
                 <div class="founder-info">
@@ -189,10 +190,11 @@ const pageDescription =
                 <div
                   class="founder-avatar h-40 w-40 overflow-hidden rounded-full shadow-elevation-medium"
                 >
-                  <VisionImage
+                  <Image
                     src={imageKai}
                     alt="Portrait von Kai Renner"
-                    class="h-full w-full rounded-full object-cover transition-transform duration-300 hover:scale-105"
+                    rounded="full"
+                    class="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
                   />
                 </div>
                 <div class="founder-info">

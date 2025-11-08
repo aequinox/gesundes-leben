@@ -1,4 +1,21 @@
 ---
+/**
+ * @deprecated This component is deprecated. Use the enhanced Image.astro component instead.
+ *
+ * Image.astro now supports all VisionImage features:
+ * - filter prop: "none" | "blur" | "grayscale" | "sepia" | "duotone"
+ * - rounded prop: boolean | "sm" | "md" | "lg" | "full"
+ *
+ * Migration example:
+ * ```astro
+ * // Before:
+ * <VisionImage src={img} alt="..." effect="duotone" rounded="full" />
+ *
+ * // After:
+ * <Image src={img} alt="..." filter="duotone" rounded="full" />
+ * ```
+ */
+
 import type { ImageMetadata } from "astro";
 
 import { logger } from "@/utils/logger";

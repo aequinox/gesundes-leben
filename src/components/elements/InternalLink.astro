@@ -366,11 +366,16 @@ const iconSymbol = icon && iconMap[icon] ? iconMap[icon] : null;
         const { trackLinkClick } = await import("@/utils/internal-linking-analytics");
         trackLinkClick(clickEvent);
       } catch (error) {
-        console.warn("Failed to load analytics:", error);
+        // Only log in development mode
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.warn("Failed to load analytics:", error);
+        }
       }
 
       // Log for development
       if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
         console.log("Internal link clicked:", clickEvent);
       }
     }

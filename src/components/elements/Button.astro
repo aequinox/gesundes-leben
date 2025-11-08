@@ -68,6 +68,7 @@ import type { InteractiveComponentProps } from "@/types";
 import BaseButton from "./button/BaseButton.astro";
 import BaseLink from "./button/BaseLink.astro";
 import { buildButtonClasses } from "./button/ButtonClassBuilder";
+import ButtonContent from "./button/ButtonContent.astro";
 import ButtonIcon from "./button/ButtonIcon.astro";
 import {
   type ButtonShape,
@@ -211,57 +212,18 @@ const loadingAnnouncement = loading ? loadingText : undefined;
 {
   isLink ? (
     <BaseLink href={href} newTab={newTab} disabled={disabled} {...commonProps}>
-      {/* Loading state announcement for screen readers */}
-      {loading && (
-        <span class="sr-only" aria-live="polite" aria-atomic="true">
-          {loadingAnnouncement}
-        </span>
-      )}
-      
-      {/* Start icon */}
-      {icon && iconPosition === "start" && (
-        <ButtonIcon 
-          icon={loading ? "loader" : icon} 
-          position="start" 
-          hasText={hasTextContent}
-          class={loading ? "animate-spin" : ""}
-          aria-hidden={!isIconOnly}
-        />
-      )}
-
-      {/* Text content */}
-      {text && (
-        <span class={loading ? "opacity-75" : ""}>
-          {loading && !icon ? loadingText : text}
-        </span>
-      )}
-      {hasSlotContent && (
-        <span class={loading ? "opacity-75" : ""}>
-          <slot />
-        </span>
-      )}
-
-      {/* End icon */}
-      {icon && iconPosition === "end" && (
-        <ButtonIcon 
-          icon={loading ? "loader" : icon} 
-          position="end" 
-          hasText={hasTextContent}
-          class={loading ? "animate-spin" : ""}
-          aria-hidden={!isIconOnly}
-        />
-      )}
-
-      {/* Icon-only button */}
-      {isIconOnly && (
-        <ButtonIcon 
-          icon={loading ? "loader" : icon} 
-          position="only" 
-          hasText={false}
-          class={loading ? "animate-spin" : ""}
-          aria-hidden="false"
-        />
-      )}
+      <ButtonContent
+        icon={icon}
+        iconPosition={iconPosition}
+        text={text}
+        loading={loading}
+        loadingText={loadingText}
+        loadingAnnouncement={loadingAnnouncement}
+        isIconOnly={isIconOnly}
+        hasTextContent={hasTextContent}
+      >
+        <slot />
+      </ButtonContent>
     </BaseLink>
   ) : (
     <BaseButton
@@ -270,57 +232,18 @@ const loadingAnnouncement = loading ? loadingText : undefined;
       loading={loading}
       {...commonProps}
     >
-      {/* Loading state announcement for screen readers */}
-      {loading && (
-        <span class="sr-only" aria-live="polite" aria-atomic="true">
-          {loadingAnnouncement}
-        </span>
-      )}
-      
-      {/* Start icon */}
-      {icon && iconPosition === "start" && (
-        <ButtonIcon 
-          icon={loading ? "loader" : icon} 
-          position="start" 
-          hasText={hasTextContent}
-          class={loading ? "animate-spin" : ""}
-          aria-hidden={!isIconOnly}
-        />
-      )}
-
-      {/* Text content */}
-      {text && (
-        <span class={loading ? "opacity-75" : ""}>
-          {loading && !icon ? loadingText : text}
-        </span>
-      )}
-      {hasSlotContent && (
-        <span class={loading ? "opacity-75" : ""}>
-          <slot />
-        </span>
-      )}
-
-      {/* End icon */}
-      {icon && iconPosition === "end" && (
-        <ButtonIcon 
-          icon={loading ? "loader" : icon} 
-          position="end" 
-          hasText={hasTextContent}
-          class={loading ? "animate-spin" : ""}
-          aria-hidden={!isIconOnly}
-        />
-      )}
-
-      {/* Icon-only button */}
-      {isIconOnly && (
-        <ButtonIcon 
-          icon={loading ? "loader" : icon} 
-          position="only" 
-          hasText={false}
-          class={loading ? "animate-spin" : ""}
-          aria-hidden="false"
-        />
-      )}
+      <ButtonContent
+        icon={icon}
+        iconPosition={iconPosition}
+        text={text}
+        loading={loading}
+        loadingText={loadingText}
+        loadingAnnouncement={loadingAnnouncement}
+        isIconOnly={isIconOnly}
+        hasTextContent={hasTextContent}
+      >
+        <slot />
+      </ButtonContent>
     </BaseButton>
   )
 }
