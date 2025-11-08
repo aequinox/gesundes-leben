@@ -16,8 +16,20 @@
 
 import { LOCALE, SITE } from "@/config";
 import { getI18nStrings } from "@/config/i18n";
-import { isNonEmptyString, isValidURL, type SEOMetadata } from "@/types";
-import { logger } from "@/utils/logger";
+import { isNonEmptyString, type SEOMetadata } from "@/types";
+import {
+  buildArticleSchema,
+  buildAuthorSchema,
+  buildBreadcrumbSchema,
+  buildMedicalAudienceSchema,
+  buildOrganizationSchema,
+  buildPublisherSchema,
+  formatDate,
+  resolveUrl,
+  sanitizeText,
+  validateSeoLength,
+  type BreadcrumbItemData,
+} from "@/utils/seo/SchemaBuilder";
 
 export interface Props extends SEOMetadata {
   /** Page type for structured data (article, webpage, etc.) */
@@ -56,23 +68,6 @@ const {
   customStructuredData = {},
 } = Astro.props;
 
-// Validate and sanitize inputs
-const sanitizeText = (text: string): string => {
-  return text
-    .replace(/<[^>]*>/g, "") // Strip HTML tags
-    .replace(/[<>'"&]/g, match => {
-      const entities: Record<string, string> = {
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#x27;",
-        "&": "&amp;",
-      };
-      return entities[match] || match;
-    })
-    .trim();
-};
-
 // Process and validate props
 const seoTitle = sanitizeText(title || SITE.title);
 const seoDescription = sanitizeText(description || SITE.desc);
@@ -81,50 +76,16 @@ const seoKeywords = Array.isArray(keywords)
   : [];
 
 // Validate SEO best practices
-if (seoTitle.length > 60) {
-  logger.warn(
-    `SEO: Title exceeds 60 characters (${seoTitle.length}): "${seoTitle}"`
-  );
-}
-
-if (seoDescription.length > 160) {
-  logger.warn(
-    `SEO: Description exceeds 160 characters (${seoDescription.length})`
-  );
-}
-
-if (seoDescription.length < 120) {
-  logger.info(
-    "SEO: Description could be longer for better SEO (recommended: 120-160 chars)"
-  );
-}
+validateSeoLength(seoTitle, seoDescription);
 
 // Generate URLs
 const currentURL = new URL(Astro.url.pathname, Astro.site);
-const resolvedCanonicalURL =
-  canonicalURL && isValidURL(canonicalURL) ? canonicalURL : currentURL.href;
+const resolvedCanonicalURL = canonicalURL
+  ? resolveUrl(canonicalURL, Astro.site.href)
+  : currentURL.href;
 
 // Handle Open Graph image
-const resolveImageURL = (imagePath?: string): string => {
-  if (!imagePath) {
-    return new URL(SITE.ogImage || "/og-default.jpg", Astro.site).href;
-  }
-
-  try {
-    // If already absolute URL, return as is
-    if (isValidURL(imagePath)) {
-      return imagePath;
-    }
-
-    // Resolve relative URLs
-    return new URL(imagePath, Astro.site).href;
-  } catch {
-    logger.warn(`SEO: Invalid image URL: ${imagePath}, using default`);
-    return new URL(SITE.ogImage || "/og-default.jpg", Astro.site).href;
-  }
-};
-
-const socialImageURL = resolveImageURL(ogImage);
+const socialImageURL = resolveUrl(ogImage, Astro.site.href, SITE.ogImage || "/og-default.jpg");
 
 // Get i18n strings for current language
 const i18n = getI18nStrings(LOCALE.lang as "de" | "en");
@@ -148,90 +109,42 @@ const generateStructuredData = () => {
 
   switch (pageType) {
     case "article":
-      // All articles are health-related content
-      pageStructuredData = {
-        "@type": ["Article", "HealthTopicContent"],
+      // All articles are health-related content using shared schema builder
+      pageStructuredData = buildArticleSchema({
         headline: seoTitle,
-        articleSection: section || i18n.seo.content.healthCategory,
-        wordCount: Math.max(100, seoDescription.length * 5),
-        genre: "Health and Wellness",
-        audience: {
-          "@type": "Audience",
-          audienceType: i18n.seo.medical.targetAudience,
-          geographicArea: {
-            "@type": "Country",
-            name: i18n.regions.germany,
-          },
-        },
+        description: seoDescription,
+        url: resolvedCanonicalURL,
+        datePublished: publishedTime!,
+        dateModified: modifiedTime,
         author: {
-          "@type": "Person",
           name: author?.name || SITE.author,
-          ...(author?.url && { url: author.url }),
-          expertise: i18n.seo.medical.expertiseLevel,
+          url: author?.url,
         },
-        publisher: {
-          "@type": "Organization",
-          name: SITE.title,
-          url: SITE.website,
-          logo: {
-            "@type": "ImageObject",
-            url: new URL("/logo.png", Astro.site).href,
-            width: 180,
-            height: 180,
-          },
-          sameAs: [
-            "https://www.facebook.com/gesundesleben",
-            "https://www.instagram.com/gesundesleben",
-          ],
-        },
-        mainEntityOfPage: {
-          "@type": "WebPage",
-          "@id": resolvedCanonicalURL,
-        },
-        isPartOf: {
-          "@type": "WebSite",
-          name: SITE.title,
-          url: SITE.website,
-          publisher: {
-            "@type": "Organization",
-            name: SITE.title,
-          },
-        },
-        ...(publishedTime && { datePublished: publishedTime.toISOString() }),
-        ...(modifiedTime && { dateModified: modifiedTime.toISOString() }),
-        ...(tags.length > 0 && { keywords: tags.join(", ") }),
-        // Health-specific properties
-        medicalAudience: {
-          "@type": "MedicalAudience",
-          audienceType: "Patient",
-        },
-        // Add disclaimer for health content
-        disclaimer: i18n.seo.medical.disclaimerShort,
-      };
+        section,
+        tags,
+        wordCount: Math.max(100, seoDescription.length * 5),
+        image: socialImageURL,
+      });
       break;
 
     case "aboutpage":
       pageStructuredData = {
         "@type": "AboutPage",
         mainEntity: {
-          "@type": "Organization",
-          name: SITE.title,
-          description: seoDescription,
-          url: SITE.website,
-          foundingLocation: {
-            "@type": "Country",
-            name: i18n.regions.germany,
-          },
-          areaServed: {
-            "@type": "Country",
-            name: i18n.regions.germany,
-          },
+          ...buildOrganizationSchema({
+            description: seoDescription,
+            foundingYear: 2024,
+          }),
           knowsLanguage: [
             {
               "@type": "Language",
               name: "Deutsch",
             },
           ],
+          areaServed: {
+            "@type": "Country",
+            name: i18n.regions.germany,
+          },
         },
       };
       break;
@@ -239,11 +152,7 @@ const generateStructuredData = () => {
     case "contactpage":
       pageStructuredData = {
         "@type": "ContactPage",
-        mainEntity: {
-          "@type": "Organization",
-          name: SITE.title,
-          url: SITE.website,
-        },
+        mainEntity: buildOrganizationSchema(),
       };
       break;
 
@@ -272,14 +181,6 @@ const generateStructuredData = () => {
 
 const jsonLD = generateStructuredData();
 
-// Define breadcrumb item interface
-interface BreadcrumbItem {
-  "@type": "ListItem";
-  position: number;
-  name: string;
-  item?: string;
-}
-
 // Generate breadcrumb structured data for nested pages
 const generateBreadcrumbs = () => {
   const pathSegments = Astro.url.pathname.split("/").filter(Boolean);
@@ -288,12 +189,11 @@ const generateBreadcrumbs = () => {
     return null;
   }
 
-  const breadcrumbItems: BreadcrumbItem[] = [
+  const breadcrumbItems: BreadcrumbItemData[] = [
     {
-      "@type": "ListItem",
       position: 1,
       name: i18n.seo.navigation.home,
-      item: SITE.website,
+      url: SITE.website,
     },
   ];
 
@@ -304,29 +204,14 @@ const generateBreadcrumbs = () => {
     const segmentName =
       segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ");
 
-    if (isLast) {
-      // Last item (current page) doesn't have an 'item' property according to Schema.org
-      breadcrumbItems.push({
-        "@type": "ListItem",
-        position: index + 2,
-        name: segmentName,
-      });
-    } else {
-      // Intermediate items have an 'item' property with the URL
-      breadcrumbItems.push({
-        "@type": "ListItem",
-        position: index + 2,
-        name: segmentName,
-        item: new URL(currentPath, Astro.site).href,
-      });
-    }
+    breadcrumbItems.push({
+      position: index + 2,
+      name: segmentName,
+      url: isLast ? undefined : new URL(currentPath, Astro.site).href,
+    });
   });
 
-  return {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: breadcrumbItems,
-  };
+  return buildBreadcrumbSchema(breadcrumbItems);
 };
 
 const breadcrumbData = generateBreadcrumbs();
