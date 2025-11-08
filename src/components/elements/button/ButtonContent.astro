@@ -1,0 +1,98 @@
+---
+/**
+ * ButtonContent Component
+ *
+ * Shared content structure for Button component.
+ * Handles rendering of loading states, icons, and text content.
+ * Used by both BaseButton and BaseLink to avoid duplication.
+ *
+ * @component
+ * @since 1.1.0
+ */
+
+import ButtonIcon from "./ButtonIcon.astro";
+
+export interface Props {
+  /** Icon identifier from astro-icon */
+  icon?: string;
+  /** Icon position relative to text */
+  iconPosition?: "start" | "end";
+  /** Button/link text content */
+  text?: string;
+  /** Whether button is in loading state */
+  loading?: boolean;
+  /** Loading text to display when loading */
+  loadingText?: string;
+  /** Loading announcement for screen readers */
+  loadingAnnouncement?: string;
+  /** Whether this is an icon-only button */
+  isIconOnly?: boolean;
+  /** Whether there is text content (text prop or slot) */
+  hasTextContent?: boolean;
+}
+
+const {
+  icon,
+  iconPosition = "start",
+  text,
+  loading = false,
+  loadingText = "Loading...",
+  loadingAnnouncement = "Loading, please wait",
+  isIconOnly = false,
+  hasTextContent = false,
+} = Astro.props;
+
+const hasSlotContent = Astro.slots.has("default");
+---
+
+{/* Loading state announcement for screen readers */}
+{loading && (
+  <span class="sr-only" aria-live="polite" aria-atomic="true">
+    {loadingAnnouncement}
+  </span>
+)}
+
+{/* Start icon */}
+{icon && iconPosition === "start" && (
+  <ButtonIcon
+    icon={loading ? "loader" : icon}
+    position="start"
+    hasText={hasTextContent}
+    class={loading ? "animate-spin" : ""}
+    aria-hidden={!isIconOnly}
+  />
+)}
+
+{/* Text content */}
+{text && (
+  <span class={loading ? "opacity-75" : ""}>
+    {loading && !icon ? loadingText : text}
+  </span>
+)}
+{hasSlotContent && (
+  <span class={loading ? "opacity-75" : ""}>
+    <slot />
+  </span>
+)}
+
+{/* End icon */}
+{icon && iconPosition === "end" && (
+  <ButtonIcon
+    icon={loading ? "loader" : icon}
+    position="end"
+    hasText={hasTextContent}
+    class={loading ? "animate-spin" : ""}
+    aria-hidden={!isIconOnly}
+  />
+)}
+
+{/* Icon-only button */}
+{isIconOnly && (
+  <ButtonIcon
+    icon={loading ? "loader" : icon}
+    position="only"
+    hasText={false}
+    class={loading ? "animate-spin" : ""}
+    aria-hidden="false"
+  />
+)}

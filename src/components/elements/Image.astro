@@ -82,8 +82,12 @@ type Props = {
   loading?: "lazy" | "eager";
   /** Optional visual style */
   style?: "default" | "polaroid" | "bordered" | "floating" | "glass";
-  /** Optional animation effect */
+  /** Optional interactive animation effect */
   effect?: "none" | "zoom" | "parallax" | "tilt";
+  /** Optional CSS filter effect */
+  filter?: "none" | "blur" | "grayscale" | "sepia" | "duotone";
+  /** Optional border radius */
+  rounded?: boolean | "sm" | "md" | "lg" | "full";
   /** Optional position */
   position?: "left" | "right" | "center" | "full";
   /** Optional widths for responsive images */
@@ -102,6 +106,8 @@ type Props = {
   height?: number;
   /** Optional invert flag to invert image colors */
   invert?: boolean;
+  /** Optional priority loading (disables lazy load for above-fold images) */
+  priority?: boolean;
 };
 
 // Define validation schema for Image component props
@@ -148,12 +154,17 @@ const imageValidationSchema = {
     type: "string" as const,
     oneOf: ["none", "zoom", "parallax", "tilt"],
   },
+  filter: {
+    type: "string" as const,
+    oneOf: ["none", "blur", "grayscale", "sepia", "duotone"],
+  },
   position: {
     type: "string" as const,
     oneOf: ["left", "right", "center", "full"],
   },
   quality: { type: "number" as const, min: 1, max: 100 },
   invert: commonRules.optionalBoolean,
+  priority: commonRules.optionalBoolean,
 };
 
 // Validate props in development only
@@ -172,8 +183,11 @@ const {
   loading = "lazy",
   style = "default",
   effect = "none",
+  filter = "none",
+  rounded = false,
   position = "center",
   invert = false,
+  priority = false,
 } = validation.validatedProps;
 
 // Parse position and other controls from title if provided (legacy support)
@@ -311,6 +325,35 @@ if (!isStringSource && !width && !height) {
     }
   }
 }
+
+// Map filter values to CSS classes
+const filterClasses = {
+  none: "",
+  blur: "image-filter-blur",
+  grayscale: "image-filter-grayscale",
+  sepia: "image-filter-sepia",
+  duotone: "image-filter-duotone",
+};
+
+// Map rounded values to CSS classes
+const roundedClasses = {
+  true: "rounded",
+  sm: "rounded-sm",
+  md: "rounded-md",
+  lg: "rounded-lg",
+  full: "rounded-full",
+  false: "",
+};
+
+// Determine the final CSS classes for filter and rounded
+const filterClass = filterClasses[filter];
+const roundedClass =
+  typeof rounded === "boolean" || rounded === undefined
+    ? roundedClasses[String(rounded) as "true" | "false"]
+    : roundedClasses[rounded];
+
+// Priority loading overrides lazy loading
+const finalLoading = priority ? "eager" : loading;
 ---
 
 <figure
@@ -368,6 +411,10 @@ if (!isStringSource && !width && !height) {
       effect === "tilt"
         ? "transition-transform duration-300 will-change-transform"
         : "",
+      // Rounded (custom border radius)
+      roundedClass,
+      // Filter effects
+      filterClass,
     ]}
     style={style === "polaroid"
       ? "transform: rotate(var(--rotation, 0deg)); --rotation: calc(2deg - 4deg * Math.random());"
@@ -382,7 +429,7 @@ if (!isStringSource && !width && !height) {
             alt={alt}
             width={width ?? 800}
             height={height ?? 600}
-            loading={loading}
+            loading={finalLoading}
             densities={densities}
             sizes={sizes}
             class:list={[
@@ -403,7 +450,7 @@ if (!isStringSource && !width && !height) {
           <img
             src={stringSource}
             alt={alt}
-            loading={loading}
+            loading={finalLoading}
             width={width}
             height={height}
             class:list={[
@@ -429,7 +476,7 @@ if (!isStringSource && !width && !height) {
           formats={formats}
           sizes={sizes}
           quality={quality}
-          loading={loading}
+          loading={finalLoading}
           class:list={[
             "h-full w-full object-cover transition-all duration-500",
             effect === "zoom"
@@ -448,7 +495,7 @@ if (!isStringSource && !width && !height) {
           densities={densities}
           sizes={sizes}
           quality={quality}
-          loading={loading}
+          loading={finalLoading}
           class:list={[
             "h-full w-full object-cover transition-all duration-500",
             effect === "zoom"
@@ -540,3 +587,48 @@ if (!isStringSource && !width && !height) {
     });
   });
 </script>
+
+<style>
+  @reference "@/styles/global.css";
+
+  /* CSS Filter Effects (from VisionImage) */
+  .image-filter-blur img,
+  .image-filter-blur picture {
+    @apply blur-[2px] hover:blur-none;
+    transition: filter 0.3s ease;
+  }
+
+  .image-filter-grayscale img,
+  .image-filter-grayscale picture {
+    @apply grayscale hover:grayscale-0;
+    transition: filter 0.3s ease;
+  }
+
+  .image-filter-sepia img,
+  .image-filter-sepia picture {
+    @apply sepia hover:sepia-0;
+    transition: filter 0.3s ease;
+  }
+
+  .image-filter-duotone img,
+  .image-filter-duotone picture {
+    @apply relative;
+    filter: grayscale(100%) contrast(1.2);
+  }
+
+  .image-filter-duotone::before {
+    content: "";
+    @apply absolute inset-0 z-10 mix-blend-color pointer-events-none;
+    background: linear-gradient(
+      45deg,
+      oklch(var(--color-accent) / 0.5),
+      oklch(var(--color-fill) / 0.5)
+    );
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+  }
+
+  .image-filter-duotone:hover::before {
+    opacity: 0.3;
+  }
+</style>
