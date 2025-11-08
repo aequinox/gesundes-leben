@@ -2,11 +2,14 @@
 import { ClientRouter } from "astro:transitions";
 
 import Breadcrumb from "@/components/Breadcrumb.astro";
+import Header from "@/components/sections/Header.astro";
 import { SEO } from "@/components/seo";
 import SizeIndicator from "@/components/SizeIndicator.astro";
 import { SITE } from "@/config";
 
 import "@/styles/global.css";
+
+import type { NavigationLink } from "@/components/types";
 
 export interface Props {
   title?: string;
@@ -18,6 +21,7 @@ export interface Props {
   pubDatetime?: Date;
   modDatetime?: Date | undefined;
   scrollSmooth?: boolean;
+  activeNav?: NavigationLink;
 }
 
 const {
@@ -30,6 +34,7 @@ const {
   pubDatetime,
   modDatetime,
   scrollSmooth = false,
+  activeNav,
 } = Astro.props;
 ---
 
@@ -85,6 +90,7 @@ const {
     </script>
   </head>
   <body data-pagefind-body class="px-2 lg:px-12" data-astro-prefetch>
+    <Header activeNav={activeNav} />
     {Astro.url.pathname !== "/" && <Breadcrumb />}
     <main transition:animate="slide" transition:name="main-content">
       <slot />
