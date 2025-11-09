@@ -80,7 +80,15 @@
     "xml-convert": "bun scripts/xml-converter.ts",
     "deploy": "bun run build && git checkout --orphan gh-pages && git --work-tree dist add --all && git --work-tree dist commit -m 'Deploy' && git push github gh-pages --force && git checkout -f main && git branch -D gh-pages",
     "perf:budget": "node scripts/performance-monitor.js",
-    "perf:check": "bun run build && bun run perf:budget"
+    "perf:check": "bun run build && bun run perf:budget",
+    "perf": "bun run build && bun run perf:budget && bun run analyze",
+    "perf:watch": "bun run build:check && bun run perf:test",
+    "perf:ci": "bun run build && bun run test:e2e:core-vitals",
+    "deps:check": "bun outdated",
+    "deps:update": "bun update --latest",
+    "deps:audit": "bun audit",
+    "security:audit": "bun audit",
+    "security:fix": "bun audit --fix"
   },
   "dependencies": {
     "@astrojs/mdx": "4.3.10",
@@ -94,9 +102,7 @@
     "astro-icon": "^1.1.5",
     "astro-pagefind": "^1.8.5",
     "astro-robots-txt": "^1.0.0",
-    "axios": "^1.13.2",
     "chalk": "^5.6.2",
-    "commander": "^14.0.2",
     "dayjs": "^1.11.19",
     "hast-util-to-string": "^3.0.1",
     "lodash.kebabcase": "^4.1.1",
@@ -110,10 +116,6 @@
     "sharp": "^0.34.5",
     "slugify": "^1.6.6",
     "tailwindcss": "^4.1.17",
-    "turndown": "^7.2.2",
-    "turndown-plugin-gfm": "^1.0.2",
-    "uuid": "^13.0.0",
-    "xml2js": "^0.6.2",
     "zod": "^4.1.12"
   },
   "devDependencies": {
@@ -129,9 +131,12 @@
     "@types/xml2js": "^0.4.14",
     "@typescript-eslint/eslint-plugin": "^8.46.3",
     "@typescript-eslint/parser": "^8.46.3",
+    "@vite-pwa/astro": "^1.1.1",
     "@vitest/coverage-v8": "^4.0.8",
     "@vitest/ui": "^4.0.8",
+    "axios": "^1.13.2",
     "chrome-launcher": "^1.2.1",
+    "commander": "^14.0.2",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.1",
     "eslint-plugin-astro": "^1.5.0",
@@ -147,9 +152,14 @@
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-astro-organize-imports": "^0.4.11",
     "prettier-plugin-tailwindcss": "^0.7.1",
+    "rollup-plugin-visualizer": "^6.0.5",
     "tsx": "^4.20.6",
+    "turndown": "^7.2.2",
+    "turndown-plugin-gfm": "^1.0.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.3",
-    "vitest": "^4.0.8"
+    "uuid": "^13.0.0",
+    "vitest": "^4.0.8",
+    "xml2js": "^0.6.2"
   }
 }
