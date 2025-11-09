@@ -89,6 +89,62 @@ src/components/
 
 **Logging Standards**: Use the project's logger utility (`src/utils/logger.ts`) instead of console statements in all Astro components, utilities, and server-side code. For standalone Node.js scripts (like performance tests), console.log is acceptable for user-facing output.
 
+**Component Size Guidelines**: To maintain readability and testability, follow these size limits:
+
+- **Components** (`*.astro`, `*.tsx`): Maximum 300 lines
+- **Utility Files** (`src/utils/`): Maximum 200 lines
+- **Page Files** (`src/pages/`): Maximum 400 lines
+- **Test Files**: Maximum 500 lines
+
+When a file exceeds limits:
+1. Extract reusable logic to utilities
+2. Split into sub-components
+3. Move configuration to separate files
+4. Create composition patterns
+
+Example refactoring:
+```typescript
+// Before: Image.astro (634 lines)
+// After:
+//   - Image.astro (200 lines) - Main component
+//   - utils/image/validation.ts (50 lines)
+//   - utils/image/transforms.ts (80 lines)
+//   - utils/image/constants.ts (30 lines)
+```
+
+**TypeScript Best Practices**:
+
+Type vs Interface Guidelines:
+
+**Use `interface` for**:
+- Object shapes (especially for component props)
+- When you expect consumers to extend/implement
+- Public APIs
+
+**Use `type` for**:
+- Union types (`type Status = "pending" | "active"`)
+- Intersection types
+- Mapped types and conditional types
+- Primitive aliases (`type ID = string`)
+- Tuples
+
+Examples:
+```typescript
+// ✅ Good
+interface BlogPostProps {
+  title: string;
+  author: Author;
+}
+
+type PostStatus = "draft" | "published" | "archived";
+type ID = string;
+
+// ❌ Avoid
+type BlogPostProps = {  // Use interface instead
+  title: string;
+}
+```
+
 ### Plugin System
 
 **Remark Plugins** (Markdown processing):

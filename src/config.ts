@@ -98,3 +98,9 @@ export const LOCALE: Readonly<LocaleConfig> = {
   lang: "de", // Primary language
   langTag: ["de-DE"], // BCP 47 language tags for better SEO
 } as const;
+
+/**
+ * Default health category used throughout the site
+ * Used as fallback when no specific category is available
+ */
+export const DEFAULT_HEALTH_CATEGORY = "Gesundheit" as const;

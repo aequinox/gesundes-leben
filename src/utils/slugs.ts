@@ -98,6 +98,18 @@ const slugify = <T extends SlugifyInput>(
   return slugifyStr(value as string, options) as SlugifyOutput<T>;
 };
 
+/**
+ * Extracts the slug (last segment) from a URL path
+ * @param path - The URL path (e.g., "/blog/post-name")
+ * @returns The slug or "unknown" if extraction fails
+ * @example
+ * extractSlugFromPath("/blog/healthy-eating") // returns "healthy-eating"
+ * extractSlugFromPath("/") // returns "unknown"
+ */
+export function extractSlugFromPath(path: string): string {
+	return path.split("/").pop() || "unknown";
+}
+
 // Export all functions at the end of the file
 export type { SlugifyOptions };
 export { getPostSlug, slugify };
