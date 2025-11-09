@@ -57,6 +57,34 @@ export const DESIGN_TOKENS = {
   },
 } as const;
 
+/**
+ * Responsive image width configurations
+ * Used for generating optimal image sizes across different positions
+ */
+export const IMAGE_WIDTHS = {
+  sidebar: [400, 600, 800],
+  content: [600, 800, 1200],
+  contentWide: [800, 1200, 1600],
+  full: [800, 1200, 1600, 2000],
+} as const;
+
+/**
+ * Theme color configurations
+ * Centralized color values for light and dark themes
+ */
+export const THEME_COLORS = {
+  light: {
+    primary: "#3b82f6",
+    primaryHover: "#2563eb",
+    background: "#ffffff",
+  },
+  dark: {
+    primary: "#1e40af",
+    primaryHover: "#1e3a8a",
+    background: "#0f172a",
+  },
+} as const;
+
 // Common focus styles
 export const focusStyles = {
   // Standard focus ring

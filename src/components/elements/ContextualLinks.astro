@@ -20,6 +20,7 @@ import InternalLink from "@/components/elements/InternalLink.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { analyzeContentRelationships } from "@/utils/internal-linking";
 import { generateSessionId } from "@/utils/internal-linking-analytics";
+import { extractSlugFromPath } from "@/utils/slugs";
 import { processAllPosts } from "@/utils/posts";
 import type { Post } from "@/utils/types";
 
@@ -78,7 +79,7 @@ const sessionId = generateSessionId();
 
 // Get current page info for analytics
 const currentPath = Astro.url.pathname;
-const currentSlug = currentPath.split("/").pop() || "unknown";
+const currentSlug = extractSlugFromPath(currentPath);
 
 // Don't render if no meaningful relationships found
 if (meaningfulRelationships.length === 0) {
@@ -319,6 +320,11 @@ if (meaningfulRelationships.length === 0) {
    * Track contextual link interactions and performance
    */
 
+  // Helper function to extract slug from path
+  const extractSlugFromPath = (path: string): string => {
+    return path.split("/").pop() || "unknown";
+  };
+
   // Track contextual link clicks
   document.addEventListener("click", async event => {
     const target = event.target as HTMLElement;
@@ -334,7 +340,7 @@ if (meaningfulRelationships.length === 0) {
 
       // Extract target post from href
       const href = link.getAttribute("href") || "";
-      const targetPost = href.split("/").pop() || "unknown";
+      const targetPost = extractSlugFromPath(href);
 
       const clickEvent = {
         linkType: "contextual" as const,

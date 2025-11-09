@@ -20,6 +20,7 @@
  */
 
 import { generateSessionId } from "@/utils/internal-linking-analytics";
+import { extractSlugFromPath } from "@/utils/slugs";
 
 export interface Props {
   /** Target URL or post slug */
@@ -59,8 +60,8 @@ const finalHref = href.startsWith("/") ? href : `/posts/${href}`;
 
 // Get current page info for analytics
 const currentPath = Astro.url.pathname;
-const currentSlug = currentPath.split("/").pop() || "unknown";
-const targetSlug = finalHref.split("/").pop() || "unknown";
+const currentSlug = extractSlugFromPath(currentPath);
+const targetSlug = extractSlugFromPath(finalHref);
 
 // Generate session ID for tracking
 const sessionId = generateSessionId();

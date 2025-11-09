@@ -438,7 +438,7 @@ export const getPostsByTag = async (
   tag: string
 ): Promise<Post[]> => getPostsBy(posts, "tags", tag);
 
-export const getPostsByTagX = (posts: Post[], tag: string) =>
+export const getPostsByTagX = (posts: Post[], tag: string): Post[] =>
   getSortedPosts(posts.filter(post => slugify(post.data.tags).includes(tag)));
 
 export default getPostsByTag;

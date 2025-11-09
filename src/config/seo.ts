@@ -10,7 +10,7 @@
  */
 import { EnumChangefreq } from "sitemap";
 
-import { SITE } from "../config";
+import { DEFAULT_HEALTH_CATEGORY, SITE } from "../config";
 
 import type { SupportedLanguage } from "./i18n";
 
@@ -335,7 +335,13 @@ export const healthSEOConfig = {
   },
 
   contentClassification: {
-    categories: ["Gesundheit", "Ernährung", "Wellness", "Fitness", "Lifestyle"],
+    categories: [
+      DEFAULT_HEALTH_CATEGORY,
+      "Ernährung",
+      "Wellness",
+      "Fitness",
+      "Lifestyle",
+    ],
     medicalAudienceTypes: [
       "Patient",
       "GeneralPublic",
