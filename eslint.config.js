@@ -130,6 +130,15 @@ export default [
       "object-shorthand": "error",
       "no-duplicate-imports": "warn",
       "import/exports-last": "off",
+      // File size limits for maintainability
+      "max-lines": [
+        "warn",
+        {
+          max: 300,
+          skipBlankLines: true,
+          skipComments: true,
+        },
+      ],
       // Performance-focused rules
       "no-async-promise-executor": "error",
       "no-await-in-loop": "warn",
@@ -198,6 +207,11 @@ export default [
       "@typescript-eslint/no-explicit-any": "off",
       // Relax strict boolean expressions in tests
       "@typescript-eslint/strict-boolean-expressions": "off",
+      // Allow larger test files
+      "max-lines": [
+        "warn",
+        { max: 500, skipBlankLines: true, skipComments: true },
+      ],
     },
   },
   {
@@ -216,6 +230,11 @@ export default [
       // Override any rules that conflict with Astro component patterns
       "import/exports-last": "off",
       "no-console": "warn", // Allow console in Astro components for development
+      // Page files can be larger than components
+      "max-lines": [
+        "warn",
+        { max: 400, skipBlankLines: true, skipComments: true },
+      ],
     },
   },
   {

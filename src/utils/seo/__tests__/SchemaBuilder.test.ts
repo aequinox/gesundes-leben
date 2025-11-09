@@ -4,6 +4,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
   buildArticleSchema,
   buildAuthorSchema,
@@ -94,7 +95,7 @@ describe("SchemaBuilder - Core Utilities", () => {
     });
 
     it("should escape special characters", () => {
-      const text = 'Test <>&"\' text';
+      const text = "Test <>&\"' text";
       const result = sanitizeText(text);
       expect(result).toContain("&lt;");
       expect(result).toContain("&gt;");
@@ -126,7 +127,11 @@ describe("SchemaBuilder - Core Utilities", () => {
     });
 
     it("should return fallback for undefined path", () => {
-      const result = resolveUrl(undefined, "https://example.com", "/default.jpg");
+      const result = resolveUrl(
+        undefined,
+        "https://example.com",
+        "/default.jpg"
+      );
       expect(result).toBe("https://example.com/default.jpg");
     });
 
@@ -136,7 +141,11 @@ describe("SchemaBuilder - Core Utilities", () => {
     });
 
     it("should return fallback for invalid URL", () => {
-      const result = resolveUrl("not a valid url", "https://example.com", "/default.jpg");
+      const result = resolveUrl(
+        "not a valid url",
+        "https://example.com",
+        "/default.jpg"
+      );
       expect(result).toBe("https://example.com/default.jpg");
     });
   });
@@ -408,7 +417,9 @@ describe("SchemaBuilder - Helper Functions", () => {
 
     it("should handle undefined schemas", () => {
       const schema1 = { name: "Test" };
-      const result = mergeSchemas(schema1, undefined, { url: "https://example.com" });
+      const result = mergeSchemas(schema1, undefined, {
+        url: "https://example.com",
+      });
       expect(result).toEqual({
         name: "Test",
         url: "https://example.com",

@@ -18,14 +18,17 @@ export function groupBy<T>(
   items: T[],
   keyFn: (item: T) => string
 ): Record<string, T[]> {
-  return items.reduce((groups, item) => {
-    const key = keyFn(item);
-    if (!groups[key]) {
-      groups[key] = [];
-    }
-    groups[key].push(item);
-    return groups;
-  }, {} as Record<string, T[]>);
+  return items.reduce(
+    (groups, item) => {
+      const key = keyFn(item);
+      if (!groups[key]) {
+        groups[key] = [];
+      }
+      groups[key].push(item);
+      return groups;
+    },
+    {} as Record<string, T[]>
+  );
 }
 
 /**
@@ -46,11 +49,14 @@ export function countBy<T>(
   items: T[],
   keyFn: (item: T) => string
 ): Record<string, number> {
-  return items.reduce((counts, item) => {
-    const key = keyFn(item);
-    counts[key] = (counts[key] || 0) + 1;
-    return counts;
-  }, {} as Record<string, number>);
+  return items.reduce(
+    (counts, item) => {
+      const key = keyFn(item);
+      counts[key] = (counts[key] || 0) + 1;
+      return counts;
+    },
+    {} as Record<string, number>
+  );
 }
 
 /**
@@ -74,7 +80,7 @@ export function groupByField<T extends Record<string, unknown>>(
   items: T[],
   field: keyof T
 ): Record<string, T[]> {
-  return groupBy(items, (item) => String(item[field] || "unknown"));
+  return groupBy(items, item => String(item[field] || "unknown"));
 }
 
 /**
@@ -84,14 +90,14 @@ export function countByField<T extends Record<string, unknown>>(
   items: T[],
   field: keyof T
 ): Record<string, number> {
-  return countBy(items, (item) => String(item[field] || "unknown"));
+  return countBy(items, item => String(item[field] || "unknown"));
 }
 
 /**
  * Calculate percentage
  */
 export function percentage(value: number, total: number): number {
-  if (total === 0) return 0;
+  if (total === 0) {return 0;}
   return Math.round((value / total) * 100 * 100) / 100; // Round to 2 decimals
 }
 
@@ -99,7 +105,7 @@ export function percentage(value: number, total: number): number {
  * Calculate average
  */
 export function average(values: number[]): number {
-  if (values.length === 0) return 0;
+  if (values.length === 0) {return 0;}
   const sum = values.reduce((total, value) => total + value, 0);
   return Math.round((sum / values.length) * 100) / 100; // Round to 2 decimals
 }
@@ -129,7 +135,7 @@ export function isWithinTimeframe(timestamp: number, days: number): boolean {
 export function groupByDay<T extends { timestamp: number }>(
   events: T[]
 ): DailyGroup<T>[] {
-  const grouped = groupBy(events, (event) => formatDate(event.timestamp));
+  const grouped = groupBy(events, event => formatDate(event.timestamp));
 
   return Object.entries(grouped)
     .map(([date, dayEvents]) => ({
@@ -144,7 +150,7 @@ export function groupByDay<T extends { timestamp: number }>(
  * Calculate click-through rate
  */
 export function calculateCTR(clicks: number, impressions: number): number {
-  if (impressions === 0) return 0;
+  if (impressions === 0) {return 0;}
   return percentage(clicks, impressions);
 }
 
@@ -163,7 +169,7 @@ export function uniqueBy<T>(
   keyFn: (item: T) => string | number
 ): T[] {
   const seen = new Set<string | number>();
-  return items.filter((item) => {
+  return items.filter(item => {
     const key = keyFn(item);
     if (seen.has(key)) {
       return false;
@@ -198,7 +204,7 @@ export function deduplicateBy<T extends Record<string, unknown>>(
   items: T[],
   key: keyof T
 ): T[] {
-  return uniqueBy(items, (item) => String(item[key]));
+  return uniqueBy(items, item => String(item[key]));
 }
 
 /**
@@ -211,7 +217,7 @@ export function sortBy<T>(
   return [...items].sort((a, b) => {
     for (const compareFn of compareFns) {
       const result = compareFn(a, b);
-      if (result !== 0) return result;
+      if (result !== 0) {return result;}
     }
     return 0;
   });
@@ -228,11 +234,11 @@ export function compareBy<T>(
     const aVal = a[field];
     const bVal = b[field];
 
-    if (aVal === bVal) return 0;
+    if (aVal === bVal) {return 0;}
 
     let result = 0;
-    if (aVal < bVal) result = -1;
-    if (aVal > bVal) result = 1;
+    if (aVal < bVal) {result = -1;}
+    if (aVal > bVal) {result = 1;}
 
     return order === "desc" ? -result : result;
   };
@@ -242,7 +248,7 @@ export function compareBy<T>(
  * Calculate median
  */
 export function median(values: number[]): number {
-  if (values.length === 0) return 0;
+  if (values.length === 0) {return 0;}
 
   const sorted = [...values].sort((a, b) => a - b);
   const middle = Math.floor(sorted.length / 2);
@@ -258,10 +264,10 @@ export function median(values: number[]): number {
  * Calculate standard deviation
  */
 export function standardDeviation(values: number[]): number {
-  if (values.length === 0) return 0;
+  if (values.length === 0) {return 0;}
 
   const avg = average(values);
-  const squareDiffs = values.map((value) => Math.pow(value - avg, 2));
+  const squareDiffs = values.map(value => Math.pow(value - avg, 2));
   const avgSquareDiff = average(squareDiffs);
 
   return Math.sqrt(avgSquareDiff);
@@ -271,7 +277,7 @@ export function standardDeviation(values: number[]): number {
  * Safe division (returns 0 if divisor is 0)
  */
 export function safeDivide(numerator: number, denominator: number): number {
-  if (denominator === 0) return 0;
+  if (denominator === 0) {return 0;}
   return numerator / denominator;
 }
 
@@ -285,10 +291,7 @@ export function clamp(value: number, min: number, max: number): number {
 /**
  * Generate date range
  */
-export function generateDateRange(
-  startDate: Date,
-  endDate: Date
-): string[] {
+export function generateDateRange(startDate: Date, endDate: Date): string[] {
   const dates: string[] = [];
   const current = new Date(startDate);
 
@@ -310,9 +313,9 @@ export function fillMissingDates<T extends { date: string; count: number }>(
   defaultValue: Omit<T, "date"> = { count: 0 } as Omit<T, "date">
 ): T[] {
   const dateRange = generateDateRange(startDate, endDate);
-  const dataMap = new Map(data.map((item) => [item.date, item]));
+  const dataMap = new Map(data.map(item => [item.date, item]));
 
-  return dateRange.map((date) => {
+  return dateRange.map(date => {
     if (dataMap.has(date)) {
       return dataMap.get(date)!;
     }
@@ -327,20 +330,25 @@ export function exportToCSV<T extends Record<string, unknown>>(
   data: T[],
   headers?: string[]
 ): string {
-  if (data.length === 0) return "";
+  if (data.length === 0) {return "";}
 
   const keys = headers || (Object.keys(data[0]) as Array<keyof T>);
   const headerRow = keys.join(",");
 
-  const rows = data.map((item) =>
-    keys.map((key) => {
-      const value = item[key as keyof T];
-      // Escape values with commas or quotes
-      if (typeof value === "string" && (value.includes(",") || value.includes('"'))) {
-        return `"${value.replace(/"/g, '""')}"`;
-      }
-      return String(value);
-    }).join(",")
+  const rows = data.map(item =>
+    keys
+      .map(key => {
+        const value = item[key as keyof T];
+        // Escape values with commas or quotes
+        if (
+          typeof value === "string" &&
+          (value.includes(",") || value.includes('"'))
+        ) {
+          return `"${value.replace(/"/g, '""')}"`;
+        }
+        return String(value);
+      })
+      .join(",")
   );
 
   return [headerRow, ...rows].join("\n");
@@ -350,8 +358,8 @@ export function exportToCSV<T extends Record<string, unknown>>(
  * Parse CSV string to objects
  */
 export function parseCSV(csv: string): Array<Record<string, string>> {
-  const lines = csv.split("\n").filter((line) => line.trim());
-  if (lines.length === 0) return [];
+  const lines = csv.split("\n").filter(line => line.trim());
+  if (lines.length === 0) {return [];}
 
   const headers = lines[0].split(",");
   const data: Array<Record<string, string>> = [];

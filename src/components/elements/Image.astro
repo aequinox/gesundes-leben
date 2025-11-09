@@ -618,7 +618,7 @@ const finalLoading = priority ? "eager" : loading;
 
   .image-filter-duotone::before {
     content: "";
-    @apply absolute inset-0 z-10 mix-blend-color pointer-events-none;
+    @apply pointer-events-none absolute inset-0 z-10 mix-blend-color;
     background: linear-gradient(
       45deg,
       oklch(var(--color-accent) / 0.5),

@@ -10,6 +10,7 @@
  */
 
 import { logger } from "../logger";
+
 import type { StorageOptions } from "./types";
 
 /**
@@ -58,10 +59,7 @@ export class StorageManager {
       logger.error(`Failed to save ${key} to localStorage`, error);
 
       // If quota exceeded, try clearing old data and retry
-      if (
-        error instanceof Error &&
-        error.name === "QuotaExceededError"
-      ) {
+      if (error instanceof Error && error.name === "QuotaExceededError") {
         logger.warn("Storage quota exceeded, attempting cleanup");
         this.cleanup(key, 7); // Keep only last 7 days
 
@@ -108,7 +106,7 @@ export class StorageManager {
     }
 
     const cutoffTime = Date.now() - daysToKeep * 24 * 60 * 60 * 1000;
-    const filtered = data.filter((item) => item.timestamp >= cutoffTime);
+    const filtered = data.filter(item => item.timestamp >= cutoffTime);
 
     if (filtered.length < data.length) {
       logger.info(
@@ -142,7 +140,7 @@ export class StorageManager {
     }
 
     // Remove them
-    keys.forEach((key) => localStorage.removeItem(key));
+    keys.forEach(key => localStorage.removeItem(key));
     logger.info(`Cleared ${keys.length} keys from localStorage`);
   }
 

@@ -5,11 +5,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
-import {
-  StorageManager,
-  SessionManager,
-  DataValidator,
-} from "../core";
+import { StorageManager, SessionManager, DataValidator } from "../core";
 
 // Mock localStorage
 const createLocalStorageMock = () => {
@@ -102,7 +98,7 @@ describe("StorageManager", () => {
 
       const loaded = storage.load<typeof data>("timed-data");
       expect(loaded).toHaveLength(2);
-      expect(loaded?.map((item) => item.id)).toEqual([2, 3]);
+      expect(loaded?.map(item => item.id)).toEqual([2, 3]);
     });
 
     it("should not modify data if all items are within timeframe", () => {

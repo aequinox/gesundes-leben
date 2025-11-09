@@ -60,7 +60,10 @@ const blog = defineCollection({
 });
 
 const glossary = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: PATHS.glossary as string }),
+  loader: glob({
+    pattern: "**/[^_]*.{md,mdx}",
+    base: PATHS.glossary as string,
+  }),
   schema: z.object({
     title: z.string().min(1, "Title cannot be empty"),
     author: z.union([z.string(), reference("authors")]).default(SITE.author),

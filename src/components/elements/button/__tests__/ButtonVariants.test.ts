@@ -30,7 +30,7 @@ describe("ButtonVariants", () => {
         "icon",
       ];
 
-      requiredVariants.forEach((variant) => {
+      requiredVariants.forEach(variant => {
         expect(variantClasses).toHaveProperty(variant);
         expect(Array.isArray(variantClasses[variant])).toBe(true);
         expect(variantClasses[variant].length).toBeGreaterThan(0);
@@ -155,7 +155,7 @@ describe("ButtonVariants", () => {
     it("should have all required sizes defined", () => {
       const requiredSizes: ButtonSize[] = ["xs", "sm", "md", "lg", "xl"];
 
-      requiredSizes.forEach((size) => {
+      requiredSizes.forEach(size => {
         expect(sizeClasses).toHaveProperty(size);
         expect(Array.isArray(sizeClasses[size])).toBe(true);
         expect(sizeClasses[size].length).toBeGreaterThan(0);
@@ -215,12 +215,12 @@ describe("ButtonVariants", () => {
     it("should have progressive sizing", () => {
       // Extract min-height values for comparison
       const getMinHeight = (classes: string[]) => {
-        const minHClass = classes.find((c) => c.startsWith("min-h-"));
+        const minHClass = classes.find(c => c.startsWith("min-h-"));
         return minHClass ? parseInt(minHClass.replace("min-h-", "")) : 0;
       };
 
       const sizes: ButtonSize[] = ["xs", "sm", "md", "lg", "xl"];
-      const heights = sizes.map((size) => getMinHeight(sizeClasses[size]));
+      const heights = sizes.map(size => getMinHeight(sizeClasses[size]));
 
       // Verify heights are progressively larger
       for (let i = 1; i < heights.length; i++) {
@@ -239,7 +239,7 @@ describe("ButtonVariants", () => {
         "square",
       ];
 
-      requiredShapes.forEach((shape) => {
+      requiredShapes.forEach(shape => {
         expect(shapeClasses).toHaveProperty(shape);
         expect(Array.isArray(shapeClasses[shape])).toBe(true);
       });
@@ -347,7 +347,7 @@ describe("ButtonVariants", () => {
         "icon",
       ];
 
-      validVariants.forEach((variant) => {
+      validVariants.forEach(variant => {
         // TypeScript should allow these
         const _classes = variantClasses[variant];
         expect(_classes).toBeDefined();
@@ -357,7 +357,7 @@ describe("ButtonVariants", () => {
     it("should enforce ButtonSize type", () => {
       const validSizes: ButtonSize[] = ["xs", "sm", "md", "lg", "xl"];
 
-      validSizes.forEach((size) => {
+      validSizes.forEach(size => {
         // TypeScript should allow these
         const _classes = sizeClasses[size];
         expect(_classes).toBeDefined();
@@ -373,7 +373,7 @@ describe("ButtonVariants", () => {
         "square",
       ];
 
-      validShapes.forEach((shape) => {
+      validShapes.forEach(shape => {
         // TypeScript should allow these
         const _classes = shapeClasses[shape];
         expect(_classes).toBeDefined();
@@ -384,8 +384,8 @@ describe("ButtonVariants", () => {
   describe("Consistency checks", () => {
     it("should have consistent color usage", () => {
       // All variants should use theme colors
-      Object.values(variantClasses).forEach((classes) => {
-        classes.forEach((className) => {
+      Object.values(variantClasses).forEach(classes => {
+        classes.forEach(className => {
           // Should not have hardcoded color values like #fff or rgb()
           expect(className).not.toMatch(/#[0-9a-f]{3,6}/i);
           expect(className).not.toMatch(/rgb\(/i);
@@ -395,8 +395,8 @@ describe("ButtonVariants", () => {
 
     it("should have consistent spacing scale", () => {
       // All sizes should use Tailwind spacing scale
-      Object.values(sizeClasses).forEach((classes) => {
-        classes.forEach((className) => {
+      Object.values(sizeClasses).forEach(classes => {
+        classes.forEach(className => {
           // Should not have arbitrary spacing values
           expect(className).not.toMatch(/\[[\d.]+rem\]/);
           expect(className).not.toMatch(/\[[\d.]+px\]/);
@@ -405,15 +405,15 @@ describe("ButtonVariants", () => {
     });
 
     it("should all variants be arrays", () => {
-      Object.values(variantClasses).forEach((classes) => {
+      Object.values(variantClasses).forEach(classes => {
         expect(Array.isArray(classes)).toBe(true);
       });
 
-      Object.values(sizeClasses).forEach((classes) => {
+      Object.values(sizeClasses).forEach(classes => {
         expect(Array.isArray(classes)).toBe(true);
       });
 
-      Object.values(shapeClasses).forEach((classes) => {
+      Object.values(shapeClasses).forEach(classes => {
         expect(Array.isArray(classes)).toBe(true);
       });
     });

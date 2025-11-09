@@ -16,7 +16,7 @@
  * @component
  * @since 1.0.0
  * @author Healthy Life Team
- * 
+ *
  * @example Basic button
  * ```astro
  * <Button variant="primary" size="md">
@@ -26,9 +26,9 @@
  *
  * @example Link button with icon
  * ```astro
- * <Button 
- *   href="/about" 
- *   variant="accent" 
+ * <Button
+ *   href="/about"
+ *   variant="accent"
  *   icon="arrow-right"
  *   iconPosition="end"
  *   ariaLabel="Learn more about our services"
@@ -39,8 +39,8 @@
  *
  * @example Loading state
  * ```astro
- * <Button 
- *   type="submit" 
+ * <Button
+ *   type="submit"
  *   loading={isSubmitting}
  *   loadingText="Submitting..."
  *   disabled={isSubmitting}
@@ -51,7 +51,7 @@
  *
  * @example Icon-only button
  * ```astro
- * <Button 
+ * <Button
  *   icon="close"
  *   variant="ghost"
  *   size="sm"
@@ -69,7 +69,6 @@ import BaseButton from "./button/BaseButton.astro";
 import BaseLink from "./button/BaseLink.astro";
 import { buildButtonClasses } from "./button/ButtonClassBuilder";
 import ButtonContent from "./button/ButtonContent.astro";
-import ButtonIcon from "./button/ButtonIcon.astro";
 import {
   type ButtonShape,
   type ButtonSize,
@@ -79,51 +78,61 @@ import {
 /**
  * Enhanced button component props with full accessibility support
  */
-export interface Props extends InteractiveComponentProps, HTMLAttributes<"button" | "a"> {
+export interface Props
+  extends InteractiveComponentProps,
+    HTMLAttributes<"button" | "a"> {
   /** Link destination URL (makes this a link instead of button) */
   href?: string;
-  
+
   /** Visual style variant */
   variant?: ButtonVariant;
-  
+
   /** Size variant */
   size?: ButtonSize;
-  
+
   /** Shape variant */
   shape?: ButtonShape;
-  
+
   /** Button/link text content */
   text?: string;
-  
+
   /** Icon identifier from astro-icon */
   icon?: string;
-  
+
   /** Icon position relative to text */
   iconPosition?: "start" | "end";
-  
+
   /** HTML button type */
   type?: "button" | "submit" | "reset";
-  
+
   /** Whether to open link in new tab */
   newTab?: boolean;
-  
+
   /** Whether to use full width */
   fullWidth?: boolean;
-  
+
   /** Loading text to display when loading */
   loadingText?: string;
-  
+
   /** Custom tooltip text */
   title?: string;
-  
+
   /** Button purpose for analytics tracking */
   purpose?: "navigation" | "action" | "submit" | "cancel" | "destructive";
-  
+
   /** ARIA pressed state for toggle buttons */
   "aria-pressed"?: boolean | "true" | "false";
-  
+
   /** ARIA haspopup for buttons that open menus/dialogs */
-  "aria-haspopup"?: boolean | "true" | "false" | "menu" | "listbox" | "tree" | "grid" | "dialog";
+  "aria-haspopup"?:
+    | boolean
+    | "true"
+    | "false"
+    | "menu"
+    | "listbox"
+    | "tree"
+    | "grid"
+    | "dialog";
 }
 
 const {
@@ -140,7 +149,7 @@ const {
   "aria-describedby": ariaDescribedby,
   "aria-pressed": ariaPressed,
   "aria-haspopup": ariaHaspopup,
-  
+
   // Button specific props
   href,
   variant = "default",
@@ -155,7 +164,7 @@ const {
   loadingText = "Loading...",
   title,
   purpose = "action",
-  
+
   ...rest
 } = Astro.props;
 

@@ -53,6 +53,45 @@ export interface Reference extends ReferenceData {
 }
 
 /**
+ * Standard field order for reference YAML files
+ * Ensures consistent formatting across all reference files
+ */
+const REFERENCE_FIELD_ORDER = [
+  "type",
+  "title",
+  "authors",
+  "year",
+  "journal",
+  "volume",
+  "issue",
+  "pages",
+  "doi",
+  "publisher",
+  "location",
+  "edition",
+  "isbn",
+  "url",
+  "pmid",
+  "keywords",
+  "abstract",
+] as const;
+
+/**
+ * Creates a sorting comparator function for reference YAML fields
+ * @returns Comparator function for sorting object keys
+ */
+function createReferenceFieldComparator(): (a: string, b: string) => number {
+  return (a: string, b: string): number => {
+    const aIndex = REFERENCE_FIELD_ORDER.indexOf(a as any);
+    const bIndex = REFERENCE_FIELD_ORDER.indexOf(b as any);
+    if (aIndex === -1 && bIndex === -1) {return a.localeCompare(b);}
+    if (aIndex === -1) {return 1;}
+    if (bIndex === -1) {return -1;}
+    return aIndex - bIndex;
+  };
+}
+
+/**
  * Fallback function to read references directly from YAML files
  */
 async function readReferencesFromFiles(): Promise<Reference[]> {
@@ -334,40 +373,7 @@ export async function createReference(
 
   // Create YAML content
   const yamlContent = stringify(data, {
-    sortKeys: (a, b) => {
-      // Custom sorting to match project conventions
-      const order = [
-        "type",
-        "title",
-        "authors",
-        "year",
-        "journal",
-        "volume",
-        "issue",
-        "pages",
-        "doi",
-        "publisher",
-        "location",
-        "edition",
-        "isbn",
-        "url",
-        "pmid",
-        "keywords",
-        "abstract",
-      ];
-      const aIndex = order.indexOf(a);
-      const bIndex = order.indexOf(b);
-      if (aIndex === -1 && bIndex === -1) {
-        return a.localeCompare(b);
-      }
-      if (aIndex === -1) {
-        return 1;
-      }
-      if (bIndex === -1) {
-        return -1;
-      }
-      return aIndex - bIndex;
-    },
+    sortKeys: createReferenceFieldComparator(),
   });
 
   await writeFile(filePath, yamlContent, "utf8");
@@ -397,39 +403,7 @@ export async function updateReference(
 
   // Create YAML content
   const yamlContent = stringify(updatedData, {
-    sortKeys: (a, b) => {
-      const order = [
-        "type",
-        "title",
-        "authors",
-        "year",
-        "journal",
-        "volume",
-        "issue",
-        "pages",
-        "doi",
-        "publisher",
-        "location",
-        "edition",
-        "isbn",
-        "url",
-        "pmid",
-        "keywords",
-        "abstract",
-      ];
-      const aIndex = order.indexOf(a);
-      const bIndex = order.indexOf(b);
-      if (aIndex === -1 && bIndex === -1) {
-        return a.localeCompare(b);
-      }
-      if (aIndex === -1) {
-        return 1;
-      }
-      if (bIndex === -1) {
-        return -1;
-      }
-      return aIndex - bIndex;
-    },
+    sortKeys: createReferenceFieldComparator(),
   });
 
   await writeFile(filePath, yamlContent, "utf8");

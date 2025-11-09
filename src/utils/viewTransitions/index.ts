@@ -1,9 +1,9 @@
 /**
  * View Transitions Module - Modular Architecture
- * 
+ *
  * This module provides a comprehensive, modular approach to managing Astro view transitions
  * with enhanced performance, accessibility, and developer experience.
- * 
+ *
  * Features:
  * - Modular architecture with separation of concerns
  * - Type-safe configuration with runtime validation

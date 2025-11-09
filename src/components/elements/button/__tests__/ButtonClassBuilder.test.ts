@@ -5,7 +5,10 @@
 
 import { describe, it, expect } from "vitest";
 
-import { buildButtonClasses, type ButtonClassOptions } from "../ButtonClassBuilder";
+import {
+  buildButtonClasses,
+  type ButtonClassOptions,
+} from "../ButtonClassBuilder";
 
 describe("buildButtonClasses", () => {
   describe("Base functionality", () => {
@@ -55,7 +58,7 @@ describe("buildButtonClasses", () => {
       "icon",
     ];
 
-    variants.forEach((variant) => {
+    variants.forEach(variant => {
       it(`should generate correct classes for ${variant} variant`, () => {
         const options: ButtonClassOptions = {
           variant,
@@ -115,9 +118,15 @@ describe("buildButtonClasses", () => {
   });
 
   describe("Size classes", () => {
-    const sizes: Array<ButtonClassOptions["size"]> = ["xs", "sm", "md", "lg", "xl"];
+    const sizes: Array<ButtonClassOptions["size"]> = [
+      "xs",
+      "sm",
+      "md",
+      "lg",
+      "xl",
+    ];
 
-    sizes.forEach((size) => {
+    sizes.forEach(size => {
       it(`should generate correct classes for ${size} size`, () => {
         const options: ButtonClassOptions = {
           variant: "default",
@@ -186,7 +195,7 @@ describe("buildButtonClasses", () => {
       "square",
     ];
 
-    shapes.forEach((shape) => {
+    shapes.forEach(shape => {
       it(`should generate correct classes for ${shape} shape`, () => {
         const options: ButtonClassOptions = {
           variant: "default",

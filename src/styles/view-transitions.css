@@ -18,7 +18,7 @@
     --vt-easing-exit: cubic-bezier(0.4, 0, 1, 1);
     --vt-easing-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
     --vt-easing-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    
+
     /* Container query breakpoints for responsive transitions */
     --vt-container-sm: 640px;
     --vt-container-md: 768px;
@@ -56,29 +56,29 @@
   ::view-transition-old([transition-name*="heroImage"]) {
     animation: vt-image-out var(--vt-duration-normal) var(--vt-easing-exit);
   }
-  
+
   ::view-transition-new([transition-name*="heroImage"]) {
     animation: vt-image-in var(--vt-duration-normal) var(--vt-easing-spring);
   }
-  
+
   /* Titles and headings */
   ::view-transition-old([transition-name*="title"]) {
     animation: vt-title-out var(--vt-duration-fast) var(--vt-easing-exit);
   }
-  
+
   ::view-transition-new([transition-name*="title"]) {
     animation: vt-title-in var(--vt-duration-fast) var(--vt-easing-bounce);
   }
-  
+
   /* Tags and badges */
   ::view-transition-old([transition-name*="tag"]) {
     animation: vt-tag-out var(--vt-duration-fast) var(--vt-easing-exit);
   }
-  
+
   ::view-transition-new([transition-name*="tag"]) {
     animation: vt-tag-in var(--vt-duration-fast) var(--vt-easing-bounce);
   }
-  
+
   /* Default fallback for unmatched elements */
   ::view-transition-old(*) {
     animation: vt-fade-out var(--vt-duration-fast) var(--vt-easing-exit);
@@ -312,7 +312,7 @@
     contain: layout style paint;
     content-visibility: auto;
   }
-  
+
   /* Container queries for responsive transitions */
   @container (min-width: 640px) {
     ::view-transition-old(main-content),
@@ -320,7 +320,7 @@
       animation-duration: var(--vt-duration-slow);
     }
   }
-  
+
   /* Staggered animations for lists */
   .vt-stagger-children > * {
     animation-delay: calc(var(--stagger-index, 0) * 50ms);
@@ -335,12 +335,12 @@
     animation: none !important;
     transition: opacity var(--vt-duration-fast) ease !important;
   }
-  
+
   /* Alternative visual feedback */
   .vt-optimize {
     transition: opacity var(--vt-duration-fast) ease;
   }
-  
+
   /* Disable all complex animations */
   .vt-stagger-children > * {
     animation-delay: 0ms !important;
