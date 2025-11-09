@@ -5,7 +5,7 @@
  * Single source of truth for linking-related types.
  */
 
-import type { Post, Category, Tag } from "../types";
+import type { Post } from "../types";
 
 /**
  * Link performance metrics interface

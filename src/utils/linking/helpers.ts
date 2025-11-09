@@ -313,11 +313,12 @@ export function clamp(value: number, min: number, max: number): number {
  */
 export function generateDateRange(startDate: Date, endDate: Date): string[] {
   const dates: string[] = [];
-  const current = new Date(startDate);
+  let currentTime = startDate.getTime();
+  const endTime = endDate.getTime();
 
-  while (current <= endDate) {
-    dates.push(formatDate(current.getTime()));
-    current.setDate(current.getDate() + 1);
+  while (currentTime <= endTime) {
+    dates.push(formatDate(currentTime));
+    currentTime += 24 * 60 * 60 * 1000; // Add one day in milliseconds
   }
 
   return dates;

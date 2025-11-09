@@ -46,7 +46,7 @@ export class PreloadManager {
       const link = target.closest("a");
 
       if (link && this.isInternalLink(link)) {
-        this.preloadPage(link.href);
+        void this.preloadPage(link.href);
       }
     };
 
@@ -78,7 +78,7 @@ export class PreloadManager {
           if (entry.isIntersecting) {
             const link = entry.target as HTMLAnchorElement;
             if (this.isInternalLink(link)) {
-              this.preloadPage(link.href);
+              void this.preloadPage(link.href);
               observer.unobserve(link);
             }
           }

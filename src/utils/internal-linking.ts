@@ -7,10 +7,9 @@
  */
 
 import { topN, unique } from "./linking/helpers";
-import { LinkScorer, type MatchType } from "./linking/scoring";
+import { LinkScorer } from "./linking/scoring";
 import { logger } from "./logger";
-import { slugify } from "./slugs";
-import type { Post, Category, Tag } from "./types";
+import type { Post } from "./types";
 
 /**
  * Topic clusters identified from content audit
@@ -149,10 +148,7 @@ function analyzeContentRelationships(
 
   // Remove source post from candidates and filter out any undefined posts
   const filteredCandidates = candidatePosts.filter(
-    post =>
-      post?.id &&
-      sourcePost?.id &&
-      post.id !== sourcePost.id
+    post => post?.id && sourcePost?.id && post.id !== sourcePost.id
   );
 
   for (const candidatePost of filteredCandidates) {
@@ -182,7 +178,7 @@ function calculateContentRelationship(
   const suggestedAnchorText: string[] = [];
 
   // Extract content data
-  const sourceTitle = sourcePost.data.title.toLowerCase();
+  const _sourceTitle = sourcePost.data.title.toLowerCase();
   const targetTitle = targetPost.data.title.toLowerCase();
   const sourceCategories = sourcePost.data.categories || [];
   const targetCategories = targetPost.data.categories || [];

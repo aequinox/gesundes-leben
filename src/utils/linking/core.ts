@@ -30,7 +30,7 @@ export class StorageManager {
    * Save data to localStorage with optional size limiting
    */
   save<T>(key: string, data: T, options: StorageOptions = {}): void {
-    const { maxRecords = 1000, compress = false } = options;
+    const { maxRecords = 1000 } = options;
     const fullKey = `${this.prefix}-${key}`;
 
     try {
