@@ -14,6 +14,12 @@
 
 import { LOCALE, SITE } from "@/config";
 import { getI18nStrings } from "@/config/i18n";
+import {
+  buildImageSchema,
+  buildMedicalAudienceSchema,
+  buildOrganizationSchema,
+  resolveUrl,
+} from "@/utils/seo/SchemaBuilder";
 
 export interface Props {
   /** Search functionality URL template */
@@ -38,8 +44,9 @@ const {
 
 // Get i18n strings for current language
 const i18n = getI18nStrings(LOCALE.lang as "de" | "en");
+const resolvedLogoUrl = resolveUrl(logoUrl || "/logo.png", SITE.website);
 
-// Comprehensive Website schema
+// Comprehensive Website schema using shared utilities
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
@@ -70,22 +77,16 @@ const websiteSchema = {
     ],
   },
   publisher: {
-    "@type": "Organization",
-    "@id": `${SITE.website}#organization`,
-    name: SITE.title,
-    url: SITE.website,
-    logo: {
-      "@type": "ImageObject",
-      url: logoUrl || new URL("/logo.png", SITE.website).href,
-      width: 180,
-      height: 180,
-      caption: `${SITE.title} Logo`,
-    },
-    foundingDate: `${foundingYear}-01-01`,
-    foundingLocation: {
-      "@type": "Country",
-      name: i18n.regions.germany,
-    },
+    ...buildOrganizationSchema({
+      logoUrl: resolvedLogoUrl,
+      foundingYear,
+      socialUrls: [
+        "https://twitter.com/gesundesleben",
+        "https://www.youtube.com/c/gesundesleben",
+        ...socialUrls,
+      ],
+      includeId: true,
+    }),
     areaServed: [
       {
         "@type": "Country",
@@ -107,13 +108,6 @@ const websiteSchema = {
         alternateName: "German",
       },
     ],
-    sameAs: [
-      "https://www.facebook.com/gesundesleben",
-      "https://www.instagram.com/gesundesleben",
-      "https://twitter.com/gesundesleben",
-      "https://www.youtube.com/c/gesundesleben",
-      ...socialUrls,
-    ].filter(Boolean),
   },
   author: {
     "@type": "Person",
@@ -212,28 +206,22 @@ const websiteSchema = {
   usageInfo: "Free to read, educational content about health and wellness",
 };
 
-// Enhanced organization schema for health content site
+// Enhanced organization schema for health content site using shared utilities
 const organizationSchema = {
   "@context": "https://schema.org",
-  "@type": "Organization",
-  "@id": `${SITE.website}#organization`,
-  name: SITE.title,
+  ...buildOrganizationSchema({
+    logoUrl: resolvedLogoUrl,
+    description,
+    foundingYear,
+    socialUrls: [
+      "https://twitter.com/gesundesleben",
+      "https://www.youtube.com/c/gesundesleben",
+      ...socialUrls,
+    ],
+    includeId: true,
+  }),
   legalName: SITE.title,
-  url: SITE.website,
-  logo: {
-    "@type": "ImageObject",
-    url: logoUrl || new URL("/logo.png", SITE.website).href,
-    width: 180,
-    height: 180,
-    caption: `${SITE.title} Logo`,
-  },
-  image: logoUrl || new URL("/logo.png", SITE.website).href,
-  description,
-  foundingDate: `${foundingYear}-01-01`,
-  foundingLocation: {
-    "@type": "Country",
-    name: i18n.regions.germany,
-  },
+  image: resolvedLogoUrl,
   areaServed: [
     {
       "@type": "Country",
@@ -255,13 +243,6 @@ const organizationSchema = {
       alternateName: "German",
     },
   ],
-  sameAs: [
-    "https://www.facebook.com/gesundesleben",
-    "https://www.instagram.com/gesundesleben",
-    "https://twitter.com/gesundesleben",
-    "https://www.youtube.com/c/gesundesleben",
-    ...socialUrls,
-  ].filter(Boolean),
   // Service offerings
   makesOffer: [
     {
@@ -294,7 +275,7 @@ const organizationSchema = {
   },
 };
 
-// Medical organization aspects for health content
+// Medical organization aspects for health content using shared utilities
 const medicalOrganizationSchema = {
   "@context": "https://schema.org",
   "@type": "MedicalOrganization",
@@ -321,20 +302,14 @@ const medicalOrganizationSchema = {
       name: i18n.regions.germany,
     },
   ],
-  audience: {
-    "@type": "MedicalAudience",
+  audience: buildMedicalAudienceSchema({
     audienceType: "Patient",
-    geographicArea: {
-      "@type": "Country",
-      name: i18n.regions.germany,
-    },
-  },
+  }),
   isAcceptingNewPatients: false,
   medicalAudience: [
-    {
-      "@type": "MedicalAudience",
+    buildMedicalAudienceSchema({
       audienceType: "Patient",
-    },
+    }),
   ],
 };
 ---
