@@ -5,6 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
+
 import {
   analyzeContentRelationships,
   identifyTopicCluster,
@@ -179,7 +180,7 @@ describe("Internal Linking Integration Tests", () => {
 
       // Find the probiotics post (should have exact keyword "probiotics" match)
       const probioticsRelationship = relationships.find(
-        (r) => r.targetPost.id === "gut-health-2"
+        r => r.targetPost.id === "gut-health-2"
       );
 
       if (probioticsRelationship) {
@@ -200,7 +201,7 @@ describe("Internal Linking Integration Tests", () => {
 
       // Same author relationship should exist
       const sameAuthorRel = relationships.find(
-        (r) => r.targetPost.id === sameAuthorPost.id
+        r => r.targetPost.id === sameAuthorPost.id
       );
       expect(sameAuthorRel).toBeDefined();
       if (sameAuthorRel) {
@@ -233,7 +234,7 @@ describe("Internal Linking Integration Tests", () => {
 
       // Source post should not appear in relationships
       const selfReference = relationships.find(
-        (r) => r.targetPost.id === sourcePost.id
+        r => r.targetPost.id === sourcePost.id
       );
       expect(selfReference).toBeUndefined();
     });
@@ -301,11 +302,9 @@ describe("Internal Linking Integration Tests", () => {
       const clusterAnalyses = analyzeTopicClusters(mockPosts);
 
       // Find a cluster with posts
-      const clusterWithPosts = clusterAnalyses.find(
-        (c) => c.posts.length >= 2
-      );
+      const clusterWithPosts = clusterAnalyses.find(c => c.posts.length >= 2);
 
-      if (clusterWithPosts && clusterWithPosts.pillarPost) {
+      if (clusterWithPosts?.pillarPost) {
         expect(clusterWithPosts.internalLinkOpportunities).toBeDefined();
         expect(Array.isArray(clusterWithPosts.internalLinkOpportunities)).toBe(
           true
@@ -316,11 +315,11 @@ describe("Internal Linking Integration Tests", () => {
     it("should separate pillar posts from supporting posts", () => {
       const clusterAnalyses = analyzeTopicClusters(mockPosts);
 
-      clusterAnalyses.forEach((cluster) => {
+      clusterAnalyses.forEach(cluster => {
         if (cluster.pillarPost) {
           // Pillar post should not be in supporting posts
           const pillarInSupporting = cluster.supportingPosts.find(
-            (p) => p.id === cluster.pillarPost?.id
+            p => p.id === cluster.pillarPost?.id
           );
           expect(pillarInSupporting).toBeUndefined();
         }
@@ -353,7 +352,7 @@ describe("Internal Linking Integration Tests", () => {
         findCrossClusterLinkingOpportunities(clusterAnalyses);
 
       // All cross-cluster links should meet minimum score threshold
-      crossClusterLinks.forEach((link) => {
+      crossClusterLinks.forEach(link => {
         expect(link.score).toBeGreaterThanOrEqual(5);
       });
     });
@@ -395,16 +394,16 @@ describe("Internal Linking Integration Tests", () => {
       const report = generateInternalLinkingReport(mockPosts);
 
       // High authority posts should have specific characteristics
-      report.highAuthorityPosts.forEach((post) => {
+      report.highAuthorityPosts.forEach(post => {
         const isFeatured = post.data.featured;
         const hasMultipleCategories =
           post.data.categories && post.data.categories.length >= 3;
         const hasManyKeywords =
           post.data.keywords && post.data.keywords.length >= 5;
 
-        expect(
-          isFeatured || hasMultipleCategories || hasManyKeywords
-        ).toBe(true);
+        expect(isFeatured || hasMultipleCategories || hasManyKeywords).toBe(
+          true
+        );
       });
     });
   });
@@ -430,7 +429,7 @@ describe("Internal Linking Integration Tests", () => {
       const cluster = identifyTopicCluster(sourcePost);
       if (cluster) {
         const clusterAnalysis = report.topicClusters.find(
-          (c) => c.clusterId === cluster
+          c => c.clusterId === cluster
         );
         expect(clusterAnalysis).toBeDefined();
       }
@@ -461,14 +460,14 @@ describe("Internal Linking Integration Tests", () => {
       }
 
       // Anchor text should be deduplicated (via unique helper)
-      relationships.forEach((rel) => {
+      relationships.forEach(rel => {
         const anchorTexts = rel.suggestedAnchorText;
         const uniqueAnchorTexts = [...new Set(anchorTexts)];
         expect(anchorTexts.length).toBe(uniqueAnchorTexts.length);
       });
 
       // Linking context should be determined by LinkScorer.getLinkingContext
-      relationships.forEach((rel) => {
+      relationships.forEach(rel => {
         expect(["strong", "moderate", "weak"]).toContain(rel.linkingContext);
 
         // Verify context matches score

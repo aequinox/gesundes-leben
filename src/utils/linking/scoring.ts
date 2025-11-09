@@ -46,7 +46,9 @@ export class LinkScorer {
   /**
    * Calculate total score from multiple matches
    */
-  calculateTotalScore(matches: Array<{ type: MatchType; count?: number }>): number {
+  calculateTotalScore(
+    matches: Array<{ type: MatchType; count?: number }>
+  ): number {
     return matches.reduce((total, match) => {
       const count = match.count || 1;
       return total + this.scoreMatch(match.type, count);
@@ -56,11 +58,7 @@ export class LinkScorer {
   /**
    * Prioritize items by score
    */
-  prioritize<T>(
-    items: T[],
-    scoreFn: (item: T) => number,
-    limit?: number
-  ): T[] {
+  prioritize<T>(items: T[], scoreFn: (item: T) => number, limit?: number): T[] {
     const sorted = [...items].sort((a, b) => scoreFn(b) - scoreFn(a));
     return limit ? sorted.slice(0, limit) : sorted;
   }
@@ -69,8 +67,8 @@ export class LinkScorer {
    * Determine link context strength based on score
    */
   getLinkingContext(score: number): "strong" | "moderate" | "weak" {
-    if (score >= 15) return "strong";
-    if (score >= 8) return "moderate";
+    if (score >= 15) {return "strong";}
+    if (score >= 8) {return "moderate";}
     return "weak";
   }
 }
@@ -114,7 +112,7 @@ export class MatchingEngine {
    * Prevent overlapping matches (keep higher priority)
    */
   preventOverlaps(matches: Match[]): Match[] {
-    if (matches.length === 0) return [];
+    if (matches.length === 0) {return [];}
 
     // Sort by priority (descending) then by position (ascending)
     const sorted = [...matches].sort((a, b) => {
@@ -150,9 +148,7 @@ export class MatchingEngine {
    * Filter matches by context (avoid headers, code blocks, existing links)
    */
   filterByContext(matches: Match[], content: string): Match[] {
-    return matches.filter((match) =>
-      !this.isInRestrictedContext(match, content)
-    );
+    return matches.filter(match => !this.isInRestrictedContext(match, content));
   }
 
   /**
@@ -188,16 +184,15 @@ export class MatchingEngine {
     const linkCloseBefore = beforeMatch.lastIndexOf("]");
     const linkAfter = afterMatch.indexOf("]");
 
-    if (
-      linkBefore > linkCloseBefore &&
-      linkAfter !== -1 &&
-      linkAfter < 100
-    ) {
+    if (linkBefore > linkCloseBefore && linkAfter !== -1 && linkAfter < 100) {
       return true; // Inside existing link
     }
 
     // Check if already inside an HTML link
-    if (/<a\s[^>]*>/.test(beforeMatch) && !/<\/a>/.test(beforeMatch.split(/<a\s[^>]*>/).pop() || "")) {
+    if (
+      /<a\s[^>]*>/.test(beforeMatch) &&
+      !/<\/a>/.test(beforeMatch.split(/<a\s[^>]*>/).pop() || "")
+    ) {
       return true; // Inside HTML link
     }
 
@@ -207,7 +202,11 @@ export class MatchingEngine {
   /**
    * Extract context around a match (for anchor text suggestions)
    */
-  extractContext(match: Match, content: string, contextLength: number = 50): {
+  extractContext(
+    match: Match,
+    content: string,
+    contextLength: number = 50
+  ): {
     before: string;
     matched: string;
     after: string;
@@ -251,7 +250,10 @@ export class TextNormalizer {
   /**
    * Create regex pattern for term with word boundaries
    */
-  static createWordPattern(term: string, caseSensitive: boolean = false): RegExp {
+  static createWordPattern(
+    term: string,
+    caseSensitive: boolean = false
+  ): RegExp {
     const escaped = this.escapeRegex(term);
     const flags = caseSensitive ? "g" : "gi";
     return new RegExp(`\\b${escaped}\\b`, flags);
@@ -264,7 +266,7 @@ export class TextNormalizer {
     terms: string[],
     caseSensitive: boolean = false
   ): RegExp {
-    const patterns = terms.map((term) => this.escapeRegex(term));
+    const patterns = terms.map(term => this.escapeRegex(term));
     const joined = patterns.join("|");
     const flags = caseSensitive ? "g" : "gi";
     return new RegExp(`\\b(${joined})\\b`, flags);

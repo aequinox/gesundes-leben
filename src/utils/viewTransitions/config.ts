@@ -88,17 +88,23 @@ export const VALIDATION_RULES = {
 /**
  * Validate configuration against rules
  */
-export function validateConfig(config: ViewTransitionConfig): ValidationError[] {
+export function validateConfig(
+  config: ViewTransitionConfig
+): ValidationError[] {
   const errors: ValidationError[] = [];
 
   // Validate fallbackDelay
   if (config.fallbackDelay !== undefined) {
     const { min, max } = VALIDATION_RULES.fallbackDelay;
-    if (typeof config.fallbackDelay !== "number" || config.fallbackDelay < min || config.fallbackDelay > max) {
+    if (
+      typeof config.fallbackDelay !== "number" ||
+      config.fallbackDelay < min ||
+      config.fallbackDelay > max
+    ) {
       errors.push({
         field: "fallbackDelay",
         message: `fallbackDelay must be a number between ${min} and ${max}`,
-        code: "INVALID_FALLBACK_DELAY"
+        code: "INVALID_FALLBACK_DELAY",
       });
     }
   }
@@ -106,11 +112,15 @@ export function validateConfig(config: ViewTransitionConfig): ValidationError[] 
   // Validate maxTransitionDuration
   if (config.maxTransitionDuration !== undefined) {
     const { min, max } = VALIDATION_RULES.maxTransitionDuration;
-    if (typeof config.maxTransitionDuration !== "number" || config.maxTransitionDuration < min || config.maxTransitionDuration > max) {
+    if (
+      typeof config.maxTransitionDuration !== "number" ||
+      config.maxTransitionDuration < min ||
+      config.maxTransitionDuration > max
+    ) {
       errors.push({
         field: "maxTransitionDuration",
         message: `maxTransitionDuration must be a number between ${min} and ${max}`,
-        code: "INVALID_MAX_DURATION"
+        code: "INVALID_MAX_DURATION",
       });
     }
   }
@@ -121,7 +131,7 @@ export function validateConfig(config: ViewTransitionConfig): ValidationError[] 
       errors.push({
         field: "preloadStrategy",
         message: `preloadStrategy must be one of: ${VALIDATION_RULES.preloadStrategies.join(", ")}`,
-        code: "INVALID_PRELOAD_STRATEGY"
+        code: "INVALID_PRELOAD_STRATEGY",
       });
     }
   }
@@ -136,7 +146,7 @@ export function validateConfig(config: ViewTransitionConfig): ValidationError[] 
           errors.push({
             field: `durations.${key}`,
             message: `${key} duration must be a number between ${min} and ${max}`,
-            code: `INVALID_DURATION_${key.toUpperCase()}`
+            code: `INVALID_DURATION_${key.toUpperCase()}`,
           });
         }
       }
@@ -149,11 +159,16 @@ export function validateConfig(config: ViewTransitionConfig): ValidationError[] 
 /**
  * Merge user config with defaults
  */
-export function mergeConfig(userConfig: ViewTransitionConfig): Required<ViewTransitionConfig> {
+export function mergeConfig(
+  userConfig: ViewTransitionConfig
+): Required<ViewTransitionConfig> {
   return {
     ...DEFAULT_CONFIG,
     ...userConfig,
     durations: { ...DEFAULT_CONFIG.durations, ...userConfig.durations },
-    accessibility: { ...DEFAULT_CONFIG.accessibility, ...userConfig.accessibility },
+    accessibility: {
+      ...DEFAULT_CONFIG.accessibility,
+      ...userConfig.accessibility,
+    },
   };
 }

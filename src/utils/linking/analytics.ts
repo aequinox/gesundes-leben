@@ -11,11 +11,12 @@
  * Single Responsibility: Link analytics tracking and analysis
  */
 
+import { logger } from "../logger";
 import type { Post } from "../types";
-import type { LinkClickEvent, LinkPerformanceMetrics } from "./types";
+
 import { StorageManager, SessionManager, DataValidator } from "./core";
 import { groupBy, countBy, topN, formatDate, groupByDay } from "./helpers";
-import { logger } from "../logger";
+import type { LinkClickEvent, LinkPerformanceMetrics } from "./types";
 
 /**
  * Extended link click event with additional tracking fields
@@ -104,7 +105,9 @@ export class LinkAnalyticsService {
   /**
    * Track a link click event
    */
-  trackClick(event: Omit<ExtendedLinkClickEvent, "timestamp" | "sessionId">): void {
+  trackClick(
+    event: Omit<ExtendedLinkClickEvent, "timestamp" | "sessionId">
+  ): void {
     // Validate event data
     if (!this.validator.isValidEvent(event)) {
       logger.warn("Invalid link click event", event);
@@ -119,7 +122,8 @@ export class LinkAnalyticsService {
     };
 
     // Store event
-    const events = this.storage.load<ExtendedLinkClickEvent>(this.STORAGE_KEY) || [];
+    const events =
+      this.storage.load<ExtendedLinkClickEvent>(this.STORAGE_KEY) || [];
     events.push(fullEvent);
 
     // Limit array size
@@ -141,7 +145,7 @@ export class LinkAnalyticsService {
    * Send event to external analytics (Google Analytics, etc.)
    */
   private sendToExternalAnalytics(event: ExtendedLinkClickEvent): void {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined") {return;}
 
     // Google Analytics 4
     if ("gtag" in window && typeof window.gtag === "function") {
@@ -171,8 +175,11 @@ export class LinkAnalyticsService {
    */
   getPerformanceMetrics(days: number = 30): LinkPerformanceMetrics {
     const cutoffTime = Date.now() - days * 24 * 60 * 60 * 1000;
-    const allEvents = this.storage.load<ExtendedLinkClickEvent>(this.STORAGE_KEY) || [];
-    const recentEvents = allEvents.filter((event) => event.timestamp > cutoffTime);
+    const allEvents =
+      this.storage.load<ExtendedLinkClickEvent>(this.STORAGE_KEY) || [];
+    const recentEvents = allEvents.filter(
+      event => event.timestamp > cutoffTime
+    );
 
     if (recentEvents.length === 0) {
       return this.getEmptyMetrics();
@@ -182,7 +189,7 @@ export class LinkAnalyticsService {
 
     // Count unique clicks (same source-target-session combination)
     const uniqueClicks = new Set(
-      recentEvents.map((e) => `${e.sourcePost}-${e.targetPost}-${e.sessionId}`)
+      recentEvents.map(e => `${e.sourcePost}-${e.targetPost}-${e.sessionId}`)
     ).size;
 
     // Calculate click-through rate (simplified - would need impression data)
@@ -190,20 +197,20 @@ export class LinkAnalyticsService {
     const clickThroughRate = (totalClicks / estimatedImpressions) * 100;
 
     // Group clicks by source and target using helper functions
-    const sourceClicks = countBy(recentEvents, (e) => e.sourcePost);
-    const targetClicks = countBy(recentEvents, (e) => e.targetPost);
+    const sourceClicks = countBy(recentEvents, e => e.sourcePost);
+    const targetClicks = countBy(recentEvents, e => e.targetPost);
 
     // Get top pages using helper function
     const topSourcePages = topN(
       Object.entries(sourceClicks).map(([page, clicks]) => ({ page, clicks })),
       10,
-      (item) => item.clicks
+      item => item.clicks
     );
 
     const topTargetPages = topN(
       Object.entries(targetClicks).map(([page, clicks]) => ({ page, clicks })),
       10,
-      (item) => item.clicks
+      item => item.clicks
     );
 
     return {
@@ -222,20 +229,23 @@ export class LinkAnalyticsService {
    * Get analytics for a specific post
    */
   getContentAnalytics(postSlug: string): ContentAnalytics {
-    const allEvents = this.storage.load<ExtendedLinkClickEvent>(this.STORAGE_KEY) || [];
+    const allEvents =
+      this.storage.load<ExtendedLinkClickEvent>(this.STORAGE_KEY) || [];
 
     // Count outbound clicks (clicks FROM this post)
-    const outboundEvents = allEvents.filter((e) => e.sourcePost === postSlug);
+    const outboundEvents = allEvents.filter(e => e.sourcePost === postSlug);
     const outboundClicks = outboundEvents.length;
 
     // Count inbound clicks (clicks TO this post)
-    const inboundClicks = allEvents.filter((e) => e.targetPost === postSlug).length;
+    const inboundClicks = allEvents.filter(
+      e => e.targetPost === postSlug
+    ).length;
 
     // Count internal links in the post content (would need content analysis)
     const internalLinksCount = 0; // TODO: Implement content parsing
 
     // Get top linked posts from this post
-    const targetCounts = countBy(outboundEvents, (e) => e.targetPost);
+    const targetCounts = countBy(outboundEvents, e => e.targetPost);
     const topLinkedPosts = topN(
       Object.entries(targetCounts).map(([slug, clicks]) => ({
         slug,
@@ -243,7 +253,7 @@ export class LinkAnalyticsService {
         clicks,
       })),
       5,
-      (item) => item.clicks
+      item => item.clicks
     );
 
     // Calculate engagement score (simple formula)
@@ -264,11 +274,12 @@ export class LinkAnalyticsService {
    */
   getClicksByDay(days: number = 30): Array<{ date: string; clicks: number }> {
     const cutoffTime = Date.now() - days * 24 * 60 * 60 * 1000;
-    const allEvents = this.storage.load<ExtendedLinkClickEvent>(this.STORAGE_KEY) || [];
-    const recentEvents = allEvents.filter((e) => e.timestamp > cutoffTime);
+    const allEvents =
+      this.storage.load<ExtendedLinkClickEvent>(this.STORAGE_KEY) || [];
+    const recentEvents = allEvents.filter(e => e.timestamp > cutoffTime);
 
     // Group by day using helper function
-    const grouped = groupByDay(recentEvents, (e) => e.timestamp);
+    const grouped = groupByDay(recentEvents, e => e.timestamp);
 
     // Convert to array format
     return Object.entries(grouped).map(([date, events]) => ({
@@ -281,13 +292,14 @@ export class LinkAnalyticsService {
    * Get top performing link types
    */
   getTopLinkTypes(limit: number = 5): Array<{ type: string; clicks: number }> {
-    const allEvents = this.storage.load<ExtendedLinkClickEvent>(this.STORAGE_KEY) || [];
-    const typeCounts = countBy(allEvents, (e) => e.linkType || "internal");
+    const allEvents =
+      this.storage.load<ExtendedLinkClickEvent>(this.STORAGE_KEY) || [];
+    const typeCounts = countBy(allEvents, e => e.linkType || "internal");
 
     return topN(
       Object.entries(typeCounts).map(([type, clicks]) => ({ type, clicks })),
       limit,
-      (item) => item.clicks
+      item => item.clicks
     );
   }
 
@@ -295,7 +307,8 @@ export class LinkAnalyticsService {
    * Export analytics data to CSV
    */
   exportToCSV(): string {
-    const events = this.storage.load<ExtendedLinkClickEvent>(this.STORAGE_KEY) || [];
+    const events =
+      this.storage.load<ExtendedLinkClickEvent>(this.STORAGE_KEY) || [];
 
     const headers = [
       "Timestamp",
@@ -309,7 +322,7 @@ export class LinkAnalyticsService {
       "Session ID",
     ];
 
-    const rows = events.map((e) => [
+    const rows = events.map(e => [
       e.timestamp.toString(),
       formatDate(e.timestamp),
       e.sourcePost,
@@ -324,8 +337,8 @@ export class LinkAnalyticsService {
     // Convert to CSV format
     const csvContent = [
       headers.join(","),
-      ...rows.map((row) =>
-        row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(",")
+      ...rows.map(row =>
+        row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(",")
       ),
     ].join("\n");
 

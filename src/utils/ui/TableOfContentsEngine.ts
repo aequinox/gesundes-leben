@@ -352,7 +352,7 @@ export class TableOfContents {
     if (ariaLabelledBy !== null && ariaLabelledBy.length > 0) {
       const labelElement = document.getElementById(ariaLabelledBy);
       const labelText = labelElement?.textContent;
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+       
       if (
         labelText !== null &&
         labelText !== undefined &&
@@ -376,7 +376,7 @@ export class TableOfContents {
     if (svg) {
       const titleElement = svg.querySelector("title");
       const titleText = titleElement?.textContent;
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+       
       if (
         titleText !== null &&
         titleText !== undefined &&
