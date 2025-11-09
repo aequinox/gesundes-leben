@@ -2,6 +2,7 @@
 
 > **Senior Developer's Comprehensive Roadmap**
 > Generated: 2025-11-09
+> **Updated**: 2025-11-09 with Astro-specific optimizations
 > Project: Gesundes Leben - Health & Wellness Blog
 
 ---
@@ -12,6 +13,8 @@
 **Performance Score: 82/100** 🚀
 
 Your codebase demonstrates **excellent SEO foundations** with ~3,900 lines of professional-grade SEO code. However, there are **27 actionable improvements** that will elevate the site from "very good" to "exceptional" and achieve **100% SEO best practices compliance**.
+
+**🎯 Astro Advantage**: This project already leverages Astro's powerful features like Islands Architecture, automatic image optimization via `astro:assets`, and View Transitions. The recommendations below are optimized for Astro's native capabilities.
 
 ### Expected Impact After Implementation
 - **SEO Score**: 85/100 → **98/100** (+13 points)
@@ -26,12 +29,13 @@ Your codebase demonstrates **excellent SEO foundations** with ~3,900 lines of pr
 
 | Priority | Category | Tasks | Est. Impact | Est. Effort |
 |----------|----------|-------|-------------|-------------|
-| 🔴 **P0** | Critical SEO | 8 | High | 16h |
-| 🟠 **P1** | Performance | 7 | High | 14h |
+| 🔴 **P0** | Critical SEO | 8 | High | 14h |
+| 🟠 **P1** | Performance | 6 | High | 11h |
 | 🟡 **P2** | Best Practices | 6 | Medium | 8h |
 | 🟢 **P3** | Enhancement | 6 | Low-Medium | 12h |
 
-**Total Estimated Effort**: 50 hours (1.5-2 sprint cycles)
+**Total Estimated Effort**: 45 hours (1.5-2 sprint cycles)
+**Time Saved**: 5 hours (using Astro native features vs. manual implementation)
 
 ---
 
@@ -116,115 +120,141 @@ Your codebase demonstrates **excellent SEO foundations** with ~3,900 lines of pr
 
 ---
 
-### 2. ✅ Implement Service Worker for Offline Support
+### 2. ✅ Implement PWA with Astro Integration (Recommended Approach)
 **Impact**: 🔥 High - PWA requirement, 40-60% faster repeat visits
-**Effort**: ⏱️ 4h
-**Files to Create/Modify**:
-- `public/sw.js` (Service Worker)
-- `src/components/seo/SEO.astro` (register SW)
+**Effort**: ⏱️ 2h (significantly faster than manual SW implementation)
+**Astro-Specific**: Uses official Vite PWA plugin optimized for Astro
 
-**Implementation**:
-```javascript
-// public/sw.js
-const CACHE_NAME = 'gesundes-leben-v1';
-const STATIC_CACHE = 'static-v1';
-const DYNAMIC_CACHE = 'dynamic-v1';
+**Why This Approach?**
+- ✅ **Automatic** service worker generation and registration
+- ✅ **Optimized** for Astro's build system and SSG
+- ✅ **Maintained** by Vite PWA team, stays up-to-date
+- ✅ **Configurable** workbox strategies per route
+- ✅ **No manual** service worker coding required
 
-// Static assets to cache immediately
-const STATIC_ASSETS = [
-  '/',
-  '/posts/',
-  '/about/',
-  '/offline.html',
-  '/styles/global.css',
-  '/toggle-theme.js',
-  '/fonts/Poppins-400.woff2',
-  '/fonts/Poppins-600.woff2',
-  '/fonts/Poppins-800.woff2'
-];
+**Installation**:
+```bash
+npm install @vite-pwa/astro -D
+```
 
-// Install event - cache static assets
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(STATIC_CACHE)
-      .then(cache => cache.addAll(STATIC_ASSETS))
-      .then(() => self.skipWaiting())
-  );
-});
+**Configuration**:
+```typescript
+// astro.config.ts
+import { defineConfig } from 'astro/config';
+import AstroPWA from '@vite-pwa/astro';
 
-// Activate event - clean old caches
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(
-        keys
-          .filter(key => key !== STATIC_CACHE && key !== DYNAMIC_CACHE)
-          .map(key => caches.delete(key))
-      ))
-      .then(() => self.clients.claim())
-  );
-});
-
-// Fetch event - stale-while-revalidate strategy
-self.addEventListener('fetch', event => {
-  const { request } = event;
-  const url = new URL(request.url);
-
-  // Skip non-GET requests
-  if (request.method !== 'GET') return;
-
-  // Skip external requests
-  if (url.origin !== location.origin) return;
-
-  event.respondWith(
-    caches.match(request)
-      .then(cached => {
-        const networked = fetch(request)
-          .then(response => {
-            const clone = response.clone();
-            caches.open(DYNAMIC_CACHE)
-              .then(cache => cache.put(request, clone));
-            return response;
-          })
-          .catch(() => caches.match('/offline.html'));
-
-        return cached || networked;
-      })
-  );
+export default defineConfig({
+  integrations: [
+    AstroPWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.svg', 'fonts/*.woff2'],
+      manifest: {
+        name: 'Gesundes Leben - Gesundheit, Ernährung & Wellness',
+        short_name: 'Gesundes Leben',
+        description: 'Dein vertrauenswürdiger Ratgeber für Gesundheit, Ernährung und Wellness',
+        theme_color: '#10b981',
+        background_color: '#ffffff',
+        display: 'standalone',
+        icons: [
+          {
+            src: '/icons/icon-192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: '/icons/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2,webp,avif}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'gstatic-fonts-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365
+              }
+            }
+          },
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|webp|avif)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images-cache',
+              expiration: {
+                maxEntries: 60,
+                maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
+              }
+            }
+          }
+        ]
+      },
+      devOptions: {
+        enabled: false // Disable in dev for faster HMR
+      }
+    })
+  ]
 });
 ```
 
-**Register in `src/components/seo/SEO.astro`:**
+**Create Offline Fallback Page**: `src/pages/offline.astro`
 ```astro
-<!-- Service Worker Registration -->
-<script is:inline>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .catch(() => {
-        // Silently fail - progressive enhancement
-      });
-  });
-}
-</script>
+---
+import Layout from '@/layouts/Layout.astro';
+---
+<Layout title="Offline - Gesundes Leben">
+  <div class="container mx-auto px-4 py-16 text-center">
+    <h1 class="text-4xl font-bold mb-4">Du bist offline</h1>
+    <p class="text-lg mb-8">Bitte überprüfe deine Internetverbindung.</p>
+    <a href="/" class="btn btn-primary">Zur Startseite</a>
+  </div>
+</Layout>
 ```
 
-**Create offline fallback page**: `src/pages/offline.astro`
+**Validation**:
+- Build project: `npm run build`
+- Check for `sw.js` in `dist/`
+- Test offline mode in DevTools → Application → Service Workers
+- Lighthouse PWA audit should show 100/100
+
+**Note**: The integration automatically handles service worker registration, no manual `<script is:inline>` needed!
 
 ---
 
 ### 3. ✅ Add Security Headers via Middleware
 **Impact**: 🔥 High - Security, trust signals for SEO
 **Effort**: ⏱️ 2h
+**Astro-Specific**: Uses Astro's native middleware system
+
 **Files to Create**:
-- `src/middleware/security-headers.ts`
+- `src/middleware.ts` (NOT `src/middleware/security-headers.ts` - Astro uses root-level middleware)
 
 **Implementation**:
 ```typescript
-// src/middleware/security-headers.ts
-import type { MiddlewareHandler } from 'astro';
+// src/middleware.ts
+import { defineMiddleware } from 'astro:middleware';
 
-export const onRequest: MiddlewareHandler = async (context, next) => {
+export const onRequest = defineMiddleware(async (context, next) => {
   const response = await next();
 
   // Security headers for better SEO trust signals
@@ -269,16 +299,10 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   });
 
   return response;
-};
+});
 ```
 
-**Register in `astro.config.ts`:**
-```typescript
-// Add to integrations array or experimental section
-experimental: {
-  middleware: true
-}
-```
+**Note**: No additional configuration needed in `astro.config.ts` - Astro 4.x+ automatically detects and uses `src/middleware.ts`!
 
 ---
 
@@ -451,14 +475,61 @@ Astro.response.statusText = 'Not Found';
 
 ## 🟠 P1: Performance Optimizations (SHOULD FIX)
 
-### 9. ✅ Add Font Preloading
+### 9. ✅ Add Font Optimization (Astro Experimental Fonts API)
 **Impact**: 🚀 High - Eliminate FOIT/FOUT, improve LCP by 50-100ms
 **Effort**: ⏱️ 30min
-**Files to Modify**:
-- `src/layouts/Layout.astro` or `src/components/seo/SEO.astro`
+**Astro-Specific**: Uses experimental fonts API for automatic optimization
 
-**Implementation**:
+**Recommended Approach (Automatic)**:
+```typescript
+// astro.config.ts
+import { defineConfig } from 'astro/config';
+
+export default defineConfig({
+  experimental: {
+    fonts: [{
+      provider: 'local',
+      name: 'Poppins',
+      cssVariable: '--font-body',
+      fallbacks: ['system-ui', '-apple-system', 'sans-serif'],
+      optimizedFallbacks: true, // Generates optimized fallback fonts
+      files: [
+        {
+          path: './src/assets/fonts/Poppins-400.woff2',
+          weight: '400',
+          style: 'normal',
+          display: 'swap' // Automatic font-display
+        },
+        {
+          path: './src/assets/fonts/Poppins-600.woff2',
+          weight: '600',
+          style: 'normal',
+          display: 'swap'
+        },
+        {
+          path: './src/assets/fonts/Poppins-800.woff2',
+          weight: '800',
+          style: 'normal',
+          display: 'swap'
+        }
+      ]
+    }]
+  }
+});
+```
+
+**This automatically handles**:
+- ✅ Font preloading
+- ✅ `font-display: swap`
+- ✅ Optimized fallback fonts
+- ✅ CSS variable generation
+- ✅ WOFF2 format optimization
+
+**Fallback (Manual) Implementation**:
+If experimental fonts API is not yet stable, use manual preloading:
+
 ```astro
+<!-- In src/layouts/Layout.astro or src/components/seo/SEO.astro -->
 <!-- Preload Critical Fonts (LCP optimization) -->
 <link
   rel="preload"
@@ -500,9 +571,10 @@ Astro.response.statusText = 'Not Found';
 
 ---
 
-### 10. ✅ Implement Virtual Scrolling for BlogFilter
+### 10. ✅ Implement Pagination/Virtual Scrolling for BlogFilter
 **Impact**: 🚀 High - Fix DOM bloat, improve TTI by 700ms-1.2s
 **Effort**: ⏱️ 3h
+**Astro-Specific**: Uses client directives for optimal hydration
 **Files to Modify**:
 - `src/components/filter/BlogFilter.astro` (line 331)
 
@@ -512,126 +584,111 @@ Astro.response.statusText = 'Not Found';
 {filteredPosts.map(post => <Card post={post} />)}
 ```
 
-**Solution Option A - Pagination (Simpler)**:
+**Solution: Astro Client Directives with Pagination**:
 ```astro
 ---
-const POSTS_PER_PAGE = 12;
-const [currentPage, setCurrentPage] = useState(1);
-const startIdx = (currentPage - 1) * POSTS_PER_PAGE;
-const endIdx = startIdx + POSTS_PER_PAGE;
-const visiblePosts = filteredPosts.slice(startIdx, endIdx);
+// BlogFilter.astro
+const INITIAL_POSTS = 12;
+const allPosts = sortedPosts;
+const initialPosts = allPosts.slice(0, INITIAL_POSTS);
+const remainingPosts = allPosts.slice(INITIAL_POSTS);
 ---
 
-{visiblePosts.map(post => <Card post={post} />)}
+<!-- Server-render initial posts (SEO-friendly, fast LCP) -->
+{initialPosts.map(post => <Card post={post} />)}
 
-<!-- Pagination Controls -->
-<div class="pagination">
-  <button onclick={() => setCurrentPage(p => Math.max(1, p - 1))}>
-    Previous
-  </button>
-  <span>Page {currentPage} of {Math.ceil(filteredPosts.length / POSTS_PER_PAGE)}</span>
-  <button onclick={() => setCurrentPage(p => p + 1)}>
-    Next
-  </button>
-</div>
+<!-- Client-load remaining posts -->
+{remainingPosts.length > 0 && (
+  <LoadMoreButton
+    client:load
+    posts={remainingPosts}
+    postsPerPage={12}
+  />
+)}
 ```
 
-**Solution Option B - Virtual Scrolling (Better UX)**:
 ```typescript
-// Install dependency: npm install @tanstack/virtual-core
-import { createVirtualizer } from '@tanstack/virtual-core';
+// LoadMoreButton.tsx (React/Preact/Solid component)
+import { useState } from 'react';
 
-// In component script
-const virtualizer = createVirtualizer({
-  count: filteredPosts.length,
-  getScrollElement: () => document.querySelector('#scroll-container'),
-  estimateSize: () => 400, // Estimated card height
-  overscan: 3 // Render 3 extra items for smooth scrolling
-});
+export default function LoadMoreButton({ posts, postsPerPage = 12 }) {
+  const [visibleCount, setVisibleCount] = useState(postsPerPage);
+  const visiblePosts = posts.slice(0, visibleCount);
+  const hasMore = visibleCount < posts.length;
 
-// Render only visible items
-{virtualizer.getVirtualItems().map(virtualRow => {
-  const post = filteredPosts[virtualRow.index];
-  return <Card post={post} style={{ transform: `translateY(${virtualRow.start}px)` }} />;
-})}
+  return (
+    <>
+      {visiblePosts.map(post => <Card post={post} />)}
+      {hasMore && (
+        <button
+          onClick={() => setVisibleCount(prev => prev + postsPerPage)}
+          className="btn btn-primary"
+        >
+          Mehr laden ({posts.length - visibleCount} weitere)
+        </button>
+      )}
+    </>
+  );
+}
 ```
 
 **Expected Impact**:
-- DOM nodes: 100+ → 12-15 (visible + overscan)
+- Initial DOM nodes: 100+ → 12 (visible only)
 - Initial render: 800ms → 150ms
-- Scroll performance: Smooth 60fps
+- LCP improvement: ~400ms
 - Memory usage: -60%
 
 ---
 
-### 11. ✅ Add Pagination Prefetch
+### 11. ✅ Optimize View Transitions Prefetch (Already Built-in!)
 **Impact**: 🚀 Medium - Faster perceived navigation
-**Effort**: ⏱️ 1h
-**Files to Modify**:
-- `src/pages/posts/[...page].astro`
+**Effort**: ⏱️ 30min (just configuration)
+**Astro-Specific**: `<ClientRouter />` already includes smart prefetching!
 
-**Implementation**:
-```astro
-<script>
-  // Prefetch next page on hover/visible
-  document.addEventListener('astro:page-load', () => {
-    const nextPageLink = document.querySelector('a[rel="next"]');
-    const prevPageLink = document.querySelector('a[rel="prev"]');
+**Current Status**: ✅ Your project already has `<ClientRouter />` which **automatically enables**:
+- Hover-based prefetching
+- Viewport-based prefetching
+- Smart caching strategies
 
-    if (nextPageLink) {
-      // Prefetch on hover
-      nextPageLink.addEventListener('mouseenter', () => {
-        const link = document.createElement('link');
-        link.rel = 'prefetch';
-        link.href = nextPageLink.href;
-        document.head.appendChild(link);
-      }, { once: true });
-
-      // Or prefetch when in viewport
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const link = document.createElement('link');
-            link.rel = 'prefetch';
-            link.href = nextPageLink.href;
-            document.head.appendChild(link);
-            observer.disconnect();
-          }
-        });
-      });
-      observer.observe(nextPageLink);
-    }
-  });
-</script>
+**Optional Fine-Tuning**:
+```typescript
+// astro.config.ts
+export default defineConfig({
+  prefetch: {
+    prefetchAll: true,  // Prefetch all internal links (default with ClientRouter)
+    defaultStrategy: 'hover' // 'hover' | 'visible' | 'load' | 'tap'
+  }
+});
 ```
 
-**Add rel attributes to pagination links**:
+**Add rel attributes to pagination links** (for SEO):
 ```astro
-<a href={prevUrl} rel="prev">Vorherige Seite</a>
-<a href={nextUrl} rel="next">Nächste Seite</a>
+<a href={prevUrl} rel="prev" data-astro-prefetch>Vorherige Seite</a>
+<a href={nextUrl} rel="next" data-astro-prefetch>Nächste Seite</a>
 ```
+
+**Note**: Manual prefetch implementation (as shown in original Task #11) is **not needed** with Astro's ClientRouter! The framework handles this automatically.
 
 ---
 
-### 12. ✅ Optimize Image Sizes Attribute
+### 12. ✅ Optimize Image Sizes Attribute (Already Using Astro Assets!)
 **Impact**: 🚀 Medium - Reduce image bandwidth by 10-20%
-**Effort**: ⏱️ 1h
-**Files to Modify**:
-- `src/components/sections/Card.astro`
-- `src/components/elements/Image.astro`
+**Effort**: ⏱️ 1h (minor tweaks only)
+**Astro-Specific**: Project already uses `astro:assets` with Sharp optimization!
 
-**Current Issue**:
-```astro
-<!-- Generic sizes don't match actual rendered size -->
-<Image sizes="(max-width: 768px) 100vw, 50vw" />
-```
+**Current Status**: ✅ Your project **already implements** Astro's `<Image />` component optimally:
+- Sharp image service configured
+- AVIF/WebP format generation
+- Responsive `widths` array
+- Proper `loading` attributes
 
-**Optimized Implementation**:
+**Minor Improvement** (more specific sizes for grid layouts):
 ```astro
 ---
+// src/components/sections/Card.astro or src/components/elements/Image.astro
 // Calculate based on actual grid layout
 const imageSize = props.layout === 'grid'
-  ? '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33.33vw' // 1col, 2col, 3col
+  ? '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1536px) 33vw, 400px' // 1col, 2col, 3col, 4col
   : props.layout === 'list'
   ? '(max-width: 768px) 100vw, 400px' // Full width mobile, fixed desktop
   : '100vw';
@@ -641,8 +698,9 @@ const imageSize = props.layout === 'grid'
   src={heroImage.src}
   alt={heroImage.alt}
   sizes={imageSize}
-  widths={[400, 600, 800, 1200]}
+  widths={[400, 600, 800, 1200, 1600]}
   loading={loading}
+  fetchpriority={priority ? "high" : "auto"}
 />
 ```
 
@@ -655,78 +713,60 @@ const imageSize = props.layout === 'grid'
 
 ---
 
-### 13. ✅ Implement Critical CSS Extraction
-**Impact**: 🚀 Medium - Improve FCP by 200-400ms
-**Effort**: ⏱️ 3h
-**Files to Create**:
-- `scripts/extract-critical-css.js`
-- Update `astro.config.ts`
+### 13. 🚫 Critical CSS Extraction (Not Needed - Astro Handles Automatically)
+**Impact**: N/A - Astro already optimizes CSS automatically
+**Effort**: ⏱️ 0h (task removed)
+**Astro-Specific**: Built-in CSS optimization makes this redundant
 
-**Implementation**:
-```javascript
-// scripts/extract-critical-css.js
-import { PurgeCSS } from 'purgecss';
-import fs from 'fs/promises';
-import path from 'path';
+**Why This Task is Removed**:
+Astro **automatically handles** critical CSS through:
+- ✅ **Scoped component styles** - Inlined automatically
+- ✅ **CSS code splitting** - Per-page CSS bundles
+- ✅ **`inlineStylesheets: 'auto'`** - Small CSS inlined (already configured)
+- ✅ **Automatic tree shaking** - Unused CSS removed
+- ✅ **Tailwind JIT** - Only used utilities included
 
-async function extractCriticalCSS() {
-  const purgecss = new PurgeCSS();
-
-  const criticalPages = [
-    'dist/index.html',
-    'dist/posts/index.html'
-  ];
-
-  const result = await purgecss.purge({
-    content: criticalPages,
-    css: ['dist/_astro/*.css'],
-    safelist: [
-      // Always keep theme classes
-      'dark', 'light',
-      // Keep animation classes
-      /^aos-/,
-      // Keep dynamic classes
-      /^hashtag/
-    ]
-  });
-
-  // Write critical CSS to inline
-  const criticalCSS = result.map(r => r.css).join('\n');
-  await fs.writeFile('dist/critical.css', criticalCSS);
-
-  console.log(`✅ Critical CSS extracted: ${(criticalCSS.length / 1024).toFixed(2)}KB`);
-}
-
-extractCriticalCSS();
-```
-
-**Add to package.json**:
-```json
-{
-  "scripts": {
-    "postbuild": "pagefind ... && node scripts/extract-critical-css.js"
+**Current Configuration** (from `astro.config.ts`):
+```typescript
+export default defineConfig({
+  build: {
+    inlineStylesheets: 'auto', // ✅ Already optimal
+    cssCodeSplit: true         // ✅ Already enabled
   }
-}
+});
 ```
 
-**Inline in Layout.astro**:
-```astro
-<head>
-  <style is:inline set:html={await Astro.glob('../dist/critical.css')} />
-  <link rel="preload" href="/styles/main.css" as="style" onload="this.rel='stylesheet'" />
-</head>
-```
+**Recommendation**: Focus on optimizing component CSS instead of manual critical CSS extraction. Astro's built-in system is superior.
 
 ---
 
 ### 14. ✅ Add Resource Hints for Above-the-Fold Images
 **Impact**: 🚀 Medium - Improve LCP by 100-200ms
 **Effort**: ⏱️ 1h
+**Astro-Specific**: Use Astro's `priority` prop for automatic optimization
 **Files to Modify**:
 - `src/pages/index.astro` (already has some preloading)
 - `src/layouts/PostDetails.astro`
 
-**Enhance existing implementation**:
+**Astro-Optimized Implementation**:
+```astro
+---
+// In index.astro or PostDetails.astro
+import { Image } from 'astro:assets';
+import heroImage from '../assets/hero.jpg';
+---
+
+<!-- Astro automatically handles preloading with priority prop -->
+<Image
+  src={heroImage}
+  alt="Hero image"
+  priority={true}  // ← Astro automatically adds fetchpriority="high" and preload
+  widths={[400, 800, 1200, 1600]}
+  sizes="(max-width: 768px) 100vw, 800px"
+/>
+```
+
+**Manual Enhancement** (if more control needed):
 ```astro
 ---
 // Extract hero image for preloading
@@ -1353,36 +1393,167 @@ const showComments = import.meta.env.PROD && SITE.enableComments;
 
 ---
 
+## 🎯 Astro-Specific Optimizations
+
+### Framework Advantages Already Implemented
+✅ **Islands Architecture** - Client directives in use (`client:load`, `client:visible`)
+✅ **Astro Assets** - Image optimization configured with Sharp
+✅ **View Transitions** - ClientRouter enabled with smart prefetching
+✅ **CSS Scoping** - Automatic critical CSS and code splitting
+✅ **Zero JS by Default** - Most pages ship minimal JavaScript
+✅ **Content Collections** - Type-safe content management
+✅ **Static Site Generation** - Optimized build output
+
+### Recommended Astro Integrations
+
+**High Priority**:
+```bash
+# PWA support (replaces manual service worker)
+npm install @vite-pwa/astro -D
+
+# Already installed and configured ✅
+# - @astrojs/sitemap
+# - @astrojs/tailwind
+# - astro-icon
+```
+
+**Optional Enhancements**:
+```bash
+# Additional compression (after build)
+npm install astro-compress -D
+
+# SEO enhancements
+npm install astro-seo-meta -D
+
+# Image optimization helpers
+npm install astro-imagetools -D
+```
+
+### Astro Configuration Best Practices
+
+**Current Configuration Review** (`astro.config.ts`):
+```typescript
+import { defineConfig } from 'astro/config';
+import AstroPWA from '@vite-pwa/astro';
+
+export default defineConfig({
+  // ✅ Already optimal
+  build: {
+    inlineStylesheets: 'auto',
+    cssCodeSplit: true
+  },
+
+  // ✅ Already configured
+  image: {
+    service: {
+      entrypoint: 'astro/assets/services/sharp'
+    }
+  },
+
+  // ✅ ClientRouter handles this
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: 'hover'
+  },
+
+  // 🆕 Add experimental fonts
+  experimental: {
+    fonts: [{
+      provider: 'local',
+      name: 'Poppins',
+      cssVariable: '--font-body',
+      fallbacks: ['system-ui', 'sans-serif'],
+      optimizedFallbacks: true,
+      files: [
+        { path: './src/assets/fonts/Poppins-400.woff2', weight: '400', style: 'normal', display: 'swap' },
+        { path: './src/assets/fonts/Poppins-600.woff2', weight: '600', style: 'normal', display: 'swap' },
+        { path: './src/assets/fonts/Poppins-800.woff2', weight: '800', style: 'normal', display: 'swap' }
+      ]
+    }]
+  },
+
+  // 🆕 Add PWA integration
+  integrations: [
+    AstroPWA({
+      registerType: 'autoUpdate',
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2,webp,avif}'],
+        runtimeCaching: [/* ... */]
+      }
+    })
+  ]
+});
+```
+
+### Performance Monitoring
+
+**Astro-Specific Commands**:
+```bash
+# Build with detailed output
+npm run build -- --verbose
+
+# Analyze bundle sizes
+npx vite-bundle-visualizer dist
+
+# Check Astro build info
+npm run build 2>&1 | grep "Total build"
+
+# Run Lighthouse CI (already configured)
+npm run perf:test
+```
+
+### Astro DevTools (Optional)
+
+```bash
+# Install Astro DevTools for better DX
+npm install @astrojs/dev-toolbar
+```
+
+```typescript
+// astro.config.ts
+export default defineConfig({
+  integrations: [
+    // ... other integrations
+  ],
+  devToolbar: {
+    enabled: true
+  }
+});
+```
+
+---
+
 ## Implementation Roadmap
 
-### Sprint 1 (Week 1-2): Critical SEO - 16h
-**Focus**: Fix show-stoppers that directly impact rankings
+### Sprint 1 (Week 1-2): Critical SEO & Astro Setup - 14h
+**Focus**: Fix show-stoppers and leverage Astro features
 
 - ✅ Task 1: PWA Manifest & Icons (3h)
-- ✅ Task 2: Service Worker (4h)
-- ✅ Task 3: Security Headers (2h)
+- ✅ Task 2: PWA Integration with @vite-pwa/astro (2h) 🆕
+- ✅ Task 3: Security Headers via Middleware (2h)
 - ✅ Task 4: Favicon Set (1h)
 - ✅ Task 5: hreflang Tags (2h)
 - ✅ Task 6: Preconnect (30min)
 - ✅ Task 7: 404 Status Fix (1h)
 - ✅ Task 8: Google Search Console (30min)
+- ✅ Task 9: Font Optimization with Experimental API (30min) 🆕
 
 **Success Metrics**:
 - Lighthouse PWA score: 60 → 100
 - Mobile SEO score: 85 → 95
 - Security headers: 3/5 → 5/5
+- Font rendering: No FOIT
 
 ---
 
-### Sprint 2 (Week 3-4): Performance - 14h
-**Focus**: Optimize Core Web Vitals
+### Sprint 2 (Week 3-4): Performance - 11h
+**Focus**: Optimize Core Web Vitals using Astro's strengths
 
-- ✅ Task 9: Font Preloading (30min)
-- ✅ Task 10: Virtual Scrolling (3h)
-- ✅ Task 11: Pagination Prefetch (1h)
-- ✅ Task 12: Image Sizes (1h)
-- ✅ Task 13: Critical CSS (3h)
-- ✅ Task 14: Resource Hints (1h)
+- ✅ Task 10: Pagination/Virtual Scrolling with Client Directives (3h) 🆕
+- ✅ Task 11: Configure ClientRouter Prefetch (30min) 🆕
+- ✅ Task 12: Fine-tune Image Sizes (1h)
+- 🚫 Task 13: Critical CSS (Removed - Astro handles automatically) 🆕
+- ✅ Task 14: Resource Hints with Astro priority prop (1h) 🆕
 
 **Success Metrics**:
 - LCP: 2.5s → 1.8s
@@ -1463,6 +1634,25 @@ const showComments = import.meta.env.PROD && SITE.enableComments;
   - FID <100ms
   - CLS <0.1
 
+#### Astro-Specific Testing
+- [ ] **Build Output Analysis**:
+  ```bash
+  npm run build -- --verbose
+  ```
+  - Check bundle sizes
+  - Verify code splitting
+  - Confirm image optimization
+
+- [ ] **PWA Testing**:
+  - Check service worker registration
+  - Test offline functionality
+  - Verify installability on mobile
+
+- [ ] **Client Directive Validation**:
+  - Verify hydration timing
+  - Check bundle loading strategy
+  - Confirm no hydration errors
+
 #### Manual Testing
 - [ ] Test on real devices:
   - iPhone (Safari)
@@ -1488,18 +1678,21 @@ const showComments = import.meta.env.PROD && SITE.enableComments;
 - [ ] Core Web Vitals trends
 - [ ] Index coverage issues
 - [ ] Manual actions
+- [ ] Astro build warnings
 
 ### Monthly Checks
 - [ ] Lighthouse score trends
 - [ ] Organic traffic growth
 - [ ] Mobile usability issues
 - [ ] Schema markup errors
+- [ ] Update Astro and integrations
 
 ### Quarterly Checks
 - [ ] Competitor SEO analysis
 - [ ] Update meta descriptions for top pages
 - [ ] Review and update outdated content
 - [ ] Audit backlink profile
+- [ ] Review Astro roadmap for new features
 
 ---
 
@@ -1537,6 +1730,7 @@ src/config/
 └── i18n.ts                     # Internationalization
 
 astro.config.ts                 # Build & image optimization (175 lines)
+src/middleware.ts               # Security headers middleware 🆕
 ```
 
 ### Pages
@@ -1545,7 +1739,8 @@ src/pages/
 ├── robots.txt.ts               # Robots.txt generation
 ├── rss.xml.ts                  # RSS feed
 ├── og.png.ts                   # Default OG image
-└── posts/[...slug].png.ts      # Dynamic OG images
+├── posts/[...slug].png.ts      # Dynamic OG images
+└── offline.astro               # PWA offline fallback 🆕
 ```
 
 ---
@@ -1565,12 +1760,14 @@ src/pages/
 - FID: **<50ms** (currently ~70ms)
 - CLS: **<0.05** (currently ~0.07)
 - Time to Interactive: **<2.5s** (currently ~3.5s)
+- **Astro Bonus**: Zero JS on static pages
 
 ### User Engagement (3 months)
 - Bounce rate: **-10-15%**
 - Pages per session: **+15-20%**
 - Average session duration: **+20-25%**
 - Mobile conversion: **+10-12%**
+- **PWA installs**: 5-10% of mobile users
 
 ### Technical SEO (immediate)
 - PWA compliance: **100%**
@@ -1578,6 +1775,7 @@ src/pages/
 - Mobile-friendly: **100%**
 - HTTPS: **100%** (already)
 - Security headers: **100%** (A+ rating)
+- **Astro Islands**: <50KB JS per page
 
 ---
 
@@ -1595,6 +1793,14 @@ src/pages/
 - **WebPageTest**: https://www.webpagetest.org/
 - **Lighthouse CI**: https://github.com/GoogleChrome/lighthouse-ci
 - **Bundle Analyzer**: https://bundlephobia.com/
+- **Vite Bundle Visualizer**: https://github.com/btd/rollup-plugin-visualizer 🆕
+
+### Astro-Specific Resources 🆕
+- **Astro Documentation**: https://docs.astro.build/
+- **Vite PWA for Astro**: https://vite-pwa-org.netlify.app/frameworks/astro.html
+- **Astro Integrations Directory**: https://astro.build/integrations/
+- **Astro Discord Community**: https://astro.build/chat
+- **Astro DevTools**: https://github.com/withastro/astro-devtools
 
 ### Favicon & Icon Generators
 - **RealFaviconGenerator**: https://realfavicongenerator.net/
@@ -1619,21 +1825,30 @@ src/pages/
 
 ### Critical Path
 **Focus on P0 tasks first** - these have the highest ROI and are ranking factors:
-1. PWA manifest (mobile SEO)
-2. Service Worker (repeat visit performance)
-3. Security headers (trust signals)
+1. PWA via @vite-pwa/astro integration 🆕
+2. Security headers via Astro middleware 🆕
+3. Font optimization with experimental API 🆕
 4. Google Search Console (monitoring)
 
 ### Performance vs. Features
 - **Don't sacrifice UX for SEO** - always prioritize user experience
 - **Progressive enhancement** - features should gracefully degrade
 - **Test on real devices** - not just dev tools
+- **Leverage Astro's strengths** - Islands Architecture, zero JS defaults 🆕
 
 ### German Market Specifics
 - **DACH region variations** - Consider Austria/Switzerland
 - **BfArM compliance** - Already implemented, maintain it
 - **Medical disclaimer** - Required for health content (already present)
 - **DSGVO/GDPR** - Ensure cookie consent if adding analytics
+
+### Astro Best Practices 🆕
+- **Islands over Client Components** - Use `client:*` directives sparingly
+- **Static First** - Leverage SSG, use SSR only when needed
+- **Content Collections** - Use typed collections for all content
+- **View Transitions** - Already enabled, optimize usage
+- **Image Optimization** - Use `astro:assets` exclusively
+- **CSS Scoping** - Prefer scoped styles over global CSS
 
 ### Content Recommendations (outside this plan)
 - **Update frequency**: Publish 2-3 new articles/month
@@ -1647,7 +1862,7 @@ src/pages/
 - **Podcast**: Consider audio content for accessibility
 - **User-generated content**: Comments, reviews (with rel="ugc")
 - **Newsletter**: Email signup for engagement signals
-- **App**: Native mobile app (long-term, if traffic justifies)
+- **Astro 5.x Features**: Monitor new releases for performance wins 🆕
 
 ---
 
@@ -1658,6 +1873,7 @@ A task is considered complete when:
 - [ ] Code implemented and tested locally
 - [ ] Tests written and passing (if applicable)
 - [ ] Lighthouse audit shows improvement
+- [ ] Astro build completes without warnings 🆕
 - [ ] Documentation updated
 - [ ] Peer review completed (if team)
 - [ ] Deployed to staging
@@ -1672,6 +1888,7 @@ Each sprint should achieve:
 - ✅ No regressions in existing scores
 - ✅ All tests passing
 - ✅ No console errors in production
+- ✅ Astro build size within budgets 🆕
 
 ---
 
@@ -1680,6 +1897,7 @@ Each sprint should achieve:
 | Date | Version | Changes | Author |
 |------|---------|---------|--------|
 | 2025-11-09 | 1.0 | Initial comprehensive SEO & performance plan | Claude (SEO Specialist) |
+| 2025-11-09 | 1.1 | Updated with Astro-specific optimizations and best practices | Claude Code |
 
 ---
 
@@ -1688,10 +1906,12 @@ Each sprint should achieve:
 For questions or issues during implementation:
 1. Review the detailed task descriptions above
 2. Check the linked resources and documentation
-3. Test incrementally (don't deploy all changes at once)
-4. Monitor Google Search Console for any negative impacts
-5. Rollback if issues occur (use git tags for each sprint)
+3. **Check Astro Documentation**: https://docs.astro.build/ 🆕
+4. Test incrementally (don't deploy all changes at once)
+5. Monitor Google Search Console for any negative impacts
+6. Rollback if issues occur (use git tags for each sprint)
+7. **Ask Astro Community**: https://astro.build/chat 🆕
 
 ---
 
-**Remember**: SEO is a marathon, not a sprint. Implement systematically, measure carefully, and iterate based on data. Good luck! 🚀
+**Remember**: SEO is a marathon, not a sprint. Implement systematically, measure carefully, and iterate based on data. Leverage Astro's powerful features to achieve better results faster! 🚀
