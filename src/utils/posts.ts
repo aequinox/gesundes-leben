@@ -25,9 +25,7 @@ export interface ProcessPostsOptions {
  * @param posts - Array of raw collection entries
  * @returns Array of posts with slug property added
  */
-const addSlugsToPosts = (
-  posts: CollectionEntry<"blog">[]
-): Post[] => {
+const addSlugsToPosts = (posts: CollectionEntry<"blog">[]): Post[] => {
   return posts.map(post => ({
     ...post,
     slug: getPostSlug(post),
