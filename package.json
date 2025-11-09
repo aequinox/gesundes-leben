@@ -126,7 +126,6 @@
     "@types/dotenv": "^8.2.3",
     "@types/lodash.kebabcase": "^4.1.9",
     "@types/turndown": "^5.0.6",
-    "@types/uuid": "^11.0.0",
     "@types/xml2js": "^0.4.14",
     "@typescript-eslint/eslint-plugin": "^8.46.3",
     "@typescript-eslint/parser": "^8.46.3",
