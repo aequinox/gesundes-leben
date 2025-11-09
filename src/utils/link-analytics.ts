@@ -238,7 +238,9 @@ export class LinkAnalytics {
       let authority = 10; // Base authority
 
       // Boost for featured posts
-      if (post.data.featured) {authority += 20;}
+      if (post.data.featured) {
+        authority += 20;
+      }
 
       // Boost for posts with many categories/tags (indicating comprehensive content)
       authority += (post.data.categories?.length || 0) * 5;
@@ -352,7 +354,9 @@ export class LinkAnalytics {
   // Private helper methods
 
   private loadStoredData(): void {
-    if (typeof localStorage === "undefined") {return;}
+    if (typeof localStorage === "undefined") {
+      return;
+    }
 
     try {
       const stored = localStorage.getItem(this.storageKey);
@@ -365,7 +369,9 @@ export class LinkAnalytics {
   }
 
   private saveData(): void {
-    if (typeof localStorage === "undefined") {return;}
+    if (typeof localStorage === "undefined") {
+      return;
+    }
 
     try {
       // Keep only last 1000 records to prevent storage bloat
@@ -377,7 +383,9 @@ export class LinkAnalytics {
   }
 
   private getSessionId(): string {
-    if (typeof sessionStorage === "undefined") {return "server";}
+    if (typeof sessionStorage === "undefined") {
+      return "server";
+    }
 
     let sessionId = sessionStorage.getItem("link_analytics_session");
     if (!sessionId) {
@@ -430,10 +438,15 @@ export class LinkAnalytics {
     let linkCount = 2; // Base assumption
 
     // More comprehensive posts likely have more links
-    if (post.data.keywords && post.data.keywords.length > 5) {linkCount += 2;}
-    if (post.data.categories && post.data.categories.length > 2) {linkCount += 1;}
-    if (post.data.description && post.data.description.length > 200)
-      {linkCount += 1;}
+    if (post.data.keywords && post.data.keywords.length > 5) {
+      linkCount += 2;
+    }
+    if (post.data.categories && post.data.categories.length > 2) {
+      linkCount += 1;
+    }
+    if (post.data.description && post.data.description.length > 200) {
+      linkCount += 1;
+    }
 
     return linkCount;
   }

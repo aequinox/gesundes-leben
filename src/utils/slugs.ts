@@ -107,7 +107,7 @@ const slugify = <T extends SlugifyInput>(
  * extractSlugFromPath("/") // returns "unknown"
  */
 export function extractSlugFromPath(path: string): string {
-	return path.split("/").pop() || "unknown";
+  return path.split("/").pop() || "unknown";
 }
 
 // Export all functions at the end of the file

@@ -150,10 +150,8 @@ function analyzeContentRelationships(
   // Remove source post from candidates and filter out any undefined posts
   const filteredCandidates = candidatePosts.filter(
     post =>
-      post &&
-      post.id &&
-      sourcePost &&
-      sourcePost.id &&
+      post?.id &&
+      sourcePost?.id &&
       post.id !== sourcePost.id
   );
 

@@ -420,8 +420,7 @@ class SEOAuditor {
 
     // Evidence-based content indicators
     if (
-      data.keywords &&
-      data.keywords.some(
+      data.keywords?.some(
         k =>
           k.includes("studie") ||
           k.includes("forschung") ||

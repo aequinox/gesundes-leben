@@ -67,8 +67,12 @@ export class LinkScorer {
    * Determine link context strength based on score
    */
   getLinkingContext(score: number): "strong" | "moderate" | "weak" {
-    if (score >= 15) {return "strong";}
-    if (score >= 8) {return "moderate";}
+    if (score >= 15) {
+      return "strong";
+    }
+    if (score >= 8) {
+      return "moderate";
+    }
     return "weak";
   }
 }
@@ -112,7 +116,9 @@ export class MatchingEngine {
    * Prevent overlapping matches (keep higher priority)
    */
   preventOverlaps(matches: Match[]): Match[] {
-    if (matches.length === 0) {return [];}
+    if (matches.length === 0) {
+      return [];
+    }
 
     // Sort by priority (descending) then by position (ascending)
     const sorted = [...matches].sort((a, b) => {
