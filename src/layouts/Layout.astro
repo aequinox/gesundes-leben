@@ -5,11 +5,10 @@ import Breadcrumb from "@/components/Breadcrumb.astro";
 import Header from "@/components/sections/Header.astro";
 import { SEO } from "@/components/seo";
 import SizeIndicator from "@/components/SizeIndicator.astro";
+import type { NavigationLink } from "@/components/types";
 import { SITE } from "@/config";
 
 import "@/styles/global.css";
-
-import type { NavigationLink } from "@/components/types";
 
 export interface Props {
   title?: string;

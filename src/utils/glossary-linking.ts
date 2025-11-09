@@ -10,7 +10,7 @@
 // import type { CollectionEntry } from "astro:content";
 import { countBy, topN } from "./linking/helpers";
 import { MatchingEngine } from "./linking/scoring";
-import type { Match, Pattern } from "./linking/types";
+import type { Pattern } from "./linking/types";
 
 // Health and medical terms with their glossary IDs and variations
 export const GLOSSARY_TERMS: Record<

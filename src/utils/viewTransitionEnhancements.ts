@@ -32,7 +32,7 @@ if (typeof window !== "undefined") {
           routeAnnouncementLanguage: "de",
         },
       });
-    } catch (error) {
+    } catch {
       // Silently fail - view transitions are progressive enhancement
     }
   };

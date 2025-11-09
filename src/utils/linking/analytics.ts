@@ -15,7 +15,7 @@ import { logger } from "../logger";
 import type { Post } from "../types";
 
 import { StorageManager, SessionManager, DataValidator } from "./core";
-import { groupBy, countBy, topN, formatDate, groupByDay } from "./helpers";
+import { countBy, topN, formatDate, groupByDay } from "./helpers";
 import type { LinkClickEvent, LinkPerformanceMetrics } from "./types";
 
 /**

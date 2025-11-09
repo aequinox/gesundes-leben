@@ -1,4 +1,5 @@
 import { getCollection, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 
 import { SITE } from "@/config";
 
@@ -25,7 +26,7 @@ export interface ProcessPostsOptions {
  * @returns Array of posts with slug property added
  */
 const addSlugsToPosts = (
-  posts: import("astro:content").CollectionEntry<"blog">[]
+  posts: CollectionEntry<"blog">[]
 ): Post[] => {
   return posts.map(post => ({
     ...post,
