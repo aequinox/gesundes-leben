@@ -327,20 +327,37 @@ if (Object.values(groupPostCounts).every(count => count === 0)) {
   >
     <div
       class="card-list grid-layout grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 [&:has(.article-card:hover)_.article-card:not(:hover)]:brightness-[0.8] [&:has(.article-card:hover)_.article-card:not(:hover)]:grayscale-[90%]"
+      data-posts-per-page="12"
     >
-      {sortedPosts.map(post => <Card post={post} />)}
-      <!-- {
+      {
         sortedPosts.map((post, index) => (
-          <Card
-            post={post}
-            loading={index < 6 ? "eager" : "lazy"}
-            animationDelay={index * 0.05}
-            animationType="fade-up"
-            animationAosDelay={index * 50}
-          />
+          <Card post={post} loading={index < 6 ? "eager" : "lazy"} />
         ))
-      } -->
+      }
     </div>
+
+    {/* Load More Button */}
+    {
+      sortedPosts.length > 12 && (
+        <div id="load-more-container" class="mt-8 flex justify-center">
+          <button
+            id="load-more-btn"
+            type="button"
+            class="relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-accent/10 px-8 py-3 font-medium text-accent transition-all duration-300 after:absolute after:inset-0 after:animate-[shimmer_3s_infinite] after:bg-gradient-to-r after:from-accent/10 after:via-accent/20 after:to-accent/50 after:bg-[length:200%_100%] after:opacity-0 after:transition-opacity after:duration-300 after:content-[''] hover:bg-accent/20 hover:shadow-[var(--shadow-glow-accent)] hover:after:opacity-100 active:shadow-[var(--shadow-inner)]"
+            aria-label="Load more posts"
+          >
+            <Icon name="tabler:chevron-down" class="h-5 w-5" />
+            <span>Mehr laden</span>
+            <span
+              id="remaining-count"
+              class="ml-1 rounded-full bg-accent/20 px-2 py-0.5 text-xs font-bold"
+            >
+              {sortedPosts.length - 12}
+            </span>
+          </button>
+        </div>
+      )
+    }
   </div>
 
   {/* No Results Message */}
@@ -391,11 +408,94 @@ if (Object.values(groupPostCounts).every(count => count === 0)) {
 <script>
   import { initBlogFilter } from "@/utils/ui/BlogFilterEngine";
 
+  // Load More functionality
+  const initLoadMore = () => {
+    const POSTS_PER_PAGE = 12;
+    let visibleCount = POSTS_PER_PAGE;
+
+    const cardList = document.querySelector(".card-list");
+    const loadMoreBtn = document.getElementById("load-more-btn");
+    const loadMoreContainer = document.getElementById("load-more-container");
+    const remainingCountSpan = document.getElementById("remaining-count");
+
+    if (!cardList || !loadMoreBtn) return;
+
+    const allCards = Array.from(cardList.querySelectorAll(".article-card"));
+    const totalCards = allCards.length;
+
+    // Initially hide cards beyond the first page
+    const updateVisibility = () => {
+      allCards.forEach((card, index) => {
+        if (index < visibleCount) {
+          card.classList.remove("hidden");
+        } else {
+          card.classList.add("hidden");
+        }
+      });
+
+      // Update remaining count
+      const remaining = totalCards - visibleCount;
+      if (remainingCountSpan) {
+        remainingCountSpan.textContent = remaining.toString();
+      }
+
+      // Hide load more button if all posts are visible
+      if (remaining <= 0 && loadMoreContainer) {
+        loadMoreContainer.classList.add("hidden");
+      }
+    };
+
+    // Initial visibility setup
+    updateVisibility();
+
+    // Load more button click handler
+    loadMoreBtn.addEventListener("click", () => {
+      visibleCount += POSTS_PER_PAGE;
+      updateVisibility();
+
+      // Smooth scroll to first newly visible card
+      const firstNewCard = allCards[visibleCount - POSTS_PER_PAGE];
+      if (firstNewCard) {
+        firstNewCard.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        });
+      }
+    });
+
+    // Re-apply visibility when filters change
+    const observer = new MutationObserver(() => {
+      const visibleCards = allCards.filter(
+        card => !card.classList.contains("hidden")
+      );
+      const currentTotal = visibleCards.length;
+
+      // Show/hide load more based on filtered results
+      if (currentTotal > POSTS_PER_PAGE && loadMoreContainer) {
+        loadMoreContainer.classList.remove("hidden");
+        visibleCount = POSTS_PER_PAGE;
+        updateVisibility();
+      } else if (loadMoreContainer) {
+        loadMoreContainer.classList.add("hidden");
+      }
+    });
+
+    // Observe the card list for changes
+    if (cardList) {
+      observer.observe(cardList, {
+        attributes: true,
+        subtree: true,
+        attributeFilter: ["class"],
+      });
+    }
+  };
+
   // Initialize the blog filter
   const initializeFilter = () => {
     initBlogFilter({
       defaultCategory: "Alle",
     });
+    initLoadMore();
   };
 
   // Initialize on first load

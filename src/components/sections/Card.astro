@@ -176,10 +176,10 @@ const readMoreClasses = `mr-2 mt-${
               <Picture
                 src={heroImage.src}
                 formats={["avif", "webp"]}
-                widths={[400, 800]}
+                widths={[400, 600, 800, 1200]}
                 width={800}
                 height={isSmall ? 600 : 450}
-                sizes="(max-width: 800px) 400px, (max-width: 1200px) 800px"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1536px) 33vw, 400px"
                 alt={title}
                 loading={loading}
                 fetchpriority={loading === "eager" ? "high" : "auto"}
