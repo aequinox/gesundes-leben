@@ -64,10 +64,28 @@ import { Image as AstroImage, Picture } from "astro:assets";
 
 // Import validation utilities
 import {
-  commonRules,
-  urlValidator,
-  validateProps,
-} from "@/utils/propValidation";
+  ANIMATION_DIRECTIONS,
+  DEFAULT_DENSITIES,
+  DEFAULT_FORMATS,
+  DEFAULT_QUALITY,
+  DEFAULT_REMOTE_DIMENSIONS,
+  DEFAULT_SIZES,
+  IMAGE_WIDTHS,
+  extractDimensions,
+  extractStringSource,
+  getFilterClass,
+  getRoundedClass,
+  imageValidationSchema,
+  isSvgImport,
+  parseImageTitle,
+  type AspectRatio,
+  type Filter,
+  type Position,
+  type Rounded,
+} from "@/utils/image";
+import { validateProps } from "@/utils/propValidation";
+
+// Import image utilities
 
 type Props = {
   /** Image source URL or metadata */
@@ -77,7 +95,7 @@ type Props = {
   /** Optional caption */
   title?: string;
   /** Optional aspect ratio */
-  aspectRatio?: "auto" | "square" | "video" | "portrait" | "ultrawide";
+  aspectRatio?: AspectRatio;
   /** Optional loading strategy */
   loading?: "lazy" | "eager";
   /** Optional visual style */
@@ -85,11 +103,11 @@ type Props = {
   /** Optional interactive animation effect */
   effect?: "none" | "zoom" | "parallax" | "tilt";
   /** Optional CSS filter effect */
-  filter?: "none" | "blur" | "grayscale" | "sepia" | "duotone";
+  filter?: Filter;
   /** Optional border radius */
-  rounded?: boolean | "sm" | "md" | "lg" | "full";
+  rounded?: Rounded;
   /** Optional position */
-  position?: "left" | "right" | "center" | "full";
+  position?: Position;
   /** Optional widths for responsive images */
   widths?: number[];
   /** Optional image formats */
@@ -108,63 +126,6 @@ type Props = {
   invert?: boolean;
   /** Optional priority loading (disables lazy load for above-fold images) */
   priority?: boolean;
-};
-
-// Define validation schema for Image component props
-const imageValidationSchema = {
-  src: {
-    required: true,
-    validator: (value: unknown) => {
-      // Allow strings (URLs or relative paths)
-      if (typeof value === "string") {
-        if (value.length === 0) {
-          return "src cannot be an empty string";
-        }
-        return value.startsWith("http") ? urlValidator(value) : true;
-      }
-
-      // Allow image objects (imported assets and SVG imports)
-      if (typeof value === "object" && value !== null) {
-        return true;
-      }
-
-      // Allow undefined/null to be caught by required validation
-      if (value === undefined || value === null) {
-        return "src is required";
-      }
-
-      return `Invalid src type: expected string or object, got ${typeof value}`;
-    },
-  },
-  alt: {
-    ...commonRules.requiredString,
-    message: "Alt text is required for accessibility",
-  },
-  title: commonRules.optionalString,
-  aspectRatio: {
-    type: "string" as const,
-    oneOf: ["auto", "square", "video", "portrait", "ultrawide"],
-  },
-  loading: { type: "string" as const, oneOf: ["lazy", "eager"] },
-  style: {
-    type: "string" as const,
-    oneOf: ["default", "polaroid", "bordered", "floating", "glass"],
-  },
-  effect: {
-    type: "string" as const,
-    oneOf: ["none", "zoom", "parallax", "tilt"],
-  },
-  filter: {
-    type: "string" as const,
-    oneOf: ["none", "blur", "grayscale", "sepia", "duotone"],
-  },
-  position: {
-    type: "string" as const,
-    oneOf: ["left", "right", "center", "full"],
-  },
-  quality: { type: "number" as const, min: 1, max: 100 },
-  invert: commonRules.optionalBoolean,
-  priority: commonRules.optionalBoolean,
 };
 
 // Validate props in development only
@@ -191,166 +152,45 @@ const {
 } = validation.validatedProps;
 
 // Parse position and other controls from title if provided (legacy support)
-let finalPosition = position;
-let finalTitle = title;
-let shouldInvert = invert;
-
-if (title) {
-  // Check for invert prefix first (can be combined with position)
-  if (title.charAt(0) === "!") {
-    shouldInvert = true;
-    finalTitle = title.slice(1);
-
-    // Check if there's a position control character after the invert
-    if (finalTitle.length > 0) {
-      const positionChar = finalTitle.charAt(0);
-      const positionMap: Record<string, string> = {
-        ">": "right",
-        "<": "left",
-        "|": "center",
-        _: "full",
-      };
-
-      if (positionMap[positionChar]) {
-        finalPosition = positionMap[positionChar] as typeof position;
-        finalTitle = finalTitle.slice(1);
-      }
-    }
-  } else {
-    // No invert prefix, check for position control characters
-    const controlChar = title.charAt(0);
-    const directionMap: Record<string, string> = {
-      ">": "right",
-      "<": "left",
-      "|": "center",
-      _: "full",
-    };
-
-    if (directionMap[controlChar]) {
-      finalPosition = directionMap[controlChar] as typeof position;
-      finalTitle = title.slice(1);
-    }
-  }
-}
-
-// Define type for SVG imports
-interface SvgImport {
-  src: string;
-  [key: string]: unknown;
-}
-
-// Type guard for SVG imports
-function isSvgImport(value: unknown): value is SvgImport {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "src" in value &&
-    typeof (value as SvgImport).src === "string" &&
-    (value as SvgImport).src.endsWith(".svg")
-  );
-}
+const parsed = parseImageTitle(title, position);
+const finalPosition = parsed.position;
+const finalTitle = parsed.title;
+const shouldInvert = invert || parsed.invert;
 
 // Determine if we're using a string URL, SVG import, or an ImageMetadata object
 const isStringSource = typeof srcProp === "string";
 const isSvgSource = isSvgImport(srcProp);
-let stringSource = "";
-
-if (isStringSource) {
-  // Use the string directly for the fallback case
-  stringSource = srcProp as string;
-} else if (isSvgSource) {
-  // Handle SVG imports which return an object with a src property
-  stringSource = srcProp.src;
-}
+const stringSource = extractStringSource(srcProp);
 
 // Determine animation based on position
-const animationDirection =
-  finalPosition === "left"
-    ? "fade-right"
-    : finalPosition === "right"
-      ? "fade-left"
-      : "fade-up";
+const animationDirection = ANIMATION_DIRECTIONS[finalPosition];
 
-// Determine responsive widths based on position
-const defaultWidths = {
-  left: [400, 600, 800],
-  right: [400, 600, 800],
-  center: [600, 800, 1200],
-  full: [800, 1200, 1600, 2000],
-};
-
-// Get widths from props or use defaults based on position
-const widths = Astro.props.widths || defaultWidths[finalPosition];
-
-// Default formats optimized for performance
-const formats = Astro.props.formats || ["avif", "webp"];
-
-// Default quality
-const quality = Astro.props.quality || 80;
-
-// Default sizes based on position
-const defaultSizes = {
-  left: "(max-width: 768px) 100vw, 40vw",
-  right: "(max-width: 768px) 100vw, 40vw",
-  center: "(max-width: 768px) 100vw, 70vw",
-  full: "100vw",
-};
-
-// Get sizes from props or use defaults based on position
-const sizes = Astro.props.sizes || defaultSizes[finalPosition];
-
-// Default densities
-const densities = Astro.props.densities || [1, 2];
+// Get responsive configuration from props or use defaults based on position
+const widths = Astro.props.widths || IMAGE_WIDTHS[finalPosition];
+const formats = Astro.props.formats || DEFAULT_FORMATS;
+const quality = Astro.props.quality || DEFAULT_QUALITY;
+const sizes = Astro.props.sizes || DEFAULT_SIZES[finalPosition];
+const densities = Astro.props.densities || DEFAULT_DENSITIES;
 
 // Calculate dimensions based on aspect ratio if not provided
 let width = Astro.props.width;
 let height = Astro.props.height;
 
-// If we have an ImageMetadata object, we can get its dimensions
-if (!isStringSource && !width && !height) {
-  const imgMetadata = srcProp as ImageMetadata;
-  width = imgMetadata.width;
-  height = imgMetadata.height;
-
-  // Apply aspect ratio adjustments if needed
-  if (aspectRatio !== "auto" && width && height) {
-    if (aspectRatio === "square") {
-      height = width;
-    } else if (aspectRatio === "video") {
-      height = Math.round(width * (9 / 16));
-    } else if (aspectRatio === "portrait") {
-      height = Math.round(width * (4 / 3));
-    } else if (aspectRatio === "ultrawide") {
-      height = Math.round(width * (9 / 21));
-    }
-  }
+// If we have an ImageMetadata object, extract and calculate dimensions
+if (!isStringSource && !isSvgSource && !width && !height) {
+  const dimensions = extractDimensions(
+    srcProp as ImageMetadata,
+    aspectRatio,
+    width,
+    height
+  );
+  width = dimensions.width;
+  height = dimensions.height;
 }
 
-// Map filter values to CSS classes
-const filterClasses = {
-  none: "",
-  blur: "image-filter-blur",
-  grayscale: "image-filter-grayscale",
-  sepia: "image-filter-sepia",
-  duotone: "image-filter-duotone",
-};
-
-// Map rounded values to CSS classes
-const roundedClasses = {
-  true: "rounded",
-  sm: "rounded-sm",
-  md: "rounded-md",
-  lg: "rounded-lg",
-  full: "rounded-full",
-  false: "",
-};
-
 // Determine the final CSS classes for filter and rounded
-const filterClass = filterClasses[filter];
-const roundedClass =
-  typeof rounded === "boolean" || rounded === undefined
-    ? roundedClasses[String(rounded) as "true" | "false"]
-    : roundedClasses[rounded];
+const filterClass = getFilterClass(filter);
+const roundedClass = getRoundedClass(rounded || false);
 
 // Priority loading overrides lazy loading
 const finalLoading = priority ? "eager" : loading;
@@ -427,8 +267,8 @@ const finalLoading = priority ? "eager" : loading;
           <AstroImage
             src={stringSource}
             alt={alt}
-            width={width ?? 800}
-            height={height ?? 600}
+            width={width ?? DEFAULT_REMOTE_DIMENSIONS.width}
+            height={height ?? DEFAULT_REMOTE_DIMENSIONS.height}
             loading={finalLoading}
             densities={densities}
             sizes={sizes}

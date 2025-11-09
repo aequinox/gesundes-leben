@@ -84,9 +84,15 @@ function createReferenceFieldComparator(): (a: string, b: string) => number {
   return (a: string, b: string): number => {
     const aIndex = REFERENCE_FIELD_ORDER.indexOf(a as any);
     const bIndex = REFERENCE_FIELD_ORDER.indexOf(b as any);
-    if (aIndex === -1 && bIndex === -1) {return a.localeCompare(b);}
-    if (aIndex === -1) {return 1;}
-    if (bIndex === -1) {return -1;}
+    if (aIndex === -1 && bIndex === -1) {
+      return a.localeCompare(b);
+    }
+    if (aIndex === -1) {
+      return 1;
+    }
+    if (bIndex === -1) {
+      return -1;
+    }
     return aIndex - bIndex;
   };
 }

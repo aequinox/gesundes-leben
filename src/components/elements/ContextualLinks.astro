@@ -20,8 +20,8 @@ import InternalLink from "@/components/elements/InternalLink.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { analyzeContentRelationships } from "@/utils/internal-linking";
 import { generateSessionId } from "@/utils/internal-linking-analytics";
-import { extractSlugFromPath } from "@/utils/slugs";
 import { processAllPosts } from "@/utils/posts";
+import { extractSlugFromPath } from "@/utils/slugs";
 import type { Post } from "@/utils/types";
 
 export interface Props {

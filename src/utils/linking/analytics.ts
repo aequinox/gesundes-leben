@@ -145,7 +145,9 @@ export class LinkAnalyticsService {
    * Send event to external analytics (Google Analytics, etc.)
    */
   private sendToExternalAnalytics(event: ExtendedLinkClickEvent): void {
-    if (typeof window === "undefined") {return;}
+    if (typeof window === "undefined") {
+      return;
+    }
 
     // Google Analytics 4
     if ("gtag" in window && typeof window.gtag === "function") {

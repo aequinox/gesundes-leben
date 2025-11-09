@@ -352,7 +352,7 @@ export class TableOfContents {
     if (ariaLabelledBy !== null && ariaLabelledBy.length > 0) {
       const labelElement = document.getElementById(ariaLabelledBy);
       const labelText = labelElement?.textContent;
-       
+
       if (
         labelText !== null &&
         labelText !== undefined &&
@@ -376,7 +376,7 @@ export class TableOfContents {
     if (svg) {
       const titleElement = svg.querySelector("title");
       const titleText = titleElement?.textContent;
-       
+
       if (
         titleText !== null &&
         titleText !== undefined &&

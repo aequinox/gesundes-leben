@@ -73,7 +73,9 @@ export interface PublisherSchemaOptions {
 export function formatDate(
   date: Date | string | undefined
 ): string | undefined {
-  if (!date) {return undefined;}
+  if (!date) {
+    return undefined;
+  }
 
   try {
     const dateObj = date instanceof Date ? date : new Date(date);
@@ -508,7 +510,9 @@ export function mergeSchemas(
   ...schemas: Array<Record<string, unknown> | undefined>
 ): Record<string, unknown> {
   return schemas.reduce((acc, schema) => {
-    if (!schema) {return acc;}
+    if (!schema) {
+      return acc;
+    }
     return { ...acc, ...schema };
   }, {});
 }

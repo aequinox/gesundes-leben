@@ -97,7 +97,9 @@ export function countByField<T extends Record<string, unknown>>(
  * Calculate percentage
  */
 export function percentage(value: number, total: number): number {
-  if (total === 0) {return 0;}
+  if (total === 0) {
+    return 0;
+  }
   return Math.round((value / total) * 100 * 100) / 100; // Round to 2 decimals
 }
 
@@ -105,7 +107,9 @@ export function percentage(value: number, total: number): number {
  * Calculate average
  */
 export function average(values: number[]): number {
-  if (values.length === 0) {return 0;}
+  if (values.length === 0) {
+    return 0;
+  }
   const sum = values.reduce((total, value) => total + value, 0);
   return Math.round((sum / values.length) * 100) / 100; // Round to 2 decimals
 }
@@ -150,7 +154,9 @@ export function groupByDay<T extends { timestamp: number }>(
  * Calculate click-through rate
  */
 export function calculateCTR(clicks: number, impressions: number): number {
-  if (impressions === 0) {return 0;}
+  if (impressions === 0) {
+    return 0;
+  }
   return percentage(clicks, impressions);
 }
 
@@ -217,7 +223,9 @@ export function sortBy<T>(
   return [...items].sort((a, b) => {
     for (const compareFn of compareFns) {
       const result = compareFn(a, b);
-      if (result !== 0) {return result;}
+      if (result !== 0) {
+        return result;
+      }
     }
     return 0;
   });
@@ -234,11 +242,17 @@ export function compareBy<T>(
     const aVal = a[field];
     const bVal = b[field];
 
-    if (aVal === bVal) {return 0;}
+    if (aVal === bVal) {
+      return 0;
+    }
 
     let result = 0;
-    if (aVal < bVal) {result = -1;}
-    if (aVal > bVal) {result = 1;}
+    if (aVal < bVal) {
+      result = -1;
+    }
+    if (aVal > bVal) {
+      result = 1;
+    }
 
     return order === "desc" ? -result : result;
   };
@@ -248,7 +262,9 @@ export function compareBy<T>(
  * Calculate median
  */
 export function median(values: number[]): number {
-  if (values.length === 0) {return 0;}
+  if (values.length === 0) {
+    return 0;
+  }
 
   const sorted = [...values].sort((a, b) => a - b);
   const middle = Math.floor(sorted.length / 2);
@@ -264,7 +280,9 @@ export function median(values: number[]): number {
  * Calculate standard deviation
  */
 export function standardDeviation(values: number[]): number {
-  if (values.length === 0) {return 0;}
+  if (values.length === 0) {
+    return 0;
+  }
 
   const avg = average(values);
   const squareDiffs = values.map(value => Math.pow(value - avg, 2));
@@ -277,7 +295,9 @@ export function standardDeviation(values: number[]): number {
  * Safe division (returns 0 if divisor is 0)
  */
 export function safeDivide(numerator: number, denominator: number): number {
-  if (denominator === 0) {return 0;}
+  if (denominator === 0) {
+    return 0;
+  }
   return numerator / denominator;
 }
 
@@ -330,7 +350,9 @@ export function exportToCSV<T extends Record<string, unknown>>(
   data: T[],
   headers?: string[]
 ): string {
-  if (data.length === 0) {return "";}
+  if (data.length === 0) {
+    return "";
+  }
 
   const keys = headers || (Object.keys(data[0]) as Array<keyof T>);
   const headerRow = keys.join(",");
@@ -359,7 +381,9 @@ export function exportToCSV<T extends Record<string, unknown>>(
  */
 export function parseCSV(csv: string): Array<Record<string, string>> {
   const lines = csv.split("\n").filter(line => line.trim());
-  if (lines.length === 0) {return [];}
+  if (lines.length === 0) {
+    return [];
+  }
 
   const headers = lines[0].split(",");
   const data: Array<Record<string, string>> = [];
