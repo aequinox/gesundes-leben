@@ -14,6 +14,11 @@
 
 import { SITE } from "@/config";
 import { getI18nStrings, getNavigationTranslation } from "@/config/i18n";
+import {
+  buildBreadcrumbSchema,
+  buildMedicalAudienceSchema,
+  type BreadcrumbItemData,
+} from "@/utils/seo/SchemaBuilder";
 
 export interface BreadcrumbItem {
   name: string;
@@ -43,13 +48,18 @@ const {
 const i18n = getI18nStrings("de");
 
 // Generate breadcrumbs from URL path
-const generateBreadcrumbs = (): BreadcrumbItem[] => {
+const generateBreadcrumbs = (): BreadcrumbItemData[] => {
   if (items.length > 0) {
-    return items;
+    // Convert existing items to BreadcrumbItemData format
+    return items.map(item => ({
+      name: item.name,
+      url: item.url,
+      position: item.position,
+    }));
   }
 
   const pathSegments = Astro.url.pathname.split("/").filter(Boolean);
-  const breadcrumbs: BreadcrumbItem[] = [
+  const breadcrumbs: BreadcrumbItemData[] = [
     {
       name: i18n.seo.navigation.home,
       url: SITE.website,
@@ -82,31 +92,15 @@ const generateBreadcrumbs = (): BreadcrumbItem[] => {
 
 const breadcrumbItems = generateBreadcrumbs();
 
-// Generate structured data
-const breadcrumbSchema = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  name: "Navigation",
-  description: `Navigationspfad für ${currentPage}`,
-  itemListElement: breadcrumbItems.map(item => ({
-    "@type": "ListItem",
-    position: item.position,
-    name: item.name,
-    ...(item.url && {
-      item: {
-        "@type": "WebPage",
-        "@id": item.url,
-        name: item.name,
-        url: item.url,
-      },
-    }),
-  })),
-};
+// Generate structured data using shared utility
+const baseBreadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
 
 // Enhanced breadcrumb schema with health categorization
 const enhancedBreadcrumbSchema = isHealthContent
   ? {
-      ...breadcrumbSchema,
+      ...baseBreadcrumbSchema,
+      name: "Navigation",
+      description: `Navigationspfad für ${currentPage}`,
       potentialAction: {
         "@type": "ReadAction",
         target: {
@@ -121,13 +115,16 @@ const enhancedBreadcrumbSchema = isHealthContent
       mainEntity: {
         "@type": "HealthTopicContent",
         hasHealthAspect: category || "Gesundheit",
-        audience: {
-          "@type": "MedicalAudience",
+        audience: buildMedicalAudienceSchema({
           audienceType: "Patient",
-        },
+        }),
       },
     }
-  : breadcrumbSchema;
+  : {
+      ...baseBreadcrumbSchema,
+      name: "Navigation",
+      description: `Navigationspfad für ${currentPage}`,
+    };
 ---
 
 <!-- Breadcrumb Structured Data -->
