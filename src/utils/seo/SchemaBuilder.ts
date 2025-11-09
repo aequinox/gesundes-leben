@@ -70,8 +70,10 @@ export interface PublisherSchemaOptions {
  * @param date - Date to format
  * @returns ISO 8601 formatted string
  */
-export function formatDate(date: Date | string | undefined): string | undefined {
-  if (!date) return undefined;
+export function formatDate(
+  date: Date | string | undefined
+): string | undefined {
+  if (!date) {return undefined;}
 
   try {
     const dateObj = date instanceof Date ? date : new Date(date);
@@ -168,7 +170,9 @@ export function validateSeoLength(title: string, description: string): void {
  * @param options - Image schema options
  * @returns ImageObject structured data
  */
-export function buildImageSchema(options: ImageSchemaOptions): Record<string, unknown> {
+export function buildImageSchema(
+  options: ImageSchemaOptions
+): Record<string, unknown> {
   const { url, width = 180, height = 180, caption, alt } = options;
 
   return {
@@ -249,11 +253,7 @@ export function buildOrganizationSchema(
 export function buildPublisherSchema(
   options: PublisherSchemaOptions = {}
 ): Record<string, unknown> {
-  const {
-    name = SITE.title,
-    url = SITE.website,
-    logoUrl,
-  } = options;
+  const { name = SITE.title, url = SITE.website, logoUrl } = options;
 
   const resolvedLogoUrl = resolveUrl(logoUrl || "/logo.png", url);
 
@@ -307,11 +307,7 @@ export function buildAuthorSchema(
 export function buildMedicalAudienceSchema(
   options: MedicalAudienceSchemaOptions = {}
 ): Record<string, unknown> {
-  const {
-    audienceType = "Patient",
-    geographicArea,
-    language = "de",
-  } = options;
+  const { audienceType = "Patient", geographicArea, language = "de" } = options;
 
   const i18n = getI18nStrings(language);
 
@@ -487,7 +483,9 @@ export interface BaseSchemaOptions {
   image?: string;
 }
 
-export function buildBaseSchema(options: BaseSchemaOptions): Record<string, unknown> {
+export function buildBaseSchema(
+  options: BaseSchemaOptions
+): Record<string, unknown> {
   const { name, description, url, image } = options;
 
   return {
@@ -510,7 +508,7 @@ export function mergeSchemas(
   ...schemas: Array<Record<string, unknown> | undefined>
 ): Record<string, unknown> {
   return schemas.reduce((acc, schema) => {
-    if (!schema) return acc;
+    if (!schema) {return acc;}
     return { ...acc, ...schema };
   }, {});
 }

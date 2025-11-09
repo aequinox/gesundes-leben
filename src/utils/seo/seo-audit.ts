@@ -406,7 +406,7 @@ class SEOAuditor {
     const hasDisclaimer =
       data.description.includes("medizinische beratung") ||
       data.description.includes("arzt") ||
-      (content?.includes("medizinische beratung"));
+      content?.includes("medizinische beratung");
 
     if (!hasDisclaimer) {
       score -= 20;

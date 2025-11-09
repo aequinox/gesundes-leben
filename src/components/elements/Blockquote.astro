@@ -17,7 +17,7 @@
  * @component
  * @since 1.0.0
  * @author Healthy Life Team
- * 
+ *
  * @example Simple blockquote
  * ```astro
  * <Blockquote>
@@ -34,7 +34,7 @@
  *   label="Therapeuten Tipp"
  *   class="my-12"
  * >
- *   Mindfulness practices can significantly reduce anxiety symptoms 
+ *   Mindfulness practices can significantly reduce anxiety symptoms
  *   when practiced consistently for just 10 minutes daily.
  * </Blockquote>
  * ```
@@ -60,36 +60,36 @@ import type { BaseComponentProps } from "@/types";
 export interface Props extends BaseComponentProps {
   /** Author's name for attribution */
   author?: string;
-  
+
   /** Professional role or title */
   role?: string;
-  
+
   /** URL to author's avatar image */
   avatar?: string;
-  
+
   /** Category label (e.g., "Therapeuten Tipp", "Experten Rat") */
   label?: string;
-  
+
   /** Quote source or context */
   cite?: string;
-  
+
   /** Visual variant for different styling */
   variant?: "default" | "professional" | "highlight" | "minimal";
-  
+
   /** Size variant */
   size?: "sm" | "md" | "lg";
 }
 
-const { 
+const {
   // Base props
   class: className,
   id,
   "data-testid": dataTestId,
-  
+
   // Blockquote specific props
-  author, 
-  role, 
-  avatar, 
+  author,
+  role,
+  avatar,
   label,
   cite,
   variant: _variant = "default",
@@ -100,12 +100,13 @@ const {
 const isEnhanced = Boolean(author || role || avatar || label);
 
 // Generate unique ID for accessibility
-const blockquoteId = id || `blockquote-${Math.random().toString(36).substring(2, 11)}`;
+const blockquoteId =
+  id || `blockquote-${Math.random().toString(36).substring(2, 11)}`;
 
 // Size-based styling
 const sizeClasses = {
   sm: "text-sm sm:text-base p-4 my-4",
-  md: "text-base sm:text-lg p-6 my-8", 
+  md: "text-base sm:text-lg p-6 my-8",
   lg: "text-lg sm:text-xl p-8 my-12",
 };
 
@@ -209,8 +210,8 @@ const baseClasses = sizeClasses[size];
             fill="currentColor"
           />
         </svg>
-        <blockquote 
-          class="-mb-8 ml-16" 
+        <blockquote
+          class="-mb-8 ml-16"
           style="quotes: none;"
           cite={cite}
           id={`${blockquoteId}-content`}

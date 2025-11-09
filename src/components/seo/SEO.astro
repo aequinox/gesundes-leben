@@ -19,12 +19,8 @@ import { getI18nStrings } from "@/config/i18n";
 import { isNonEmptyString, type SEOMetadata } from "@/types";
 import {
   buildArticleSchema,
-  buildAuthorSchema,
   buildBreadcrumbSchema,
-  buildMedicalAudienceSchema,
   buildOrganizationSchema,
-  buildPublisherSchema,
-  formatDate,
   resolveUrl,
   sanitizeText,
   validateSeoLength,
@@ -85,7 +81,11 @@ const resolvedCanonicalURL = canonicalURL
   : currentURL.href;
 
 // Handle Open Graph image
-const socialImageURL = resolveUrl(ogImage, Astro.site.href, SITE.ogImage || "/og-default.jpg");
+const socialImageURL = resolveUrl(
+  ogImage,
+  Astro.site.href,
+  SITE.ogImage || "/og-default.jpg"
+);
 
 // Get i18n strings for current language
 const i18n = getI18nStrings(LOCALE.lang as "de" | "en");

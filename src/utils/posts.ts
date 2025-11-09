@@ -24,12 +24,14 @@ export interface ProcessPostsOptions {
  * @param posts - Array of raw collection entries
  * @returns Array of posts with slug property added
  */
-const addSlugsToPosts = (posts: import("astro:content").CollectionEntry<"blog">[]): Post[] => {
+const addSlugsToPosts = (
+  posts: import("astro:content").CollectionEntry<"blog">[]
+): Post[] => {
   return posts.map(post => ({
     ...post,
-    slug: getPostSlug(post)
+    slug: getPostSlug(post),
   })) as Post[];
-}
+};
 
 /**
  * Retrieves all blog posts, optionally including drafts.

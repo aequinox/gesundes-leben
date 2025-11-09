@@ -19,7 +19,7 @@
 import InternalLink from "@/components/elements/InternalLink.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { analyzeContentRelationships } from "@/utils/internal-linking";
-// Dynamic import for analytics used in client-side script
+import { generateSessionId } from "@/utils/internal-linking-analytics";
 import { processAllPosts } from "@/utils/posts";
 import type { Post } from "@/utils/types";
 
@@ -74,7 +74,7 @@ const defaultTitles = {
 const sectionTitle = title || defaultTitles[placement];
 
 // Generate session ID for tracking
-const sessionId = `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 15)}`;
+const sessionId = generateSessionId();
 
 // Get current page info for analytics
 const currentPath = Astro.url.pathname;
@@ -202,9 +202,10 @@ if (meaningfulRelationships.length === 0) {
   .contextual-links--highlighted {
     @apply rounded-xl border p-4;
     border-color: oklch(var(--color-accent, 0.5 0.15 250) / 0.2);
-    background: linear-gradient(to right, 
-      oklch(var(--color-accent, 0.5 0.15 250) / 0.1), 
-      oklch(var(--color-accent, 0.5 0.15 250) / 0.05), 
+    background: linear-gradient(
+      to right,
+      oklch(var(--color-accent, 0.5 0.15 250) / 0.1),
+      oklch(var(--color-accent, 0.5 0.15 250) / 0.05),
       transparent
     );
   }
@@ -319,7 +320,7 @@ if (meaningfulRelationships.length === 0) {
    */
 
   // Track contextual link clicks
-  document.addEventListener("click", async (event) => {
+  document.addEventListener("click", async event => {
     const target = event.target as HTMLElement;
     const link = target.closest(".internal-link") as HTMLAnchorElement;
     const contextualSection = target.closest(
@@ -348,20 +349,12 @@ if (meaningfulRelationships.length === 0) {
 
       // Dynamically import and track the click
       try {
-        const { trackLinkClick } = await import("@/utils/internal-linking-analytics");
+        const { trackLinkClick } = await import(
+          "@/utils/internal-linking-analytics"
+        );
         trackLinkClick(clickEvent);
       } catch (error) {
-        // Only log in development mode
-        if (import.meta.env.DEV) {
-          // eslint-disable-next-line no-console
-          console.warn("Failed to load analytics:", error);
-        }
-      }
-
-      // Log for development
-      if (import.meta.env.DEV) {
-        // eslint-disable-next-line no-console
-        console.log("Contextual link clicked:", clickEvent);
+        // Silently fail - analytics are non-critical
       }
     }
   });
@@ -375,7 +368,7 @@ if (meaningfulRelationships.length === 0) {
     if ("IntersectionObserver" in window) {
       const observer = new IntersectionObserver(
         entries => {
-          entries.forEach(async (entry) => {
+          entries.forEach(async entry => {
             if (entry.isIntersecting) {
               const section = entry.target as HTMLElement;
               const currentPost = section.dataset.currentPost || "unknown";
@@ -395,19 +388,12 @@ if (meaningfulRelationships.length === 0) {
 
               // Dynamically import and track the view
               try {
-                const { trackLinkClick } = await import("@/utils/internal-linking-analytics");
+                const { trackLinkClick } = await import(
+                  "@/utils/internal-linking-analytics"
+                );
                 trackLinkClick(viewEvent);
               } catch (error) {
-                // Only log in development mode
-                if (import.meta.env.DEV) {
-                  // eslint-disable-next-line no-console
-                  console.warn("Failed to load analytics:", error);
-                }
-              }
-
-              if (import.meta.env.DEV) {
-                // eslint-disable-next-line no-console
-                console.log("Contextual links section viewed:", viewEvent);
+                // Silently fail - analytics are non-critical
               }
 
               // Only track once per section

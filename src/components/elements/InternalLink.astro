@@ -19,7 +19,7 @@
  * ```
  */
 
-// Dynamic import for analytics used in client-side script
+import { generateSessionId } from "@/utils/internal-linking-analytics";
 
 export interface Props {
   /** Target URL or post slug */
@@ -63,7 +63,7 @@ const currentSlug = currentPath.split("/").pop() || "unknown";
 const targetSlug = finalHref.split("/").pop() || "unknown";
 
 // Generate session ID for tracking
-const sessionId = `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 15)}`;
+const sessionId = generateSessionId();
 
 // Generate tracking attributes for analytics
 const trackingAttributes = trackClick
@@ -196,14 +196,16 @@ const iconSymbol = icon && iconMap[icon] ? iconMap[icon] : null;
 
   .internal-link--highlight {
     @apply rounded-md px-2 py-1 font-medium no-underline;
-    background: linear-gradient(to right, 
-      oklch(var(--color-accent, 0.5 0.15 250) / 0.2), 
+    background: linear-gradient(
+      to right,
+      oklch(var(--color-accent, 0.5 0.15 250) / 0.2),
       oklch(var(--color-accent, 0.5 0.15 250) / 0.1)
     );
 
     &:hover {
-      background: linear-gradient(to right, 
-        oklch(var(--color-accent, 0.5 0.15 250) / 0.3), 
+      background: linear-gradient(
+        to right,
+        oklch(var(--color-accent, 0.5 0.15 250) / 0.3),
         oklch(var(--color-accent, 0.5 0.15 250) / 0.2)
       );
     }
@@ -343,40 +345,32 @@ const iconSymbol = icon && iconMap[icon] ? iconMap[icon] : null;
    */
 
   // Track internal link clicks for comprehensive analytics
-  document.addEventListener("click", async (event) => {
+  document.addEventListener("click", async event => {
     const target = event.target as HTMLElement;
     const link = target.closest(".internal-link") as HTMLAnchorElement;
 
     if (link && link.dataset.linkType) {
       const linkText = link.textContent?.trim() || "";
-      
+
       const clickEvent = {
-        linkType: link.dataset.linkType as 'internal',
-        sourcePost: link.dataset.sourcePost || 'unknown',
-        targetPost: link.dataset.targetPost || 'unknown',
+        linkType: link.dataset.linkType as "internal",
+        sourcePost: link.dataset.sourcePost || "unknown",
+        targetPost: link.dataset.targetPost || "unknown",
         linkText,
-        variant: link.dataset.variant || 'inline',
-        context: link.dataset.context || 'moderate',
+        variant: link.dataset.variant || "inline",
+        context: link.dataset.context || "moderate",
         timestamp: Date.now(),
         sessionId: link.dataset.sessionId,
       };
 
       // Dynamically import and use the analytics system
       try {
-        const { trackLinkClick } = await import("@/utils/internal-linking-analytics");
+        const { trackLinkClick } = await import(
+          "@/utils/internal-linking-analytics"
+        );
         trackLinkClick(clickEvent);
       } catch (error) {
-        // Only log in development mode
-        if (import.meta.env.DEV) {
-          // eslint-disable-next-line no-console
-          console.warn("Failed to load analytics:", error);
-        }
-      }
-
-      // Log for development
-      if (import.meta.env.DEV) {
-        // eslint-disable-next-line no-console
-        console.log("Internal link clicked:", clickEvent);
+        // Silently fail - analytics are non-critical
       }
     }
   });

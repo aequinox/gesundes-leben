@@ -1,17 +1,20 @@
 /**
  * View Transitions Performance Enhancements
- * 
+ *
  * This module provides a backward-compatible interface to the new modular
  * view transitions architecture. It re-exports the modular components
  * while maintaining the existing API for seamless migration.
- * 
+ *
  * @deprecated Use the modular architecture from @/utils/viewTransitions instead
  */
 
 // Re-export everything from the modular architecture
 // Backward compatibility: provide a default initialization
 // that uses the new modular architecture
-import { initViewTransitions, type ViewTransitionEnhancer } from "./viewTransitions";
+import {
+  initViewTransitions,
+  type ViewTransitionEnhancer,
+} from "./viewTransitions";
 
 // Auto-initialize with default config for backward compatibility
 if (typeof window !== "undefined") {
@@ -30,14 +33,7 @@ if (typeof window !== "undefined") {
         },
       });
     } catch (error) {
-      // Use logger for better error handling and development debugging
-      import("./logger").then(({ logger }) => {
-        logger.error("ViewTransitionEnhancer: Failed to initialize:", error);
-      }).catch(() => {
-        // Fallback if logger import fails
-        // eslint-disable-next-line no-console
-        console.error("ViewTransitionEnhancer: Failed to initialize:", error);
-      });
+      // Silently fail - view transitions are progressive enhancement
     }
   };
 

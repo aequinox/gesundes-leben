@@ -8,9 +8,9 @@
  */
 
 // import type { CollectionEntry } from "astro:content";
-import type { Match, Pattern } from "./linking/types";
-import { MatchingEngine } from "./linking/scoring";
 import { countBy, topN } from "./linking/helpers";
+import { MatchingEngine } from "./linking/scoring";
+import type { Match, Pattern } from "./linking/types";
 
 // Health and medical terms with their glossary IDs and variations
 export const GLOSSARY_TERMS: Record<
@@ -346,16 +346,16 @@ export function getGlossaryStats(content: string): {
   // Use countBy helper to count terms by category
   const termsByCategory = countBy(
     matches,
-    (match) => GLOSSARY_TERMS[match.glossaryId]?.category || "unknown"
+    match => GLOSSARY_TERMS[match.glossaryId]?.category || "unknown"
   );
 
   // Use countBy helper to count term occurrences
-  const termCounts = countBy(matches, (match) => match.term);
+  const termCounts = countBy(matches, match => match.term);
 
   // Use topN helper to get top 10 terms with their metadata
   const termsWithMetadata = Object.entries(termCounts).map(([term, count]) => {
-    const matchData = Object.values(GLOSSARY_TERMS).find((t) =>
-      t.variations.some((v) => v.toLowerCase() === term.toLowerCase())
+    const matchData = Object.values(GLOSSARY_TERMS).find(t =>
+      t.variations.some(v => v.toLowerCase() === term.toLowerCase())
     );
     return {
       term,
@@ -364,7 +364,7 @@ export function getGlossaryStats(content: string): {
     };
   });
 
-  const topTerms = topN(termsWithMetadata, 10, (item) => item.count);
+  const topTerms = topN(termsWithMetadata, 10, item => item.count);
 
   return {
     totalTerms: matches.length,

@@ -40,11 +40,21 @@ for (const [clusterName, cluster] of Object.entries(TOPIC_CLUSTERS)) {
 
 // Get cross-cluster relationships
 const crossClusterRelationships: Record<string, string[]> = {
-  'mentale-gesundheit': ['ernaehrung-nahrungsergaenzung', 'darm-mikrobiom'],
-  'ernaehrung-nahrungsergaenzung': ['immunsystem-gesundheit', 'vitamine-mineralstoffe', 'darm-mikrobiom'],
-  'immunsystem-gesundheit': ['ernaehrung-nahrungsergaenzung', 'vitamine-mineralstoffe'],
-  'darm-mikrobiom': ['ernaehrung-nahrungsergaenzung', 'mentale-gesundheit'],
-  'vitamine-mineralstoffe': ['ernaehrung-nahrungsergaenzung', 'immunsystem-gesundheit'],
+  "mentale-gesundheit": ["ernaehrung-nahrungsergaenzung", "darm-mikrobiom"],
+  "ernaehrung-nahrungsergaenzung": [
+    "immunsystem-gesundheit",
+    "vitamine-mineralstoffe",
+    "darm-mikrobiom",
+  ],
+  "immunsystem-gesundheit": [
+    "ernaehrung-nahrungsergaenzung",
+    "vitamine-mineralstoffe",
+  ],
+  "darm-mikrobiom": ["ernaehrung-nahrungsergaenzung", "mentale-gesundheit"],
+  "vitamine-mineralstoffe": [
+    "ernaehrung-nahrungsergaenzung",
+    "immunsystem-gesundheit",
+  ],
 };
 
 const relatedClusters = crossClusterRelationships[currentCluster] || [];
@@ -67,8 +77,14 @@ for (const clusterName of relatedClusters) {
 
   const cluster = TOPIC_CLUSTERS[clusterName];
   const clusterPosts = allPosts.filter(post => {
-    if (!post || !post.id || !currentPost || !currentPost.id || 
-        post.id === currentPost.id || post.data.draft) {
+    if (
+      !post ||
+      !post.id ||
+      !currentPost ||
+      !currentPost.id ||
+      post.id === currentPost.id ||
+      post.data.draft
+    ) {
       return false;
     }
 
@@ -106,7 +122,8 @@ const finalLinks = crossClusterPosts
   .slice(0, maxLinks);
 
 // Only show if we have good quality cross-cluster links
-const hasQualityLinks = finalLinks.length > 0 && finalLinks[0] && finalLinks[0].score > 0.3;
+const hasQualityLinks =
+  finalLinks.length > 0 && finalLinks[0] && finalLinks[0].score > 0.3;
 ---
 
 {

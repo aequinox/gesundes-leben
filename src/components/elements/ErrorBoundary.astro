@@ -17,7 +17,7 @@
  * @component
  * @since 1.0.0
  * @author Healthy Life Team
- * 
+ *
  * @example Basic usage
  * ```astro
  * <ErrorBoundary fallback="Something went wrong">
@@ -119,7 +119,7 @@ const {
   id,
   ariaLabel,
   "data-testid": dataTestId,
-  
+
   // Error boundary specific props
   fallback = "Something went wrong. Please try again.",
   showRetry = true,
@@ -141,12 +141,13 @@ const {
 const hasErrorSlot = Astro.slots.has("error");
 
 // Generate unique error ID for tracking and accessibility
-const errorId = id || `error-boundary-${Math.random().toString(36).substring(2, 11)}`;
+const errorId =
+  id || `error-boundary-${Math.random().toString(36).substring(2, 11)}`;
 
 // Severity-based styling mappings
 const severityClasses = {
   low: "border-warning/20 bg-warning/5",
-  medium: "border-error/20 bg-error/5", 
+  medium: "border-error/20 bg-error/5",
   high: "border-error/30 bg-error/10",
   critical: "border-error/50 bg-error/20 animate-pulse",
 };
@@ -154,7 +155,7 @@ const severityClasses = {
 // Variant-based color classes
 const variantClasses = {
   primary: "text-primary",
-  secondary: "text-secondary", 
+  secondary: "text-secondary",
   accent: "text-accent",
   muted: "text-muted",
   success: "text-success",
@@ -166,7 +167,7 @@ const variantClasses = {
 const errorContainerClasses = cn(
   "error-boundary",
   "flex",
-  "flex-col", 
+  "flex-col",
   "items-center",
   "justify-center",
   "p-6",
@@ -247,14 +248,14 @@ if (hasError && import.meta.env.DEV && autoReport) {
             </div>
           ) : (
             <Fragment>
-              <h3 
+              <h3
                 class="text-lg font-semibold text-foreground"
                 id={`${errorId}-title`}
               >
                 {componentName} Error
               </h3>
-              <p 
-                class="max-w-md text-sm text-muted-foreground"
+              <p
+                class="text-muted-foreground max-w-md text-sm"
                 id={`${errorId}-description`}
               >
                 {fallback}
@@ -264,20 +265,22 @@ if (hasError && import.meta.env.DEV && autoReport) {
 
           {/* Enhanced Development Error Details */}
           {showDetails && import.meta.env.DEV && (
-            <details class="mt-4 rounded border bg-background p-4 text-left max-w-lg">
-              <summary class="cursor-pointer text-sm font-medium focus:outline-none focus:ring-2 focus:ring-accent">
+            <details class="mt-4 max-w-lg rounded border bg-background p-4 text-left">
+              <summary class="cursor-pointer text-sm font-medium focus:ring-2 focus:ring-accent focus:outline-none">
                 🔍 Error Details (Development Only)
               </summary>
               <div class="mt-2 space-y-2">
-                <pre class="text-xs whitespace-pre-wrap text-muted-foreground bg-muted p-2 rounded overflow-x-auto">
-Component: {componentName}
-Error ID: {errorId}
-Severity: {severity}
-Strategy: {recoveryStrategy}
-URL: {Astro.url.pathname}
-Timestamp: {new Date().toISOString()}
-Max Retries: {maxRetries}
-{errorContext && Object.keys(errorContext).length > 0 && `
+                <pre class="text-muted-foreground overflow-x-auto rounded bg-muted p-2 text-xs whitespace-pre-wrap">
+                  Component: {componentName}
+                  Error ID: {errorId}
+                  Severity: {severity}
+                  Strategy: {recoveryStrategy}
+                  URL: {Astro.url.pathname}
+                  Timestamp: {new Date().toISOString()}
+                  Max Retries: {maxRetries}
+                  {errorContext &&
+                    Object.keys(errorContext).length > 0 &&
+                    `
 Context: ${JSON.stringify(errorContext, null, 2)}`}
                 </pre>
               </div>
@@ -285,11 +288,15 @@ Context: ${JSON.stringify(errorContext, null, 2)}`}
           )}
 
           {/* Enhanced Action Buttons */}
-          <div class="mt-6 flex flex-wrap justify-center gap-3" role="group" aria-label="Error recovery actions">
+          <div
+            class="mt-6 flex flex-wrap justify-center gap-3"
+            role="group"
+            aria-label="Error recovery actions"
+          >
             {showRetry && (
               <button
                 type="button"
-                class="retry-button rounded-lg bg-accent px-4 py-2 font-medium text-accent-foreground transition-all duration-200 hover:bg-accent/90 focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                class="retry-button text-accent-foreground rounded-lg bg-accent px-4 py-2 font-medium transition-all duration-200 hover:bg-accent/90 focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 data-retry-count="0"
                 aria-describedby={`${errorId}-retry-info`}
               >
@@ -300,15 +307,15 @@ Context: ${JSON.stringify(errorContext, null, 2)}`}
             <a
               href={redirectUrl}
               class="home-button rounded-lg border border-border bg-card px-4 py-2 font-medium text-foreground transition-all duration-200 hover:bg-muted focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:outline-none"
-              aria-label={`Return to ${redirectUrl === '/' ? 'homepage' : 'previous page'}`}
+              aria-label={`Return to ${redirectUrl === "/" ? "homepage" : "previous page"}`}
             >
-              🏠 {redirectUrl === '/' ? 'Go Home' : 'Go Back'}
+              🏠 {redirectUrl === "/" ? "Go Home" : "Go Back"}
             </a>
 
-            {severity === 'critical' && (
+            {severity === "critical" && (
               <button
                 type="button"
-                class="support-button rounded-lg border border-error bg-error/10 px-4 py-2 font-medium text-error transition-all duration-200 hover:bg-error/20 focus:ring-2 focus:ring-error focus:ring-offset-2 focus:outline-none"
+                class="support-button border-error bg-error/10 text-error hover:bg-error/20 focus:ring-error rounded-lg border px-4 py-2 font-medium transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:outline-none"
                 onclick="window.open('mailto:support@example.com?subject=Critical Error Report', '_blank')"
                 aria-label="Contact support for critical error"
               >
@@ -319,9 +326,9 @@ Context: ${JSON.stringify(errorContext, null, 2)}`}
 
           {/* Retry Information */}
           {showRetry && (
-            <p 
+            <p
               id={`${errorId}-retry-info`}
-              class="mt-2 text-xs text-muted-foreground"
+              class="text-muted-foreground mt-2 text-xs"
               aria-live="polite"
             >
               Maximum {maxRetries} retry attempts allowed
