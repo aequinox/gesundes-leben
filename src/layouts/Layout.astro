@@ -2,6 +2,7 @@
 import { ClientRouter } from "astro:transitions";
 
 import Breadcrumb from "@/components/Breadcrumb.astro";
+import BottomNav from "@/components/sections/BottomNav.astro";
 import Header from "@/components/sections/Header.astro";
 import { SEO } from "@/components/seo";
 import SizeIndicator from "@/components/SizeIndicator.astro";
@@ -92,6 +93,9 @@ const {
       <slot />
     </main>
     {import.meta.env.DEV && <SizeIndicator />}
+
+    {/* Mobile Bottom Navigation */}
+    <BottomNav activeNav={activeNav} />
 
     {/* Site Behaviour */}
     <!-- {import.meta.env.PROD && <SiteBehaviour />} -->

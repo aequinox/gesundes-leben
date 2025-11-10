@@ -109,8 +109,27 @@
       @apply max-h-[1000px] opacity-100;
     }
   }
+  /* Enhanced Link Affordance - WCAG AAA compliant with clear visual indicators */
   .prose a {
-    @apply break-words hover:!text-accent;
+    @apply break-words;
+    text-decoration: underline;
+    text-decoration-color: oklch(from var(--accent) l c h / 0.4);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 2px;
+    transition: all 200ms ease-out;
+  }
+
+  .prose a:hover {
+    @apply !text-accent;
+    text-decoration-color: var(--accent);
+  }
+
+  .prose a:focus-visible {
+    @apply outline-none;
+    box-shadow:
+      0 0 0 2px var(--background),
+      0 0 0 4px var(--accent);
+    border-radius: 2px;
   }
   .prose thead th:first-child,
   tbody td:first-child,

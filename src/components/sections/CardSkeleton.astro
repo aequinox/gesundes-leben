@@ -1,0 +1,193 @@
+---
+/**
+ * CardSkeleton Component
+ *
+ * A loading skeleton component that mimics the Card component structure
+ * for improved perceived performance during content loading.
+ * Implements shimmer animation for a modern loading experience.
+ *
+ * @component
+ * @example
+ * ```astro
+ * <!-- Normal size skeleton -->
+ * <CardSkeleton withHeroImage={true} />
+ *
+ * <!-- Small size skeleton -->
+ * <CardSkeleton size="small" withHeroImage={true} />
+ * ```
+ */
+
+export interface Props {
+  /** Card size variant - matches Card component */
+  size?: "normal" | "small";
+  /** Whether to show the hero image placeholder */
+  withHeroImage?: boolean;
+  /** Whether to show the meta data placeholder */
+  withMeta?: boolean;
+  /** Whether to show the description placeholder */
+  withDescription?: boolean;
+  /** Whether to show the categories placeholder */
+  withCategories?: boolean;
+  /** Number of category placeholders to show */
+  categoryCount?: number;
+}
+
+const {
+  size = "normal",
+  withHeroImage = true,
+  withMeta = true,
+  withDescription = true,
+  withCategories = true,
+  categoryCount = 2,
+} = Astro.props;
+
+// Determine if we're using the small variant
+const isSmall = size === "small";
+
+// Card classes - matches Card component structure
+const cardClasses = `relative isolate rounded-xs backdrop-blur-md bg-card/5 border border-accent/10 shadow-sm flex flex-col justify-between h-full overflow-hidden ${
+  isSmall ? "text-sm" : ""
+}`;
+
+// Animation classes for shimmer effect
+const shimmerClasses = "animate-pulse";
+---
+
+<article
+  class={cardClasses}
+  aria-busy="true"
+  aria-label="Loading content..."
+  role="status"
+>
+  <div class="relative flex h-full flex-col">
+    <div class="flex h-full flex-col">
+      {
+        withHeroImage && (
+          <div class="card-image-container relative overflow-hidden">
+            <div
+              class={`${shimmerClasses} w-full bg-muted/20 ${
+                isSmall ? "aspect-4/3" : "aspect-video"
+              }`}
+            >
+              {/* Shimmer effect overlay */}
+              <div class="shimmer-overlay absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            </div>
+
+            {/* Badge placeholder */}
+            <div
+              class={`absolute z-30 rounded-full bg-muted/30 backdrop-blur-md ${shimmerClasses} ${
+                isSmall
+                  ? "right-2 bottom-2 h-8 w-8"
+                  : "right-3 bottom-3 h-10 w-10"
+              }`}
+            />
+          </div>
+        )
+      }
+
+      <div class={`flex flex-grow flex-col ${isSmall ? "p-4" : "p-6"}`}>
+        <div
+          class={`flex flex-col flex-grow ${isSmall ? "space-y-1" : "space-y-2"}`}
+        >
+          {
+            withCategories && (
+              <div class={`flex flex-wrap ${isSmall ? "gap-1" : "gap-1.5"}`}>
+                {Array.from({ length: categoryCount }).map((_, i) => (
+                  <div
+                    class={`${shimmerClasses} h-5 rounded-full bg-muted/20 ${
+                      i === 0 ? "w-16" : "w-20"
+                    }`}
+                  />
+                ))}
+              </div>
+            )
+          }
+
+          {/* Title placeholder */}
+          <div class="space-y-2">
+            <div
+              class={`${shimmerClasses} h-${isSmall ? "5" : "6"} rounded bg-muted/20 w-full`}
+            />
+            <div
+              class={`${shimmerClasses} h-${isSmall ? "5" : "6"} rounded bg-muted/20 w-3/4`}
+            />
+          </div>
+
+          {
+            withDescription && (
+              <div class="space-y-1.5 mt-2">
+                <div class={`${shimmerClasses} h-4 rounded bg-muted/20 w-full`} />
+                <div
+                  class={`${shimmerClasses} h-4 rounded bg-muted/20 w-5/6`}
+                />
+                <div
+                  class={`${shimmerClasses} h-4 rounded bg-muted/20 w-4/6`}
+                />
+              </div>
+            )
+          }
+        </div>
+
+        {
+          withMeta && (
+            <div class={`flex items-center gap-3 mt-${isSmall ? "2" : "4"}`}>
+              {/* Author avatar placeholder */}
+              <div
+                class={`${shimmerClasses} rounded-full bg-muted/20 ${
+                  isSmall ? "h-6 w-6" : "h-8 w-8"
+                }`}
+              />
+
+              {/* Meta info placeholders */}
+              <div class="flex flex-col space-y-1 flex-1">
+                <div class={`${shimmerClasses} h-3 rounded bg-muted/20 w-24`} />
+                <div class={`${shimmerClasses} h-3 rounded bg-muted/20 w-32`} />
+              </div>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</article>
+
+<style>
+  /* Shimmer animation for loading effect */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .shimmer-overlay {
+    animation: shimmer 2s infinite;
+  }
+
+  /* Ensure smooth animation performance */
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Respect reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-pulse {
+      animation: none;
+    }
+    .shimmer-overlay {
+      animation: none;
+    }
+  }
+</style>

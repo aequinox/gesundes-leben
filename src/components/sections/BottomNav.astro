@@ -1,0 +1,155 @@
+---
+/**
+ * BottomNav Component
+ *
+ * Mobile-optimized bottom navigation bar for improved mobile engagement.
+ * Implements modern iOS/Android patterns with safe-area support.
+ *
+ * Features:
+ * - Fixed bottom positioning (only visible on mobile)
+ * - 5-item grid layout with optimal touch targets (56px min height)
+ * - Backdrop blur for modern aesthetic
+ * - Active state with visual feedback
+ * - Safe-area-bottom for notched devices
+ * - Smooth animations with reduced-motion support
+ *
+ * @component
+ * @example
+ * ```astro
+ * <BottomNav activeNav="posts" />
+ * ```
+ */
+
+import { Icon } from "astro-icon/components";
+import type { NavigationLink } from "@/components/types";
+import { SITE } from "@/config";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+interface Props {
+  activeNav?: NavigationLink;
+}
+
+const { activeNav }: Props = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Icon mapping for navigation items
+const iconMap: Record<string, string> = {
+  posts: "tabler:article",
+  glossary: "tabler:book",
+  tags: "tabler:tags",
+  "our-vision": "tabler:eye",
+  about: "tabler:info-circle",
+  search: "tabler:search",
+  archives: "tabler:archive",
+};
+
+// Mobile navigation items - top 5 priority items
+const mobileNavItems = [
+  { href: "/", key: "home", label: t("nav.home"), icon: "tabler:home" },
+  { href: "/posts/", key: "posts", label: t("nav.posts"), icon: iconMap.posts },
+  {
+    href: "/glossary/",
+    key: "glossary",
+    label: t("nav.glossary"),
+    icon: iconMap.glossary,
+  },
+  { href: "/tags/", key: "tags", label: t("nav.tags"), icon: iconMap.tags },
+  SITE.showSearch
+    ? { href: "/search/", key: "search", label: t("nav.search"), icon: iconMap.search }
+    : { href: "/about/", key: "about", label: t("nav.about"), icon: iconMap.about },
+].slice(0, 5); // Ensure exactly 5 items
+
+// Check if current page matches nav item
+const isActive = (key: string) => {
+  if (!activeNav) return false;
+  return activeNav === key;
+};
+---
+
+<nav
+  class="md:hidden fixed bottom-0 inset-x-0 z-50 bg-card/90 backdrop-blur-lg border-t border-border safe-area-pb"
+  aria-label="Mobile navigation"
+  role="navigation"
+>
+  <div class="grid grid-cols-5 gap-1">
+    {
+      mobileNavItems.map((item) => {
+        const active = isActive(item.key);
+        return (
+          <a
+            href={item.href}
+            class={`flex flex-col items-center justify-center py-2 min-h-[56px] transition-all duration-200 ease-out active:scale-95 ${
+              active
+                ? "text-accent"
+                : "text-muted hover:text-accent"
+            }`}
+            aria-label={item.label}
+            aria-current={active ? "page" : undefined}
+          >
+            {/* Icon */}
+            <Icon
+              name={item.icon}
+              class={`h-6 w-6 transition-transform duration-200 ${
+                active ? "scale-110" : ""
+              }`}
+              aria-hidden="true"
+            />
+
+            {/* Label */}
+            <span
+              class={`text-xs mt-1 font-medium transition-all duration-200 ${
+                active ? "opacity-100" : "opacity-75"
+              }`}
+            >
+              {item.label}
+            </span>
+
+            {/* Active indicator */}
+            {active && (
+              <div
+                class="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-accent rounded-t-full"
+                aria-hidden="true"
+              />
+            )}
+          </a>
+        );
+      })
+    }
+  </div>
+</nav>
+
+<style>
+  /* Safe area bottom padding for notched devices */
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Ensure smooth touch feedback */
+  @media (hover: none) and (pointer: coarse) {
+    nav a:active {
+      transform: scale(0.95);
+      transition-duration: 100ms;
+    }
+  }
+
+  /* Respect reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    nav a,
+    nav a > * {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+
+  /* Prevent content from being hidden behind bottom nav */
+  :global(body) {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom));
+  }
+
+  @media (min-width: 768px) {
+    :global(body) {
+      padding-bottom: 0;
+    }
+  }
+</style>
