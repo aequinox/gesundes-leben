@@ -99,5 +99,76 @@ const {
 
     {/* Site Behaviour */}
     <!-- {import.meta.env.PROD && <SiteBehaviour />} -->
+
+    {/* Swipe Gestures for Article Navigation */}
+    <script>
+      class SwipeNavigationController {
+        private touchStartX: number = 0;
+        private touchEndX: number = 0;
+        private touchStartY: number = 0;
+        private touchEndY: number = 0;
+        private readonly SWIPE_THRESHOLD: number = 100;
+        private readonly VERTICAL_THRESHOLD: number = 50;
+
+        constructor() {
+          this.init();
+        }
+
+        private init(): void {
+          document.addEventListener('touchstart', this.handleTouchStart.bind(this), {
+            passive: true,
+          });
+          document.addEventListener('touchend', this.handleTouchEnd.bind(this), {
+            passive: true,
+          });
+        }
+
+        private handleTouchStart(event: TouchEvent): void {
+          this.touchStartX = event.changedTouches[0].screenX;
+          this.touchStartY = event.changedTouches[0].screenY;
+        }
+
+        private handleTouchEnd(event: TouchEvent): void {
+          this.touchEndX = event.changedTouches[0].screenX;
+          this.touchEndY = event.changedTouches[0].screenY;
+          this.handleSwipe();
+        }
+
+        private handleSwipe(): void {
+          const horizontalDiff = this.touchEndX - this.touchStartX;
+          const verticalDiff = Math.abs(this.touchEndY - this.touchStartY);
+
+          // Ignore if vertical swipe is too large (scrolling)
+          if (verticalDiff > this.VERTICAL_THRESHOLD) {
+            return;
+          }
+
+          // Swipe left - next article
+          if (horizontalDiff < -this.SWIPE_THRESHOLD) {
+            const nextLink = document.querySelector<HTMLAnchorElement>(
+              'a[rel="next"]'
+            );
+            if (nextLink) {
+              nextLink.click();
+            }
+          }
+
+          // Swipe right - previous article
+          if (horizontalDiff > this.SWIPE_THRESHOLD) {
+            const prevLink = document.querySelector<HTMLAnchorElement>(
+              'a[rel="prev"]'
+            );
+            if (prevLink) {
+              prevLink.click();
+            }
+          }
+        }
+      }
+
+      // Initialize on page load
+      document.addEventListener('astro:page-load', () => {
+        new SwipeNavigationController();
+      });
+    </script>
   </body>
 </html>

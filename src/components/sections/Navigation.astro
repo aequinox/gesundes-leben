@@ -142,14 +142,15 @@ const ACTIONS = actionItems;
             id={id}
             href={href}
             class:list={[
-              "items-center justify-center rounded-full text-foreground transition-colors hover:text-accent",
+              "inline-flex items-center justify-center gap-2 rounded-full px-3 py-1.5 text-foreground transition-all hover:text-accent",
+              "bg-surface2 hover:bg-surface3",
               { "bg-surface3 text-accent": activeNav === id },
             ]}
             aria-label={label}
             title={label}
           >
             <svg-icon name={icon} class="h-4 w-4" />
-            <span class="sr-only">{label}</span>
+            <span class="hidden text-sm font-medium md:inline">{label}</span>
           </a>
         ))
       }

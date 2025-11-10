@@ -1,0 +1,263 @@
+---
+/**
+ * MegaMenu Component
+ *
+ * Displays a dropdown mega menu for health categories with icons and descriptions.
+ * Implements WCAG AAA accessibility standards with keyboard navigation support.
+ *
+ * @component
+ * @example
+ * <MegaMenu isOpen={true} />
+ */
+
+import Icon from "@/components/elements/Icon.astro";
+
+export interface Props {
+  isOpen?: boolean;
+}
+
+const { isOpen = false } = Astro.props;
+
+// Health categories with metadata
+const categories = [
+  {
+    name: "Ernährung",
+    slug: "ernährung",
+    icon: "tabler:salad",
+    description: "Gesunde Rezepte & Ernährungstipps",
+    color: "health-nutrition",
+  },
+  {
+    name: "Immunsystem",
+    slug: "immunsystem",
+    icon: "tabler:shield-check",
+    description: "Immunabwehr stärken",
+    color: "health-medical",
+  },
+  {
+    name: "Lifestyle & Psyche",
+    slug: "lifestyle-psyche",
+    icon: "tabler:brain",
+    description: "Mentale Gesundheit & Wohlbefinden",
+    color: "health-mental",
+  },
+  {
+    name: "Mikronährstoffe",
+    slug: "mikronährstoffe",
+    icon: "tabler:vitamins",
+    description: "Vitamine & Mineralstoffe",
+    color: "health-nutrition",
+  },
+  {
+    name: "Organsysteme",
+    slug: "organsysteme",
+    icon: "tabler:heart",
+    description: "Körpersysteme verstehen",
+    color: "health-medical",
+  },
+  {
+    name: "Wissenschaftliches",
+    slug: "wissenschaftliches",
+    icon: "tabler:microscope",
+    description: "Forschung & Studien",
+    color: "health-medical",
+  },
+  {
+    name: "Wissenswertes",
+    slug: "wissenswertes",
+    icon: "tabler:bulb",
+    description: "Gesundheitswissen kompakt",
+    color: "health-lifestyle",
+  },
+  {
+    name: "Lesenswertes",
+    slug: "lesenswertes",
+    icon: "tabler:book-2",
+    description: "Empfehlungen & Artikel",
+    color: "health-lifestyle",
+  },
+];
+---
+
+<div
+  id="mega-menu"
+  class={`mega-menu absolute left-0 right-0 top-full border-b border-border bg-card/95 shadow-elevation-high backdrop-blur-lg transition-all duration-300 ${
+    isOpen ? "opacity-100 visible" : "opacity-0 invisible"
+  }`}
+  role="menu"
+  aria-label="Gesundheitskategorien"
+>
+  <div class="container mx-auto px-4 py-8">
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {
+        categories.map((category) => (
+          <a
+            href={`/categories/${category.slug}`}
+            class="mega-menu-item group flex items-start gap-3 rounded-lg p-4 transition-all duration-200 hover:bg-surface1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+            role="menuitem"
+          >
+            <div
+              class={`flex-shrink-0 rounded-full p-3 transition-all duration-200 group-hover:scale-110 bg-${category.color}/10`}
+            >
+              <Icon
+                name={category.icon}
+                class={`h-6 w-6 text-${category.color}`}
+                aria-hidden="true"
+              />
+            </div>
+            <div class="flex-1">
+              <h3 class="font-semibold text-foreground transition-colors duration-200 group-hover:text-accent">
+                {category.name}
+              </h3>
+              <p class="mt-1 text-sm text-muted">{category.description}</p>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+
+    <!-- View All Categories Link -->
+    <div class="mt-6 border-t border-border pt-6 text-center">
+      <a
+        href="/categories"
+        class="inline-flex items-center gap-2 font-semibold text-accent transition-colors duration-200 hover:text-accent/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+        role="menuitem"
+      >
+        <span>Alle Kategorien ansehen</span>
+        <Icon name="tabler:arrow-right" class="h-4 w-4" aria-hidden="true" />
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .mega-menu {
+    z-index: 40;
+  }
+
+  /* Smooth appearance animation */
+  .mega-menu.visible {
+    animation: slideDown 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Enhanced hover states */
+  .mega-menu-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Keyboard navigation highlight */
+  .mega-menu-item:focus-visible {
+    background: var(--surface1);
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .mega-menu,
+    .mega-menu-item,
+    .mega-menu-item > div {
+      animation: none !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+
+<script>
+  // Keyboard navigation for mega menu
+  class MegaMenuController {
+    private menuItems: NodeListOf<HTMLAnchorElement>;
+    private currentIndex: number = 0;
+
+    constructor() {
+      this.menuItems = document.querySelectorAll(
+        '.mega-menu-item'
+      ) as NodeListOf<HTMLAnchorElement>;
+      this.init();
+    }
+
+    private init(): void {
+      // Handle keyboard navigation
+      document.addEventListener('keydown', this.handleKeyDown.bind(this));
+    }
+
+    private handleKeyDown(event: KeyboardEvent): void {
+      const megaMenu = document.getElementById('mega-menu');
+      if (!megaMenu || !megaMenu.classList.contains('visible')) return;
+
+      switch (event.key) {
+        case 'ArrowDown':
+          event.preventDefault();
+          this.focusNext();
+          break;
+        case 'ArrowUp':
+          event.preventDefault();
+          this.focusPrevious();
+          break;
+        case 'ArrowRight':
+          event.preventDefault();
+          this.focusNext();
+          break;
+        case 'ArrowLeft':
+          event.preventDefault();
+          this.focusPrevious();
+          break;
+        case 'Home':
+          event.preventDefault();
+          this.focusFirst();
+          break;
+        case 'End':
+          event.preventDefault();
+          this.focusLast();
+          break;
+        case 'Escape':
+          event.preventDefault();
+          this.close();
+          break;
+      }
+    }
+
+    private focusNext(): void {
+      this.currentIndex = (this.currentIndex + 1) % this.menuItems.length;
+      this.menuItems[this.currentIndex].focus();
+    }
+
+    private focusPrevious(): void {
+      this.currentIndex =
+        (this.currentIndex - 1 + this.menuItems.length) % this.menuItems.length;
+      this.menuItems[this.currentIndex].focus();
+    }
+
+    private focusFirst(): void {
+      this.currentIndex = 0;
+      this.menuItems[this.currentIndex].focus();
+    }
+
+    private focusLast(): void {
+      this.currentIndex = this.menuItems.length - 1;
+      this.menuItems[this.currentIndex].focus();
+    }
+
+    private close(): void {
+      const megaMenu = document.getElementById('mega-menu');
+      if (megaMenu) {
+        megaMenu.classList.remove('visible');
+        megaMenu.classList.add('invisible', 'opacity-0');
+      }
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener('astro:page-load', () => {
+    new MegaMenuController();
+  });
+</script>
