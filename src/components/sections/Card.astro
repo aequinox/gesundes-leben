@@ -132,10 +132,11 @@ const groupConfigs: Record<string, GroupConfig> = {
 const groupConfig =
   groupConfigs[groupProp || "fragezeiten"] || groupConfigs["fragezeiten"];
 
-// Card classes based on size
-const cardClasses = `hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-lg hover:bg-linear-to-br from-card/50 to-card relative isolate transform-gpu backface-hidden preserve-3d perspective-1000 rounded-xs backdrop-blur-md bg-card/5 transition-all duration-300 ease-out border border-accent/10 shadow-sm flex flex-col justify-between h-full overflow-hidden ${
+// Card classes based on size - Refined animations for premium feel
+const cardClasses = `hover:-translate-y-1 hover:border-accent/20 hover:shadow-elevation-medium hover:bg-linear-to-br from-card/50 to-card relative isolate transform-gpu backface-hidden preserve-3d perspective-1000 rounded-xs backdrop-blur-md bg-card/5 border border-accent/10 shadow-sm flex flex-col justify-between h-full overflow-hidden ${
   isSmall ? "text-sm" : ""
 }`;
+// Note: transition timing is defined in the style section for better control
 
 // Title classes based on size
 const titleClasses = `text-foreground font-medium tracking-tight leading-tight font-feature-salt ${
@@ -308,13 +309,20 @@ const readMoreClasses = `mr-2 mt-${
 
 <style>
   @reference "@/styles/global.css";
-  /* Hover effects and animations */
+
+  /* Base card transitions - Smooth bounce easing for premium feel */
+  article {
+    transition: all 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Hover effects and animations - Refined for subtle, premium interactions */
   article:hover {
-    @apply -translate-y-0.5 border-accent/30 bg-linear-to-br from-card/50 to-card shadow-lg;
+    @apply -translate-y-1 border-accent/20 shadow-elevation-medium;
   }
 
   .card-image-container:hover .card-image {
-    @apply scale-105 brightness-105 contrast-[1.02];
+    @apply scale-[1.03] brightness-[1.02] contrast-[1.02];
+    transition: transform 600ms cubic-bezier(0.19, 1, 0.22, 1);
   }
 
   .card-image-container:hover .card-image-overlay {
@@ -418,7 +426,22 @@ const readMoreClasses = `mr-2 mt-${
       0 0 15px 2px oklch(var(--color-accent) / 0.2);
   }
 
-  /* Reduced motion */
+  /* Touch device optimization - Disable hover animations, use tap feedback */
+  @media (hover: none) and (pointer: coarse) {
+    /* Disable hover animations on touch devices */
+    article:hover,
+    .card-image-container:hover .card-image {
+      transform: none !important;
+    }
+
+    /* Use tap feedback instead */
+    article:active {
+      @apply scale-[0.98] shadow-elevation-low;
+      transition: all 100ms ease-out;
+    }
+  }
+
+  /* Reduced motion accessibility */
   @media (prefers-reduced-motion: reduce) {
     article,
     article:hover,
