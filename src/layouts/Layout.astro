@@ -82,9 +82,13 @@ const {
     </script>
   </head>
   <body data-pagefind-body class="px-2 lg:px-12" data-astro-prefetch>
+    <!-- Skip Navigation Link for Accessibility (WCAG AAA) -->
+    <a href="#main-content" class="skip-link">
+      Zum Hauptinhalt springen
+    </a>
     <Header activeNav={activeNav} />
     {Astro.url.pathname !== "/" && <Breadcrumb />}
-    <main transition:animate="slide" transition:name="main-content">
+    <main id="main-content" transition:animate="slide" transition:name="main-content">
       <slot />
     </main>
     {import.meta.env.DEV && <SizeIndicator />}
