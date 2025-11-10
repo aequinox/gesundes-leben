@@ -220,9 +220,27 @@ html[data-theme="dark"] .invert {
     color: var(--foreground);
     text-shadow: none;
   }
-  a,
-  button {
-    @apply outline-offset-1 outline-accent focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-dashed;
+  /* Modern Focus Indicators - WCAG AAA compliant with triple-layer ring */
+  *:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 3px var(--background),
+      0 0 0 5px var(--accent),
+      0 0 20px 2px oklch(from var(--accent) l c h / 0.3);
+    border-radius: 4px;
+    transition: box-shadow 200ms ease-out;
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    @apply no-underline;
+  }
+
+  /* Reduce motion for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    *:focus-visible {
+      transition-duration: 0.01ms;
+    }
   }
   button:not(:disabled),
   [role="button"]:not(:disabled) {
