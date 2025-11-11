@@ -1,5 +1,7 @@
 # Component Quick Reference Card
 
+> **📖 Full Documentation**: For detailed explanations and best practices, see [Component Style Guide](./component-style-guide.md)
+
 ## Import Template
 ```astro
 import Image from "@/components/elements/Image.astro";

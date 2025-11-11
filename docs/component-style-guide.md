@@ -2,6 +2,8 @@
 
 This guide provides best practices for using enhanced components in the Healthy Life blog. All components are designed to improve user experience, accessibility, and SEO performance.
 
+> **📋 Quick Reference**: For a condensed cheat sheet, see [Component Quick Reference](./component-quick-reference.md)
+
 ## Available Components
 
 ### 1. List Component (`@/components/elements/List.astro`)
