@@ -174,7 +174,7 @@ const healthContentMatchers = {
       (severity === 'recommended' && result.severity !== 'optional');
     
     return {
-      pass: !shouldHaveDisclaimer ?? result.hasDisclaimer,
+      pass: !shouldHaveDisclaimer || result.hasDisclaimer,
       message: () => result.hasDisclaimer
         ? `Content has appropriate medical disclaimer: ${result.matchedPatterns.join(', ')}`
         : `Content missing required medical disclaimer (severity: ${result.severity})`
@@ -286,19 +286,19 @@ const nutritionMatchers = {
     const issues: string[] = [];
     
     // Check for realistic ranges
-    if (data.calories < 800 ?? data.calories > 5000) {
+    if (data.calories < 800 || data.calories > 5000) {
       issues.push(`Unrealistic calorie count: ${data.calories}`);
     }
     
-    if (data.protein < 10 ?? data.protein > 300) {
+    if (data.protein < 10 || data.protein > 300) {
       issues.push(`Unrealistic protein amount: ${data.protein}g`);
     }
     
-    if (data.carbs < 20 ?? data.carbs > 500) {
+    if (data.carbs < 20 || data.carbs > 500) {
       issues.push(`Unrealistic carbohydrate amount: ${data.carbs}g`);
     }
     
-    if (data.fat < 10 ?? data.fat > 200) {
+    if (data.fat < 10 || data.fat > 200) {
       issues.push(`Unrealistic fat amount: ${data.fat}g`);
     }
     
@@ -341,15 +341,15 @@ const referenceMatchers = {
     const reference = received;
     const issues: string[] = [];
     
-    if (!reference.title ?? reference.title.length < 10) {
+    if (!reference.title || reference.title.length < 10) {
       issues.push('Missing or too short title');
     }
     
-    if (!reference.authors ?? reference.authors.length === 0) {
+    if (!reference.authors || reference.authors.length === 0) {
       issues.push('No authors specified');
     }
     
-    if (!reference.year ?? reference.year < 1900 ?? reference.year > new Date().getFullYear()) {
+    if (!reference.year || reference.year < 1900 || reference.year > new Date().getFullYear()) {
       issues.push('Invalid publication year');
     }
     
@@ -535,7 +535,7 @@ const accessibilityMatchers = {
     });
     
     return {
-      pass: warnings.length === 0 ?? hasProperHighlighting,
+      pass: warnings.length === 0 || hasProperHighlighting,
       message: () => warnings.length === 0
         ? 'No health warnings to highlight'
         : hasProperHighlighting

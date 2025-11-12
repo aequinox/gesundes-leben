@@ -11,13 +11,8 @@ import {
   updateCategorySelectionUI,
   updateGroupSelectionUI,
 } from "./FilterDOMUpdates";
-import {
-  getOptions,
-  getState,
-  updateState,
-  type Elements,
-  type GroupType,
-} from "./FilterState";
+import type { Elements, GroupType } from "./FilterState";
+import { getOptions, getState, updateState } from "./FilterState";
 import { applyFilters } from "./FilterVisibility";
 
 /**

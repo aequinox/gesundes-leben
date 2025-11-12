@@ -76,8 +76,8 @@ test.describe('Keyboard Navigation', () => {
       // Should be on a different element
       const backwardElementId = await backwardElement.getAttribute('id');
       const backwardElementClass = await backwardElement.getAttribute('class');
-      
-      expect(forwardElementId !== backwardElementId ?? forwardElementClass !== backwardElementClass).toBeTruthy();
+
+      expect(forwardElementId !== backwardElementId || forwardElementClass !== backwardElementClass).toBeTruthy();
     });
 
     test('should have visible focus indicators', async ({ page }) => {
@@ -386,10 +386,10 @@ test.describe('Keyboard Navigation', () => {
           
           // Main content should be focused
           const mainContent = page.locator('#main, main, #content');
-          
+
           if (await mainContent.count() > 0) {
-            const mainIsFocused = await mainContent.evaluate(el => 
-              el === document.activeElement ?? el.hasAttribute('tabindex')
+            const mainIsFocused = await mainContent.evaluate(el =>
+              el === document.activeElement || el.hasAttribute('tabindex')
             );
             
             expect(mainIsFocused).toBeTruthy();

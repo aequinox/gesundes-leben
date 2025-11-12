@@ -14,13 +14,8 @@ import {
   updateGroupSelectionUI,
 } from "./FilterDOMUpdates";
 import { attachEventListeners } from "./FilterEventHandlers";
-import {
-  getOptions,
-  initializeOptions,
-  updateState,
-  type Elements,
-  type FilterOptions,
-} from "./FilterState";
+import type { Elements, FilterOptions } from "./FilterState";
+import { getOptions, initializeOptions, updateState } from "./FilterState";
 import { applyFilters, prepareArticlesForFiltering } from "./FilterVisibility";
 
 // Module-level elements storage

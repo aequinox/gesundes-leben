@@ -80,7 +80,7 @@ export function formatDate(
   try {
     const dateObj = date instanceof Date ? date : new Date(date);
     return dateObj.toISOString();
-  } catch (_error) {
+  } catch {
     logger.warn(`SchemaBuilder: Invalid date format: ${date}`);
     return undefined;
   }
@@ -132,7 +132,7 @@ export function resolveUrl(
 
     // Resolve relative URLs
     return new URL(path, baseUrl).href;
-  } catch (_error) {
+  } catch {
     logger.warn(`SchemaBuilder: Invalid URL: ${path}, using fallback`);
     return new URL(fallback, baseUrl).href;
   }
