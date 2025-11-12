@@ -48,7 +48,6 @@ export default defineConfig({
     pagefind(),
     mdx(),
     icon({
-      // Disable local icons to avoid loading errors
       svgoOptions: {
         multipass: true,
       },

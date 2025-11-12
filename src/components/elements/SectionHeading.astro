@@ -92,7 +92,7 @@ const HeadingTag = `h${level}` as keyof astroHTML.JSX.IntrinsicElements;
 
 <div class={containerClasses}>
   {
-    icon && (
+    icon && icon.trim() !== "" && (
       <Icon
         name={icon}
         class={`text-accent ${iconSizeClasses[iconSize]}`}

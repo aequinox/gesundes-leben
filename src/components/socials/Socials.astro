@@ -14,7 +14,7 @@ const { centered = false } = Astro.props;
 
 <div class:list={["flex-wrap justify-center gap-1", { flex: centered }]}>
   {
-    SOCIALS.map(social => (
+    SOCIALS.filter(social => social.icon && social.icon.trim() !== "").map(social => (
       <LinkButton
         href={social.href}
         class="p-2 hover:rotate-6 sm:p-1"

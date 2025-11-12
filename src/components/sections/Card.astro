@@ -191,25 +191,27 @@ const readMoreClasses = `group mr-2 mt-${
               />
             </a>
 
-            <div
-              class={`card-badge absolute z-30 rounded-full border border-white/15 bg-white text-white shadow-lg backdrop-blur-md transition-all duration-300 ${
-                groupConfig?.gradient
-              } ${
-                isSmall
-                  ? "right-2 bottom-2 px-2 py-1"
-                  : "right-3 bottom-3 px-2.5 py-2.5"
-              }`}
-              style="backdrop-filter: blur(12px) saturate(180%);"
-              aria-label={groupConfig?.label}
-            >
-              <Icon
-                name={groupConfig?.icon}
-                class={`card-badge-icon transition-transform duration-300 ${
-                  isSmall ? "h-4 w-4" : "h-5 w-5"
+            {groupConfig?.icon && groupConfig.icon.trim() !== "" && (
+              <div
+                class={`card-badge absolute z-30 rounded-full border border-white/15 bg-white text-white shadow-lg backdrop-blur-md transition-all duration-300 ${
+                  groupConfig?.gradient
+                } ${
+                  isSmall
+                    ? "right-2 bottom-2 px-2 py-1"
+                    : "right-3 bottom-3 px-2.5 py-2.5"
                 }`}
-                aria-hidden="true"
-              />
-            </div>
+                style="backdrop-filter: blur(12px) saturate(180%);"
+                aria-label={groupConfig?.label}
+              >
+                <Icon
+                  name={groupConfig.icon}
+                  class={`card-badge-icon transition-transform duration-300 ${
+                    isSmall ? "h-4 w-4" : "h-5 w-5"
+                  }`}
+                  aria-hidden="true"
+                />
+              </div>
+            )}
           </div>
         )
       }

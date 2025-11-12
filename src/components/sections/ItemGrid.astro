@@ -103,7 +103,7 @@ const gridId = `item-grid-${Math.random().toString(36).substring(2, 9)}`;
             data-aos-delay={index * 100}
           >
             <div class="flex justify-center">
-              {(icon || defaultIcon) && (
+              {(icon || defaultIcon) && (icon || defaultIcon).trim() !== "" && (
                 <Icon
                   name={icon || defaultIcon}
                   class={`${iconClasses} ${itemClasses?.icon || ""}`}
