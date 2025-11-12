@@ -43,7 +43,7 @@ test.describe('Categories Page', () => {
       const hasCategoryList = await categoriesPage.categoriesList.count() > 0;
       const hasCategoryCards = await categoriesPage.categoryCards.count() > 0;
       
-      expect(hasCategoryList || hasCategoryCards).toBeTruthy();
+      expect(hasCategoryList ?? hasCategoryCards).toBeTruthy();
       
       if (hasCategoryCards) {
         expect(await categoriesPage.categoryCards.count()).toBeGreaterThan(0);

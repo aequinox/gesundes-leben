@@ -123,7 +123,7 @@ test.describe('Search Interactions', () => {
       const hasNoResults = await searchPage.noResults.count() > 0;
       
       // Either results or no-results message should appear
-      expect(hasResults || hasNoResults).toBeTruthy();
+      expect(hasResults ?? hasNoResults).toBeTruthy();
     });
   });
 
@@ -246,7 +246,7 @@ test.describe('Search Interactions', () => {
         const hasNoResults = await searchPage.noResults.count() > 0;
         
         // Should get some response (results or no results message)
-        expect(hasResults || hasNoResults).toBeTruthy();
+        expect(hasResults ?? hasNoResults).toBeTruthy();
         
         if (hasResults) {
           // Results should be relevant to health content
@@ -351,7 +351,7 @@ test.describe('Search Interactions', () => {
         // Should get some response
         const hasResults = await searchPage.searchResults.count() > 0;
         const hasNoResults = await searchPage.noResults.count() > 0;
-        expect(hasResults || hasNoResults).toBeTruthy();
+        expect(hasResults ?? hasNoResults).toBeTruthy();
       }
     });
   });
@@ -449,7 +449,7 @@ test.describe('Search Interactions', () => {
       await page.waitForFunction(() => {
         const results = document.querySelector('#pagefind-results, .search-results');
         const noResults = document.querySelector('.no-results, .pagefind-zero-results');
-        return (results?.children?.length ?? 0) > 0 || noResults !== null;
+        return (results?.children?.length ?? 0) > 0 ?? noResults !== null;
       }, { timeout: 5000 });
       
       const searchTime = Date.now() - startTime;

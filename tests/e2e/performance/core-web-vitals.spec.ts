@@ -74,7 +74,7 @@ test.describe('Core Web Vitals Performance', () => {
                 tagName: lastEntry.element.tagName,
                 id: lastEntry.element.id,
                 className: lastEntry.element.className,
-                src: lastEntry.element.src || null
+                src: lastEntry.element.src ?? null
               });
             } else {
               resolve(null);
@@ -433,8 +433,8 @@ test.describe('Core Web Vitals Performance', () => {
         return {
           domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
           loadComplete: navigation.loadEventEnd - navigation.loadEventStart,
-          firstPaint: paint.find(entry => entry.name === 'first-paint')?.startTime || 0,
-          firstContentfulPaint: paint.find(entry => entry.name === 'first-contentful-paint')?.startTime || 0,
+          firstPaint: paint.find(entry => entry.name === 'first-paint')?.startTime ?? 0,
+          firstContentfulPaint: paint.find(entry => entry.name === 'first-contentful-paint')?.startTime ?? 0,
           transferSize: navigation.transferSize,
           encodedBodySize: navigation.encodedBodySize
         };

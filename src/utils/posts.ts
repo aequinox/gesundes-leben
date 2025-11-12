@@ -228,15 +228,15 @@ export function getRelatedPosts(
     let score = 0;
 
     // Tag matching (highest relevance)
-    const currentTags = currentPost.data.tags || [];
-    const postTags = post.data.tags || [];
+    const currentTags = currentPost.data.tags ?? [];
+    const postTags = post.data.tags ?? [];
 
     const sharedTags = currentTags.filter((tag: Tag) => postTags.includes(tag));
     score += sharedTags.length * 3;
 
     // Category matching (medium relevance)
-    const currentCategories = currentPost.data.categories || [];
-    const postCategories = post.data.categories || [];
+    const currentCategories = currentPost.data.categories ?? [];
+    const postCategories = post.data.categories ?? [];
 
     const sharedCategories = currentCategories.filter((category: Category) =>
       postCategories.includes(category)

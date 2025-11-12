@@ -401,7 +401,7 @@ export function buildArticleSchema(
   } = options;
 
   const i18n = getI18nStrings(LOCALE.lang as "de" | "en");
-  const imageUrl = resolveUrl(image || SITE.ogImage);
+  const imageUrl = resolveUrl(image ?? SITE.ogImage);
 
   const schema: Record<string, unknown> = {
     "@type": ["Article", "HealthTopicContent"],
@@ -496,7 +496,7 @@ export function buildBaseSchema(
     name: sanitizeText(name),
     description: sanitizeText(description),
     url,
-    image: resolveUrl(image || SITE.ogImage),
+    image: resolveUrl(image ?? SITE.ogImage),
     inLanguage: LOCALE.langTag[0],
   };
 }

@@ -185,7 +185,7 @@ export class SessionManager {
   private storage: StorageManager;
 
   constructor(storage?: StorageManager) {
-    this.storage = storage || new StorageManager();
+    this.storage = storage ?? new StorageManager();
   }
 
   /**

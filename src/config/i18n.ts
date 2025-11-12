@@ -512,11 +512,11 @@ export function t(
     if (value && typeof value === "object" && k in value) {
       value = (value as Record<string, unknown>)[k];
     } else {
-      return fallback || key;
+      return fallback ?? key;
     }
   }
 
-  let translatedText = typeof value === "string" ? value : fallback || key;
+  let translatedText = typeof value === "string" ? value : fallback ?? key;
 
   // Handle pluralization
   if (pluralization) {
@@ -549,7 +549,7 @@ function interpolateString(
   return template.replace(
     /\{(\w+)\}|\[(\w+)\]|\$\{(\w+)\}/g,
     (match, curly, square, dollar) => {
-      const key = curly || square || dollar;
+      const key = curly ?? square ?? dollar;
       const value = values[key];
 
       if (value !== undefined) {

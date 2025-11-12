@@ -367,7 +367,7 @@ test.describe('Author Pages', () => {
         // Should have proper dimensions
         const width = await authorImage.getAttribute('width');
         const height = await authorImage.getAttribute('height');
-        expect(width || height).toBeTruthy();
+        expect(width ?? height).toBeTruthy();
       }
     });
   });

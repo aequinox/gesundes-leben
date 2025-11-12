@@ -213,7 +213,7 @@ test.describe('WCAG Compliance Testing', () => {
           const mainContent = page.locator('#main, main, #content');
           if (await mainContent.count() > 0) {
             const isMainFocused = await mainContent.evaluate(el => el === document.activeElement);
-            expect(isMainFocused || await mainContent.getAttribute('tabindex')).toBeTruthy();
+            expect(isMainFocused ?? await mainContent.getAttribute('tabindex')).toBeTruthy();
           }
         }
       }
@@ -296,7 +296,7 @@ test.describe('WCAG Compliance Testing', () => {
           const title = await link.getAttribute('title');
           
           // Link should have meaningful text
-          const meaningfulText = linkText || ariaLabel || title;
+          const meaningfulText = linkText ?? ariaLabel ?? title;
           
           if (meaningfulText) {
             expect(meaningfulText.trim().length).toBeGreaterThan(2);
@@ -340,7 +340,7 @@ test.describe('WCAG Compliance Testing', () => {
               hasLabel = await label.count() > 0;
             }
             
-            hasLabel = hasLabel || Boolean(ariaLabel) || Boolean(ariaLabelledby);
+            hasLabel = hasLabel ?? Boolean(ariaLabel) || Boolean(ariaLabelledby);
             
             // For search and other special inputs, multiple acceptable labeling methods
             if (!hasLabel) {
@@ -351,7 +351,7 @@ test.describe('WCAG Compliance Testing', () => {
               const hasRole = await input.getAttribute('role');
               
               // Inputs can be considered labeled if they have sufficient context
-              if (hasPlaceholder || hasTitle || hasAriaDescribedby || hasRole) {
+              if (hasPlaceholder ?? hasTitle ?? hasAriaDescribedby ?? hasRole) {
                 hasLabel = true;
               }
               
@@ -482,7 +482,7 @@ test.describe('WCAG Compliance Testing', () => {
           const hasIcon = await element.locator('svg, i, .icon').count() > 0;
           
           // Should not rely on color alone
-          expect(textContent?.trim().length || hasIcon).toBeTruthy();
+          expect(textContent?.trim().length ?? hasIcon).toBeTruthy();
         }
       }
     });
@@ -641,7 +641,7 @@ test.describe('WCAG Compliance Testing', () => {
         
         if (id) {
           const label = page.locator(`label[for="${id}"]`);
-          hasLabel = hasLabel || await label.count() > 0;
+          hasLabel = hasLabel ?? await label.count() > 0;
         }
         
         expect(hasLabel).toBeTruthy();

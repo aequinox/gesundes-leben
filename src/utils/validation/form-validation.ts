@@ -131,7 +131,7 @@ export class FormValidator {
             result.isValid = false;
             result.errors.push(message);
           } else if (rule.severity === "warning") {
-            result.warnings = result.warnings || [];
+            result.warnings = result.warnings ?? [];
             result.warnings.push(message);
           }
         }

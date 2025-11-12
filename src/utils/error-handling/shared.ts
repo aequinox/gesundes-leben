@@ -69,7 +69,7 @@ export async function withAsyncErrorHandling<T>(
   fallbackValue: T,
   options?: Partial<Omit<ErrorHandlingOptions<T>, "context" | "fallbackValue">>
 ): Promise<T> {
-  const { logError = true, transformError, onError } = options || {};
+  const { logError = true, transformError, onError } = options ?? {};
 
   try {
     return await operation();
@@ -121,7 +121,7 @@ export function withErrorHandling<T>(
   fallbackValue: T,
   options?: Partial<Omit<ErrorHandlingOptions<T>, "context" | "fallbackValue">>
 ): T {
-  const { logError = true, transformError, onError } = options || {};
+  const { logError = true, transformError, onError } = options ?? {};
 
   try {
     return operation();
@@ -180,7 +180,7 @@ export async function withAsyncErrorThrow<T>(
     onError?: (error: unknown, context: string) => void;
   }
 ): Promise<T> {
-  const { logError = true, contextData, onError } = options || {};
+  const { logError = true, contextData, onError } = options ?? {};
 
   try {
     return await operation();
@@ -312,7 +312,7 @@ export async function withRetry<T>(
     backoffMultiplier = 2,
     shouldRetry = () => true,
     onRetry,
-  } = options || {};
+  } = options ?? {};
 
   let lastError: unknown;
   let delay = initialDelay;
