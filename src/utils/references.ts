@@ -77,13 +77,25 @@ const REFERENCE_FIELD_ORDER = [
 ] as const;
 
 /**
+ * Type for valid reference field names
+ */
+type ReferenceFieldName = (typeof REFERENCE_FIELD_ORDER)[number];
+
+/**
+ * Type guard to check if a string is a valid reference field name
+ */
+function isReferenceFieldName(value: string): value is ReferenceFieldName {
+  return (REFERENCE_FIELD_ORDER as readonly string[]).includes(value);
+}
+
+/**
  * Creates a sorting comparator function for reference YAML fields
  * @returns Comparator function for sorting object keys
  */
 function createReferenceFieldComparator(): (a: string, b: string) => number {
   return (a: string, b: string): number => {
-    const aIndex = REFERENCE_FIELD_ORDER.indexOf(a as any);
-    const bIndex = REFERENCE_FIELD_ORDER.indexOf(b as any);
+    const aIndex = isReferenceFieldName(a) ? REFERENCE_FIELD_ORDER.indexOf(a) : -1;
+    const bIndex = isReferenceFieldName(b) ? REFERENCE_FIELD_ORDER.indexOf(b) : -1;
     if (aIndex === -1 && bIndex === -1) {
       return a.localeCompare(b);
     }

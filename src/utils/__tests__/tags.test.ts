@@ -8,8 +8,17 @@ import {
 } from "../tags";
 import type { Post } from "../types";
 
+/**
+ * Interface for mock environment with DEV property
+ */
+interface MockImportMeta {
+  env: {
+    DEV: boolean;
+  };
+}
+
 // Mock data for testing
-const createMockPost = (overrides: any = {}): any => ({
+const createMockPost = (overrides: Partial<Post["data"]> = {}): Post => ({
   data: {
     title: "Test Post",
     description: "Test description",
@@ -55,16 +64,26 @@ describe("Tags Utilities", () => {
           pubDatetime: new Date("2025-12-01"),
           draft: false,
         }),
-        createMockPost({
-          title: "Post without date",
-          pubDatetime: undefined as any,
-          draft: false,
-        }),
-        createMockPost({
-          title: "Post with invalid date",
-          pubDatetime: "invalid-date" as any,
-          draft: false,
-        }),
+        {
+          ...createMockPost({
+            title: "Post without date",
+            draft: false,
+          }),
+          data: {
+            ...createMockPost({ title: "Post without date", draft: false }).data,
+            pubDatetime: undefined as unknown as Date,
+          },
+        },
+        {
+          ...createMockPost({
+            title: "Post with invalid date",
+            draft: false,
+          }),
+          data: {
+            ...createMockPost({ title: "Post with invalid date", draft: false }).data,
+            pubDatetime: "invalid-date" as unknown as Date,
+          },
+        },
       ];
     });
 
@@ -85,7 +104,7 @@ describe("Tags Utilities", () => {
     it("should include published posts in production mode", () => {
       // Mock production environment
       const originalEnv = import.meta.env.DEV;
-      (import.meta.env as any).DEV = false;
+      (import.meta as MockImportMeta).env.DEV = false;
 
       const result = filterPosts(mockPosts);
       const publishedPost = result.find(
@@ -94,39 +113,39 @@ describe("Tags Utilities", () => {
       expect(publishedPost).toBeDefined();
 
       // Restore original environment
-      (import.meta.env as any).DEV = originalEnv;
+      (import.meta as MockImportMeta).env.DEV = originalEnv;
     });
 
     it("should exclude draft posts in production mode", () => {
       // Mock production environment
       const originalEnv = import.meta.env.DEV;
-      (import.meta.env as any).DEV = false;
+      (import.meta as MockImportMeta).env.DEV = false;
 
       const result = filterPosts(mockPosts);
       const draftPost = result.find(post => post.data.title === "Draft Post");
       expect(draftPost).toBeUndefined();
 
       // Restore original environment
-      (import.meta.env as any).DEV = originalEnv;
+      (import.meta as MockImportMeta).env.DEV = originalEnv;
     });
 
     it("should exclude future posts in production mode", () => {
       // Mock production environment
       const originalEnv = import.meta.env.DEV;
-      (import.meta.env as any).DEV = false;
+      (import.meta as MockImportMeta).env.DEV = false;
 
       const result = filterPosts(mockPosts);
       const futurePost = result.find(post => post.data.title === "Future Post");
       expect(futurePost).toBeUndefined();
 
       // Restore original environment
-      (import.meta.env as any).DEV = originalEnv;
+      (import.meta as MockImportMeta).env.DEV = originalEnv;
     });
 
     it("should include all valid posts in development mode", () => {
       // Mock development environment
       const originalEnv = import.meta.env.DEV;
-      (import.meta.env as any).DEV = true;
+      (import.meta as MockImportMeta).env.DEV = true;
 
       const result = filterPosts(mockPosts);
       const publishedPost = result.find(
@@ -140,7 +159,7 @@ describe("Tags Utilities", () => {
       expect(futurePost).toBeDefined();
 
       // Restore original environment
-      (import.meta.env as any).DEV = originalEnv;
+      (import.meta as MockImportMeta).env.DEV = originalEnv;
     });
 
     it("should handle empty posts array", () => {
@@ -358,7 +377,7 @@ describe("Tags Utilities", () => {
     it("should count tags correctly for published posts", () => {
       // Mock production environment to test filtering
       const originalEnv = import.meta.env.DEV;
-      (import.meta.env as any).DEV = false;
+      (import.meta as MockImportMeta).env.DEV = false;
 
       const result = getTagCounts(mockPosts);
 
@@ -368,13 +387,13 @@ describe("Tags Utilities", () => {
       expect(result.get("nutrition")).toBe(1);
 
       // Restore original environment
-      (import.meta.env as any).DEV = originalEnv;
+      (import.meta as MockImportMeta).env.DEV = originalEnv;
     });
 
     it("should include all posts in development mode", () => {
       // Mock development environment
       const originalEnv = import.meta.env.DEV;
-      (import.meta.env as any).DEV = true;
+      (import.meta as MockImportMeta).env.DEV = true;
 
       const result = getTagCounts(mockPosts);
 
@@ -384,7 +403,7 @@ describe("Tags Utilities", () => {
       expect(result.get("nutrition")).toBe(1);
 
       // Restore original environment
-      (import.meta.env as any).DEV = originalEnv;
+      (import.meta as MockImportMeta).env.DEV = originalEnv;
     });
 
     it("should handle posts without tags", () => {
@@ -434,7 +453,7 @@ describe("Tags Utilities", () => {
 
   describe("Edge Cases and Error Handling", () => {
     it("should handle malformed post data gracefully", () => {
-      const malformedPosts = [
+      const malformedPosts: Post[] = [
         {
           data: {
             title: "Valid Post",
@@ -446,11 +465,11 @@ describe("Tags Utilities", () => {
         {
           data: {
             title: "Post with null tags",
-            tags: null,
+            tags: null as unknown as string[],
             pubDatetime: new Date("2024-01-01"),
             draft: false,
           },
-        } as any,
+        } as Post,
       ];
 
       expect(() => extractUniqueTags(malformedPosts)).not.toThrow();

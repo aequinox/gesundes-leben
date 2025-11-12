@@ -202,7 +202,7 @@ describe("safeFetch", () => {
       statusText: "OK",
     };
 
-    (global.fetch as any).mockResolvedValue(mockResponse);
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(mockResponse);
 
     const result = await safeFetch("https://api.example.com/data");
 
@@ -220,7 +220,7 @@ describe("safeFetch", () => {
       statusText: "Not Found",
     };
 
-    (global.fetch as any).mockResolvedValue(mockResponse);
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(mockResponse);
 
     const config: SafeRenderConfig = { showDevErrors: false };
     const result = await safeFetch(
@@ -244,7 +244,7 @@ describe("safeFetch", () => {
       statusText: "OK",
     };
 
-    (global.fetch as any)
+    (global.fetch as ReturnType<typeof vi.fn>)
       .mockResolvedValueOnce(mockErrorResponse)
       .mockResolvedValueOnce(mockErrorResponse)
       .mockResolvedValue(mockSuccessResponse);

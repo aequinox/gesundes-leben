@@ -97,20 +97,20 @@ describe("Slug Utilities", () => {
 
     describe("error handling", () => {
       it("should throw error for non-string input", () => {
-        expect(() => slugify(123 as any)).toThrow(
+        expect(() => slugify(123 as unknown as string)).toThrow(
           "Invalid input: string required"
         );
-        expect(() => slugify(null as any)).toThrow(
+        expect(() => slugify(null as unknown as string)).toThrow(
           "Invalid input: string required"
         );
-        expect(() => slugify(undefined as any)).toThrow(
+        expect(() => slugify(undefined as unknown as string)).toThrow(
           "Invalid input: string required"
         );
       });
 
       it("should throw error for non-array input when expecting array", () => {
-        expect(() => slugify("string" as any)).not.toThrow(); // String is valid
-        expect(() => slugify(123 as any)).toThrow(); // Number is not valid
+        expect(() => slugify("string")).not.toThrow(); // String is valid
+        expect(() => slugify(123 as unknown as string)).toThrow(); // Number is not valid
       });
     });
   });
@@ -136,7 +136,7 @@ describe("Slug Utilities", () => {
         format: "jpg" as const,
         width: 800,
         height: 600,
-      } as any,
+      },
       keywords: ["test"],
       group: "pro",
       references: [],
@@ -188,19 +188,19 @@ describe("Slug Utilities", () => {
 
     describe("error handling", () => {
       it("should throw error for invalid post object", () => {
-        expect(() => getPostSlug(null as any)).toThrow(
+        expect(() => getPostSlug(null as unknown as Post)).toThrow(
           "Invalid post object or missing title"
         );
-        expect(() => getPostSlug(undefined as any)).toThrow(
+        expect(() => getPostSlug(undefined as unknown as Post)).toThrow(
           "Invalid post object or missing title"
         );
-        expect(() => getPostSlug({} as any)).toThrow(
+        expect(() => getPostSlug({} as Post)).toThrow(
           "Invalid post object or missing title"
         );
       });
 
       it("should throw error for post without data", () => {
-        const invalidPost = { id: "test" } as any;
+        const invalidPost = { id: "test" } as Post;
         expect(() => getPostSlug(invalidPost)).toThrow(
           "Invalid post object or missing title"
         );
@@ -208,7 +208,7 @@ describe("Slug Utilities", () => {
 
       it("should throw error for post without title", () => {
         const postWithoutTitle = createMockPost("Test");
-        postWithoutTitle.data.title = undefined as any;
+        postWithoutTitle.data.title = undefined as unknown as string;
         expect(() => getPostSlug(postWithoutTitle)).toThrow(
           "Invalid post object or missing title"
         );
@@ -308,16 +308,16 @@ describe("Slug Utilities", () => {
 
     it("should throw error for invalid input types", () => {
       // This tests input validation in slugs.ts
-      expect(() => slugify({} as any)).toThrow(
+      expect(() => slugify({} as unknown as string)).toThrow(
         "Invalid input: string required"
       );
-      expect(() => slugify(123 as any)).toThrow(
+      expect(() => slugify(123 as unknown as string)).toThrow(
         "Invalid input: string required"
       );
-      expect(() => slugify(null as any)).toThrow(
+      expect(() => slugify(null as unknown as string)).toThrow(
         "Invalid input: string required"
       );
-      expect(() => slugify(undefined as any)).toThrow(
+      expect(() => slugify(undefined as unknown as string)).toThrow(
         "Invalid input: string required"
       );
     });

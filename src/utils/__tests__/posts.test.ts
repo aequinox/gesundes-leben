@@ -66,7 +66,10 @@ describe("Posts utilities", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     // Get the mocked module and set up the return value
-    const astroContent = (await vi.importMock("astro:content")) as any;
+    interface MockedAstroContent {
+      getCollection: ReturnType<typeof vi.fn>;
+    }
+    const astroContent = (await vi.importMock("astro:content")) as unknown as MockedAstroContent;
     vi.mocked(astroContent.getCollection).mockResolvedValue(mockPosts);
   });
 
@@ -74,7 +77,10 @@ describe("Posts utilities", () => {
     it("should return all posts when includeDrafts is true", async () => {
       const posts = await getAllPosts(true);
       expect(posts).toHaveLength(3);
-      const astroContent = (await vi.importMock("astro:content")) as any;
+      interface MockedAstroContent {
+      getCollection: ReturnType<typeof vi.fn>;
+    }
+    const astroContent = (await vi.importMock("astro:content")) as unknown as MockedAstroContent;
       expect(astroContent.getCollection).toHaveBeenCalledWith("blog");
     });
 

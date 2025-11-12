@@ -58,23 +58,23 @@ describe("isValidEmail", () => {
     });
 
     it("should validate null as invalid", () => {
-      expect(isValidEmail(null as any)).toBe(false);
+      expect(isValidEmail(null as unknown as string)).toBe(false);
     });
 
     it("should validate undefined as invalid", () => {
-      expect(isValidEmail(undefined as any)).toBe(false);
+      expect(isValidEmail(undefined as unknown as string)).toBe(false);
     });
 
     it("should validate number as invalid", () => {
-      expect(isValidEmail(123 as any)).toBe(false);
+      expect(isValidEmail(123 as unknown as string)).toBe(false);
     });
 
     it("should validate object as invalid", () => {
-      expect(isValidEmail({} as any)).toBe(false);
+      expect(isValidEmail({} as unknown as string)).toBe(false);
     });
 
     it("should validate array as invalid", () => {
-      expect(isValidEmail([] as any)).toBe(false);
+      expect(isValidEmail([] as unknown as string)).toBe(false);
     });
   });
 
@@ -237,11 +237,19 @@ describe("error handling", () => {
     // Create a mock email string that will cause an error during validation
     const mockEmail = "test@example.com";
 
+    // Interface for global logger
+    interface GlobalWithLogger {
+      logger?: {
+        error: (...args: unknown[]) => void;
+      };
+    }
+
     // Mock the logger.error to track calls
     const loggerErrorSpy = () => {};
-    const originalError = (globalThis as any).logger?.error;
-    if ((globalThis as any).logger) {
-      (globalThis as any).logger.error = loggerErrorSpy;
+    const globalWithLogger = globalThis as unknown as GlobalWithLogger;
+    const originalError = globalWithLogger.logger?.error;
+    if (globalWithLogger.logger) {
+      globalWithLogger.logger.error = loggerErrorSpy;
     }
 
     // Create a malformed input that will cause type conversion errors
@@ -252,11 +260,11 @@ describe("error handling", () => {
       toString: () => mockEmail,
     };
 
-    expect(isValidEmail(malformedInput as any)).toBe(false);
+    expect(isValidEmail(malformedInput as unknown as string)).toBe(false);
 
     // Restore original logger
-    if ((globalThis as any).logger) {
-      (globalThis as any).logger.error = originalError;
+    if (globalWithLogger.logger && originalError) {
+      globalWithLogger.logger.error = originalError;
     }
   });
 
@@ -360,7 +368,7 @@ describe("RFC compliance", () => {
       ];
 
       malformedInputs.forEach(input => {
-        const result = isValidEmail(input as any);
+        const result = isValidEmail(input as unknown as string);
         expect(typeof result).toBe("boolean");
         expect(result).toBe(false);
       });
