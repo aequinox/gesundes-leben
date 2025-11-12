@@ -38,7 +38,7 @@ import { Picture } from "astro:assets";
 import { getPostSlug, slugify } from "@/utils/slugs";
 import type { Post } from "@/utils/types";
 
-import Badge from "../elements/Badge.astro";
+import BadgeGroup from "../elements/BadgeGroup.astro";
 import ArticleMeta from "../partials/ArticleMeta.astro";
 
 export interface Props {
@@ -225,19 +225,15 @@ const readMoreClasses = `group mr-2 mt-${
         >
           {
             withCategories && categories && categories.length > 0 && (
-              <div class={`flex flex-wrap ${isSmall ? "gap-1" : "gap-1.5"}`}>
-                {categories
-                  .slice(0, effectiveMaxCategories)
-                  .map((category: string) => (
-                    <Badge
-                      text={category}
-                      variant="primary"
-                      size="xs"
-                      shape="square"
-                      outlined={true}
-                    />
-                  ))}
-              </div>
+              <BadgeGroup
+                items={categories}
+                maxItems={effectiveMaxCategories}
+                variant="primary"
+                size="xs"
+                shape="square"
+                outlined={true}
+                gap={isSmall ? "small" : "medium"}
+              />
             )
           }
 

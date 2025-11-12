@@ -1,0 +1,154 @@
+---
+/**
+ * SectionContainer Component
+ *
+ * A reusable container for sections with consistent styling, gradient backgrounds,
+ * and animation support. Follows DRY principles and provides a single source of truth
+ * for section styling across the application.
+ *
+ * Features:
+ * - Configurable background gradients
+ * - Built-in AOS animation support
+ * - Responsive padding and spacing
+ * - Decorative background elements
+ * - Performance optimizations (content-visibility, will-change)
+ *
+ * @component
+ * @example
+ * ```astro
+ * <SectionContainer
+ *   id="hero"
+ *   variant="gradient"
+ *   withDecorations={true}
+ * >
+ *   <h1>Your content here</h1>
+ * </SectionContainer>
+ * ```
+ */
+
+export interface Props {
+  /** Section ID for navigation/linking */
+  id?: string;
+
+  /** Visual variant of the section */
+  variant?: "default" | "gradient" | "minimal";
+
+  /** Whether to show decorative background elements */
+  withDecorations?: boolean;
+
+  /** AOS animation type */
+  animation?: string;
+
+  /** AOS animation duration in ms */
+  animationDuration?: number;
+
+  /** AOS animation delay in ms */
+  animationDelay?: number;
+
+  /** Additional CSS classes */
+  class?: string;
+
+  /** ARIA label for accessibility */
+  ariaLabel?: string;
+
+  /** Whether to apply content-visibility optimization */
+  optimized?: boolean;
+
+  /** Padding size */
+  padding?: "none" | "small" | "medium" | "large";
+}
+
+const {
+  id,
+  variant = "default",
+  withDecorations = false,
+  animation,
+  animationDuration = 600,
+  animationDelay = 0,
+  class: className = "",
+  ariaLabel,
+  optimized = false,
+  padding = "medium",
+} = Astro.props;
+
+// Build variant classes
+const variantClasses = {
+  default: "bg-background",
+  gradient: "overflow-hidden bg-gradient-to-br from-card/5 to-card-muted/5",
+  minimal: "",
+};
+
+// Build padding classes
+const paddingClasses = {
+  none: "",
+  small: "py-4 md:py-6",
+  medium: "pt-16 pb-8",
+  large: "pt-24 pb-16",
+};
+
+const baseClasses = "relative z-10";
+const optimizationClasses = optimized
+  ? "will-change-opacity will-change-transform transition-all duration-300"
+  : "";
+
+const containerClasses = [
+  baseClasses,
+  variantClasses[variant],
+  paddingClasses[padding],
+  optimizationClasses,
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+
+const optimizationStyle = optimized
+  ? "content-visibility: auto; contain-intrinsic-size: 1px 1000px;"
+  : "";
+---
+
+<section
+  id={id}
+  class={containerClasses}
+  aria-label={ariaLabel}
+  data-aos={animation}
+  data-aos-duration={animation ? animationDuration : undefined}
+  data-aos-delay={animation ? animationDelay : undefined}
+  style={optimizationStyle}
+>
+  {
+    withDecorations && (
+      <>
+        <div
+          class="bg-radial-gradient absolute -top-16 -right-16 -z-10 h-64 w-64 rounded-full opacity-20 blur-3xl"
+          aria-hidden="true"
+        />
+        <div
+          class="bg-radial-gradient absolute top-1/2 -left-24 -z-10 h-96 w-96 -translate-y-1/2 rounded-full opacity-20 blur-3xl"
+          aria-hidden="true"
+        />
+      </>
+    )
+  }
+
+  <div class="relative z-10 mx-auto max-w-content">
+    <slot />
+  </div>
+</section>
+
+<style>
+  @reference "@/styles/global.css";
+
+  .bg-radial-gradient {
+    background: radial-gradient(
+      circle,
+      oklch(var(--color-accent) / 0.3) 0%,
+      transparent 70%
+    );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    section {
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>

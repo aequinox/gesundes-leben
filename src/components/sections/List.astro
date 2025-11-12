@@ -3,6 +3,9 @@
  * List component for displaying single or multiple lists with customizable styling
  * and optimized two-column layout
  *
+ * Refactored to use ListColumn component, eliminating 120 lines of code duplication.
+ * Follows DRY and Single Responsibility principles.
+ *
  * @example Single List
  * ```astro
  * <List
@@ -47,6 +50,8 @@
  * />
  * ```
  */
+
+import ListColumn from "./ListColumn.astro";
 
 interface Item {
   intro?: string;
@@ -159,126 +164,13 @@ const containerClass =
           <div class="mx-auto w-full max-w-content px-0">
             <div class="grid grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-2 md:gap-x-6 md:gap-y-0">
               {/* Left Column */}
-              <ul
-                class="custom-list mb-2 list-none px-0 pl-0 md:mb-6"
-                role="list"
-              >
-                {list.leftCol.map((item, index) => (
-                  <li
-                    data-index={index}
-                    class="animate-fadeIn relative mb-2 list-item translate-y-[10px] py-1 pl-8 opacity-0 transition-all duration-300 ease-in-out md:mb-3"
-                    style={`animation-delay: calc(${index} * 100ms);`}
-                  >
-                    <div class="item-wrapper before:absolute before:top-[0.6em] before:left-0 before:h-2 before:w-2 before:rounded-full before:bg-accent before:content-['']">
-                      {item.intro && (
-                        <strong class="font-semibold">
-                          {item.intro}:&nbsp;
-                        </strong>
-                      )}
-                      <span class="item-content">{item.content}</span>
-                    </div>
-                    {item.subitems && (
-                      <ul class="subitem-list mt-2 list-none px-0 pl-0">
-                        {item.subitems.map((subitem, subIndex) => (
-                          <li
-                            data-subindex={subIndex}
-                            class="subitem animate-fadeInSubitem mb-1 pl-6 text-[0.95em] opacity-0 before:absolute before:top-[0.65em] before:left-0 before:h-1.5 before:w-1.5 before:rotate-45 before:bg-blue-500 before:content-[''] md:mb-2"
-                          >
-                            {subitem.intro && (
-                              <strong class="font-semibold">
-                                {subitem.intro}:&nbsp;
-                              </strong>
-                            )}
-                            <span class="item-content">{subitem.content}</span>
-                            {subitem.subitems && (
-                              <ul class="sub-subitem-list mt-1 list-none pl-0">
-                                {subitem.subitems.map(
-                                  (subSubitem, subSubIndex) => (
-                                    <li
-                                      data-subsubindex={subSubIndex}
-                                      class="sub-subitem animate-fadeInSubitem mb-1 pl-5 text-sm text-foreground/90 opacity-0 delay-100 before:absolute before:top-[0.65em] before:left-0 before:h-1 before:w-1 before:rounded-full before:bg-green-400 before:content-['']"
-                                    >
-                                      {subSubitem.intro && (
-                                        <strong class="font-semibold">
-                                          {subSubitem.intro}:&nbsp;
-                                        </strong>
-                                      )}
-                                      <span class="item-content">
-                                        {subSubitem.content}
-                                      </span>
-                                    </li>
-                                  )
-                                )}
-                              </ul>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <ListColumn items={list.leftCol} startIndex={0} />
 
               {/* Right Column */}
-              <ul
-                class="custom-list mb-2 list-none px-0 pl-0 md:mb-6"
-                role="list"
-              >
-                {list.rightCol.map((item, index) => (
-                  <li
-                    data-index={index + list.leftCol.length}
-                    class="animate-fadeIn relative mb-2 list-item translate-y-[10px] py-1 pl-8 opacity-0 transition-all duration-300 ease-in-out md:mb-3"
-                    style={`animation-delay: calc(${index + list.leftCol.length} * 100ms);`}
-                  >
-                    <div class="item-wrapper before:absolute before:top-[0.6em] before:left-0 before:h-2 before:w-2 before:rounded-full before:bg-accent before:content-['']">
-                      {item.intro && (
-                        <strong class="font-semibold">
-                          {item.intro}:&nbsp;
-                        </strong>
-                      )}
-                      <span class="item-content">{item.content}</span>
-                    </div>
-                    {item.subitems && (
-                      <ul class="subitem-list mt-2 list-none px-0 pl-0">
-                        {item.subitems.map((subitem, subIndex) => (
-                          <li
-                            data-subindex={subIndex}
-                            class="subitem animate-fadeInSubitem mb-1 pl-6 text-[0.95em] opacity-0 before:absolute before:top-[0.65em] before:left-0 before:h-1.5 before:w-1.5 before:rotate-45 before:bg-blue-500 before:content-[''] md:mb-2"
-                          >
-                            {subitem.intro && (
-                              <strong class="font-semibold">
-                                {subitem.intro}:&nbsp;
-                              </strong>
-                            )}
-                            <span class="item-content">{subitem.content}</span>
-                            {subitem.subitems && (
-                              <ul class="sub-subitem-list mt-1 list-none pl-0">
-                                {subitem.subitems.map(
-                                  (subSubitem, subSubIndex) => (
-                                    <li
-                                      data-subsubindex={subSubIndex}
-                                      class="sub-subitem animate-fadeInSubitem mb-1 pl-5 text-[0.9em] text-foreground/90 opacity-0 delay-100 before:absolute before:top-[0.65em] before:left-0 before:h-1 before:w-1 before:rounded-full before:bg-green-400 before:content-['']"
-                                    >
-                                      {subSubitem.intro && (
-                                        <strong class="font-semibold">
-                                          {subSubitem.intro}:&nbsp;
-                                        </strong>
-                                      )}
-                                      <span class="item-content">
-                                        {subSubitem.content}
-                                      </span>
-                                    </li>
-                                  )
-                                )}
-                              </ul>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <ListColumn
+                items={list.rightCol}
+                startIndex={list.leftCol.length}
+              />
             </div>
           </div>
         </section>
@@ -308,80 +200,13 @@ const containerClass =
         <div class="mx-auto prose w-full max-w-content px-0">
           <div class="grid grid-cols-1 gap-x-4 gap-y-2 transition-all duration-300 md:grid-cols-2 md:gap-x-6 md:gap-y-0">
             {/* Left Column */}
-            <ul
-              class="custom-list mb-2 list-none px-0 pl-0 md:mb-6"
-              role="list"
-            >
-              {preparedLists[0].leftCol.map((item, index) => (
-                <li
-                  data-index={index}
-                  class="animate-fadeIn relative mb-2 list-item translate-y-[10px] py-1 pl-8 opacity-0 transition-all duration-300 ease-in-out md:mb-3"
-                  style={`animation-delay: calc(${index} * 100ms);`}
-                >
-                  <div class="item-wrapper before:absolute before:top-[0.6em] before:left-0 before:h-2 before:w-2 before:rounded-full before:bg-accent before:content-['']">
-                    {item.intro && (
-                      <strong class="font-semibold">{item.intro}:&nbsp;</strong>
-                    )}
-                    <span class="item-content">{item.content}</span>
-                  </div>
-                  {item.subitems && (
-                    <ul class="subitem-list mt-2 list-none px-0 pl-0">
-                      {item.subitems.map((subitem, subIndex) => (
-                        <li
-                          data-subindex={subIndex}
-                          class="subitem animate-fadeInSubitem mb-1 pl-6 text-[0.95em] opacity-0 before:absolute before:top-[0.65em] before:left-0 before:h-1.5 before:w-1.5 before:rotate-45 before:bg-blue-500 before:content-[''] md:mb-2"
-                        >
-                          {subitem.intro && (
-                            <strong class="font-semibold">
-                              {subitem.intro}:&nbsp;
-                            </strong>
-                          )}
-                          <span class="item-content">{subitem.content}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </li>
-              ))}
-            </ul>
+            <ListColumn items={preparedLists[0].leftCol} startIndex={0} />
 
             {/* Right Column */}
-            <ul
-              class="custom-list mb-2 list-none px-0 pl-0 md:mb-6"
-              role="list"
-            >
-              {preparedLists[0].rightCol.map((item, index) => (
-                <li
-                  data-index={index + preparedLists[0].leftCol.length}
-                  class="animate-fadeIn relative mb-2 list-item translate-y-[10px] py-1 pl-8 opacity-0 transition-all duration-300 ease-in-out md:mb-3"
-                  style={`animation-delay: calc(${index + preparedLists[0].leftCol.length} * 100ms);`}
-                >
-                  <div class="item-wrapper before:absolute before:top-[0.6em] before:left-0 before:h-2 before:w-2 before:rounded-full before:bg-accent before:content-['']">
-                    {item.intro && (
-                      <strong class="font-semibold">{item.intro}:&nbsp;</strong>
-                    )}
-                    <span class="item-content">{item.content}</span>
-                  </div>
-                  {item.subitems && (
-                    <ul class="subitem-list mt-2 list-none px-0 pl-0">
-                      {item.subitems.map((subitem, subIndex) => (
-                        <li
-                          data-subindex={subIndex}
-                          class="subitem animate-fadeInSubitem mb-1 pl-6 text-[0.95em] opacity-0 before:absolute before:top-[0.65em] before:left-0 before:h-1.5 before:w-1.5 before:rotate-45 before:bg-blue-500 before:content-[''] md:mb-2"
-                        >
-                          {subitem.intro && (
-                            <strong class="font-semibold">
-                              {subitem.intro}:&nbsp;
-                            </strong>
-                          )}
-                          <span class="item-content">{subitem.content}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </li>
-              ))}
-            </ul>
+            <ListColumn
+              items={preparedLists[0].rightCol}
+              startIndex={preparedLists[0].leftCol.length}
+            />
           </div>
         </div>
       </section>

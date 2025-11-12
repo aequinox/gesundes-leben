@@ -1,0 +1,116 @@
+---
+/**
+ * ContentGrid Component
+ *
+ * A responsive grid layout component for displaying content items (cards, articles, etc.)
+ * with consistent spacing and optional staggered animations.
+ *
+ * Features:
+ * - Responsive column layouts (1-4 columns)
+ * - Consistent gap spacing
+ * - Staggered animation support with AOS
+ * - Transform animations on hover
+ * - Follows DRY principles
+ *
+ * @component
+ * @example
+ * ```astro
+ * <ContentGrid columns={3} gap="medium">
+ *   <Card post={post1} />
+ *   <Card post={post2} />
+ *   <Card post={post3} />
+ * </ContentGrid>
+ * ```
+ */
+
+export interface Props {
+  /** Number of columns on large screens */
+  columns?: 1 | 2 | 3 | 4;
+
+  /** Gap size between items */
+  gap?: "small" | "medium" | "large";
+
+  /** Enable staggered animations */
+  withAnimation?: boolean;
+
+  /** Animation delay increment in ms */
+  animationStagger?: number;
+
+  /** Animation type for items */
+  animationType?: string;
+
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  columns = 3,
+  gap = "medium",
+  withAnimation = true,
+  animationStagger = 50,
+  animationType = "fade-up",
+  class: className = "",
+} = Astro.props;
+
+// Gap size classes
+const gapClasses = {
+  small: "gap-4",
+  medium: "gap-6",
+  large: "gap-8",
+};
+
+// Column layout classes
+const columnClasses = {
+  1: "grid-cols-1",
+  2: "grid-cols-1 md:grid-cols-2",
+  3: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
+  4: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+};
+
+const gridClasses = [
+  "grid",
+  columnClasses[columns],
+  gapClasses[gap],
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<div class={gridClasses}>
+  <slot
+    withAnimation={withAnimation}
+    animationStagger={animationStagger}
+    animationType={animationType}
+  />
+</div>
+
+<style>
+  @reference "@/styles/global.css";
+
+  /* Add transform animations support */
+  div > :global(*) {
+    transition:
+      transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 300ms ease-out;
+  }
+
+  div > :global(*:hover) {
+    transform: translateY(-4px);
+  }
+
+  /* Disable transform on touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    div > :global(*:hover) {
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    div > :global(*),
+    div > :global(*:hover) {
+      transform: none !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
