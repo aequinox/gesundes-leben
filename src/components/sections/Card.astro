@@ -170,7 +170,7 @@ const readMoreClasses = `group mr-2 mt-${
               aria-label={`Read more about ${title}`}
               class="card-image-link relative block overflow-hidden"
             >
-              <div class="card-image-overlay absolute inset-0 z-10 bg-gradient-to-t from-black/50 via-black/20 to-transparent opacity-40" />
+              <div class="card-image-overlay absolute inset-0 z-10 bg-linear-to-t from-black/50 via-black/20 to-transparent opacity-40" />
 
               <div class="card-light-reflection absolute inset-0 z-20 bg-gradient-to-tr from-white/0 via-white/8 to-white/0 opacity-0" />
 
@@ -202,13 +202,15 @@ const readMoreClasses = `group mr-2 mt-${
               style="backdrop-filter: blur(12px) saturate(180%);"
               aria-label={groupConfig?.label}
             >
-              <Icon
-                name={groupConfig?.icon}
-                class={`card-badge-icon transition-transform duration-300 ${
-                  isSmall ? "h-4 w-4" : "h-5 w-5"
-                }`}
-                aria-hidden="true"
-              />
+              {groupConfig?.icon && groupConfig.icon.trim() !== "" && (
+                <Icon
+                  name={groupConfig.icon}
+                  class={`card-badge-icon transition-transform duration-300 ${
+                    isSmall ? "h-4 w-4" : "h-5 w-5"
+                  }`}
+                  aria-hidden="true"
+                />
+              )}
             </div>
           </div>
         )
@@ -474,7 +476,7 @@ const readMoreClasses = `group mr-2 mt-${
    */
   class CardAnimationController {
     private observer: IntersectionObserver;
-    private readonly ROOT_MARGIN = '50px';
+    private readonly ROOT_MARGIN = "50px";
     private readonly THRESHOLD = 0.1;
 
     constructor() {
@@ -484,11 +486,11 @@ const readMoreClasses = `group mr-2 mt-${
 
     private createObserver(): IntersectionObserver {
       return new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
+        entries => {
+          entries.forEach(entry => {
             if (entry.isIntersecting) {
               // Add visible class to trigger animations
-              entry.target.classList.add('card-visible');
+              entry.target.classList.add("card-visible");
               // Unobserve after triggering to improve performance
               this.observer.unobserve(entry.target);
             }
@@ -504,9 +506,9 @@ const readMoreClasses = `group mr-2 mt-${
     private init(): void {
       // Observe all card elements
       const cards = document.querySelectorAll('article[class*="card-"]');
-      cards.forEach((card) => {
+      cards.forEach(card => {
         // Initially hide cards (will be shown when visible)
-        card.classList.add('card-animating');
+        card.classList.add("card-animating");
         this.observer.observe(card);
       });
     }
@@ -519,12 +521,12 @@ const readMoreClasses = `group mr-2 mt-${
   // Initialize on page load
   let controller: CardAnimationController | null = null;
 
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener("astro:page-load", () => {
     controller = new CardAnimationController();
   });
 
   // Clean up on page transition
-  document.addEventListener('astro:before-preparation', () => {
+  document.addEventListener("astro:before-preparation", () => {
     if (controller) {
       controller.destroy();
       controller = null;
