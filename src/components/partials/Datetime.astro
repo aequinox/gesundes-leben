@@ -38,15 +38,19 @@ const ariaLabel = isModified
   ]}
   aria-label={ariaLabel}
 >
-  <Icon
-    name={iconName}
-    class:list={[
-      "datetime-icon group-hover:fill--accent inline-block fill-foreground transition-transform duration-300 group-hover:scale-110",
-      size === "sm" ? "h-5 w-5" : "h-6 w-6",
-      isModified ? "text-accent" : "",
-    ]}
-    aria-hidden="true"
-  />
+  {
+    iconName && iconName.trim() !== "" && (
+      <Icon
+        name={iconName}
+        class:list={[
+          "datetime-icon group-hover:fill--accent inline-block fill-foreground transition-transform duration-300 group-hover:scale-110",
+          size === "sm" ? "h-5 w-5" : "h-6 w-6",
+          isModified ? "text-accent" : "",
+        ]}
+        aria-hidden="true"
+      />
+    )
+  }
   <time
     datetime={new Date(datetime).toISOString()}
     class:list={[

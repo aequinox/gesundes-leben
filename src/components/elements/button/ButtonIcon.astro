@@ -34,13 +34,15 @@ const getIconClasses = () => {
 const iconClassList = getIconClasses();
 
 // Don't render if icon is empty or undefined
-if (!icon || icon.trim() === "") {
-  return null;
-}
+const shouldRender = icon && icon.trim() !== "";
 ---
 
-<Icon
-  name={icon}
-  class:list={["size-4", "flex-shrink-0", ...iconClassList]}
-  aria-hidden="true"
-/>
+{
+  shouldRender && (
+    <Icon
+      name={icon}
+      class:list={["size-4", "flex-shrink-0", ...iconClassList]}
+      aria-hidden="true"
+    />
+  )
+}

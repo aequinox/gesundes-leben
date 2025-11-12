@@ -184,18 +184,20 @@ if (Object.values(groupPostCounts).every(count => count === 0)) {
                   }`}
                   data-selected-class="${selected-group === group}}"
                 >
-                  <Icon
-                    name={icon}
-                    class:list={[
-                      "h-12 w-12 transition-transform duration-500",
-                      group === "pro"
-                        ? "text-pro drop-shadow-md dark:text-pro dark:drop-shadow-pro/50"
-                        : group === "contra"
-                          ? "text-contra drop-shadow-md dark:text-contra dark:drop-shadow-contra/50"
-                          : "text-question-time drop-shadow-md dark:text-question-time dark:drop-shadow-question-time/50",
-                    ]}
-                    aria-hidden="true"
-                  />
+                  {icon && icon.trim() !== "" && (
+                    <Icon
+                      name={icon}
+                      class:list={[
+                        "h-12 w-12 transition-transform duration-500",
+                        group === "pro"
+                          ? "text-pro drop-shadow-md dark:text-pro dark:drop-shadow-pro/50"
+                          : group === "contra"
+                            ? "text-contra drop-shadow-md dark:text-contra dark:drop-shadow-contra/50"
+                            : "text-question-time drop-shadow-md dark:text-question-time dark:drop-shadow-question-time/50",
+                      ]}
+                      aria-hidden="true"
+                    />
+                  )}
                 </div>
               </div>
               <div class="cursor-pointer">

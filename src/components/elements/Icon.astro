@@ -80,22 +80,32 @@ const sizeMap = {
 };
 
 const animationClass = animated ? "icon-animated" : "";
+
+// Get the mapped icon name, fallback to a default if not found
+const mappedIconName = iconMap[name];
+
+// Only render if we have a valid icon name
+const shouldRender = mappedIconName && mappedIconName.trim() !== "";
 ---
 
-<AstroIcon
-  name={iconMap[name]}
-  id={id}
-  class:list={[
-    "icon",
-    sizeMap[size],
-    active && "icon-active",
-    animationClass,
-    id?.includes("moon") && "dark:hidden",
-    id?.includes("sun") && "hidden dark:block",
-    className,
-  ]}
-  aria-hidden="true"
-/>
+{
+  shouldRender && (
+    <AstroIcon
+      name={mappedIconName}
+      id={id}
+      class:list={[
+        "icon",
+        sizeMap[size],
+        active && "icon-active",
+        animationClass,
+        id?.includes("moon") && "dark:hidden",
+        id?.includes("sun") && "hidden dark:block",
+        className,
+      ]}
+      aria-hidden="true"
+    />
+  )
+}
 
 <style>
   @reference "@/styles/global.css";

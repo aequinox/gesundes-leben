@@ -86,7 +86,7 @@ const uniqueId = `accordion-${Math.random().toString(36).substring(2, 9)}`;
             aria-controls={`${uniqueId}-panel-${index}`}
           >
             <div class="flex items-center">
-              {item.icon && (
+              {item.icon && item.icon.trim() !== "" && (
                 <span
                   class={`accordion-item-icon mr-3 flex items-center justify-center transition-all duration-300 ${item.open ? "scale-110 text-accent" : ""}`}
                 >
