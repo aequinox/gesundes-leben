@@ -21,6 +21,7 @@
  */
 
 import { Icon } from "astro-icon/components";
+
 import type { NavigationLink } from "@/components/types";
 import { SITE } from "@/config";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
@@ -62,7 +63,9 @@ const mobileNavItems = [
 
 // Check if current page matches nav item
 const isActive = (key: string) => {
-  if (!activeNav) return false;
+  if (!activeNav) {
+    return false;
+  }
   return activeNav === key;
 };
 ---

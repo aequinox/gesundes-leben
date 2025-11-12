@@ -24,9 +24,8 @@
  * ```
  */
 
+import { createError, isAppError, formatErrorMessage, type AppError } from "@/utils/errors";
 import { logger } from "@/utils/logger";
-import { createError, isAppError, formatErrorMessage } from "@/utils/errors";
-import type { AppError } from "@/utils/errors";
 
 /**
  * Options for error handling configuration
