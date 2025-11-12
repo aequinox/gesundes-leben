@@ -1,0 +1,110 @@
+---
+/**
+ * SectionHeading Component
+ *
+ * A reusable section heading component with optional icon.
+ * Provides consistent typography and spacing for section titles throughout the application.
+ * Follows the DRY principle by eliminating duplicated heading patterns.
+ *
+ * Features:
+ * - Optional icon support (Tabler Icons)
+ * - Consistent typography and spacing
+ * - Accessible heading hierarchy
+ * - Responsive sizing
+ *
+ * @component
+ * @example
+ * ```astro
+ * <SectionHeading
+ *   icon="tabler:star"
+ *   title="Featured Articles"
+ *   level={2}
+ * />
+ * ```
+ */
+
+import { Icon } from "astro-icon/components";
+import type { IconName } from "@/components/types";
+
+export interface Props {
+  /** The heading text */
+  title: string;
+
+  /** Optional icon name (Tabler Icons) */
+  icon?: IconName;
+
+  /** Heading level (h1-h6) */
+  level?: 1 | 2 | 3 | 4 | 5 | 6;
+
+  /** Additional CSS classes */
+  class?: string;
+
+  /** Icon size */
+  iconSize?: "small" | "medium" | "large";
+
+  /** Alignment */
+  align?: "left" | "center" | "right";
+}
+
+const {
+  title,
+  icon,
+  level = 2,
+  class: className = "",
+  iconSize = "medium",
+  align = "left",
+} = Astro.props;
+
+// Icon size classes
+const iconSizeClasses = {
+  small: "h-5 w-5",
+  medium: "h-7 w-7",
+  large: "h-9 w-9",
+};
+
+// Heading size classes based on level
+const headingSizeClasses = {
+  1: "text-4xl sm:text-5xl",
+  2: "text-3xl sm:text-4xl",
+  3: "text-2xl sm:text-3xl",
+  4: "text-xl sm:text-2xl",
+  5: "text-lg sm:text-xl",
+  6: "text-base sm:text-lg",
+};
+
+// Alignment classes
+const alignClasses = {
+  left: "justify-start",
+  center: "justify-center",
+  right: "justify-end",
+};
+
+const containerClasses = [
+  "flex items-center gap-3",
+  alignClasses[align],
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+
+const HeadingTag = `h${level}` as keyof astroHTML.JSX.IntrinsicElements;
+---
+
+<div class={containerClasses}>
+  {
+    icon && (
+      <Icon
+        name={icon}
+        class={`text-accent ${iconSizeClasses[iconSize]}`}
+        aria-hidden="true"
+      />
+    )
+  }
+  <HeadingTag class={`font-bold tracking-tight ${headingSizeClasses[level]}`}>
+    {title}
+  </HeadingTag>
+</div>
+
+<style>
+  @reference "@/styles/global.css";
+</style>

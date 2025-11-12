@@ -4,6 +4,9 @@ import { Icon } from "astro-icon/components";
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
 import Hr from "@/components/elements/Hr.astro";
 import LinkButton from "@/components/elements/LinkButton.astro";
+import SectionHeading from "@/components/elements/SectionHeading.astro";
+import ContentGrid from "@/components/layout/ContentGrid.astro";
+import SectionContainer from "@/components/layout/SectionContainer.astro";
 import Card from "@/components/sections/Card.astro";
 import Footer from "@/components/sections/Footer.astro";
 import Header from "@/components/sections/Header.astro";
@@ -68,23 +71,13 @@ if (recentPosts.length > 0 && recentPosts[0].data.heroImage) {
     }
 
     {/* Hero Section with enhanced styling and accessibility */}
-    <div class="relative z-10">
-      <section
-        id="hero"
-        class="relative min-h-100 overflow-hidden bg-gradient-to-br from-card/5 to-card-muted/5 pt-4 pb-8 md:pt-6 md:pb-12"
-      >
-        <!-- Decorative background elements -->
-        <div
-          class="bg-radial-gradient absolute -top-16 -right-16 -z-10 h-64 w-64 rounded-full opacity-20 blur-3xl"
-          aria-hidden="true"
-        >
-        </div>
-        <div
-          class="bg-radial-gradient absolute top-1/2 -left-24 -z-10 h-96 w-96 -translate-y-1/2 rounded-full opacity-20 blur-3xl"
-          aria-hidden="true"
-        >
-        </div>
-        <div class="relative z-10 mx-auto max-w-content">
+    <SectionContainer
+      id="hero"
+      variant="gradient"
+      withDecorations={true}
+      padding="small"
+      class="min-h-100"
+    >
           <!-- Main heading -->
           <div class="mb-8 flex items-center justify-between">
             <div
@@ -177,38 +170,30 @@ if (recentPosts.length > 0 && recentPosts[0].data.heroImage) {
             )
           }
         </div>
-      </section>
-    </div>
+    </SectionContainer>
 
     <Hr variant="dots" />
 
     {/* Featured Articles Section - Optimized animations and rendering */}
     {
       featuredPostCount > 0 && (
-        <section
+        <SectionContainer
           id="featured"
-          class="will-change-opacity relative z-10 pt-16 pb-8 transition-all duration-300 will-change-transform"
-          data-aos="fade-up"
-          data-aos-duration="600"
-          style="content-visibility: auto; contain-intrinsic-size: 1px 1000px;"
+          animation="fade-up"
+          animationDuration={600}
+          optimized={true}
         >
-          <div class="flex items-center gap-3">
-            <Icon
-              name="tabler:star"
-              class="h-7 w-7 text-accent"
-              aria-hidden="true"
-            />
-            <h2 class="text-3xl font-bold tracking-tight">
-              Ausgewählte Artikel
-            </h2>
-          </div>
+          <SectionHeading
+            icon="tabler:star"
+            title="Ausgewählte Artikel"
+            level={2}
+          />
 
-          <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <ContentGrid columns={3} gap="medium" class="mt-8">
             {featuredPosts.map((post, index) => (
               <div
                 data-aos="fade-up"
                 data-aos-delay={Math.min(index * 50, 500)}
-                class="transform transition-all duration-300 hover:translate-y-[-4px]"
               >
                 <Card
                   post={post}
@@ -217,8 +202,8 @@ if (recentPosts.length > 0 && recentPosts[0].data.heroImage) {
                 />
               </div>
             ))}
-          </div>
-        </section>
+          </ContentGrid>
+        </SectionContainer>
       )
     }
 
@@ -227,28 +212,23 @@ if (recentPosts.length > 0 && recentPosts[0].data.heroImage) {
       recentPostCount > 0 && (
         <Fragment>
           <Hr variant="dots" />
-          <section
+          <SectionContainer
             id="recent-posts"
-            class="will-change-opacity relative z-10 pt-16 pb-8 transition-all duration-300 will-change-transform"
-            data-aos="fade-up"
-            data-aos-duration="600"
-            style="content-visibility: auto; contain-intrinsic-size: 1px 1000px;"
+            animation="fade-up"
+            animationDuration={600}
+            optimized={true}
           >
-            <div class="flex items-center gap-3">
-              <Icon
-                name="tabler:clock"
-                class="h-7 w-7 text-accent"
-                aria-hidden="true"
-              />
-              <h2 class="text-3xl font-bold tracking-tight">Neueste Artikel</h2>
-            </div>
+            <SectionHeading
+              icon="tabler:clock"
+              title="Neueste Artikel"
+              level={2}
+            />
 
-            <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <ContentGrid columns={3} gap="medium" class="mt-8">
               {recentPosts.slice(0, SITE.postPerIndex).map((post, index) => (
                 <div
                   data-aos="fade-up"
                   data-aos-delay={Math.min(index * 50, 300)}
-                  class="transform transition-all duration-300 hover:translate-y-[-4px]"
                 >
                   <Card
                     post={post}
@@ -257,8 +237,8 @@ if (recentPosts.length > 0 && recentPosts[0].data.heroImage) {
                   />
                 </div>
               ))}
-            </div>
-          </section>
+            </ContentGrid>
+          </SectionContainer>
         </Fragment>
       )
     }

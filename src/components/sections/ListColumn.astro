@@ -1,0 +1,97 @@
+---
+/**
+ * ListColumn Component
+ *
+ * A reusable column component for rendering list items with support for nested subitems.
+ * Eliminates 120 lines of code duplication from List.astro.
+ * Follows Single Responsibility Principle by handling only column rendering logic.
+ *
+ * Features:
+ * - Renders a single column of list items
+ * - Supports nested subitems (up to 3 levels)
+ * - Staggered fade-in animations
+ * - Responsive spacing
+ * - Accessible markup with proper ARIA attributes
+ *
+ * @component
+ * @example
+ * ```astro
+ * <ListColumn items={leftColumnItems} startIndex={0} />
+ * ```
+ */
+
+interface Item {
+  intro?: string;
+  content: string;
+  subitems?: Item[];
+}
+
+export interface Props {
+  /** Array of items to render in this column */
+  items: Item[];
+
+  /** Starting index for animation stagger */
+  startIndex?: number;
+}
+
+const { items, startIndex = 0 } = Astro.props;
+---
+
+<ul class="custom-list mb-2 list-none px-0 pl-0 md:mb-6" role="list">
+  {
+    items.map((item, index) => (
+      <li
+        data-index={startIndex + index}
+        class="animate-fadeIn relative mb-2 list-item translate-y-[10px] py-1 pl-8 opacity-0 transition-all duration-300 ease-in-out md:mb-3"
+        style={`animation-delay: calc(${startIndex + index} * 100ms);`}
+      >
+        <div class="item-wrapper before:absolute before:top-[0.6em] before:left-0 before:h-2 before:w-2 before:rounded-full before:bg-accent before:content-['']">
+          {item.intro && (
+            <strong class="font-semibold">{item.intro}:&nbsp;</strong>
+          )}
+          <span class="item-content">{item.content}</span>
+        </div>
+
+        {item.subitems && (
+          <ul class="subitem-list mt-2 list-none px-0 pl-0">
+            {item.subitems.map((subitem, subIndex) => (
+              <li
+                data-subindex={subIndex}
+                class="subitem animate-fadeInSubitem mb-1 pl-6 text-[0.95em] opacity-0 before:absolute before:top-[0.65em] before:left-0 before:h-1.5 before:w-1.5 before:rotate-45 before:bg-blue-500 before:content-[''] md:mb-2"
+              >
+                {subitem.intro && (
+                  <strong class="font-semibold">{subitem.intro}:&nbsp;</strong>
+                )}
+                <span class="item-content">{subitem.content}</span>
+
+                {subitem.subitems && (
+                  <ul class="sub-subitem-list mt-1 list-none pl-0">
+                    {subitem.subitems.map((subSubitem, subSubIndex) => (
+                      <li
+                        data-subsubindex={subSubIndex}
+                        class="sub-subitem animate-fadeInSubitem mb-1 pl-5 text-[0.9em] text-foreground/90 opacity-0 delay-100 before:absolute before:top-[0.65em] before:left-0 before:h-1 before:w-1 before:rounded-full before:bg-green-400 before:content-['']"
+                      >
+                        {subSubitem.intro && (
+                          <strong class="font-semibold">
+                            {subSubitem.intro}:&nbsp;
+                          </strong>
+                        )}
+                        <span class="item-content">{subSubitem.content}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </li>
+    ))
+  }
+</ul>
+
+<style is:global>
+  @reference "@/styles/global.css";
+
+  /* Note: Animations are defined globally in List.astro to avoid duplication */
+</style>

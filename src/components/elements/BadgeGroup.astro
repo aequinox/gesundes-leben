@@ -1,0 +1,108 @@
+---
+/**
+ * BadgeGroup Component
+ *
+ * Renders a group of badges with consistent spacing and styling.
+ * Extracts badge rendering logic from larger components to follow Single Responsibility Principle.
+ *
+ * Features:
+ * - Renders multiple badges with consistent spacing
+ * - Supports max count limiting
+ * - Responsive gap sizing
+ * - Follows DRY principles
+ *
+ * @component
+ * @example
+ * ```astro
+ * <BadgeGroup
+ *   items={["Health", "Nutrition", "Fitness"]}
+ *   maxItems={2}
+ *   size="xs"
+ * />
+ * ```
+ */
+
+import Badge from "./Badge.astro";
+
+export interface Props {
+  /** Array of badge text items */
+  items: string[];
+
+  /** Maximum number of badges to display */
+  maxItems?: number;
+
+  /** Badge variant */
+  variant?: "primary" | "secondary" | "accent" | "neutral";
+
+  /** Badge size */
+  size?: "xs" | "sm" | "md" | "lg";
+
+  /** Badge shape */
+  shape?: "rounded" | "square" | "pill";
+
+  /** Whether badges should be outlined */
+  outlined?: boolean;
+
+  /** Gap size between badges */
+  gap?: "small" | "medium" | "large";
+
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  items,
+  maxItems,
+  variant = "primary",
+  size = "xs",
+  shape = "square",
+  outlined = true,
+  gap = "small",
+  class: className = "",
+} = Astro.props;
+
+// Determine how many items to display
+const displayItems = maxItems ? items.slice(0, maxItems) : items;
+const hasMore = maxItems && items.length > maxItems;
+const remainingCount = hasMore ? items.length - maxItems : 0;
+
+// Gap size classes
+const gapClasses = {
+  small: "gap-1",
+  medium: "gap-1.5",
+  large: "gap-2",
+};
+
+const containerClasses = ["flex flex-wrap", gapClasses[gap], className]
+  .filter(Boolean)
+  .join(" ");
+---
+
+{
+  items && items.length > 0 && (
+    <div class={containerClasses}>
+      {displayItems.map((item: string) => (
+        <Badge
+          text={item}
+          variant={variant}
+          size={size}
+          shape={shape}
+          outlined={outlined}
+        />
+      ))}
+      {hasMore && (
+        <Badge
+          text={`+${remainingCount}`}
+          variant="neutral"
+          size={size}
+          shape={shape}
+          outlined={outlined}
+        />
+      )}
+    </div>
+  )
+}
+
+<style>
+  @reference "@/styles/global.css";
+</style>
