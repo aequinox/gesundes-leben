@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * @file propValidation.ts
  * @description Runtime prop validation utilities for Astro components
@@ -37,13 +36,31 @@ import { logger } from "./logger";
 // === Core Validation Types ===
 
 /**
- * Validation rule configuration for a single property
+ * Valid prop value types that can be validated
  */
-export interface PropValidationRule {
+export type PropValue =
+  | string
+  | number
+  | boolean
+  | object
+  | unknown[]
+  | ((...args: unknown[]) => unknown)
+  | null
+  | undefined;
+
+/**
+ * Type name for runtime validation
+ */
+export type PropTypeName = "string" | "number" | "boolean" | "object" | "array" | "function";
+
+/**
+ * Generic validation rule configuration for a single property
+ */
+export interface PropValidationRule<T = PropValue> {
   /** Whether the property is required */
   required?: boolean;
   /** Expected type(s) */
-  type?: "string" | "number" | "boolean" | "object" | "array" | "function";
+  type?: PropTypeName;
   /** For strings: minimum length */
   minLength?: number;
   /** For strings: maximum length */
@@ -55,9 +72,9 @@ export interface PropValidationRule {
   /** Valid enum values */
   oneOf?: readonly string[] | string[];
   /** Custom validation function */
-  validator?: (value: any) => boolean | string;
+  validator?: (value: T) => boolean | string;
   /** Default value if not provided */
-  defaultValue?: any;
+  defaultValue?: T;
   /** Error message override */
   message?: string;
 }
@@ -65,8 +82,8 @@ export interface PropValidationRule {
 /**
  * Validation schema for a component's props
  */
-export type PropValidationSchema<T extends Record<string, any>> = {
-  [K in keyof T]?: PropValidationRule;
+export type PropValidationSchema<T extends Record<string, PropValue>> = {
+  [K in keyof T]?: PropValidationRule<T[K]>;
 };
 
 /**
@@ -84,9 +101,9 @@ export interface ValidationContext {
 /**
  * Validates a single property value against a rule
  */
-export function validateProp(
-  value: any,
-  rule: PropValidationRule,
+export function validateProp<T extends PropValue>(
+  value: T,
+  rule: PropValidationRule<T>,
   propName: string
 ): ValidationResult {
   const errors: string[] = [];
@@ -135,7 +152,7 @@ export function validateProp(
   }
 
   // Enum validation
-  if (rule.oneOf && !rule.oneOf.includes(value)) {
+  if (rule.oneOf && typeof value === 'string' && !rule.oneOf.includes(value)) {
     errors.push(`${propName} must be one of: ${rule.oneOf.join(", ")}`);
   }
 
@@ -159,7 +176,7 @@ export function validateProp(
 /**
  * Validates an object against a schema
  */
-export function validateProps<T extends Record<string, any>>(
+export function validateProps<T extends Record<string, PropValue>>(
   props: T,
   schema: PropValidationSchema<T>,
   context: ValidationContext = {}
@@ -174,14 +191,14 @@ export function validateProps<T extends Record<string, any>>(
       continue;
     }
 
-    const propValue = props[propName];
+    const propValue = props[propName as keyof T];
 
     // Apply default value
     if (!isDefined(propValue) && isDefined(rule.defaultValue)) {
-      (validatedProps as any)[propName] = rule.defaultValue;
+      validatedProps[propName as keyof T] = rule.defaultValue as T[keyof T];
     }
 
-    const validation = validateProp(validatedProps[propName], rule, propName);
+    const validation = validateProp(validatedProps[propName as keyof T], rule, propName);
 
     allErrors.push(...validation.errors);
     if (validation.warnings) {
@@ -222,7 +239,7 @@ export function validateProps<T extends Record<string, any>>(
 /**
  * Type validation helper
  */
-function validateType(value: any, expectedType: string): boolean {
+function validateType(value: PropValue, expectedType: PropTypeName): boolean {
   switch (expectedType) {
     case "string":
       return typeof value === "string";
@@ -246,9 +263,21 @@ function validateType(value: any, expectedType: string): boolean {
 // === Component-Specific Validators ===
 
 /**
+ * Base component props for common HTML attributes
+ */
+interface BaseComponentProps extends Record<string, PropValue> {
+  class?: string;
+  id?: string;
+  disabled?: boolean;
+  loading?: "true" | "false" | "idle" | "loading" | "success" | "error";
+  ariaLabel?: string;
+  "data-testid"?: string;
+}
+
+/**
  * Base component props validation schema
  */
-export const baseComponentSchema: PropValidationSchema<Record<string, any>> = {
+export const baseComponentSchema: PropValidationSchema<BaseComponentProps> = {
   class: { type: "string" },
   id: { type: "string" },
   disabled: { type: "boolean" },
@@ -262,7 +291,7 @@ export const baseComponentSchema: PropValidationSchema<Record<string, any>> = {
 /**
  * Size variant validation
  */
-export const sizeVariantValidator = (value: any): boolean => {
+export const sizeVariantValidator = (value: SizeVariant): boolean => {
   const validSizes: SizeVariant[] = ["xs", "sm", "md", "lg", "xl"];
   return validSizes.includes(value);
 };
@@ -270,7 +299,7 @@ export const sizeVariantValidator = (value: any): boolean => {
 /**
  * Color variant validation
  */
-export const colorVariantValidator = (value: any): boolean => {
+export const colorVariantValidator = (value: ColorVariant): boolean => {
   const validColors: ColorVariant[] = [
     "primary",
     "secondary",
@@ -286,7 +315,7 @@ export const colorVariantValidator = (value: any): boolean => {
 /**
  * Button variant validation
  */
-export const buttonVariantValidator = (value: any): boolean => {
+export const buttonVariantValidator = (value: ButtonVariant): boolean => {
   const validVariants: ButtonVariant[] = [
     "default",
     "accent",
@@ -303,7 +332,7 @@ export const buttonVariantValidator = (value: any): boolean => {
 /**
  * URL validation helper
  */
-export const urlValidator = (value: any): boolean | string => {
+export const urlValidator = (value: string): boolean | string => {
   if (!isNonEmptyString(value)) {
     return "URL must be a non-empty string";
   }
@@ -318,7 +347,7 @@ export const urlValidator = (value: any): boolean | string => {
 /**
  * Email validation helper
  */
-export const emailValidator = (value: any): boolean | string => {
+export const emailValidator = (value: string): boolean | string => {
   if (!isNonEmptyString(value)) {
     return "Email must be a non-empty string";
   }
@@ -332,9 +361,20 @@ export const emailValidator = (value: any): boolean | string => {
 };
 
 /**
+ * Props object for accessible name validation
+ */
+interface AccessibleProps extends Record<string, PropValue> {
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
+  title?: string;
+  children?: string;
+  text?: string;
+}
+
+/**
  * Accessible name validation (for interactive elements)
  */
-export const accessibleNameValidator = (props: any): boolean | string => {
+export const accessibleNameValidator = (props: AccessibleProps): boolean | string => {
   const hasAriaLabel = isNonEmptyString(props["aria-label"]);
   const hasAriaLabelledBy = isNonEmptyString(props["aria-labelledby"]);
   const hasTitle = isNonEmptyString(props.title);
@@ -353,7 +393,7 @@ export const accessibleNameValidator = (props: any): boolean | string => {
 /**
  * Creates a validation function for a specific component
  */
-export function createValidator<T extends Record<string, any>>(
+export function createValidator<T extends Record<string, PropValue>>(
   schema: PropValidationSchema<T>,
   context: ValidationContext = {}
 ) {
@@ -365,7 +405,7 @@ export function createValidator<T extends Record<string, any>>(
 /**
  * Creates a strict validator that throws on validation errors
  */
-export function createStrictValidator<T extends Record<string, any>>(
+export function createStrictValidator<T extends Record<string, PropValue>>(
   schema: PropValidationSchema<T>,
   componentName: string
 ) {
@@ -379,7 +419,7 @@ export function createStrictValidator<T extends Record<string, any>>(
 /**
  * HOC-style validator for component props
  */
-export function withValidation<T extends Record<string, any>>(
+export function withValidation<T extends Record<string, PropValue>>(
   schema: PropValidationSchema<T>,
   componentName?: string
 ) {
@@ -424,10 +464,18 @@ export const commonRules = {
 // === Development Helpers ===
 
 /**
+ * Props object for inspection
+ */
+interface InspectableProps extends Record<string, PropValue> {
+  children?: PropValue;
+  slots?: PropValue;
+}
+
+/**
  * Dev-only prop inspection utility
  */
 export function inspectProps(
-  props: Record<string, any>,
+  props: InspectableProps,
   componentName: string
 ): void {
   if (!import.meta.env.DEV) {
@@ -450,7 +498,7 @@ export function inspectProps(
 /**
  * Performance monitoring for prop validation
  */
-export function measureValidation<T extends Record<string, any>>(
+export function measureValidation<T extends Record<string, PropValue>>(
   props: T,
   schema: PropValidationSchema<T>,
   componentName: string
@@ -475,8 +523,8 @@ export function measureValidation<T extends Record<string, any>>(
 /**
  * Generate TypeScript interface from validation schema (dev helper)
  */
-export function generateInterface(
-  schema: PropValidationSchema<any>,
+export function generateInterface<T extends Record<string, PropValue>>(
+  schema: PropValidationSchema<T>,
   interfaceName: string
 ): string {
   if (!import.meta.env.DEV) {
@@ -491,7 +539,7 @@ export function generateInterface(
     }
 
     const optional = rule.required ? "" : "?";
-    const type = rule.type || "any";
+    const type = rule.type || "unknown";
     interfaceStr += `  ${propName}${optional}: ${type};\n`;
   }
 
