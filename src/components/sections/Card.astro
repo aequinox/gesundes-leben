@@ -132,6 +132,9 @@ const groupConfigs: Record<string, GroupConfig> = {
 const groupConfig =
   groupConfigs[groupProp || "fragezeiten"] || groupConfigs["fragezeiten"];
 
+// Ensure icon name is never empty (safety check)
+const iconName = groupConfig?.icon || "tabler:question-mark";
+
 // Card classes based on size - Refined animations for premium feel
 const cardClasses = `hover:-translate-y-1 hover:border-accent/20 hover:shadow-elevation-medium hover:bg-linear-to-br from-card/50 to-card relative isolate transform-gpu backface-hidden preserve-3d perspective-1000 rounded-xs backdrop-blur-md bg-card/5 border border-accent/10 shadow-sm flex flex-col justify-between h-full overflow-hidden ${
   isSmall ? "text-sm" : ""
@@ -203,7 +206,7 @@ const readMoreClasses = `group mr-2 mt-${
               aria-label={groupConfig?.label}
             >
               <Icon
-                name={groupConfig?.icon}
+                name={iconName}
                 class={`card-badge-icon transition-transform duration-300 ${
                   isSmall ? "h-4 w-4" : "h-5 w-5"
                 }`}
