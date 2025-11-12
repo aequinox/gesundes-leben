@@ -4,8 +4,8 @@ import { join, dirname } from "node:path";
 
 import { parse, stringify } from "yaml";
 
-import { logger } from "@/utils/logger";
 import { withAsyncErrorHandling } from "@/utils/error-handling/shared";
+import { logger } from "@/utils/logger";
 import {
   withCache,
   CacheKeys,
@@ -182,10 +182,10 @@ export async function getAllReferences(): Promise<Reference[]> {
       [],
       {
         // Custom error handler to try fallback method
-        onError: async (_error) => {
+        onError: (_error) => {
           if (getCollection !== null) {
             logger.info("Trying fallback method...");
-            return await readReferencesFromFiles();
+            void readReferencesFromFiles();
           }
         },
       }

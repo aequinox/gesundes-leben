@@ -5,6 +5,8 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { logger } from "@/utils/logger";
+
 import {
   buildArticleSchema,
   buildAuthorSchema,
@@ -24,7 +26,6 @@ import {
   type ArticleSchemaOptions,
   type BreadcrumbItemData,
 } from "../SchemaBuilder";
-import { logger } from "@/utils/logger";
 
 // Mock the logger
 vi.mock("@/utils/logger", () => ({
@@ -451,7 +452,6 @@ describe("SchemaBuilder - Helper Functions", () => {
     });
 
     it("should return empty object for error", () => {
-      const { logger } = require("@/utils/logger");
       // Create a circular reference
       const circular: any = { name: "test" };
       circular.self = circular;

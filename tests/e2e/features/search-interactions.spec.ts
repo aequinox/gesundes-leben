@@ -449,7 +449,7 @@ test.describe('Search Interactions', () => {
       await page.waitForFunction(() => {
         const results = document.querySelector('#pagefind-results, .search-results');
         const noResults = document.querySelector('.no-results, .pagefind-zero-results');
-        return (results?.children?.length ?? 0) > 0 ?? noResults !== null;
+        return (results?.children?.length ?? 0) > 0 || noResults !== null;
       }, { timeout: 5000 });
       
       const searchTime = Date.now() - startTime;

@@ -309,7 +309,7 @@ test.describe('Image Optimization', () => {
       // Wait for images to load
       await page.waitForFunction(() => {
         const images = Array.from(document.querySelectorAll('img'));
-        return images.length === 0 ?? images.every(img => img.complete);
+        return images.length === 0 || images.every(img => img.complete);
       }, { timeout: 10000 });
       
       const layoutShifts = await page.evaluate(() => window.layoutShifts);
@@ -553,9 +553,9 @@ test.describe('Image Optimization', () => {
       // Broken image should be handled (hidden or replaced)
       const visibleBrokenImages = await page.evaluate(() => {
         const images = Array.from(document.querySelectorAll('img'));
-        return images.filter(img => 
+        return images.filter(img =>
           img.style.display !== 'none' &&
-          (!img.complete ?? img.naturalWidth === 0)
+          (!img.complete || img.naturalWidth === 0)
         ).length;
       });
       

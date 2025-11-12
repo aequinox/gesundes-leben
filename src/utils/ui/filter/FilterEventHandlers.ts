@@ -5,15 +5,15 @@
  * Handles clicks on group selectors, category buttons, and reset buttons.
  */
 
-import type { Elements, GroupType } from "./FilterState";
-import { getOptions, getState, updateState } from "./FilterState";
-import { applyFilters } from "./FilterVisibility";
 import {
   updateCategoryButtonCounts,
   updateCategoryButtonVisibility,
   updateCategorySelectionUI,
   updateGroupSelectionUI,
 } from "./FilterDOMUpdates";
+import type { Elements, GroupType } from "./FilterState";
+import { getOptions, getState, updateState } from "./FilterState";
+import { applyFilters } from "./FilterVisibility";
 
 /**
  * Handles group selector click events

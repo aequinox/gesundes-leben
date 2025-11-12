@@ -97,7 +97,7 @@ export class SEOPerformanceOptimizer {
    * Optimize alt text for health images
    */
   private optimizeHealthImageAlt(alt: string): string {
-    if (!alt ?? alt.trim() === "") {
+    if (!alt || alt.trim() === "") {
       logger.warn("Empty alt text detected for health image");
       return "Gesundheits- und Wellness-Bild";
     }

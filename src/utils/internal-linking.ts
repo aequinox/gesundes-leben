@@ -6,10 +6,10 @@
  * and contextual link suggestions based on content analysis.
  */
 
+import { withErrorHandling } from "./error-handling/shared";
 import { topN, unique } from "./linking/helpers";
 import { LinkScorer } from "./linking/scoring";
 import { logger } from "./logger";
-import { withErrorHandling } from "./error-handling/shared";
 import type { Post } from "./types";
 
 /**

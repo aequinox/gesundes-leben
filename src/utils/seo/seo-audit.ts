@@ -205,7 +205,7 @@ class SEOAuditor {
     let score = 100;
 
     // Title optimization
-    if (!data.title ?? data.title.trim().length === 0) {
+    if (!data.title || data.title.trim().length === 0) {
       score -= 30;
       criticalIssues.push("Missing page title");
     } else if (data.title.length > 60) {
@@ -219,7 +219,7 @@ class SEOAuditor {
     }
 
     // Meta description
-    if (!data.description ?? data.description.trim().length === 0) {
+    if (!data.description || data.description.trim().length === 0) {
       score -= 25;
       criticalIssues.push("Missing meta description");
     } else if (data.description.length > 160) {
@@ -233,7 +233,7 @@ class SEOAuditor {
     }
 
     // Keywords
-    if (!data.keywords ?? data.keywords.length === 0) {
+    if (!data.keywords || data.keywords.length === 0) {
       score -= 5;
       recommendations.push(
         "Add relevant keywords for better content categorization"
@@ -250,7 +250,7 @@ class SEOAuditor {
       score -= 15;
       warnings.push("Missing hero image affects social sharing and engagement");
     } else {
-      if (!data.heroImage.alt ?? data.heroImage.alt.trim().length === 0) {
+      if (!data.heroImage.alt || data.heroImage.alt.trim().length === 0) {
         score -= 10;
         criticalIssues.push("Missing alt text for hero image");
       } else {
@@ -259,7 +259,7 @@ class SEOAuditor {
     }
 
     // Categories and tags
-    if (!data.categories ?? data.categories.length === 0) {
+    if (!data.categories || data.categories.length === 0) {
       score -= 10;
       warnings.push("Missing categories for content organization");
     } else {

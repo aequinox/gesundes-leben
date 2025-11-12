@@ -246,9 +246,9 @@ test.describe('Edge Cases and Error Handling', () => {
       // Should handle broken images (hide or show fallback)
       const visibleBrokenImages = await page.evaluate(() => {
         const images = Array.from(document.querySelectorAll('img'));
-        return images.filter(img => 
+        return images.filter(img =>
           img.style.display !== 'none' &&
-          (!img.complete ?? img.naturalWidth === 0)
+          (!img.complete || img.naturalWidth === 0)
         ).length;
       });
       

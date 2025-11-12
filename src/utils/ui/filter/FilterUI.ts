@@ -6,8 +6,7 @@
  */
 
 import { logger } from "../../logger";
-import type { Elements, FilterOptions } from "./FilterState";
-import { getOptions, initializeOptions, updateState } from "./FilterState";
+
 import {
   updateCategoryButtonCounts,
   updateCategoryButtonVisibility,
@@ -15,6 +14,8 @@ import {
   updateGroupSelectionUI,
 } from "./FilterDOMUpdates";
 import { attachEventListeners } from "./FilterEventHandlers";
+import type { Elements, FilterOptions } from "./FilterState";
+import { getOptions, initializeOptions, updateState } from "./FilterState";
 import { applyFilters, prepareArticlesForFiltering } from "./FilterVisibility";
 
 // Module-level elements storage
