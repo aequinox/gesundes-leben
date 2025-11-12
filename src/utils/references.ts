@@ -5,6 +5,7 @@ import { join, dirname } from "node:path";
 import { parse, stringify } from "yaml";
 
 import { logger } from "@/utils/logger";
+import { withAsyncErrorHandling } from "@/utils/error-handling/shared";
 import {
   withCache,
   CacheKeys,
@@ -113,43 +114,49 @@ function createReferenceFieldComparator(): (a: string, b: string) => number {
  * Fallback function to read references directly from YAML files
  */
 async function readReferencesFromFiles(): Promise<Reference[]> {
-  const referencesDir = join(process.cwd(), "src/data/references");
+  return withAsyncErrorHandling(
+    async () => {
+      const referencesDir = join(process.cwd(), "src/data/references");
 
-  if (!existsSync(referencesDir)) {
-    logger.warn("References directory not found:", referencesDir);
-    return [];
-  }
-
-  try {
-    const { readdir } = await import("node:fs/promises");
-    const files = await readdir(referencesDir);
-    const yamlFiles = files.filter(
-      file => file.endsWith(".yaml") || file.endsWith(".yml")
-    );
-
-    const references: Reference[] = [];
-
-    for (const file of yamlFiles) {
-      try {
-        const filePath = join(referencesDir, file);
-        const content = await readFile(filePath, "utf8");
-        const data = parse(content) as ReferenceData;
-        const id = file.replace(/\.(yaml|yml)$/, "");
-
-        references.push({
-          id,
-          ...data,
-        });
-      } catch (error) {
-        logger.warn(`Failed to read reference file ${file}:`, error);
+      if (!existsSync(referencesDir)) {
+        logger.warn("References directory not found:", referencesDir);
+        return [];
       }
-    }
 
-    return references;
-  } catch (error) {
-    logger.error("Failed to read references from files:", error);
-    return [];
-  }
+      const { readdir } = await import("node:fs/promises");
+      const files = await readdir(referencesDir);
+      const yamlFiles = files.filter(
+        file => file.endsWith(".yaml") || file.endsWith(".yml")
+      );
+
+      const references: Reference[] = [];
+
+      for (const file of yamlFiles) {
+        await withAsyncErrorHandling(
+          async () => {
+            const filePath = join(referencesDir, file);
+            const content = await readFile(filePath, "utf8");
+            const data = parse(content) as ReferenceData;
+            const id = file.replace(/\.(yaml|yml)$/, "");
+
+            references.push({
+              id,
+              ...data,
+            });
+          },
+          `readReferencesFromFiles[${file}]`,
+          undefined,
+          { logError: false } // Don't log per-file errors, just warn
+        ).catch(error => {
+          logger.warn(`Failed to read reference file ${file}:`, error);
+        });
+      }
+
+      return references;
+    },
+    "readReferencesFromFiles",
+    []
+  );
 }
 
 /**
@@ -157,31 +164,32 @@ async function readReferencesFromFiles(): Promise<Reference[]> {
  */
 export async function getAllReferences(): Promise<Reference[]> {
   return withCache(CacheKeys.allReferences(), async () => {
-    try {
-      // Try Astro's getCollection first
-      if (getCollection !== null) {
-        const referencesCollection = await getCollection("references");
-        return referencesCollection.map(entry => ({
-          id: entry.id,
-          ...entry.data,
-        }));
-      } else {
-        // Fallback to reading files directly
-        return await readReferencesFromFiles();
-      }
-    } catch (error) {
-      logger.error("Failed to load references:", error);
-      // If Astro method fails, try fallback
-      if (getCollection !== null) {
-        logger.info("Trying fallback method...");
-        try {
+    return withAsyncErrorHandling(
+      async () => {
+        // Try Astro's getCollection first
+        if (getCollection !== null) {
+          const referencesCollection = await getCollection("references");
+          return referencesCollection.map(entry => ({
+            id: entry.id,
+            ...entry.data,
+          }));
+        } else {
+          // Fallback to reading files directly
           return await readReferencesFromFiles();
-        } catch (fallbackError) {
-          logger.error("Fallback method also failed:", fallbackError);
         }
+      },
+      "getAllReferences",
+      [],
+      {
+        // Custom error handler to try fallback method
+        onError: async (error) => {
+          if (getCollection !== null) {
+            logger.info("Trying fallback method...");
+            return await readReferencesFromFiles();
+          }
+        },
       }
-      return [];
-    }
+    );
   });
 }
 
