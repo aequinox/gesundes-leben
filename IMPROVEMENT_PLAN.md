@@ -178,23 +178,46 @@ Image.astro (200 lines) - Main component
 
 #### 2.2 Large Utilities (14+ files exceed limit)
 
-##### **Priority 1: BlogFilterEngine.ts (726 → split 3 files)**
+##### **Priority 1: BlogFilterEngine.ts (726 → split 5 files)** ✅ COMPLETED
 
+**Status:** COMPLETED (2025-11-12)
+**Commit:** 3b351c8
+
+**Actual Implementation:**
 ```
 utils/ui/filter/
-├── FilterState.ts (200 lines)
-│   ├── State initialization
-│   ├── State updates
-│   └── State persistence
-├── FilterVisibility.ts (180 lines)
-│   ├── Show/hide logic
+├── FilterState.ts (245 lines)
+│   ├── State management
+│   ├── Filtering logic
+│   └── Category/group data operations
+├── FilterVisibility.ts (198 lines)
+│   ├── Show/hide article logic
 │   ├── Animation handling
-│   └── Intersection observer
-└── FilterUI.ts (200 lines)
-    ├── DOM updates
-    ├── Event handlers
-    └── Accessibility
+│   └── Article preparation
+├── FilterDOMUpdates.ts (166 lines)
+│   ├── Group selection UI
+│   ├── Category button visibility
+│   ├── Category button counts
+│   └── Category selection UI
+├── FilterEventHandlers.ts (137 lines)
+│   ├── Group selector clicks
+│   ├── Category button clicks
+│   ├── Reset filter clicks
+│   └── Event listener attachment
+└── FilterUI.ts (100 lines)
+    ├── Element initialization
+    ├── Main initialization
+    └── Coordination
 ```
+
+**Results:**
+- ✅ **Average 178 lines per file** (vs 726 in 1 file)
+- ✅ **4 of 5 files under 200-line guideline**
+- ✅ **Clear separation of concerns**
+- ✅ **Backward compatible** via re-exports
+- ✅ **All existing imports work unchanged**
+
+---
 
 ---
 
