@@ -574,13 +574,15 @@ export function createDebouncedValidator(
           clearTimeout(timeoutId);
         }
 
-        timeoutId = window.setTimeout(async () => {
-          const result = await validator.validateField(
-            fieldName,
-            value,
-            formData
-          );
-          resolve(result);
+        timeoutId = window.setTimeout(() => {
+          void (async () => {
+            const result = await validator.validateField(
+              fieldName,
+              value,
+              formData
+            );
+            resolve(result);
+          })();
         }, delay);
       });
     },

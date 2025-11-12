@@ -1,0 +1,72 @@
+---
+import type { GetStaticPathsOptions } from "astro";
+
+import Hr from "@/components/elements/Hr.astro";
+import Card from "@/components/sections/Card.astro";
+import Footer from "@/components/sections/Footer.astro";
+import Header from "@/components/sections/Header.astro";
+import PageHero from "@/components/sections/PageHero.astro";
+import Pagination from "@/components/sections/Pagination.astro";
+import { SITE } from "@/config";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import { extractUniqueCategories } from "@/utils/categories";
+import { getPostsByCategory, processAllPosts } from "@/utils/posts";
+
+export const getStaticPaths = async ({ paginate }: GetStaticPathsOptions) => {
+  // Use the unified post processing function
+  const posts = await processAllPosts();
+  const categories = extractUniqueCategories(posts);
+
+  return Promise.all(
+    categories.map(async ({ category, categoryName }) => {
+      const categoryPosts = await getPostsByCategory(posts, category);
+
+      return paginate(categoryPosts, {
+        params: { category },
+        props: { categoryName },
+        pageSize: SITE.postPerPage,
+      });
+    })
+  ).then(results => results.flat());
+};
+
+const { page, categoryName } = Astro.props;
+
+// Get current language and translation function
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Extract pagination info for modern pagination component
+const currentPage = page.currentPage;
+const totalPages = page.lastPage;
+---
+
+<Layout title={`${categoryName} | ${SITE.title}`}>
+  <Header />
+  <PageHero
+    title={categoryName}
+    subtitle={t("categories.description") ?? "Artikel in dieser Kategorie"}
+  />
+
+  <Hr />
+
+  <main id="main-content" class="mx-auto w-full max-w-content px-4 py-8">
+    <div
+      class="grid grid-cols-1 gap-4 space-y-4 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4"
+    >
+      {
+        page.data.map(post => (
+          <Card {post} withHeroImage={true} withMeta={false} />
+        ))
+      }
+    </div>
+  </main>
+  <Pagination
+    currentPage={currentPage}
+    totalPages={totalPages}
+    prevUrl={page.url.prev ?? ""}
+    nextUrl={page.url.next ?? ""}
+  />
+  <Footer />
+</Layout>
