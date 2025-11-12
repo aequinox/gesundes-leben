@@ -88,13 +88,15 @@ const isActive = (key: string) => {
             aria-current={active ? "page" : undefined}
           >
             {/* Icon */}
-            <Icon
-              name={item.icon}
-              class={`h-6 w-6 transition-transform duration-200 ${
-                active ? "scale-110" : ""
-              }`}
-              aria-hidden="true"
-            />
+            {item.icon && item.icon.trim() !== "" && (
+              <Icon
+                name={item.icon}
+                class={`h-6 w-6 transition-transform duration-200 ${
+                  active ? "scale-110" : ""
+                }`}
+                aria-hidden="true"
+              />
+            )}
 
             {/* Label */}
             <span
