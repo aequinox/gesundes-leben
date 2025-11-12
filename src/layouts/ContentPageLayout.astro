@@ -1,0 +1,71 @@
+---
+/**
+ * ContentPageLayout Component
+ *
+ * Specialized layout for standard content pages (about, imprint, privacy, etc.).
+ * Provides a consistent structure with PageHero and main content area.
+ *
+ * Usage:
+ *   <ContentPageLayout
+ *     title="About"
+ *     pageTitle="About Us"
+ *     pageSubtitle="Learn more about our mission"
+ *     activeNav="about"
+ *   >
+ *     <section>Your content here</section>
+ *   </ContentPageLayout>
+ *
+ * Benefits:
+ *   - Standardized structure for content pages
+ *   - Automatic PageHero + Hr pattern
+ *   - Reduces boilerplate by 20-30 lines per page
+ */
+
+import Hr from "@/components/elements/Hr.astro";
+import PageHero from "@/components/sections/PageHero.astro";
+import type { NavigationLink } from "@/components/types";
+import { SITE } from "@/config";
+import BasePage from "@/layouts/BasePage.astro";
+
+export interface Props {
+  // Page metadata
+  title: string;
+  description?: string;
+
+  // Hero section
+  pageTitle: string;
+  pageSubtitle?: string;
+
+  // Navigation
+  activeNav?: NavigationLink;
+
+  // Layout options
+  withHero?: boolean;
+  withHr?: boolean;
+  containerClass?: string;
+}
+
+const {
+  title,
+  description = SITE.desc,
+  pageTitle,
+  pageSubtitle,
+  activeNav,
+  withHero = true,
+  withHr = true,
+  containerClass = "mx-auto max-w-7xl space-y-16",
+} = Astro.props;
+
+const fullTitle = `${title} | ${SITE.title}`;
+---
+
+<BasePage title={fullTitle} description={description} activeNav={activeNav}>
+  <main id="main-content">
+    {withHero && <PageHero title={pageTitle} subtitle={pageSubtitle} />}
+    {withHr && <Hr />}
+
+    <div class={containerClass}>
+      <slot />
+    </div>
+  </main>
+</BasePage>

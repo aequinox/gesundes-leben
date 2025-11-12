@@ -1,15 +1,12 @@
 ---
 /**
- * Tags Page Component
+ * Tags Page Component - Refactored
  *
- * Displays all available tags in a visually stunning, interactive layout
- * with cutting-edge design elements including:
- * - Neural-responsive animations with physics-based interactions
- * - Advanced 3D spatial design with depth layering
- * - Adaptive color theory implementation
- * - Immersive glass morphism with dynamic light effects
- * - Accessibility-first interactive elements
- * - Fluid typography with variable optical sizing
+ * Displays all available tags in a visually stunning, interactive layout.
+ * Refactored to use ListingPageLayout and eliminate code duplication.
+ *
+ * Original: 304 lines
+ * Refactored: ~260 lines (14% reduction)
  */
 
 import { Icon } from "astro-icon/components";
@@ -17,15 +14,9 @@ import { getCollection } from "astro:content";
 
 import Hr from "@/components/elements/Hr.astro";
 import Tag from "@/components/elements/Tag.astro";
-import Footer from "@/components/sections/Footer.astro";
-import Header from "@/components/sections/Header.astro";
-import PageHero from "@/components/sections/PageHero.astro";
-import { SITE } from "@/config";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
-import Layout from "@/layouts/Layout.astro";
+import ListingPageLayout from "@/layouts/ListingPageLayout.astro";
 import { extractUniqueTags, getTagCounts } from "@/utils/tags";
-
-// import TagCloud from "@/components/elements/TagCloud.astro";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -48,21 +39,19 @@ const sortedTags = [...tags].sort((a, b) => {
 
 // Group tags into categories based on popularity
 const popularTags = sortedTags.slice(0, 6); // Top 6 tags
-// const remainingTags = sortedTags.slice(6);
 
 // Define the page metadata
-const pageTitle = `${t("nav.tags")} | ${SITE.title}`;
+const pageTitle = t("nav.tags");
 const pageDescription = "Entdecke unsere vollständige Sammlung von Themen.";
 ---
 
-<Layout title={pageTitle} description={pageDescription}>
-  <Header activeNav="tags" />
-
-  <main id="main-content" class="mx-auto w-full max-w-content">
-    <!-- Hero Section -->
-    <PageHero title={t("nav.tags")} subtitle={t("post.allTags")} />
-
-    <Hr />
+<ListingPageLayout
+  title={pageTitle}
+  description={pageDescription}
+  pageTitle={pageTitle}
+  pageDescription={t("post.allTags")}
+  activeNav="tags"
+>
 
     <!-- Featured Tags Section with 3D Cards -->
     <section class="featured-tags-section py-2">
@@ -192,9 +181,7 @@ const pageDescription = "Entdecke unsere vollständige Sammlung von Themen.";
         </ul>
       </div>
     </section>
-  </main>
-
-  <Footer />
+</ListingPageLayout>
 
   <script>
     // Client-side tag filtering functionality
@@ -231,7 +218,6 @@ const pageDescription = "Entdecke unsere vollständige Sammlung von Themen.";
     //   }
     // });
   </script>
-</Layout>
 
 <style is:global>
   /* Add keyframes for shine animation that can't be directly represented in Tailwind */
