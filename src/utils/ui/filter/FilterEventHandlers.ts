@@ -5,7 +5,7 @@
  * Handles clicks on group selectors, category buttons, and reset buttons.
  */
 
-import type { Elements, FilterOptions, GroupType } from "./FilterState";
+import type { Elements, GroupType } from "./FilterState";
 import { getOptions, getState, updateState } from "./FilterState";
 import { applyFilters } from "./FilterVisibility";
 import {

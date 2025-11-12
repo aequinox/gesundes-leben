@@ -182,7 +182,7 @@ export async function getAllReferences(): Promise<Reference[]> {
       [],
       {
         // Custom error handler to try fallback method
-        onError: async (error) => {
+        onError: async (_error) => {
           if (getCollection !== null) {
             logger.info("Trying fallback method...");
             return await readReferencesFromFiles();

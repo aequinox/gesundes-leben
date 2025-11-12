@@ -187,7 +187,7 @@ export class EnhancedSitemapGenerator {
 
     const entry: SitemapEntry = {
       url,
-      lastModified: post.data.modDatetime || post.data.pubDatetime,
+      lastModified: post.data.modDatetime ?? post.data.pubDatetime,
       changeFrequency: this.getChangeFrequency(
         "article",
         post.data.pubDatetime,
@@ -237,7 +237,7 @@ export class EnhancedSitemapGenerator {
 
     return {
       url: url.endsWith("/") ? url : `${url}/`,
-      lastModified: lastModified || new Date(),
+      lastModified: lastModified ?? new Date(),
       changeFrequency: this.getChangeFrequency(type),
       priority: this.calculatePriority(type, category),
     };
@@ -436,5 +436,5 @@ export function generateSitemapEntries(
   entries.push(generator.generatePageEntry("/about/", "page"));
   entries.push(generator.generatePageEntry("/contact/", "page"));
 
-  return entries.sort((a, b) => (b.priority || 0) - (a.priority || 0));
+  return entries.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0));
 }

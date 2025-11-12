@@ -276,7 +276,7 @@ export class ViewTransitionEnhancer {
       this.metricsCollector.reset();
     }
 
-    this.preloadManager.clearCache();
+    void this.preloadManager.clearCache();
 
     if (this.config.debug) {
       logger.debug("ViewTransitionEnhancer: Reset completed");

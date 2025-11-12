@@ -188,7 +188,7 @@ test.describe('Image Optimization', () => {
           const img = responsiveImages.first();
           
           // Get actual image being used
-          const currentSrc = await img.evaluate((el: HTMLImageElement) => el.currentSrc || el.src);
+          const currentSrc = await img.evaluate((el: HTMLImageElement) => el.currentSrc ?? el.src);
           
           if (currentSrc) {
             // Get image dimensions
@@ -309,7 +309,7 @@ test.describe('Image Optimization', () => {
       // Wait for images to load
       await page.waitForFunction(() => {
         const images = Array.from(document.querySelectorAll('img'));
-        return images.length === 0 || images.every(img => img.complete);
+        return images.length === 0 ?? images.every(img => img.complete);
       }, { timeout: 10000 });
       
       const layoutShifts = await page.evaluate(() => window.layoutShifts);
@@ -438,7 +438,7 @@ test.describe('Image Optimization', () => {
           
           // Check for image properties in structured data
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          if (data.image || data['@type'] === 'ImageObject') {
+          if (data.image ?? data['@type'] === 'ImageObject') {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             expect(data.image ?? data.url).toBeTruthy();
             
@@ -555,7 +555,7 @@ test.describe('Image Optimization', () => {
         const images = Array.from(document.querySelectorAll('img'));
         return images.filter(img => 
           img.style.display !== 'none' &&
-          (!img.complete || img.naturalWidth === 0)
+          (!img.complete ?? img.naturalWidth === 0)
         ).length;
       });
       

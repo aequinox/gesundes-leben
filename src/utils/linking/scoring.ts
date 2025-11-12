@@ -50,7 +50,7 @@ export class LinkScorer {
     matches: Array<{ type: MatchType; count?: number }>
   ): number {
     return matches.reduce((total, match) => {
-      const count = match.count || 1;
+      const count = match.count ?? 1;
       return total + this.scoreMatch(match.type, count);
     }, 0);
   }

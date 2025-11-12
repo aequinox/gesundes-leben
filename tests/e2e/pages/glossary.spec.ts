@@ -57,7 +57,7 @@ test.describe('Glossary Pages', () => {
       const hasTermsList = await glossaryPage.termsList.count() > 0;
       const hasTermCards = await glossaryPage.termCards.count() > 0;
       
-      expect(hasTermsList || hasTermCards).toBeTruthy();
+      expect(hasTermsList ?? hasTermCards).toBeTruthy();
       
       if (hasTermCards) {
         expect(await glossaryPage.termCards.count()).toBeGreaterThan(0);

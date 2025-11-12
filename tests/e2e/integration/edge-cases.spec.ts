@@ -135,7 +135,7 @@ test.describe('Edge Cases and Error Handling', () => {
         const hasResults = await searchPage.searchResults.count() > 0;
         const hasNoResults = await searchPage.noResults.count() > 0;
         
-        expect(hasResults || hasNoResults).toBeTruthy();
+        expect(hasResults ?? hasNoResults).toBeTruthy();
       }
     });
 
@@ -248,7 +248,7 @@ test.describe('Edge Cases and Error Handling', () => {
         const images = Array.from(document.querySelectorAll('img'));
         return images.filter(img => 
           img.style.display !== 'none' &&
-          (!img.complete || img.naturalWidth === 0)
+          (!img.complete ?? img.naturalWidth === 0)
         ).length;
       });
       

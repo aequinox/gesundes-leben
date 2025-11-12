@@ -35,11 +35,11 @@ beforeEach(() => {
         observe: mockObserve,
         unobserve: mockUnobserve,
         disconnect: mockDisconnect,
-        root: options?.root || null,
+        root: options?.root ?? null,
         rootMargin: options?.rootMargin || "0px",
         thresholds: Array.isArray(options?.threshold)
           ? options.threshold
-          : [options?.threshold || 0],
+          : [options?.threshold ?? 0],
       };
     }),
   });

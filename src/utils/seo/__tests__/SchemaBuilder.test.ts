@@ -24,6 +24,7 @@ import {
   type ArticleSchemaOptions,
   type BreadcrumbItemData,
 } from "../SchemaBuilder";
+import { logger } from "@/utils/logger";
 
 // Mock the logger
 vi.mock("@/utils/logger", () => ({
@@ -156,28 +157,24 @@ describe("SchemaBuilder - Core Utilities", () => {
     });
 
     it("should warn for title exceeding 60 characters", () => {
-      const { logger } = require("@/utils/logger");
       const longTitle = "A".repeat(70);
       validateSeoLength(longTitle, "Valid description");
       expect(logger.warn).toHaveBeenCalled();
     });
 
     it("should warn for description exceeding 160 characters", () => {
-      const { logger } = require("@/utils/logger");
       const longDesc = "A".repeat(170);
       validateSeoLength("Valid title", longDesc);
       expect(logger.warn).toHaveBeenCalled();
     });
 
     it("should info for description below 120 characters", () => {
-      const { logger } = require("@/utils/logger");
       const shortDesc = "A".repeat(100);
       validateSeoLength("Valid title", shortDesc);
       expect(logger.info).toHaveBeenCalled();
     });
 
     it("should not warn for valid lengths", () => {
-      const { logger } = require("@/utils/logger");
       validateSeoLength("Valid title", "A".repeat(130));
       // Should have called info but not warn
       expect(logger.warn).not.toHaveBeenCalled();

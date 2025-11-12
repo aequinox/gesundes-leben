@@ -14,13 +14,13 @@ export async function getAuthorEntry(
   try {
     const identifier = typeof author === "string" ? author : author.id;
     const entry = await getEntry("authors", identifier);
-    return entry || null;
+    return entry ?? null;
   } catch (err) {
     logger.error(
       "Failed to fetch author with identifier:",
       typeof author === "string" ? author : author.id,
       "Error:",
-      err instanceof Error ? err.stack || err.message : String(err)
+      err instanceof Error ? err.stack ?? err.message : String(err)
     );
     return null;
   }
@@ -41,7 +41,7 @@ export async function getAllAuthors(): Promise<Author[]> {
   } catch (err) {
     logger.error(
       "Failed to fetch authors collection Error:",
-      err instanceof Error ? err.stack || err.message : String(err)
+      err instanceof Error ? err.stack ?? err.message : String(err)
     );
     return [];
   }
@@ -56,7 +56,7 @@ export async function getAuthorData(
   slug: string
 ): Promise<Author["data"] | null> {
   const author = await getAuthorEntry(slug);
-  return author?.data || null;
+  return author?.data ?? null;
 }
 
 /**

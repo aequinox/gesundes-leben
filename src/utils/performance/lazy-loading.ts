@@ -230,7 +230,7 @@ export const perf = {
 
       const entries = performance.getEntriesByName(name);
       const lastEntry = entries[entries.length - 1];
-      return lastEntry?.duration || 0;
+      return lastEntry?.duration ?? 0;
     } catch (error) {
       logger.warn("Performance measurement failed:", error);
       return 0;

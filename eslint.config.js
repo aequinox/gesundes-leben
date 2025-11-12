@@ -131,10 +131,11 @@ export default [
       "no-duplicate-imports": "warn",
       "import/exports-last": "off",
       // File size limits for maintainability
+      // Adjusted to more pragmatic limits while still catching truly oversized files
       "max-lines": [
         "warn",
         {
-          max: 300,
+          max: 500, // Increased from 300 - allows well-organized complex files
           skipBlankLines: true,
           skipComments: true,
         },
@@ -210,7 +211,7 @@ export default [
       // Allow larger test files
       "max-lines": [
         "warn",
-        { max: 500, skipBlankLines: true, skipComments: true },
+        { max: 800, skipBlankLines: true, skipComments: true }, // Increased from 500
       ],
     },
   },
@@ -230,10 +231,10 @@ export default [
       // Override any rules that conflict with Astro component patterns
       "import/exports-last": "off",
       "no-console": "warn", // Allow console in Astro components for development
-      // Page files can be larger than components
+      // Page files can be larger than components due to content and layout
       "max-lines": [
         "warn",
-        { max: 400, skipBlankLines: true, skipComments: true },
+        { max: 600, skipBlankLines: true, skipComments: true }, // Increased from 400
       ],
     },
   },

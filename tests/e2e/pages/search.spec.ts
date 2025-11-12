@@ -52,7 +52,7 @@ test.describe('Search Page', () => {
       const hasResults = await searchPage.searchResults.count() > 0;
       const hasNoResults = await searchPage.noResults.count() > 0;
       
-      expect(hasResults || hasNoResults).toBeTruthy();
+      expect(hasResults ?? hasNoResults).toBeTruthy();
     });
 
     test('should search for German health terms', async ({ page }) => {
