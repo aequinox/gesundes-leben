@@ -12,6 +12,8 @@
  * - SEO-friendly URL structure
  */
 
+import { getCollection } from "astro:content";
+
 import { SITE } from "@/config";
 import { getI18nStrings, getNavigationTranslation } from "@/config/i18n";
 import {
@@ -19,6 +21,7 @@ import {
   buildMedicalAudienceSchema,
   type BreadcrumbItemData,
 } from "@/utils/seo/SchemaBuilder";
+import { slugify } from "@/utils/slugs";
 
 export interface BreadcrumbItem {
   name: string;
@@ -46,6 +49,34 @@ const {
 
 // Get i18n strings for current language
 const i18n = getI18nStrings("de");
+
+// Get all blog posts for category lookup
+const allPosts = await getCollection("blog");
+
+/**
+ * Finds a category name by its slug
+ * @param slug The category slug to search for
+ * @returns The original category name if found, or null if not found
+ */
+const findCategoryNameBySlug = (slug: string): string | null => {
+  // Extract all unique categories from posts
+  const allCategories = new Set<string>();
+
+  allPosts.forEach(post => {
+    post.data.categories?.forEach((category: string) => {
+      allCategories.add(category);
+    });
+  });
+
+  // Find the category whose slug matches the input slug
+  for (const category of allCategories) {
+    if (slugify(category) === slug) {
+      return category;
+    }
+  }
+
+  return null;
+};
 
 // Generate breadcrumbs from URL path
 const generateBreadcrumbs = (): BreadcrumbItemData[] => {
@@ -79,6 +110,14 @@ const generateBreadcrumbs = (): BreadcrumbItemData[] => {
 
     // Apply translations using i18n utility
     segmentName = getNavigationTranslation(segment, "de");
+
+    // Handle category slugs - check if previous segment is "categories"
+    if (index > 0 && pathSegments[index - 1] === "categories") {
+      const categoryName = findCategoryNameBySlug(segment);
+      if (categoryName) {
+        segmentName = categoryName;
+      }
+    }
 
     breadcrumbs.push({
       name: isLast ? currentPage : segmentName,

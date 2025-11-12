@@ -4,7 +4,7 @@ import { getCollection } from "astro:content";
 import Badge from "@/components/elements/Badge.astro";
 import type { UITranslations } from "@/i18n/ui";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
-import { getPostSlug } from "@/utils/slugs";
+import { getPostSlug, slugify } from "@/utils/slugs";
 
 interface Props {
   class?: string;
@@ -43,6 +43,31 @@ const findPostTitleBySlug = (slug: string): string | null => {
   });
 
   return post ? post.data.title : null;
+};
+
+/**
+ * Finds a category name by its slug
+ * @param slug The category slug to search for
+ * @returns The original category name if found, or null if not found
+ */
+const findCategoryNameBySlug = (slug: string): string | null => {
+  // Extract all unique categories from posts
+  const allCategories = new Set<string>();
+
+  allPosts.forEach(post => {
+    post.data.categories?.forEach((category: string) => {
+      allCategories.add(category);
+    });
+  });
+
+  // Find the category whose slug matches the input slug
+  for (const category of allCategories) {
+    if (slugify(category) === slug) {
+      return category;
+    }
+  }
+
+  return null;
 };
 
 /**
@@ -97,6 +122,15 @@ const formatBreadcrumbLabel = (segment: string, index: number): string => {
     const postTitle = findPostTitleBySlug(segment);
     if (postTitle) {
       return postTitle;
+    }
+  }
+
+  // Handle category slugs - check if this is a category slug
+  if (pathSegments[index - 1] === "categories" && isNaN(Number(segment))) {
+    // Try to find the category name by slug
+    const categoryName = findCategoryNameBySlug(segment);
+    if (categoryName) {
+      return categoryName;
     }
   }
 
