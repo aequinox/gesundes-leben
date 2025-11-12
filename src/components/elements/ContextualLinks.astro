@@ -133,7 +133,7 @@ if (meaningfulRelationships.length === 0) {
                     ? "content"
                     : placement
               }
-              icon={linkingContext === "strong" ? "related" : ""}
+              icon={linkingContext === "strong" ? "related" : undefined}
               title={`${targetPost.data.title} - ${matchReasons.join(", ")}`}
             >
               {anchorText}
