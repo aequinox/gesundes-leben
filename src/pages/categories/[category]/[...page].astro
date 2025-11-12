@@ -8,6 +8,7 @@ import Header from "@/components/sections/Header.astro";
 import PageHero from "@/components/sections/PageHero.astro";
 import Pagination from "@/components/sections/Pagination.astro";
 import { SITE } from "@/config";
+import type { TranslationKey } from "@/i18n/ui";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import { extractUniqueCategories } from "@/utils/categories";
@@ -37,6 +38,16 @@ const { page, categoryName } = Astro.props;
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
+// Get the category slug from the URL params
+const categorySlug = Astro.params.category;
+
+// Map category slug to translation key
+const categoryDescriptionKey = `categories.${categorySlug}.description`;
+const categoryDescription =
+  t(categoryDescriptionKey as TranslationKey) ??
+  t("categories.description") ??
+  "Artikel in dieser Kategorie";
+
 // Extract pagination info for modern pagination component
 const currentPage = page.currentPage;
 const totalPages = page.lastPage;
@@ -44,10 +55,7 @@ const totalPages = page.lastPage;
 
 <Layout title={`${categoryName} | ${SITE.title}`}>
   <Header />
-  <PageHero
-    title={categoryName}
-    subtitle={t("categories.description") ?? "Artikel in dieser Kategorie"}
-  />
+  <PageHero title={categoryName} subtitle={categoryDescription} />
 
   <Hr />
 

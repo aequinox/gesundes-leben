@@ -207,6 +207,17 @@ export interface UITranslations {
   // Tags
   "tags.description": string;
 
+  // Categories
+  "categories.description": string;
+  "categories.ernaehrung.description": string;
+  "categories.immunsystem.description": string;
+  "categories.lesenswertes.description": string;
+  "categories.lifestyle-und-psyche.description": string;
+  "categories.mikronaehrstoffe.description": string;
+  "categories.organsysteme.description": string;
+  "categories.wissenschaftliches.description": string;
+  "categories.wissenswertes.description": string;
+
   // Internal Linking & Topic Clusters
   "cluster.articles": string;
   "cluster.categories": string;
@@ -452,6 +463,25 @@ export const ui: Record<
     "tags.description":
       "Explore articles grouped by specific topics and themes.",
     "tag.popularTags": "Popular Tags",
+
+    // Categories
+    "categories.description": "Explore articles in this category.",
+    "categories.ernaehrung.description":
+      "Evidence-based nutrition and healthy eating for optimal health.",
+    "categories.immunsystem.description":
+      "Science-backed strategies to strengthen your immune system naturally.",
+    "categories.lesenswertes.description":
+      "Curated books, studies, and health resources.",
+    "categories.lifestyle-und-psyche.description":
+      "Mental health and well-being with practical lifestyle tips.",
+    "categories.mikronaehrstoffe.description":
+      "Vitamins, minerals, and optimal micronutrient supplementation.",
+    "categories.organsysteme.description":
+      "How your organ systems work and how to support them.",
+    "categories.wissenschaftliches.description":
+      "Current research and evidence-based health information.",
+    "categories.wissenswertes.description":
+      "Interesting facts and educational health content.",
     "tag.popularTagsDescription":
       "Our most frequently used topics to help you find relevant content",
     "tag.allTags": "All Tags",
@@ -707,6 +737,25 @@ export const ui: Record<
     "tags.description":
       "Entdecke Artikel, die nach spezifischen Themen und Motiven gruppiert sind.",
     "tag.popularTags": "Beliebte Tags",
+
+    // Categories
+    "categories.description": "Entdecke Artikel in dieser Kategorie.",
+    "categories.ernaehrung.description":
+      "Wissenschaftlich fundierte Ernährung und gesunde Essgewohnheiten.",
+    "categories.immunsystem.description":
+      "Natürliche Strategien zur Stärkung deines Immunsystems.",
+    "categories.lesenswertes.description":
+      "Kuratierte Bücher, Studien und Gesundheitsressourcen.",
+    "categories.lifestyle-und-psyche.description":
+      "Mentale Gesundheit und Wohlbefinden mit praktischen Tipps.",
+    "categories.mikronaehrstoffe.description":
+      "Vitamine, Mineralstoffe und optimale Supplementierung.",
+    "categories.organsysteme.description":
+      "Wie deine Organsysteme funktionieren und wie du sie unterstützt.",
+    "categories.wissenschaftliches.description":
+      "Aktuelle Forschung und evidenzbasierte Gesundheitsinformationen.",
+    "categories.wissenswertes.description":
+      "Interessante Fakten und lehrreiche Gesundheitsinhalte.",
     "tag.popularTagsDescription":
       "Unsere am häufigsten verwendeten Themen, um relevante Inhalte zu finden",
     "tag.allTags": "Alle Tags",
