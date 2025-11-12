@@ -26,21 +26,21 @@ export interface Props {
   /** Target URL or post slug */
   href: string;
   /** Visual style variant */
-  variant?: "inline" | "button" | "highlight" | "subtle";
+  variant?: "inline" | "button" | "highlight" | "subtle" | undefined;
   /** Relationship strength for styling */
-  context?: "strong" | "moderate" | "weak";
+  context?: "strong" | "moderate" | "weak" | undefined;
   /** Whether to open in new tab */
-  external?: boolean;
+  external?: boolean | undefined;
   /** Whether to track click analytics */
-  trackClick?: boolean;
+  trackClick?: boolean | undefined;
   /** Additional CSS classes */
-  class?: string;
+  class?: string | undefined;
   /** Icon to display with link */
-  icon?: string;
+  icon?: string | undefined;
   /** Tooltip text */
-  title?: string;
+  title?: string | undefined;
   /** Whether link is within content or in sidebar */
-  placement?: "content" | "sidebar" | "navigation";
+  placement?: "content" | "sidebar" | "navigation" | undefined;
 }
 
 const {
