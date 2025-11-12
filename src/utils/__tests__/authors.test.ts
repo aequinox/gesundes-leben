@@ -47,10 +47,15 @@ describe("Authors utilities", () => {
     },
   ];
 
+  interface MockedAstroContent {
+    getCollection: ReturnType<typeof vi.fn>;
+    getEntry: ReturnType<typeof vi.fn>;
+  }
+
   beforeEach(async () => {
     vi.clearAllMocks();
     // Get the mocked module and set up the return value
-    const astroContent = (await vi.importMock("astro:content")) as any;
+    const astroContent = (await vi.importMock("astro:content")) as unknown as MockedAstroContent;
     vi.mocked(astroContent.getCollection).mockResolvedValue(mockAuthors);
   });
 
@@ -59,7 +64,7 @@ describe("Authors utilities", () => {
       const authors = await getAllAuthors();
 
       expect(authors).toHaveLength(2);
-      const astroContent = (await vi.importMock("astro:content")) as any;
+      const astroContent = (await vi.importMock("astro:content")) as unknown as MockedAstroContent;
       expect(astroContent.getCollection).toHaveBeenCalledWith("authors");
 
       // Check that authors have expected properties
@@ -83,7 +88,7 @@ describe("Authors utilities", () => {
   describe("getAuthorEntry", () => {
     it("should return the correct author by ID", async () => {
       // Mock getEntry to return specific author
-      const astroContent = (await vi.importMock("astro:content")) as any;
+      const astroContent = (await vi.importMock("astro:content")) as unknown as MockedAstroContent;
       vi.mocked(astroContent.getEntry).mockResolvedValue(mockAuthors[0]);
 
       const author = await getAuthorEntry("dr-mueller");
@@ -94,7 +99,7 @@ describe("Authors utilities", () => {
     });
 
     it("should return null for non-existent author ID", async () => {
-      const astroContent = (await vi.importMock("astro:content")) as any;
+      const astroContent = (await vi.importMock("astro:content")) as unknown as MockedAstroContent;
       vi.mocked(astroContent.getEntry).mockResolvedValue(null);
 
       const author = await getAuthorEntry("non-existent");
@@ -103,7 +108,7 @@ describe("Authors utilities", () => {
     });
 
     it("should handle empty or invalid IDs gracefully", async () => {
-      const astroContent = (await vi.importMock("astro:content")) as any;
+      const astroContent = (await vi.importMock("astro:content")) as unknown as MockedAstroContent;
       vi.mocked(astroContent.getEntry).mockResolvedValue(null);
 
       const emptyIdAuthor = await getAuthorEntry("");
