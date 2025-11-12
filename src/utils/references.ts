@@ -4,8 +4,8 @@ import { join, dirname } from "node:path";
 
 import { parse, stringify } from "yaml";
 
-import { logger } from "@/utils/logger";
 import { withAsyncErrorHandling } from "@/utils/error-handling/shared";
+import { logger } from "@/utils/logger";
 import {
   withCache,
   CacheKeys,
@@ -95,8 +95,12 @@ function isReferenceFieldName(value: string): value is ReferenceFieldName {
  */
 function createReferenceFieldComparator(): (a: string, b: string) => number {
   return (a: string, b: string): number => {
-    const aIndex = isReferenceFieldName(a) ? REFERENCE_FIELD_ORDER.indexOf(a) : -1;
-    const bIndex = isReferenceFieldName(b) ? REFERENCE_FIELD_ORDER.indexOf(b) : -1;
+    const aIndex = isReferenceFieldName(a)
+      ? REFERENCE_FIELD_ORDER.indexOf(a)
+      : -1;
+    const bIndex = isReferenceFieldName(b)
+      ? REFERENCE_FIELD_ORDER.indexOf(b)
+      : -1;
     if (aIndex === -1 && bIndex === -1) {
       return a.localeCompare(b);
     }
@@ -182,10 +186,10 @@ export async function getAllReferences(): Promise<Reference[]> {
       [],
       {
         // Custom error handler to try fallback method
-        onError: async (_error) => {
+        onError: _error => {
           if (getCollection !== null) {
             logger.info("Trying fallback method...");
-            return await readReferencesFromFiles();
+            void readReferencesFromFiles();
           }
         },
       }

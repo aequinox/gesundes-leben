@@ -5,15 +5,20 @@
  * Handles clicks on group selectors, category buttons, and reset buttons.
  */
 
-import type { Elements, GroupType } from "./FilterState";
-import { getOptions, getState, updateState } from "./FilterState";
-import { applyFilters } from "./FilterVisibility";
 import {
   updateCategoryButtonCounts,
   updateCategoryButtonVisibility,
   updateCategorySelectionUI,
   updateGroupSelectionUI,
 } from "./FilterDOMUpdates";
+import {
+  getOptions,
+  getState,
+  updateState,
+  type Elements,
+  type GroupType,
+} from "./FilterState";
+import { applyFilters } from "./FilterVisibility";
 
 /**
  * Handles group selector click events
@@ -109,7 +114,7 @@ export function handleResetFiltersClick(elements: Elements): void {
 export function attachEventListeners(elements: Elements): void {
   if (elements.groupSelectors) {
     elements.groupSelectors.forEach(selector => {
-      selector.addEventListener("click", (event) =>
+      selector.addEventListener("click", event =>
         handleGroupSelectorClick(event, elements)
       );
     });
@@ -117,7 +122,7 @@ export function attachEventListeners(elements: Elements): void {
 
   if (elements.categoryButtons) {
     elements.categoryButtons.forEach(button => {
-      button.addEventListener("click", (event) =>
+      button.addEventListener("click", event =>
         handleCategoryButtonClick(event, elements)
       );
     });

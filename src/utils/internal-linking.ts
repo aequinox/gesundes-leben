@@ -6,10 +6,10 @@
  * and contextual link suggestions based on content analysis.
  */
 
+import { withErrorHandling } from "./error-handling/shared";
 import { topN, unique } from "./linking/helpers";
 import { LinkScorer } from "./linking/scoring";
 import { logger } from "./logger";
-import { withErrorHandling } from "./error-handling/shared";
 import type { Post } from "./types";
 
 /**
@@ -186,104 +186,106 @@ function calculateContentRelationship(
       const matchReasons: string[] = [];
       const suggestedAnchorText: string[] = [];
 
-  // Extract content data
-  const _sourceTitle = sourcePost.data.title.toLowerCase();
-  const targetTitle = targetPost.data.title.toLowerCase();
-  const sourceCategories = sourcePost.data.categories ?? [];
-  const targetCategories = targetPost.data.categories ?? [];
-  const sourceTags = sourcePost.data.tags ?? [];
-  const targetTags = targetPost.data.tags ?? [];
-  const sourceKeywords = sourcePost.data.keywords ?? [];
-  const targetKeywords = targetPost.data.keywords ?? [];
+      // Extract content data
+      const _sourceTitle = sourcePost.data.title.toLowerCase();
+      const targetTitle = targetPost.data.title.toLowerCase();
+      const sourceCategories = sourcePost.data.categories ?? [];
+      const targetCategories = targetPost.data.categories ?? [];
+      const sourceTags = sourcePost.data.tags ?? [];
+      const targetTags = targetPost.data.tags ?? [];
+      const sourceKeywords = sourcePost.data.keywords ?? [];
+      const targetKeywords = targetPost.data.keywords ?? [];
 
-  // 1. Keyword matching (highest priority)
-  for (const keyword of sourceKeywords) {
-    const keywordLower = keyword.toLowerCase();
+      // 1. Keyword matching (highest priority)
+      for (const keyword of sourceKeywords) {
+        const keywordLower = keyword.toLowerCase();
 
-    // Exact keyword match in target
-    if (
-      targetKeywords.some(k => k.toLowerCase() === keywordLower) ||
-      targetTitle.includes(keywordLower)
-    ) {
-      score += linkScorer.scoreMatch("exact-keyword");
-      matchReasons.push(`Exact keyword match: ${keyword}`);
-      suggestedAnchorText.push(keyword);
-    }
+        // Exact keyword match in target
+        if (
+          targetKeywords.some(k => k.toLowerCase() === keywordLower) ||
+          targetTitle.includes(keywordLower)
+        ) {
+          score += linkScorer.scoreMatch("exact-keyword");
+          matchReasons.push(`Exact keyword match: ${keyword}`);
+          suggestedAnchorText.push(keyword);
+        }
 
-    // Partial keyword match
-    else if (
-      targetTitle.includes(keywordLower.split(" ")[0]) ||
-      targetKeywords.some(k =>
-        k.toLowerCase().includes(keywordLower.split(" ")[0])
-      )
-    ) {
-      score += linkScorer.scoreMatch("partial-keyword");
-      matchReasons.push(`Partial keyword match: ${keyword}`);
-    }
-  }
+        // Partial keyword match
+        else if (
+          targetTitle.includes(keywordLower.split(" ")[0]) ||
+          targetKeywords.some(k =>
+            k.toLowerCase().includes(keywordLower.split(" ")[0])
+          )
+        ) {
+          score += linkScorer.scoreMatch("partial-keyword");
+          matchReasons.push(`Partial keyword match: ${keyword}`);
+        }
+      }
 
-  // 2. Category matching
-  const sharedCategories = sourceCategories.filter((cat: Category) =>
-    targetCategories.includes(cat)
-  );
-  if (sharedCategories.length > 0) {
-    score += linkScorer.scoreMatch("category", sharedCategories.length);
-    matchReasons.push(`Shared categories: ${sharedCategories.join(", ")}`);
+      // 2. Category matching
+      const sharedCategories = sourceCategories.filter((cat: Category) =>
+        targetCategories.includes(cat)
+      );
+      if (sharedCategories.length > 0) {
+        score += linkScorer.scoreMatch("category", sharedCategories.length);
+        matchReasons.push(`Shared categories: ${sharedCategories.join(", ")}`);
 
-    // Add category-based anchor text suggestions
-    sharedCategories.forEach(category => {
-      suggestedAnchorText.push(getCategoryAnchorText(category as string));
-    });
-  }
+        // Add category-based anchor text suggestions
+        sharedCategories.forEach(category => {
+          suggestedAnchorText.push(getCategoryAnchorText(category as string));
+        });
+      }
 
-  // 3. Tag matching
-  const sharedTags = sourceTags.filter((tag: Tag) => targetTags.includes(tag));
-  if (sharedTags.length > 0) {
-    score += linkScorer.scoreMatch("tag", sharedTags.length);
-    matchReasons.push(`Shared tags: ${sharedTags.join(", ")}`);
-  }
+      // 3. Tag matching
+      const sharedTags = sourceTags.filter((tag: Tag) =>
+        targetTags.includes(tag)
+      );
+      if (sharedTags.length > 0) {
+        score += linkScorer.scoreMatch("tag", sharedTags.length);
+        matchReasons.push(`Shared tags: ${sharedTags.join(", ")}`);
+      }
 
-  // 4. Topic cluster matching
-  const sourceCluster = identifyTopicCluster(sourcePost);
-  const targetCluster = identifyTopicCluster(targetPost);
+      // 4. Topic cluster matching
+      const sourceCluster = identifyTopicCluster(sourcePost);
+      const targetCluster = identifyTopicCluster(targetPost);
 
-  if (sourceCluster && targetCluster && sourceCluster === targetCluster) {
-    score += linkScorer.scoreMatch("cluster");
-    matchReasons.push(
-      `Same topic cluster: ${TOPIC_CLUSTERS[sourceCluster].name}`
-    );
-  }
+      if (sourceCluster && targetCluster && sourceCluster === targetCluster) {
+        score += linkScorer.scoreMatch("cluster");
+        matchReasons.push(
+          `Same topic cluster: ${TOPIC_CLUSTERS[sourceCluster].name}`
+        );
+      }
 
-  // Cross-cluster bonus for related topics (e.g., gut health → mental health)
-  if (
-    sourceCluster &&
-    targetCluster &&
-    areRelatedClusters(sourceCluster, targetCluster)
-  ) {
-    score += linkScorer.scoreMatch("cluster") / 2;
-    matchReasons.push(`Related topic clusters`);
-  }
+      // Cross-cluster bonus for related topics (e.g., gut health → mental health)
+      if (
+        sourceCluster &&
+        targetCluster &&
+        areRelatedClusters(sourceCluster, targetCluster)
+      ) {
+        score += linkScorer.scoreMatch("cluster") / 2;
+        matchReasons.push(`Related topic clusters`);
+      }
 
-  // 5. Author matching (small bonus)
-  if (sourcePost.data.author === targetPost.data.author) {
-    score += linkScorer.scoreMatch("author");
-    matchReasons.push("Same author");
-  }
+      // 5. Author matching (small bonus)
+      if (sourcePost.data.author === targetPost.data.author) {
+        score += linkScorer.scoreMatch("author");
+        matchReasons.push("Same author");
+      }
 
-  // 6. Recency bonus (newer posts get slight preference)
-  const targetDate = new Date(targetPost.data.pubDatetime);
-  const oneYearAgo = new Date();
-  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      // 6. Recency bonus (newer posts get slight preference)
+      const targetDate = new Date(targetPost.data.pubDatetime);
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-  if (targetDate > oneYearAgo) {
-    score += RECENCY_BONUS;
-    matchReasons.push("Recent content");
-  }
+      if (targetDate > oneYearAgo) {
+        score += RECENCY_BONUS;
+        matchReasons.push("Recent content");
+      }
 
-  // Generate smart anchor text suggestions
-  if (suggestedAnchorText.length === 0) {
-    suggestedAnchorText.push(...generateSmartAnchorText(targetPost));
-  }
+      // Generate smart anchor text suggestions
+      if (suggestedAnchorText.length === 0) {
+        suggestedAnchorText.push(...generateSmartAnchorText(targetPost));
+      }
 
       // Determine linking context strength using shared LinkScorer
       const linkingContext = linkScorer.getLinkingContext(score);
@@ -526,7 +528,11 @@ function findCrossClusterLinkingOpportunities(
       }
 
       // Sort by score using topN (no limit, but sorted)
-      return topN(crossClusterLinks, crossClusterLinks.length, rel => rel.score);
+      return topN(
+        crossClusterLinks,
+        crossClusterLinks.length,
+        rel => rel.score
+      );
     },
     "findCrossClusterLinkingOpportunities",
     []
@@ -554,7 +560,9 @@ function generateInternalLinkingReport(posts: Post[]): {
       const clusteredPostIds = new Set(
         topicClusters.flatMap(cluster => cluster.posts.map(post => post.id))
       );
-      const orphanedPosts = posts.filter(post => !clusteredPostIds.has(post.id));
+      const orphanedPosts = posts.filter(
+        post => !clusteredPostIds.has(post.id)
+      );
 
       // Identify high authority posts (featured posts or posts with many relationships)
       const highAuthorityPosts = posts.filter(

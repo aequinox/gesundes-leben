@@ -24,9 +24,13 @@
  * ```
  */
 
+import {
+  createError,
+  isAppError,
+  formatErrorMessage,
+  type AppError,
+} from "@/utils/errors";
 import { logger } from "@/utils/logger";
-import { createError, isAppError, formatErrorMessage } from "@/utils/errors";
-import type { AppError } from "@/utils/errors";
 
 /**
  * Options for error handling configuration
@@ -87,7 +91,10 @@ export async function withAsyncErrorHandling<T>(
       try {
         onError(finalError, context);
       } catch (callbackError) {
-        logger.error(`Error in onError callback for ${context}:`, callbackError);
+        logger.error(
+          `Error in onError callback for ${context}:`,
+          callbackError
+        );
       }
     }
 
@@ -139,7 +146,10 @@ export function withErrorHandling<T>(
       try {
         onError(finalError, context);
       } catch (callbackError) {
-        logger.error(`Error in onError callback for ${context}:`, callbackError);
+        logger.error(
+          `Error in onError callback for ${context}:`,
+          callbackError
+        );
       }
     }
 
@@ -195,7 +205,10 @@ export async function withAsyncErrorThrow<T>(
       try {
         onError(error, context);
       } catch (callbackError) {
-        logger.error(`Error in onError callback for ${context}:`, callbackError);
+        logger.error(
+          `Error in onError callback for ${context}:`,
+          callbackError
+        );
       }
     }
 
@@ -235,7 +248,9 @@ export function createAsyncErrorHandler<TArgs extends unknown[], TReturn>(
   fn: (...args: TArgs) => Promise<TReturn>,
   context: string,
   fallbackValue: TReturn,
-  options?: Partial<Omit<ErrorHandlingOptions<TReturn>, "context" | "fallbackValue">>
+  options?: Partial<
+    Omit<ErrorHandlingOptions<TReturn>, "context" | "fallbackValue">
+  >
 ): (...args: TArgs) => Promise<TReturn> {
   return async (...args: TArgs): Promise<TReturn> => {
     return withAsyncErrorHandling(
@@ -271,10 +286,17 @@ export function createErrorHandler<TArgs extends unknown[], TReturn>(
   fn: (...args: TArgs) => TReturn,
   context: string,
   fallbackValue: TReturn,
-  options?: Partial<Omit<ErrorHandlingOptions<TReturn>, "context" | "fallbackValue">>
+  options?: Partial<
+    Omit<ErrorHandlingOptions<TReturn>, "context" | "fallbackValue">
+  >
 ): (...args: TArgs) => TReturn {
   return (...args: TArgs): TReturn => {
-    return withErrorHandling(() => fn(...args), context, fallbackValue, options);
+    return withErrorHandling(
+      () => fn(...args),
+      context,
+      fallbackValue,
+      options
+    );
   };
 }
 
@@ -378,10 +400,13 @@ export function assertDefined<T>(
   fieldName: string = "value"
 ): T {
   if (value === null || value === undefined) {
-    const error = createError(`${fieldName} is null or undefined in ${context}`, {
-      context,
-      fieldName,
-    });
+    const error = createError(
+      `${fieldName} is null or undefined in ${context}`,
+      {
+        context,
+        fieldName,
+      }
+    );
     logger.error(error.message);
     throw error;
   }

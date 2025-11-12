@@ -21,6 +21,7 @@
  */
 
 import { Icon } from "astro-icon/components";
+
 import type { NavigationLink } from "@/components/types";
 import { SITE } from "@/config";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
@@ -56,33 +57,43 @@ const mobileNavItems = [
   },
   { href: "/tags/", key: "tags", label: t("nav.tags"), icon: iconMap.tags },
   SITE.showSearch
-    ? { href: "/search/", key: "search", label: t("nav.search"), icon: iconMap.search }
-    : { href: "/about/", key: "about", label: t("nav.about"), icon: iconMap.about },
+    ? {
+        href: "/search/",
+        key: "search",
+        label: t("nav.search"),
+        icon: iconMap.search,
+      }
+    : {
+        href: "/about/",
+        key: "about",
+        label: t("nav.about"),
+        icon: iconMap.about,
+      },
 ].slice(0, 5); // Ensure exactly 5 items
 
 // Check if current page matches nav item
 const isActive = (key: string) => {
-  if (!activeNav) return false;
+  if (!activeNav) {
+    return false;
+  }
   return activeNav === key;
 };
 ---
 
 <nav
-  class="md:hidden fixed bottom-0 inset-x-0 z-50 bg-card/90 backdrop-blur-lg border-t border-border safe-area-pb"
+  class="safe-area-pb fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card/90 backdrop-blur-lg md:hidden"
   aria-label="Mobile navigation"
   role="navigation"
 >
   <div class="grid grid-cols-5 gap-1">
     {
-      mobileNavItems.map((item) => {
+      mobileNavItems.map(item => {
         const active = isActive(item.key);
         return (
           <a
             href={item.href}
-            class={`flex flex-col items-center justify-center py-2 min-h-[56px] transition-all duration-200 ease-out active:scale-95 ${
-              active
-                ? "text-accent"
-                : "text-muted hover:text-accent"
+            class={`flex min-h-[56px] flex-col items-center justify-center py-2 transition-all duration-200 ease-out active:scale-95 ${
+              active ? "text-accent" : "text-muted hover:text-accent"
             }`}
             aria-label={item.label}
             aria-current={active ? "page" : undefined}
@@ -100,7 +111,7 @@ const isActive = (key: string) => {
 
             {/* Label */}
             <span
-              class={`text-xs mt-1 font-medium transition-all duration-200 ${
+              class={`mt-1 text-xs font-medium transition-all duration-200 ${
                 active ? "opacity-100" : "opacity-75"
               }`}
             >
@@ -110,7 +121,7 @@ const isActive = (key: string) => {
             {/* Active indicator */}
             {active && (
               <div
-                class="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-accent rounded-t-full"
+                class="absolute bottom-0 left-1/2 h-1 w-8 -translate-x-1/2 rounded-t-full bg-accent"
                 aria-hidden="true"
               />
             )}
