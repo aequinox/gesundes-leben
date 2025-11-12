@@ -9,6 +9,7 @@
 import { topN, unique } from "./linking/helpers";
 import { LinkScorer } from "./linking/scoring";
 import { logger } from "./logger";
+import { withErrorHandling } from "./error-handling/shared";
 import type { Post } from "./types";
 
 /**
@@ -144,26 +145,32 @@ function analyzeContentRelationships(
   candidatePosts: Post[],
   maxSuggestions: number = 5
 ): ContentRelationship[] {
-  const relationships: ContentRelationship[] = [];
+  return withErrorHandling(
+    () => {
+      const relationships: ContentRelationship[] = [];
 
-  // Remove source post from candidates and filter out any undefined posts
-  const filteredCandidates = candidatePosts.filter(
-    post => post?.id && sourcePost?.id && post.id !== sourcePost.id
+      // Remove source post from candidates and filter out any undefined posts
+      const filteredCandidates = candidatePosts.filter(
+        post => post?.id && sourcePost?.id && post.id !== sourcePost.id
+      );
+
+      for (const candidatePost of filteredCandidates) {
+        const relationship = calculateContentRelationship(
+          sourcePost,
+          candidatePost
+        );
+
+        if (relationship.score > 0) {
+          relationships.push(relationship);
+        }
+      }
+
+      // Sort by score and return top suggestions using helper
+      return topN(relationships, maxSuggestions, rel => rel.score);
+    },
+    "analyzeContentRelationships",
+    [] // Return empty array on error
   );
-
-  for (const candidatePost of filteredCandidates) {
-    const relationship = calculateContentRelationship(
-      sourcePost,
-      candidatePost
-    );
-
-    if (relationship.score > 0) {
-      relationships.push(relationship);
-    }
-  }
-
-  // Sort by score and return top suggestions using helper
-  return topN(relationships, maxSuggestions, rel => rel.score);
 }
 
 /**
@@ -173,9 +180,11 @@ function calculateContentRelationship(
   sourcePost: Post,
   targetPost: Post
 ): ContentRelationship {
-  let score = 0;
-  const matchReasons: string[] = [];
-  const suggestedAnchorText: string[] = [];
+  return withErrorHandling(
+    () => {
+      let score = 0;
+      const matchReasons: string[] = [];
+      const suggestedAnchorText: string[] = [];
 
   // Extract content data
   const _sourceTitle = sourcePost.data.title.toLowerCase();
@@ -276,16 +285,26 @@ function calculateContentRelationship(
     suggestedAnchorText.push(...generateSmartAnchorText(targetPost));
   }
 
-  // Determine linking context strength using shared LinkScorer
-  const linkingContext = linkScorer.getLinkingContext(score);
+      // Determine linking context strength using shared LinkScorer
+      const linkingContext = linkScorer.getLinkingContext(score);
 
-  return {
-    targetPost,
-    score,
-    matchReasons,
-    suggestedAnchorText: unique(suggestedAnchorText), // Remove duplicates using helper
-    linkingContext,
-  };
+      return {
+        targetPost,
+        score,
+        matchReasons,
+        suggestedAnchorText: unique(suggestedAnchorText), // Remove duplicates using helper
+        linkingContext,
+      };
+    },
+    "calculateContentRelationship",
+    {
+      targetPost,
+      score: 0,
+      matchReasons: [],
+      suggestedAnchorText: [],
+      linkingContext: "weak" as const,
+    }
+  );
 }
 
 /**
@@ -422,47 +441,53 @@ function getCategoryAnchorText(category: string): string {
  * Analyzes all posts to create topic cluster analysis
  */
 function analyzeTopicClusters(posts: Post[]): TopicClusterAnalysis[] {
-  const clusterAnalyses: TopicClusterAnalysis[] = [];
+  return withErrorHandling(
+    () => {
+      const clusterAnalyses: TopicClusterAnalysis[] = [];
 
-  for (const [clusterId, clusterInfo] of Object.entries(TOPIC_CLUSTERS)) {
-    const clusterPosts = posts.filter(
-      post => identifyTopicCluster(post) === clusterId
-    );
+      for (const [clusterId, clusterInfo] of Object.entries(TOPIC_CLUSTERS)) {
+        const clusterPosts = posts.filter(
+          post => identifyTopicCluster(post) === clusterId
+        );
 
-    // Find pillar post
-    const pillarPost = clusterPosts.find(
-      post => post.slug === clusterInfo.pillarPost
-    );
+        // Find pillar post
+        const pillarPost = clusterPosts.find(
+          post => post.slug === clusterInfo.pillarPost
+        );
 
-    // Separate supporting posts
-    const supportingPosts = clusterPosts.filter(
-      post => post.slug !== clusterInfo.pillarPost
-    );
+        // Separate supporting posts
+        const supportingPosts = clusterPosts.filter(
+          post => post.slug !== clusterInfo.pillarPost
+        );
 
-    // Find internal linking opportunities within cluster
-    const internalLinkOpportunities: ContentRelationship[] = [];
+        // Find internal linking opportunities within cluster
+        const internalLinkOpportunities: ContentRelationship[] = [];
 
-    if (pillarPost) {
-      // Get links from pillar to supporting posts
-      const pillarLinks = analyzeContentRelationships(
-        pillarPost,
-        supportingPosts,
-        10
-      );
-      internalLinkOpportunities.push(...pillarLinks);
-    }
+        if (pillarPost) {
+          // Get links from pillar to supporting posts
+          const pillarLinks = analyzeContentRelationships(
+            pillarPost,
+            supportingPosts,
+            10
+          );
+          internalLinkOpportunities.push(...pillarLinks);
+        }
 
-    clusterAnalyses.push({
-      clusterId: clusterId as keyof typeof TOPIC_CLUSTERS,
-      clusterName: clusterInfo.name,
-      posts: clusterPosts,
-      pillarPost,
-      supportingPosts,
-      internalLinkOpportunities,
-    });
-  }
+        clusterAnalyses.push({
+          clusterId: clusterId as keyof typeof TOPIC_CLUSTERS,
+          clusterName: clusterInfo.name,
+          posts: clusterPosts,
+          pillarPost,
+          supportingPosts,
+          internalLinkOpportunities,
+        });
+      }
 
-  return clusterAnalyses;
+      return clusterAnalyses;
+    },
+    "analyzeTopicClusters",
+    []
+  );
 }
 
 /**
@@ -471,35 +496,41 @@ function analyzeTopicClusters(posts: Post[]): TopicClusterAnalysis[] {
 function findCrossClusterLinkingOpportunities(
   clusters: TopicClusterAnalysis[]
 ): ContentRelationship[] {
-  const crossClusterLinks: ContentRelationship[] = [];
+  return withErrorHandling(
+    () => {
+      const crossClusterLinks: ContentRelationship[] = [];
 
-  for (let i = 0; i < clusters.length; i++) {
-    for (let j = i + 1; j < clusters.length; j++) {
-      const cluster1 = clusters[i];
-      const cluster2 = clusters[j];
+      for (let i = 0; i < clusters.length; i++) {
+        for (let j = i + 1; j < clusters.length; j++) {
+          const cluster1 = clusters[i];
+          const cluster2 = clusters[j];
 
-      // Check if clusters are related
-      if (areRelatedClusters(cluster1.clusterId, cluster2.clusterId)) {
-        // Find top posts from each cluster for cross-linking
-        const cluster1TopPosts = cluster1.posts.slice(0, 3);
-        const cluster2TopPosts = cluster2.posts.slice(0, 3);
+          // Check if clusters are related
+          if (areRelatedClusters(cluster1.clusterId, cluster2.clusterId)) {
+            // Find top posts from each cluster for cross-linking
+            const cluster1TopPosts = cluster1.posts.slice(0, 3);
+            const cluster2TopPosts = cluster2.posts.slice(0, 3);
 
-        for (const post1 of cluster1TopPosts) {
-          const relationships = analyzeContentRelationships(
-            post1,
-            cluster2TopPosts,
-            2
-          );
-          crossClusterLinks.push(
-            ...relationships.filter(rel => rel.score >= 5)
-          );
+            for (const post1 of cluster1TopPosts) {
+              const relationships = analyzeContentRelationships(
+                post1,
+                cluster2TopPosts,
+                2
+              );
+              crossClusterLinks.push(
+                ...relationships.filter(rel => rel.score >= 5)
+              );
+            }
+          }
         }
       }
-    }
-  }
 
-  // Sort by score using topN (no limit, but sorted)
-  return topN(crossClusterLinks, crossClusterLinks.length, rel => rel.score);
+      // Sort by score using topN (no limit, but sorted)
+      return topN(crossClusterLinks, crossClusterLinks.length, rel => rel.score);
+    },
+    "findCrossClusterLinkingOpportunities",
+    []
+  );
 }
 
 /**
@@ -511,36 +542,47 @@ function generateInternalLinkingReport(posts: Post[]): {
   orphanedPosts: Post[];
   highAuthorityPosts: Post[];
 } {
-  logger.log("Generating comprehensive internal linking report...");
+  return withErrorHandling(
+    () => {
+      logger.log("Generating comprehensive internal linking report...");
 
-  const topicClusters = analyzeTopicClusters(posts);
-  const crossClusterOpportunities =
-    findCrossClusterLinkingOpportunities(topicClusters);
+      const topicClusters = analyzeTopicClusters(posts);
+      const crossClusterOpportunities =
+        findCrossClusterLinkingOpportunities(topicClusters);
 
-  // Find orphaned posts (not in any cluster)
-  const clusteredPostIds = new Set(
-    topicClusters.flatMap(cluster => cluster.posts.map(post => post.id))
+      // Find orphaned posts (not in any cluster)
+      const clusteredPostIds = new Set(
+        topicClusters.flatMap(cluster => cluster.posts.map(post => post.id))
+      );
+      const orphanedPosts = posts.filter(post => !clusteredPostIds.has(post.id));
+
+      // Identify high authority posts (featured posts or posts with many relationships)
+      const highAuthorityPosts = posts.filter(
+        post =>
+          post.data.featured ||
+          (post.data.categories && post.data.categories.length >= 3) ||
+          (post.data.keywords && post.data.keywords.length >= 5)
+      );
+
+      logger.log(
+        `Analysis complete: ${topicClusters.length} clusters, ${crossClusterOpportunities.length} cross-cluster opportunities`
+      );
+
+      return {
+        topicClusters,
+        crossClusterOpportunities,
+        orphanedPosts,
+        highAuthorityPosts,
+      };
+    },
+    "generateInternalLinkingReport",
+    {
+      topicClusters: [],
+      crossClusterOpportunities: [],
+      orphanedPosts: [],
+      highAuthorityPosts: [],
+    }
   );
-  const orphanedPosts = posts.filter(post => !clusteredPostIds.has(post.id));
-
-  // Identify high authority posts (featured posts or posts with many relationships)
-  const highAuthorityPosts = posts.filter(
-    post =>
-      post.data.featured ||
-      (post.data.categories && post.data.categories.length >= 3) ||
-      (post.data.keywords && post.data.keywords.length >= 5)
-  );
-
-  logger.log(
-    `Analysis complete: ${topicClusters.length} clusters, ${crossClusterOpportunities.length} cross-cluster opportunities`
-  );
-
-  return {
-    topicClusters,
-    crossClusterOpportunities,
-    orphanedPosts,
-    highAuthorityPosts,
-  };
 }
 
 // Export all functions and constants at the end of the file

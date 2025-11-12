@@ -3,7 +3,7 @@ import type { CollectionEntry } from "astro:content";
 
 import { SITE } from "@/config";
 
-import { handleAsync } from "./errors";
+import { withAsyncErrorHandling, withErrorHandling } from "./error-handling/shared";
 import { logger } from "./logger";
 import { slugify, getPostSlug } from "./slugs";
 import type { Category, Post, Tag } from "./types";
@@ -47,8 +47,8 @@ const addSlugsToPosts = (posts: CollectionEntry<"blog">[]): Post[] => {
  */
 
 export const getAllPosts = async (includeDrafts = false): Promise<Post[]> => {
-  return handleAsync(async () => {
-    try {
+  return withAsyncErrorHandling(
+    async () => {
       logger.log("Getting all posts, includeDrafts:", includeDrafts);
       const allPosts = await getCollection("blog");
       logger.log("Total posts found:", allPosts.length);
@@ -101,11 +101,10 @@ export const getAllPosts = async (includeDrafts = false): Promise<Post[]> => {
 
       logger.log("Filtered posts count:", filteredPosts.length);
       return addSlugsToPosts(filteredPosts);
-    } catch (e) {
-      logger.error("Error in getAllPosts:", e);
-      return [];
-    }
-  });
+    },
+    "getAllPosts",
+    []
+  );
 };
 
 /**
@@ -124,26 +123,27 @@ export const getSortedPosts = (
   posts: Post[],
   sortDirection: "asc" | "desc" = "desc"
 ): Post[] => {
-  try {
-    logger.log("Sorting posts, count:", posts.length);
+  return withErrorHandling(
+    () => {
+      logger.log("Sorting posts, count:", posts.length);
 
-    const sortedPosts = [...posts].sort((a, b) => {
-      const dateA = new Date(
-        a.data.modDatetime ?? a.data.pubDatetime ?? 0
-      ).getTime();
-      const dateB = new Date(
-        b.data.modDatetime ?? b.data.pubDatetime ?? 0
-      ).getTime();
+      const sortedPosts = [...posts].sort((a, b) => {
+        const dateA = new Date(
+          a.data.modDatetime ?? a.data.pubDatetime ?? 0
+        ).getTime();
+        const dateB = new Date(
+          b.data.modDatetime ?? b.data.pubDatetime ?? 0
+        ).getTime();
 
-      return sortDirection === "desc" ? dateB - dateA : dateA - dateB;
-    });
+        return sortDirection === "desc" ? dateB - dateA : dateA - dateB;
+      });
 
-    logger.log("Sorted posts count:", sortedPosts.length);
-    return sortedPosts;
-  } catch (error) {
-    logger.error("Error in getSortedPosts:", error);
-    return posts; // Return unsorted posts on error
-  }
+      logger.log("Sorted posts count:", sortedPosts.length);
+      return sortedPosts;
+    },
+    "getSortedPosts",
+    posts // Return unsorted posts on error
+  );
 };
 
 /**
@@ -158,18 +158,17 @@ export const getSortedPosts = (
  */
 
 export const getFeaturedPosts = async (posts?: Post[]): Promise<Post[]> => {
-  return handleAsync(async () => {
-    try {
+  return withAsyncErrorHandling(
+    async () => {
       logger.log("Getting featured posts");
       const postsToFilter = posts || (await getAllPosts());
       const featuredPosts = postsToFilter.filter(post => post.data.featured);
       logger.log("Featured posts count:", featuredPosts.length);
       return featuredPosts;
-    } catch (error) {
-      logger.error("Error in getFeaturedPosts:", error);
-      return [];
-    }
-  });
+    },
+    "getFeaturedPosts",
+    []
+  );
 };
 
 /**
@@ -183,18 +182,17 @@ export const getFeaturedPosts = async (posts?: Post[]): Promise<Post[]> => {
  * Logs the recent posts count upon successful retrieval, or an error message if an error occurs.
  */
 export const getRecentPosts = async (posts?: Post[]): Promise<Post[]> => {
-  return handleAsync(async () => {
-    try {
+  return withAsyncErrorHandling(
+    async () => {
       logger.log("Getting recent (non-featured) posts");
       const postsToFilter = posts || (await getAllPosts());
       const recentPosts = postsToFilter.filter(post => !post.data.featured);
       logger.log("Recent posts count:", recentPosts.length);
       return recentPosts;
-    } catch (error) {
-      logger.error("Error in getRecentPosts:", error);
-      return [];
-    }
-  });
+    },
+    "getRecentPosts",
+    []
+  );
 };
 
 /**
@@ -271,44 +269,44 @@ export function getRelatedPosts(
 export const getPostsWithReadingTime = async (
   posts: Post[]
 ): Promise<Post[]> => {
-  return handleAsync(async () => {
-    // Process each post to add reading time if not already present
-    return Promise.all(
-      posts.map(async post => {
-        // Skip if reading time is already calculated
-        if (post.data.readingTime) {
-          return post;
-        }
-
-        try {
-          // Calculate reading time based on post content
-          const { remarkPluginFrontmatter } = await render(post);
-
-          // If the remark plugin has already calculated reading time, use it
-          if (remarkPluginFrontmatter?.readingTime) {
-            post.data.readingTime = remarkPluginFrontmatter.readingTime;
-            logger.log(
-              "Reading time for post",
-              post.id,
-              "calculated:",
-              remarkPluginFrontmatter.readingTime,
-              "minutes"
-            );
+  return withAsyncErrorHandling(
+    async () => {
+      // Process each post to add reading time if not already present
+      return Promise.all(
+        posts.map(async post => {
+          // Skip if reading time is already calculated
+          if (post.data.readingTime) {
+            return post;
           }
 
-          return post;
-        } catch (e) {
-          logger.error(
-            "Error calculating reading time for post",
-            post.id,
-            ":",
-            e
+          return withAsyncErrorHandling(
+            async () => {
+              // Calculate reading time based on post content
+              const { remarkPluginFrontmatter } = await render(post);
+
+              // If the remark plugin has already calculated reading time, use it
+              if (remarkPluginFrontmatter?.readingTime) {
+                post.data.readingTime = remarkPluginFrontmatter.readingTime;
+                logger.log(
+                  "Reading time for post",
+                  post.id,
+                  "calculated:",
+                  remarkPluginFrontmatter.readingTime,
+                  "minutes"
+                );
+              }
+
+              return post;
+            },
+            `getPostsWithReadingTime[${post.id}]`,
+            post // Return post without reading time on error
           );
-          return post;
-        }
-      })
-    );
-  });
+        })
+      );
+    },
+    "getPostsWithReadingTime",
+    posts
+  );
 };
 
 // A simple in-memory cache to store processed posts
@@ -335,8 +333,8 @@ const postCache: Record<string, Post[]> = {};
 export const processAllPosts = async (
   options: ProcessPostsOptions = {}
 ): Promise<Post[]> => {
-  return handleAsync(async () => {
-    try {
+  return withAsyncErrorHandling(
+    async () => {
       // Create a unique cache key based on options
       const cacheKey = JSON.stringify(options);
 
@@ -374,11 +372,10 @@ export const processAllPosts = async (
 
       logger.log("Processed posts count:", limitedPosts.length);
       return limitedPosts;
-    } catch (e) {
-      logger.error("Error in processAllPosts:", e);
-      return [];
-    }
-  });
+    },
+    "processAllPosts",
+    []
+  );
 };
 
 /**
@@ -395,8 +392,8 @@ const getPostsBy = async (
   type: "tags" | "categories" | "group",
   value: string
 ): Promise<Post[]> => {
-  return handleAsync(async () => {
-    try {
+  return withAsyncErrorHandling(
+    async () => {
       logger.log(
         "Filtering posts by",
         type,
@@ -419,11 +416,10 @@ const getPostsBy = async (
 
       logger.log("Filtered posts count:", filteredPosts.length);
       return filteredPosts;
-    } catch (err) {
-      logger.error("Error in getPostsBy", type, ":", err);
-      return []; // Return empty array on error
-    }
-  });
+    },
+    `getPostsBy[${type}]`,
+    [] // Return empty array on error
+  );
 };
 
 /**
@@ -478,17 +474,18 @@ export const getPostsByGroup = async (
  */
 
 export const getAllPostsByGroup = async (group: string): Promise<Post[]> => {
-  try {
-    logger.log("Getting all posts by group:", group);
-    const posts = await processAllPosts();
-    logger.log("Posts count before filtering by group:", posts.length);
-    const groupPosts = await getPostsByGroup(posts, group);
-    logger.log("Posts count after filtering by group:", groupPosts.length);
-    return groupPosts;
-  } catch (err) {
-    logger.error("Error in getAllPostsByGroup:", err);
-    return []; // Return empty array on error
-  }
+  return withAsyncErrorHandling(
+    async () => {
+      logger.log("Getting all posts by group:", group);
+      const posts = await processAllPosts();
+      logger.log("Posts count before filtering by group:", posts.length);
+      const groupPosts = await getPostsByGroup(posts, group);
+      logger.log("Posts count after filtering by group:", groupPosts.length);
+      return groupPosts;
+    },
+    "getAllPostsByGroup",
+    [] // Return empty array on error
+  );
 };
 
 /**
@@ -547,41 +544,42 @@ export const groupByCondition = <T>(
     initialGroups?: Record<GroupKey, T[]>;
   }
 ): Record<GroupKey, T[]> => {
-  try {
-    // Use provided initial groups or create a new empty object
-    const result: Record<GroupKey, T[]> = options?.initialGroups || {};
+  return withErrorHandling(
+    () => {
+      // Use provided initial groups or create a new empty object
+      const result: Record<GroupKey, T[]> = options?.initialGroups || {};
 
-    // Use forEach for better performance than for loop
-    items.forEach((item, index) => {
-      try {
-        // Get the group key for this item
-        const groupKey = groupFunction(item, index);
+      // Use forEach for better performance than for loop
+      items.forEach((item, index) => {
+        try {
+          // Get the group key for this item
+          const groupKey = groupFunction(item, index);
 
-        // Initialize the group array if it doesn't exist
-        if (!result[groupKey]) {
-          result[groupKey] = [];
-        }
-
-        // Add the item to its group
-        result[groupKey].push(item);
-      } catch (error) {
-        // Handle errors in the grouping function
-        if (options?.onError) {
-          const fallbackKey = options.onError(item, error);
-          if (!result[fallbackKey]) {
-            result[fallbackKey] = [];
+          // Initialize the group array if it doesn't exist
+          if (!result[groupKey]) {
+            result[groupKey] = [];
           }
-          result[fallbackKey].push(item);
-        } else {
-          // Re-throw if no error handler is provided
-          throw error;
-        }
-      }
-    });
 
-    return result;
-  } catch (error) {
-    logger.error("Error in groupByCondition:", error);
-    return options?.initialGroups || {};
-  }
+          // Add the item to its group
+          result[groupKey].push(item);
+        } catch (error) {
+          // Handle errors in the grouping function
+          if (options?.onError) {
+            const fallbackKey = options.onError(item, error);
+            if (!result[fallbackKey]) {
+              result[fallbackKey] = [];
+            }
+            result[fallbackKey].push(item);
+          } else {
+            // Re-throw if no error handler is provided
+            throw error;
+          }
+        }
+      });
+
+      return result;
+    },
+    "groupByCondition",
+    options?.initialGroups || {}
+  );
 };

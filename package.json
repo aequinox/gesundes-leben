@@ -90,6 +90,12 @@
     "security:audit": "bun audit",
     "security:fix": "bun audit --fix"
   },
+  "sideEffects": [
+    "**/*.css",
+    "**/*.scss",
+    "src/utils/ui/**/*.ts",
+    "src/scripts/**/*.ts"
+  ],
   "dependencies": {
     "@astrojs/mdx": "4.3.10",
     "@astrojs/rss": "4.0.13",
