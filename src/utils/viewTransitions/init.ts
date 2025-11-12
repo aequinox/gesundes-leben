@@ -13,6 +13,15 @@ import {
 import { ViewTransitionEnhancer } from "./enhancer";
 
 /**
+ * Extend Window interface to include view transitions enhancer
+ */
+declare global {
+  interface Window {
+    __viewTransitionEnhancer?: ViewTransitionEnhancer;
+  }
+}
+
+/**
  * Initialize view transitions with configuration
  */
 export function initViewTransitions(
@@ -41,8 +50,7 @@ export function initViewTransitions(
 
   // Store reference for cleanup
   if (typeof window !== "undefined") {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window as any).__viewTransitionEnhancer = enhancer;
+    window.__viewTransitionEnhancer = enhancer;
   }
 
   return enhancer;
@@ -56,8 +64,7 @@ export function getViewTransitionsInstance(): ViewTransitionEnhancer | null {
     return null;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (window as any).__viewTransitionEnhancer || null;
+  return window.__viewTransitionEnhancer ?? null;
 }
 
 /**
@@ -67,8 +74,7 @@ export function cleanupViewTransitions(): void {
   const instance = getViewTransitionsInstance();
   if (instance) {
     instance.cleanup();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    delete (window as any).__viewTransitionEnhancer;
+    delete window.__viewTransitionEnhancer;
   }
 }
 

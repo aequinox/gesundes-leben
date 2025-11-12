@@ -394,7 +394,7 @@ describe("SchemaBuilder - Schema Building Functions", () => {
         { name: "Current", position: 2 },
       ];
       const schema = buildBreadcrumbSchema(items);
-      const elements = schema.itemListElement as any[];
+      const elements = schema.itemListElement as Array<{ item?: string; name: string; position: number }>;
       expect(elements[0].item).toBe("https://example.com");
       expect(elements[1].item).toBeUndefined();
     });
