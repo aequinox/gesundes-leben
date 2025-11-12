@@ -36,7 +36,7 @@ const categories = [
   },
   {
     name: "Lifestyle & Psyche",
-    slug: "lifestyle-psyche",
+    slug: "lifestyle-und-psyche",
     icon: "tabler:brain",
     description: "Mentale Gesundheit & Wohlbefinden",
     color: "health-mental",
@@ -90,10 +90,10 @@ const categories = [
   <div class="container mx-auto px-4 py-8">
     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {
-        categories.map((category) => (
+        categories.map(category => (
           <a
             href={`/categories/${category.slug}/`}
-            class="mega-menu-item group flex items-start gap-3 rounded-lg p-4 transition-all duration-200 hover:bg-surface1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+            class="mega-menu-item group hover:bg-surface1 flex items-start gap-3 rounded-lg p-4 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:outline-none"
             role="menuitem"
           >
             <div
@@ -120,7 +120,7 @@ const categories = [
     <div class="mt-6 border-t border-border pt-6 text-center">
       <a
         href="/categories/"
-        class="inline-flex items-center gap-2 font-semibold text-accent transition-colors duration-200 hover:text-accent/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+        class="inline-flex items-center gap-2 font-semibold text-accent transition-colors duration-200 hover:text-accent/80 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:outline-none"
         role="menuitem"
       >
         <span>Alle Kategorien ansehen</span>
@@ -180,46 +180,46 @@ const categories = [
 
     constructor() {
       this.menuItems = document.querySelectorAll(
-        '.mega-menu-item'
+        ".mega-menu-item"
       ) as NodeListOf<HTMLAnchorElement>;
       this.init();
     }
 
     private init(): void {
       // Handle keyboard navigation
-      document.addEventListener('keydown', this.handleKeyDown.bind(this));
+      document.addEventListener("keydown", this.handleKeyDown.bind(this));
     }
 
     private handleKeyDown(event: KeyboardEvent): void {
-      const megaMenu = document.getElementById('mega-menu');
-      if (!megaMenu || !megaMenu.classList.contains('visible')) return;
+      const megaMenu = document.getElementById("mega-menu");
+      if (!megaMenu || !megaMenu.classList.contains("visible")) return;
 
       switch (event.key) {
-        case 'ArrowDown':
+        case "ArrowDown":
           event.preventDefault();
           this.focusNext();
           break;
-        case 'ArrowUp':
+        case "ArrowUp":
           event.preventDefault();
           this.focusPrevious();
           break;
-        case 'ArrowRight':
+        case "ArrowRight":
           event.preventDefault();
           this.focusNext();
           break;
-        case 'ArrowLeft':
+        case "ArrowLeft":
           event.preventDefault();
           this.focusPrevious();
           break;
-        case 'Home':
+        case "Home":
           event.preventDefault();
           this.focusFirst();
           break;
-        case 'End':
+        case "End":
           event.preventDefault();
           this.focusLast();
           break;
-        case 'Escape':
+        case "Escape":
           event.preventDefault();
           this.close();
           break;
@@ -248,16 +248,16 @@ const categories = [
     }
 
     private close(): void {
-      const megaMenu = document.getElementById('mega-menu');
+      const megaMenu = document.getElementById("mega-menu");
       if (megaMenu) {
-        megaMenu.classList.remove('visible');
-        megaMenu.classList.add('invisible', 'opacity-0');
+        megaMenu.classList.remove("visible");
+        megaMenu.classList.add("invisible", "opacity-0");
       }
     }
   }
 
   // Initialize on page load
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener("astro:page-load", () => {
     new MegaMenuController();
   });
 </script>
