@@ -1,10 +1,11 @@
 ---
-import { getCollection } from "astro:content";
+import { getCollection, type CollectionEntry } from "astro:content";
 
 import Badge from "@/components/elements/Badge.astro";
 import type { UITranslations } from "@/i18n/ui";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { getPostSlug, slugify } from "@/utils/slugs";
+import type { Post } from "@/utils/types";
 
 interface Props {
   class?: string;
@@ -12,7 +13,7 @@ interface Props {
 
 interface BreadcrumbItem {
   label: string;
-  href?: string;
+  href: string | undefined;
   isCurrentPage: boolean;
 }
 
@@ -37,8 +38,10 @@ const allPosts = await getCollection("blog");
  */
 const findPostTitleBySlug = (slug: string): string | null => {
   // Find the post with a matching slug
-  const post = allPosts.find(post => {
-    const postSlug = getPostSlug(post);
+  const post = allPosts.find((post: CollectionEntry<"blog">) => {
+    // Create a Post-like object with the slug property
+    const postWithSlug = { ...post, slug: post.id } as Post;
+    const postSlug = getPostSlug(postWithSlug);
     return postSlug === slug;
   });
 
@@ -54,7 +57,7 @@ const findCategoryNameBySlug = (slug: string): string | null => {
   // Extract all unique categories from posts
   const allCategories = new Set<string>();
 
-  allPosts.forEach(post => {
+  allPosts.forEach((post: CollectionEntry<"blog">) => {
     post.data.categories?.forEach((category: string) => {
       allCategories.add(category);
     });
@@ -94,13 +97,16 @@ const formatBreadcrumbLabel = (segment: string, index: number): string => {
 
   // Translate common segments
   if (segment in commonSegments) {
-    return t(commonSegments[segment]);
+    const translationKey = commonSegments[segment];
+    if (translationKey) {
+      return t(translationKey);
+    }
   }
 
   // Handle posts pagination
   if (segment === "posts" && pathSegments[index + 1]) {
-    const pageNum = pathSegments[index + 1];
-    return `${t("nav.posts")} (${t("nav.page")} ${pageNum || 1})`;
+    const pageNum = pathSegments[index + 1] ?? "1";
+    return `${t("nav.posts")} (${t("nav.page")} ${pageNum})`;
   }
 
   // Handle tags pagination
@@ -109,8 +115,8 @@ const formatBreadcrumbLabel = (segment: string, index: number): string => {
     pathSegments[index + 1] &&
     pathSegments[index + 2]
   ) {
-    const tag = pathSegments[index + 1];
-    const pageNum = pathSegments[index + 2];
+    const tag = pathSegments[index + 1] ?? "";
+    const pageNum = pathSegments[index + 2] ?? "1";
     const pageIndicator =
       Number(pageNum) === 1 ? "" : ` (${t("nav.page")} ${pageNum})`;
     return `${decodeURIComponent(tag)}${pageIndicator}`;
@@ -142,17 +148,18 @@ const formatBreadcrumbLabel = (segment: string, index: number): string => {
  * Builds the breadcrumb items array with proper formatting and links
  */
 const buildBreadcrumbItems = (): BreadcrumbItem[] => {
+  const isHomePage = pathSegments.length === 0;
   const items: BreadcrumbItem[] = [
     {
       label: t("nav.home"),
-      href: "/",
-      isCurrentPage: pathSegments.length === 0,
+      href: isHomePage ? undefined : "/",
+      isCurrentPage: isHomePage,
     },
   ];
 
   let currentPath = "";
 
-  pathSegments.forEach((segment, index) => {
+  pathSegments.forEach((segment: string, index: number) => {
     // Skip pagination numbers for posts and tags
     if (
       (pathSegments[index - 1] === "posts" && !isNaN(Number(segment))) ||
@@ -165,7 +172,7 @@ const buildBreadcrumbItems = (): BreadcrumbItem[] => {
 
     items.push({
       label: formatBreadcrumbLabel(segment, index),
-      href: index === pathSegments.length - 1 ? undefined : currentPath,
+      href: index === pathSegments.length - 1 ? undefined : `${currentPath}/`,
       isCurrentPage: index === pathSegments.length - 1,
     });
   });
@@ -204,7 +211,7 @@ const breadcrumbItems = buildBreadcrumbItems();
               <Fragment>
                 <a
                   href={item.href}
-                  class="relative z-10 rounded-md px-2 py-1 font-medium capitalize transition-all duration-500 ease-in-out hover:-translate-y-[1px] hover:bg-card active:translate-y-0"
+                  class="relative z-10 rounded-md px-2 py-1 font-medium capitalize transition-all duration-500 ease-in-out hover:-translate-y-px hover:bg-card active:translate-y-0"
                 >
                   <span>{item.label}</span>
                 </a>
