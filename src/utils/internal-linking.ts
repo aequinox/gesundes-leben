@@ -189,12 +189,12 @@ function calculateContentRelationship(
   // Extract content data
   const _sourceTitle = sourcePost.data.title.toLowerCase();
   const targetTitle = targetPost.data.title.toLowerCase();
-  const sourceCategories = sourcePost.data.categories || [];
-  const targetCategories = targetPost.data.categories || [];
-  const sourceTags = sourcePost.data.tags || [];
-  const targetTags = targetPost.data.tags || [];
-  const sourceKeywords = sourcePost.data.keywords || [];
-  const targetKeywords = targetPost.data.keywords || [];
+  const sourceCategories = sourcePost.data.categories ?? [];
+  const targetCategories = targetPost.data.categories ?? [];
+  const sourceTags = sourcePost.data.tags ?? [];
+  const targetTags = targetPost.data.tags ?? [];
+  const sourceKeywords = sourcePost.data.keywords ?? [];
+  const targetKeywords = targetPost.data.keywords ?? [];
 
   // 1. Keyword matching (highest priority)
   for (const keyword of sourceKeywords) {
@@ -312,10 +312,10 @@ function calculateContentRelationship(
  */
 function identifyTopicCluster(post: Post): keyof typeof TOPIC_CLUSTERS | null {
   const title = post.data.title.toLowerCase();
-  const categories = (post.data.categories || []).map((c: string) =>
+  const categories = (post.data.categories ?? []).map((c: string) =>
     c.toLowerCase()
   );
-  const keywords = (post.data.keywords || []).map((k: string) =>
+  const keywords = (post.data.keywords ?? []).map((k: string) =>
     k.toLowerCase()
   );
   const content = [title, ...categories, ...keywords].join(" ");
@@ -378,7 +378,7 @@ function areRelatedClusters(
  */
 function generateSmartAnchorText(post: Post): string[] {
   const title = post.data.title;
-  const keywords = post.data.keywords || [];
+  const keywords = post.data.keywords ?? [];
   const suggestions: string[] = [];
 
   // 1. Use keywords as anchor text

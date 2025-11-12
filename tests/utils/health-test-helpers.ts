@@ -107,7 +107,7 @@ export class HealthContentValidator {
 export class NutritionValidator {
   validateNutritionData(data: any, _context: any = {}): { isValid: boolean; dgeCompliance: number; violations: string[] } {
     // Basic nutrition data validation
-    if (!data || typeof data !== 'object') {
+    if (!data ?? typeof data !== 'object') {
       return { isValid: false, dgeCompliance: 0, violations: ['Invalid data format'] };
     }
     
@@ -163,7 +163,7 @@ export class NutritionValidator {
 export class ReferenceValidator {
   validateReference(reference: any): { isCredible: boolean; credibilityScore: number; strengths: string[]; issues: string[] } {
     // Basic reference validation
-    if (!reference || typeof reference !== 'object') {
+    if (!reference ?? typeof reference !== 'object') {
       return { isCredible: false, credibilityScore: 0, strengths: [], issues: ['Invalid reference format'] };
     }
     
@@ -178,7 +178,7 @@ export class ReferenceValidator {
       issues.push('Missing or inadequate title');
     }
     
-    if (reference.url || reference.doi) {
+    if (reference.url ?? reference.doi) {
       strengths.push('Has accessible link');
       score += 0.3;
     } else {
@@ -232,7 +232,7 @@ export class ReferenceValidator {
     return Boolean(reference?.authors &&
       reference?.title &&
       reference?.year &&
-      (reference?.journal || reference?.doi));
+      (reference?.journal ?? reference?.doi));
   }
 
   validateReferenceAccessibility(reference: any): boolean {

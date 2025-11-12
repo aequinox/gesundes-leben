@@ -25,7 +25,7 @@ test.describe('Theme Toggle Functionality', () => {
         const ariaLabel = await nav.themeToggle.getAttribute('aria-label');
         const title = await nav.themeToggle.getAttribute('title');
         
-        expect(ariaLabel || title).toMatch(/theme|Theme|dunkel|hell|dark|light/i);
+        expect(ariaLabel ?? title).toMatch(/theme|Theme|dunkel|hell|dark|light/i);
       }
     });
 
@@ -61,7 +61,7 @@ test.describe('Theme Toggle Functionality', () => {
         const buttonHTML = await nav.themeToggle.innerHTML();
         
         // Should have sun/moon icon or German text
-        expect(buttonContent || buttonHTML).toMatch(/☀|🌙|sun|moon|hell|dunkel|light|dark|theme/i);
+        expect(buttonContent ?? buttonHTML).toMatch(/☀|🌙|sun|moon|hell|dunkel|light|dark|theme/i);
       }
     });
   });
@@ -292,7 +292,7 @@ test.describe('Theme Toggle Functionality', () => {
         const ariaLabel = await nav.themeToggle.getAttribute('aria-label');
         const title = await nav.themeToggle.getAttribute('title');
         
-        expect(ariaLabel || title).toBeTruthy();
+        expect(ariaLabel ?? title).toBeTruthy();
         
         // May have aria-pressed for toggle state
         const ariaPressed = await nav.themeToggle.getAttribute('aria-pressed');
@@ -361,7 +361,7 @@ test.describe('Theme Toggle Functionality', () => {
         (!htmlClassLight?.includes('dark') && !bodyClassLight?.includes('dark'));
       
       // Either theme should be detected
-      expect(hasDarkTheme || hasLightTheme).toBeTruthy();
+      expect(hasDarkTheme ?? hasLightTheme).toBeTruthy();
     });
 
     test('should handle theme with reduced motion preference', async ({ page }) => {

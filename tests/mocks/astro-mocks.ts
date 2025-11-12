@@ -155,11 +155,11 @@ export const createAstroContentMocks = () => {
         if (typeof ref === 'object' && ref.collection && ref.slug) {
           switch (ref.collection) {
             case 'blog':
-              return mockBlogPosts.find(post => post.id.includes(ref.slug || ref.id || ''));
+              return mockBlogPosts.find(post => post.id.includes(ref.slug ?? ref.id || ''));
             case 'authors':
-              return mockAuthors.find(author => author.id.includes(ref.slug || ref.id || ''));
+              return mockAuthors.find(author => author.id.includes(ref.slug ?? ref.id || ''));
             case 'glossary':
-              return mockGlossary.find(term => term.id.includes(ref.slug || ref.id || ''));
+              return mockGlossary.find(term => term.id.includes(ref.slug ?? ref.id || ''));
           }
         }
         return undefined;
@@ -177,8 +177,8 @@ export const createAstroImageMock = () => {
     const img = {
       src: typeof src === 'string' ? src : src.src,
       alt: alt || '',
-      width: width || 800,
-      height: height || 600,
+      width: width ?? 800,
+      height: height ?? 600,
       loading: props.loading || 'lazy',
       ...props
     };
@@ -209,8 +209,8 @@ export const createAstroImageMock = () => {
     getImage: vi.fn().mockImplementation((options) => {
       return Promise.resolve({
         src: options.src,
-        width: options.width || 800,
-        height: options.height || 600,
+        width: options.width ?? 800,
+        height: options.height ?? 600,
         format: options.format || 'jpeg'
       });
     })

@@ -60,7 +60,7 @@ export function extractUniqueTags(posts: Post[]): TagInfo[] {
   const uniqueTags = new Map<string, string>();
 
   filteredPosts
-    .flatMap(post => post.data.tags || [])
+    .flatMap(post => post.data.tags ?? [])
     .forEach(tag => {
       const slugifiedTag = slugify(tag);
       // Keep first occurrence of tag name for consistent display

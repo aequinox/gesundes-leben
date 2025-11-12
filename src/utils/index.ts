@@ -85,6 +85,13 @@ export {
   type TagFrequency,
 } from "./tags";
 
+export {
+  extractUniqueCategories,
+  filterPostsByCategory,
+  getCategoryCounts,
+  type CategoryInfo,
+} from "./categories";
+
 // === Date & Time ===
 export {
   formatDate,

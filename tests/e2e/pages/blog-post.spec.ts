@@ -315,7 +315,7 @@ test.describe('Blog Post Pages', () => {
         const height = await firstImage.getAttribute('height');
         
         // Should have dimensions or CSS to prevent layout shift
-        expect(width || height).toBeTruthy();
+        expect(width ?? height).toBeTruthy();
       }
     });
   });

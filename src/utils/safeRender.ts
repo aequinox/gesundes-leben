@@ -90,9 +90,9 @@ export async function safelyRender<T>(
 
       // If we have more retries, wait and try again
       if (attempt < fullConfig.maxRetries) {
-        await new Promise(resolve =>
-          setTimeout(resolve, fullConfig.retryDelay)
-        );
+        await new Promise<void>(resolve => {
+          setTimeout(resolve, fullConfig.retryDelay);
+        });
         continue;
       }
 
@@ -282,17 +282,19 @@ export function createSafeDebounced<TArgs extends any[], TReturn>(
 
       latestResolve = resolve;
 
-      timeoutId = setTimeout(async () => {
-        const result = await safelyRender(
-          () => fn(...args),
-          "Debounced function failed",
-          config
-        );
+      timeoutId = setTimeout(() => {
+        void (async () => {
+          const result = await safelyRender(
+            () => fn(...args),
+            "Debounced function failed",
+            config
+          );
 
-        if (latestResolve === resolve) {
-          resolve(result);
-          latestResolve = null;
-        }
+          if (latestResolve === resolve) {
+            resolve(result);
+            latestResolve = null;
+          }
+        })();
       }, delay);
     });
   };

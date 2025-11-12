@@ -131,7 +131,7 @@ export class FormValidator {
             result.isValid = false;
             result.errors.push(message);
           } else if (rule.severity === "warning") {
-            result.warnings = result.warnings || [];
+            result.warnings = result.warnings ?? [];
             result.warnings.push(message);
           }
         }
@@ -574,13 +574,15 @@ export function createDebouncedValidator(
           clearTimeout(timeoutId);
         }
 
-        timeoutId = window.setTimeout(async () => {
-          const result = await validator.validateField(
-            fieldName,
-            value,
-            formData
-          );
-          resolve(result);
+        timeoutId = window.setTimeout(() => {
+          void (async () => {
+            const result = await validator.validateField(
+              fieldName,
+              value,
+              formData
+            );
+            resolve(result);
+          })();
         }, delay);
       });
     },

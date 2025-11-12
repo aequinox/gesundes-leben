@@ -87,7 +87,15 @@ export function initBlogFilter(userOptions: FilterOptions = {}): void {
   };
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initialize);
+    document.addEventListener("DOMContentLoaded", () => {
+      initialize()
+        .then(() => {
+          logger.log("Blog filter initialized successfully.");
+        })
+        .catch(error => {
+          logger.error("Blog filter initialization failed:", error.message);
+        });
+    });
   } else {
     initialize()
       .then(() => {

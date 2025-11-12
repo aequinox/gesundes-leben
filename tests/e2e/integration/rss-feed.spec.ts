@@ -121,7 +121,7 @@ test.describe('RSS Feed Integration', () => {
         const linkText = await rssLinks.first().textContent();
         const linkHtml = await rssLinks.first().innerHTML();
         
-        expect(linkText || linkHtml).toMatch(/RSS|Feed|Abonnieren|Subscribe/i);
+        expect(linkText ?? linkHtml).toMatch(/RSS|Feed|Abonnieren|Subscribe/i);
       }
     });
   });
