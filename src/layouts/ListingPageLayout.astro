@@ -1,0 +1,69 @@
+---
+/**
+ * ListingPageLayout Component
+ *
+ * Specialized layout for listing/archive pages (categories, tags, authors, posts).
+ * Provides a consistent structure with PageHero, optional filters, and pagination.
+ *
+ * Usage:
+ *   <ListingPageLayout
+ *     title="All Posts"
+ *     pageTitle="Blog Posts"
+ *     pageDescription="Browse all articles"
+ *     activeNav="posts"
+ *   >
+ *     <section>Your listing content here</section>
+ *   </ListingPageLayout>
+ *
+ * Benefits:
+ *   - Standardized structure for all listing pages
+ *   - Consistent PageHero + Hr pattern
+ *   - Reduces code duplication across archive pages
+ */
+
+import Hr from "@/components/elements/Hr.astro";
+import PageHero from "@/components/sections/PageHero.astro";
+import type { NavigationLink } from "@/components/types";
+import { SITE } from "@/config";
+import BasePage from "@/layouts/BasePage.astro";
+
+export interface Props {
+  // Page metadata
+  title: string;
+  description?: string;
+
+  // Hero section
+  pageTitle: string;
+  pageDescription?: string;
+
+  // Navigation
+  activeNav?: NavigationLink;
+
+  // Layout options
+  withHero?: boolean;
+  withHr?: boolean;
+  containerClass?: string;
+}
+
+const {
+  title,
+  description = SITE.desc,
+  pageTitle,
+  pageDescription,
+  activeNav,
+  withHero = true,
+  withHr = true,
+  containerClass = "mx-auto w-full max-w-content",
+} = Astro.props;
+
+const fullTitle = `${title} | ${SITE.title}`;
+---
+
+<BasePage title={fullTitle} description={description} activeNav={activeNav}>
+  <main id="main-content" class={containerClass}>
+    {withHero && <PageHero title={pageTitle} subtitle={pageDescription} />}
+    {withHr && <Hr />}
+
+    <slot />
+  </main>
+</BasePage>

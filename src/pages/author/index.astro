@@ -1,12 +1,15 @@
 ---
+/**
+ * Authors Index Page
+ *
+ * Displays all authors with their bio and links to their posts.
+ * Refactored to fix double-layout bug and use ListingPageLayout.
+ */
+
 import { Icon } from "astro-icon/components";
 
-import Footer from "@/components/sections/Footer.astro";
-import Header from "@/components/sections/Header.astro";
-import { SITE } from "@/config";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
-import Layout from "@/layouts/Layout.astro";
-import Main from "@/layouts/Main.astro";
+import ListingPageLayout from "@/layouts/ListingPageLayout.astro";
 import { getAllAuthors } from "@/utils/authors";
 
 const authors = await getAllAuthors();
@@ -19,42 +22,36 @@ const pageTitle = t("nav.authors");
 const pageDescription = t("post.allAuthors");
 ---
 
-<Layout title={`${pageTitle} | ${SITE.title}`}>
-  <Header activeNav="categories" />
-
-  <Layout title={`${pageTitle} | ${SITE.title}`}>
-    <Header activeNav="posts" />
-    <Main pageTitle={pageTitle} pageDesc={pageDescription}>
-      <section class="mx-auto prose max-w-3xl">
-        <h1 class="mb-6 text-center text-2xl font-semibold sm:text-3xl">
-          {pageTitle}
-        </h1>
-        <ul class="grid gap-4 sm:grid-cols-2">
-          {
-            authors.map(author => (
-              <li class="flex items-center rounded-lg border border-line p-4 shadow-sm transition-all hover:shadow-md">
-                <a
-                  href={`/author/${author.id.replace(/\.(md|mdx)$/, "")}`}
-                  class="flex w-full items-center gap-4"
-                >
-                  <div class="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-accent">
-                    <Icon name="tabler:user" class="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h2 class="text-lg font-medium">{author.data.name}</h2>
-                    {author.data.bio && (
-                      <p class="line-clamp-2 text-sm opacity-80">
-                        {author.data.bio}
-                      </p>
-                    )}
-                  </div>
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </section>
-    </Main>
-    <Footer />
-  </Layout>
-</Layout>
+<ListingPageLayout
+  title={pageTitle}
+  pageTitle={pageTitle}
+  pageDescription={pageDescription}
+  activeNav="authors"
+>
+  <section class="mx-auto max-w-3xl prose">
+    <ul class="grid gap-4 sm:grid-cols-2">
+      {
+        authors.map(author => (
+          <li class="flex items-center rounded-lg border border-line p-4 shadow-sm transition-all hover:shadow-md">
+            <a
+              href={`/author/${author.id.replace(/\.(md|mdx)$/, "")}`}
+              class="flex w-full items-center gap-4"
+            >
+              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-accent">
+                <Icon name="tabler:user" class="h-6 w-6" />
+              </div>
+              <div>
+                <h2 class="text-lg font-medium">{author.data.name}</h2>
+                {author.data.bio && (
+                  <p class="line-clamp-2 text-sm opacity-80">
+                    {author.data.bio}
+                  </p>
+                )}
+              </div>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</ListingPageLayout>

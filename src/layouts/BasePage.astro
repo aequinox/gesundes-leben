@@ -1,0 +1,76 @@
+---
+/**
+ * BasePage Layout Component
+ *
+ * Provides a standardized page structure with Header, Footer, and Layout wrapper.
+ * This eliminates the need for each page to manually import and render Header/Footer.
+ *
+ * Usage:
+ *   <BasePage title="Page Title" description="Page description" activeNav="home">
+ *     <main>Your content here</main>
+ *   </BasePage>
+ *
+ * Benefits:
+ *   - Single source of truth for page structure
+ *   - Reduces code duplication across all pages
+ *   - Easier to add/modify global page elements
+ *   - Consistent page layout across the site
+ */
+
+import Footer from "@/components/sections/Footer.astro";
+import Header from "@/components/sections/Header.astro";
+import type { NavigationLink } from "@/components/types";
+import { SITE } from "@/config";
+import Layout from "@/layouts/Layout.astro";
+
+export interface Props {
+  title?: string;
+  author?: string;
+  description?: string;
+  ogImage?: string;
+  canonicalURL?: string;
+  pubDatetime?: Date;
+  modDatetime?: Date | undefined;
+  scrollSmooth?: boolean;
+  activeNav?: NavigationLink;
+  noMarginTop?: boolean;
+  keywords?: string[];
+  tags?: string[];
+  categories?: string[];
+}
+
+const {
+  title = SITE.title,
+  author = SITE.author,
+  description = SITE.desc,
+  ogImage,
+  canonicalURL,
+  pubDatetime,
+  modDatetime,
+  scrollSmooth = false,
+  activeNav,
+  noMarginTop = false,
+  keywords,
+  tags,
+  categories,
+} = Astro.props;
+---
+
+<Layout
+  {title}
+  {author}
+  {description}
+  {ogImage}
+  {canonicalURL}
+  {pubDatetime}
+  {modDatetime}
+  {scrollSmooth}
+  {activeNav}
+  {...(keywords && { keywords })}
+  {...(tags && { tags })}
+  {...(categories && { categories })}
+>
+  <Header {activeNav} />
+  <slot />
+  <Footer {noMarginTop} />
+</Layout>
