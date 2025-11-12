@@ -83,7 +83,7 @@ const interactiveClass = interactive ? "badge-interactive" : "";
   style={inlineStyle}
 >
   {dot && <span class="badge-indicator" />}
-  {icon && <Icon name={icon} class="badge-icon" />}
+  {icon && icon.trim() !== "" && <Icon name={icon} class="badge-icon" />}
   {text && <span class="badge-text">{text}</span>}
   <slot />
 </span>

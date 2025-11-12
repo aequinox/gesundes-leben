@@ -25,8 +25,9 @@ const URL = Astro.url;
             class="scale-90 p-2 hover:rotate-6 sm:p-1"
             title={social.linkTitle}
           >
-            <Icon name={social.icon} size={24} aria-hidden="true" />
-
+            {social.icon && social.icon.trim() !== "" && (
+              <Icon name={social.icon} size={24} aria-hidden="true" />
+            )}
             <span class="sr-only">{social.linkTitle}</span>
           </LinkButton>
         )

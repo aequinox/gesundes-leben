@@ -52,32 +52,38 @@
   }
 
   /* Specific element transitions for better performance */
-  /* Hero images */
-  ::view-transition-old([transition-name*="heroImage"]) {
+  /* Note: View transition pseudo-elements don't support attribute selectors.
+     If you need these animations, define specific transition names like:
+     ::view-transition-old(heroImage) { ... }
+     and apply them to elements with: style="view-transition-name: heroImage"
+  */
+
+  /* Uncomment and customize these if you're using specific transition names:
+
+  ::view-transition-old(heroImage) {
     animation: vt-image-out var(--vt-duration-normal) var(--vt-easing-exit);
   }
 
-  ::view-transition-new([transition-name*="heroImage"]) {
+  ::view-transition-new(heroImage) {
     animation: vt-image-in var(--vt-duration-normal) var(--vt-easing-spring);
   }
 
-  /* Titles and headings */
-  ::view-transition-old([transition-name*="title"]) {
+  ::view-transition-old(article-title) {
     animation: vt-title-out var(--vt-duration-fast) var(--vt-easing-exit);
   }
 
-  ::view-transition-new([transition-name*="title"]) {
+  ::view-transition-new(article-title) {
     animation: vt-title-in var(--vt-duration-fast) var(--vt-easing-bounce);
   }
 
-  /* Tags and badges */
-  ::view-transition-old([transition-name*="tag"]) {
+  ::view-transition-old(article-tag) {
     animation: vt-tag-out var(--vt-duration-fast) var(--vt-easing-exit);
   }
 
-  ::view-transition-new([transition-name*="tag"]) {
+  ::view-transition-new(article-tag) {
     animation: vt-tag-in var(--vt-duration-fast) var(--vt-easing-bounce);
   }
+  */
 
   /* Default fallback for unmatched elements */
   ::view-transition-old(*) {

@@ -32,6 +32,11 @@ const getIconClasses = () => {
 };
 
 const iconClassList = getIconClasses();
+
+// Don't render if icon is empty or undefined
+if (!icon || icon.trim() === "") {
+  return null;
+}
 ---
 
 <Icon

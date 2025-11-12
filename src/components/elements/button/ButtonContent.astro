@@ -58,7 +58,7 @@ const hasSlotContent = Astro.slots.has("default");
 {
   icon && iconPosition === "start" && (
     <ButtonIcon
-      icon={loading ? "loader" : icon}
+      icon={loading ? "tabler:loader" : icon}
       position="start"
       hasText={hasTextContent}
       class={loading ? "animate-spin" : ""}
@@ -87,7 +87,7 @@ const hasSlotContent = Astro.slots.has("default");
 {
   icon && iconPosition === "end" && (
     <ButtonIcon
-      icon={loading ? "loader" : icon}
+      icon={loading ? "tabler:loader" : icon}
       position="end"
       hasText={hasTextContent}
       class={loading ? "animate-spin" : ""}
@@ -98,9 +98,9 @@ const hasSlotContent = Astro.slots.has("default");
 
 {/* Icon-only button */}
 {
-  isIconOnly && (
+  isIconOnly && icon && (
     <ButtonIcon
-      icon={loading ? "loader" : icon}
+      icon={loading ? "tabler:loader" : icon}
       position="only"
       hasText={false}
       class={loading ? "animate-spin" : ""}
