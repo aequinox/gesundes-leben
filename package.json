@@ -92,7 +92,9 @@
     "security:fix": "bun audit --fix",
     "images:optimize": "node scripts/optimize-images.js",
     "images:backup": "find src/data/blog -name '*.backup' -exec rm {} \\;",
-    "images:restore": "find src/data/blog -name '*.backup' -exec bash -c 'mv \"$0\" \"${0%.backup}\"' {} \\;"
+    "images:restore": "find src/data/blog -name '*.backup' -exec bash -c 'mv \"$0\" \"${0%.backup}\"' {} \\;",
+    "perf:measure": "node scripts/performance-baseline.js",
+    "perf:full": "bun run build && bun run perf:measure"
   },
   "sideEffects": [
     "**/*.css",
