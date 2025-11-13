@@ -1,14 +1,30 @@
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
-import globPkg from 'glob';
 import { Resvg } from '@resvg/resvg-js';
-
-const { glob } = globPkg;
 
 // Import the OG templates (we'll need to adapt these)
 const OUTPUT_DIR = 'public/og';
 const CACHE_FILE = 'public/og/.cache.json';
+
+/**
+ * Recursively find all blog post files
+ */
+async function findBlogPosts(dir) {
+  const files = [];
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...(await findBlogPosts(fullPath)));
+    } else if (entry.isFile() && /\.(md|mdx)$/i.test(entry.name)) {
+      files.push(fullPath);
+    }
+  }
+
+  return files;
+}
 
 /**
  * Generate a content hash for a post to detect changes
@@ -69,14 +85,15 @@ async function needsRegeneration(slug, contentHash) {
 /**
  * Generate OG image for a post
  */
-async function generateOgImage(post, slug) {
+async function generateOgImage(post, slug, config) {
   console.log(`  Generating: ${slug}`);
 
-  // Import the template dynamically
-  const { default: postOgImage } = await import('../src/utils/og-templates/post.js');
+  // Import the template dynamically with Node.js compatible paths
+  const templatePath = new URL('../src/utils/og-templates/post-node.js', import.meta.url);
+  const { default: postOgImage } = await import(templatePath);
 
   // Generate SVG
-  const svg = await postOgImage(post);
+  const svg = await postOgImage(post, config);
 
   // Convert to PNG
   const resvg = new Resvg(svg);
@@ -99,11 +116,18 @@ async function processOgImages() {
   // Ensure output directory exists
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
 
+  // Load configuration
+  const configPath = new URL('../src/config.ts', import.meta.url);
+  const configModule = await import(configPath);
+  const config = {
+    SITE: configModule.SITE,
+  };
+
   // Load cache
   const cache = await loadCache();
 
   // Find all blog post files
-  const postFiles = await glob('src/data/blog/**/*.{md,mdx}');
+  const postFiles = await findBlogPosts('src/data/blog');
   console.log(`Found ${postFiles.length} blog posts\n`);
 
   let generated = 0;
@@ -148,7 +172,7 @@ async function processOgImages() {
 
     // Check if regeneration needed
     if (await needsRegeneration(slug, contentHash)) {
-      const size = await generateOgImage(post, slug);
+      const size = await generateOgImage(post, slug, config);
       cache.images[slug] = contentHash;
       generated++;
       totalSize += size;

@@ -115,7 +115,7 @@
     "images:optimize": "node scripts/optimize-images.js",
     "images:backup": "find src/data/blog -name '*.backup' -exec rm {} \\;",
     "images:restore": "find src/data/blog -name '*.backup' -exec bash -c 'mv \"$0\" \"${0%.backup}\"' {} \\;",
-    "og:generate": "node scripts/generate-og-images.js",
+    "og:generate": "tsx scripts/generate-og-images.js",
     "og:clear": "rm -rf public/og",
     "og:rebuild": "bun run og:clear && bun run og:generate",
     "perf:measure": "node scripts/performance-baseline.js"
