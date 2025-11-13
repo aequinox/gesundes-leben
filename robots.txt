@@ -1,0 +1,60 @@
+User-agent: *
+Disallow: /search/
+Disallow: /_image/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /temp/
+Disallow: /draft/
+Disallow: *.json$
+Disallow: /rss.xml
+Disallow: /sitemap*.xml
+Allow: /
+Crawl-delay: 1
+
+User-agent: Googlebot
+Disallow: /search/
+Disallow: /_image/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /temp/
+Disallow: /draft/
+Allow: /
+Crawl-delay: 0.5
+
+User-agent: Bingbot
+Disallow: /search/
+Disallow: /_image/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /temp/
+Disallow: /draft/
+Allow: /
+Crawl-delay: 1
+
+User-agent: healthbot
+Disallow: /search/
+Disallow: /_image/
+Disallow: /api/
+Disallow: /admin/
+Allow: /posts/
+Crawl-delay: 2
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+Sitemap: https://gesundes-leben.vision/sitemap-index.xml
+Sitemap: https://gesundes-leben.vision/sitemap-0.xml
