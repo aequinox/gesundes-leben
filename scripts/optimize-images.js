@@ -1,15 +1,28 @@
 import sharp from 'sharp';
-import globPkg from 'glob';
 import path from 'path';
 import fs from 'fs/promises';
-
-const { glob } = globPkg;
 
 const MAX_WIDTH = 2400; // Max width for any image
 const QUALITY = 85; // JPEG/WebP quality
 
+async function findImages(dir) {
+  const files = [];
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...await findImages(fullPath));
+    } else if (entry.isFile() && /\.(jpg|jpeg|png)$/i.test(entry.name)) {
+      files.push(fullPath);
+    }
+  }
+
+  return files;
+}
+
 async function optimizeImages() {
-  const images = await glob('src/data/blog/**/images/*.{jpg,jpeg,png}');
+  const images = await findImages('src/data/blog');
   console.log(`Found ${images.length} images to optimize`);
 
   let totalSaved = 0;
