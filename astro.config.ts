@@ -56,85 +56,85 @@ export default defineConfig({
         tabler: ["*"],
       },
     }),
-    AstroPWA({
-      registerType: "autoUpdate",
-      includeAssets: ["favicon.svg", "fonts/*.woff2"],
-      workbox: {
-        globPatterns: ["**/*.{css,js,html,svg,png,ico,txt,woff2}"],
-        navigateFallback: "/404",
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: "CacheFirst",
-            options: {
-              cacheName: "google-fonts-cache",
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365, // 365 days
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-            },
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-            handler: "CacheFirst",
-            options: {
-              cacheName: "gstatic-fonts-cache",
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365, // 365 days
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-            },
-          },
-          {
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|avif)$/i,
-            handler: "CacheFirst",
-            options: {
-              cacheName: "image-cache",
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
-              },
-            },
-          },
-        ],
-      },
-      manifest: {
-        name: "Gesundes Leben - Gesundheit, Ernährung & Wellness",
-        short_name: "Gesundes Leben",
-        description:
-          "Dein vertrauenswürdiger Ratgeber für Gesundheit, Ernährung und Wellness",
-        theme_color: "#10b981",
-        background_color: "#ffffff",
-        display: "standalone",
-        scope: "/",
-        start_url: "/",
-        orientation: "portrait-primary",
-        icons: [
-          {
-            src: "/pwa-192x192.png",
-            sizes: "192x192",
-            type: "image/png",
-          },
-          {
-            src: "/pwa-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-          },
-          {
-            src: "/pwa-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "any maskable",
-          },
-        ],
-      },
-    }),
+    // AstroPWA({
+    //   registerType: "autoUpdate",
+    //   includeAssets: ["favicon.svg", "fonts/*.woff2"],
+    //   workbox: {
+    //     globPatterns: ["**/*.{css,js,html,svg,png,ico,txt,woff2}"],
+    //     navigateFallback: "/404",
+    //     runtimeCaching: [
+    //       {
+    //         urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+    //         handler: "CacheFirst",
+    //         options: {
+    //           cacheName: "google-fonts-cache",
+    //           expiration: {
+    //             maxEntries: 10,
+    //             maxAgeSeconds: 60 * 60 * 24 * 365, // 365 days
+    //           },
+    //           cacheableResponse: {
+    //             statuses: [0, 200],
+    //           },
+    //         },
+    //       },
+    //       {
+    //         urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+    //         handler: "CacheFirst",
+    //         options: {
+    //           cacheName: "gstatic-fonts-cache",
+    //           expiration: {
+    //             maxEntries: 10,
+    //             maxAgeSeconds: 60 * 60 * 24 * 365, // 365 days
+    //           },
+    //           cacheableResponse: {
+    //             statuses: [0, 200],
+    //           },
+    //         },
+    //       },
+    //       {
+    //         urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|avif)$/i,
+    //         handler: "CacheFirst",
+    //         options: {
+    //           cacheName: "image-cache",
+    //           expiration: {
+    //             maxEntries: 100,
+    //             maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+    //           },
+    //         },
+    //       },
+    //     ],
+    //   },
+    //   manifest: {
+    //     name: "Gesundes Leben - Gesundheit, Ernährung & Wellness",
+    //     short_name: "Gesundes Leben",
+    //     description:
+    //       "Dein vertrauenswürdiger Ratgeber für Gesundheit, Ernährung und Wellness",
+    //     theme_color: "#10b981",
+    //     background_color: "#ffffff",
+    //     display: "standalone",
+    //     scope: "/",
+    //     start_url: "/",
+    //     orientation: "portrait-primary",
+    //     icons: [
+    //       {
+    //         src: "/pwa-192x192.png",
+    //         sizes: "192x192",
+    //         type: "image/png",
+    //       },
+    //       {
+    //         src: "/pwa-512x512.png",
+    //         sizes: "512x512",
+    //         type: "image/png",
+    //       },
+    //       {
+    //         src: "/pwa-512x512.png",
+    //         sizes: "512x512",
+    //         type: "image/png",
+    //         purpose: "any maskable",
+    //       },
+    //     ],
+    //   },
+    // }),
   ],
   markdown: {
     remarkPlugins,
