@@ -27,7 +27,7 @@ export default defineConfig({
   trailingSlash: "always",
   // Build optimizations
   build: {
-    format: "file",
+    format: "directory",
     inlineStylesheets: "auto",
   },
   // Compression
