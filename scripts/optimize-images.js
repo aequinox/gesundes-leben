@@ -1,7 +1,9 @@
 import sharp from 'sharp';
-import { glob } from 'glob';
+import globPkg from 'glob';
 import path from 'path';
 import fs from 'fs/promises';
+
+const { glob } = globPkg;
 
 const MAX_WIDTH = 2400; // Max width for any image
 const QUALITY = 85; // JPEG/WebP quality

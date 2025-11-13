@@ -1,8 +1,10 @@
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
-import { glob } from 'glob';
+import globPkg from 'glob';
 import { Resvg } from '@resvg/resvg-js';
+
+const { glob } = globPkg;
 
 // Import the OG templates (we'll need to adapt these)
 const OUTPUT_DIR = 'public/og';
