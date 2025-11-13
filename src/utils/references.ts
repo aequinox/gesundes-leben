@@ -122,13 +122,15 @@ function createReferenceFieldComparator(): (a: string, b: string) => number {
 function sortReferenceKeys(data: ReferenceData): ReferenceData {
   const comparator = createReferenceFieldComparator();
   const sortedKeys = Object.keys(data).sort(comparator);
-  const sortedData: Record<string, unknown> = {};
+  const sortedData: Partial<ReferenceData> = {};
 
   for (const key of sortedKeys) {
-    sortedData[key] = data[key as keyof ReferenceData];
+    const typedKey = key as keyof ReferenceData;
+    sortedData[typedKey] = data[typedKey];
   }
 
-  return sortedData as unknown as ReferenceData;
+  // At this point all keys from data have been copied, so it's safe to cast
+  return sortedData as ReferenceData;
 }
 
 /**

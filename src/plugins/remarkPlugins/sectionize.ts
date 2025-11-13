@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// import type { Root, RootContent, Heading, Parent, Node, Data } from "mdast";
 import type { Properties } from "hast";
 import type { Heading, Parent, Root, RootContent } from "mdast";
 import { findAfter } from "unist-util-find-after";
@@ -88,19 +86,19 @@ export function remarkSectionize(
  * Creates a section in the AST
  * @param heading - The heading node to create a section for
  * @param index - The index of the heading in the parent's children
- * @param parent - The parent node containing the heading
+ * @param parent - The parent node (Root or SectionNode) containing the heading
  * @param getSectionData - Function to get section data based on depth
  */
 function sectionize(
-  heading: Heading | any,
+  heading: Heading,
   index: number,
-  parent: Root | any,
+  parent: Root | SectionNode,
   getSectionData: Required<SectionizeOptions>["getSectionData"]
 ): void {
   const depth = heading.depth;
 
-  const isEndOfSection: HeadingMatcher | any = (node: RootContentWithHeading) =>
-    node.type === "heading" && node.depth <= depth;
+  const isEndOfSection: HeadingMatcher = (node: RootContentWithHeading) =>
+    node.type === "heading" && (node.depth ?? 0) <= depth;
 
   const endNode = findAfter(parent, heading, isEndOfSection);
   const endIndex = endNode
