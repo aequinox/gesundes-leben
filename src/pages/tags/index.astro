@@ -17,6 +17,7 @@ import Tag from "@/components/elements/Tag.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import ListingPageLayout from "@/layouts/ListingPageLayout.astro";
 import { extractUniqueTags, getTagCounts } from "@/utils/tags";
+import { getFeaturedTagTransition } from "@/utils/viewTransitionNames";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -52,76 +53,72 @@ const pageDescription = "Entdecke unsere vollständige Sammlung von Themen.";
   pageDescription={t("post.allTags")}
   activeNav="tags"
 >
-
-    <!-- Featured Tags Section with 3D Cards -->
-    <section class="featured-tags-section py-2">
-      <div class="section-container mx-auto max-w-content py-8">
-        <div class="section-header mb-10 text-center">
-          <h2
-            class="section-title mb-3 flex items-center justify-center gap-2 text-2xl font-bold text-accent md:text-3xl"
-          >
-            <Icon
-              name="tabler:star"
-              class="section-icon h-6 w-6 md:h-7 md:w-7"
-            />
-            <span>{t("tag.popularTags")}</span>
-          </h2>
-          <p class="section-description text-lg text-foreground/70">
-            {t("tag.popularTagsDescription")}
-          </p>
-        </div>
-
-        <div
-          class="featured-tags-grid grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 4xl:grid-cols-6"
+  <!-- Featured Tags Section with 3D Cards -->
+  <section class="featured-tags-section py-2">
+    <div class="section-container mx-auto max-w-content py-8">
+      <div class="section-header mb-10 text-center">
+        <h2
+          class="section-title mb-3 flex items-center justify-center gap-2 text-2xl font-bold text-accent md:text-3xl"
         >
-          {
-            popularTags.map(({ tag, tagName }) => (
-              <div
-                class="featured-tag-card relative overflow-hidden rounded-xl bg-gradient-to-br from-card/80 to-card/30 backdrop-blur-md transition-all duration-500 hover:-translate-y-2 hover:shadow-xl dark:from-gray-800/80 dark:to-gray-900/30"
-                style="box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.1); border: 1px solid rgba(var(--color-accent-rgb), 0.1);"
-                data-tag={tag}
-                data-posts={tagCounts[tag] || 0}
-              >
-                <a
-                  href={`/tags/${tag}/`}
-                  class="featured-tag-link block h-full p-6 no-underline"
-                >
-                  <div class="featured-tag-content relative z-10 flex flex-col items-center text-center">
-                    <div class="featured-tag-icon-wrapper mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 p-4 transition-all duration-500 group-hover:bg-accent">
-                      <Icon
-                        name="tabler:hash"
-                        class="featured-tag-icon h-8 w-8 text-accent transition-all duration-500 group-hover:text-white"
-                      />
-                    </div>
-                    <h3
-                      class="featured-tag-name mb-2 text-xl font-semibold text-foreground transition-all duration-300 group-hover:text-accent"
-                      transition:name={`featured-tag-${tag}`}
-                    >
-                      {tagName}
-                    </h3>
-                    <div class="featured-tag-count flex items-baseline gap-1 text-foreground/70">
-                      <span class="text-2xl font-bold text-accent">
-                        {tagCounts[tag] || 0}
-                      </span>
-                      <span class="featured-tag-count-label text-sm">
-                        {tagCounts[tag] === 1 ? t("tag.post") : t("tag.posts")}
-                      </span>
-                    </div>
-                  </div>
-                  <div
-                    class="featured-tag-shine group-hover:animate-shine absolute inset-0 z-0 opacity-0 transition-opacity duration-1000 group-hover:opacity-100"
-                    style="background: linear-gradient(45deg, transparent 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%);"
-                  />
-                </a>
-              </div>
-            ))
-          }
-        </div>
+          <Icon name="tabler:star" class="section-icon h-6 w-6 md:h-7 md:w-7" />
+          <span>{t("tag.popularTags")}</span>
+        </h2>
+        <p class="section-description text-lg text-foreground/70">
+          {t("tag.popularTagsDescription")}
+        </p>
       </div>
-    </section>
 
-    <!-- Modern Tag Cloud Visualization -->
-    <!-- <section class="py-12 tag-cloud-section">
+      <div
+        class="featured-tags-grid grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 4xl:grid-cols-6"
+      >
+        {
+          popularTags.map(({ tag, tagName }) => (
+            <div
+              class="featured-tag-card relative overflow-hidden rounded-xl bg-gradient-to-br from-card/80 to-card/30 backdrop-blur-md transition-all duration-500 hover:-translate-y-2 hover:shadow-xl dark:from-gray-800/80 dark:to-gray-900/30"
+              style="box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.1); border: 1px solid rgba(var(--color-accent-rgb), 0.1);"
+              data-tag={tag}
+              data-posts={tagCounts[tag] || 0}
+            >
+              <a
+                href={`/tags/${tag}/`}
+                class="featured-tag-link block h-full p-6 no-underline"
+              >
+                <div class="featured-tag-content relative z-10 flex flex-col items-center text-center">
+                  <div class="featured-tag-icon-wrapper mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 p-4 transition-all duration-500 group-hover:bg-accent">
+                    <Icon
+                      name="tabler:hash"
+                      class="featured-tag-icon h-8 w-8 text-accent transition-all duration-500 group-hover:text-white"
+                    />
+                  </div>
+                  <h3
+                    class="featured-tag-name mb-2 text-xl font-semibold text-foreground transition-all duration-300 group-hover:text-accent"
+                    transition:name={getFeaturedTagTransition(tag)}
+                  >
+                    {tagName}
+                  </h3>
+                  <div class="featured-tag-count flex items-baseline gap-1 text-foreground/70">
+                    <span class="text-2xl font-bold text-accent">
+                      {tagCounts[tag] || 0}
+                    </span>
+                    <span class="featured-tag-count-label text-sm">
+                      {tagCounts[tag] === 1 ? t("tag.post") : t("tag.posts")}
+                    </span>
+                  </div>
+                </div>
+                <div
+                  class="featured-tag-shine group-hover:animate-shine absolute inset-0 z-0 opacity-0 transition-opacity duration-1000 group-hover:opacity-100"
+                  style="background: linear-gradient(45deg, transparent 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%);"
+                />
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Modern Tag Cloud Visualization -->
+  <!-- <section class="py-12 tag-cloud-section">
       <div class="mx-auto max-w-content py-8 section-container">
         <div class="mb-10 text-center section-header">
           <h2 class="mb-3 flex items-center justify-center gap-2 text-2xl font-bold text-accent md:text-3xl section-title">
@@ -145,79 +142,76 @@ const pageDescription = "Entdecke unsere vollständige Sammlung von Themen.";
       </div>
     </section> -->
 
-    <Hr />
+  <Hr />
 
-    <!-- All Tags Section with Advanced Grid Layout -->
-    <section class="all-tags-section p-0">
-      <div class="section-container mx-auto max-w-content py-8">
-        <div class="section-header mb-10 text-center">
-          <h2
-            class="section-title mb-3 flex items-center justify-center gap-2 text-2xl font-bold text-accent md:text-3xl"
-          >
-            <Icon
-              name="tabler:tags"
-              class="section-icon h-6 w-6 md:h-7 md:w-7"
-            />
-            <span>{t("tag.allTags")}</span>
-          </h2>
-          <p class="section-description text-lg text-foreground/70">
-            {t("tag.allTagsDescription")}
-          </p>
-        </div>
-
-        <ul class="all-tags-list flex flex-wrap gap-3" id="tags-container">
-          {
-            sortedTags.map(({ tag, tagName }) => (
-              <Tag
-                tag={tag}
-                tagName={`${tagName} (${tagCounts[tag] || 0})`}
-                variant="outline"
-                size="lg"
-                showIcon={true}
-                class="all-tags-item inline-block transition-all duration-300"
-              />
-            ))
-          }
-        </ul>
+  <!-- All Tags Section with Advanced Grid Layout -->
+  <section class="all-tags-section p-0">
+    <div class="section-container mx-auto max-w-content py-8">
+      <div class="section-header mb-10 text-center">
+        <h2
+          class="section-title mb-3 flex items-center justify-center gap-2 text-2xl font-bold text-accent md:text-3xl"
+        >
+          <Icon name="tabler:tags" class="section-icon h-6 w-6 md:h-7 md:w-7" />
+          <span>{t("tag.allTags")}</span>
+        </h2>
+        <p class="section-description text-lg text-foreground/70">
+          {t("tag.allTagsDescription")}
+        </p>
       </div>
-    </section>
+
+      <ul class="all-tags-list flex flex-wrap gap-3" id="tags-container">
+        {
+          sortedTags.map(({ tag, tagName }) => (
+            <Tag
+              tag={tag}
+              tagName={`${tagName} (${tagCounts[tag] || 0})`}
+              variant="outline"
+              size="lg"
+              showIcon={true}
+              class="all-tags-item inline-block transition-all duration-300"
+            />
+          ))
+        }
+      </ul>
+    </div>
+  </section>
 </ListingPageLayout>
 
-  <script>
-    // Client-side tag filtering functionality
-    // document.addEventListener("DOMContentLoaded", () => {
-    //   const searchInput = document.getElementById(
-    //     "tag-search"
-    //   ) as HTMLInputElement | null;
-    //   const tagsContainer = document.getElementById("tags-container");
+<script>
+  // Client-side tag filtering functionality
+  // document.addEventListener("DOMContentLoaded", () => {
+  //   const searchInput = document.getElementById(
+  //     "tag-search"
+  //   ) as HTMLInputElement | null;
+  //   const tagsContainer = document.getElementById("tags-container");
 
-    //   if (searchInput && tagsContainer) {
-    //     searchInput.addEventListener("input", e => {
-    //       const target = e.target as HTMLInputElement;
-    //       const searchTerm = target.value.toLowerCase();
-    //       const tagItems =
-    //         tagsContainer.querySelectorAll<HTMLElement>(".all-tags-item");
+  //   if (searchInput && tagsContainer) {
+  //     searchInput.addEventListener("input", e => {
+  //       const target = e.target as HTMLInputElement;
+  //       const searchTerm = target.value.toLowerCase();
+  //       const tagItems =
+  //         tagsContainer.querySelectorAll<HTMLElement>(".all-tags-item");
 
-    //       tagItems.forEach(item => {
-    //         const tagName = item.getAttribute("data-tag");
-    //         if (tagName) {
-    //           const isVisible = tagName.toLowerCase().includes(searchTerm);
-    //           item.style.display = isVisible ? "inline-block" : "none";
+  //       tagItems.forEach(item => {
+  //         const tagName = item.getAttribute("data-tag");
+  //         if (tagName) {
+  //           const isVisible = tagName.toLowerCase().includes(searchTerm);
+  //           item.style.display = isVisible ? "inline-block" : "none";
 
-    //           // Add animation classes
-    //           if (isVisible) {
-    //             item.classList.add("tag-visible");
-    //             item.classList.remove("tag-hidden");
-    //           } else {
-    //             item.classList.add("tag-hidden");
-    //             item.classList.remove("tag-visible");
-    //           }
-    //         }
-    //       });
-    //     });
-    //   }
-    // });
-  </script>
+  //           // Add animation classes
+  //           if (isVisible) {
+  //             item.classList.add("tag-visible");
+  //             item.classList.remove("tag-hidden");
+  //           } else {
+  //             item.classList.add("tag-hidden");
+  //             item.classList.remove("tag-visible");
+  //           }
+  //         }
+  //       });
+  //     });
+  //   }
+  // });
+</script>
 
 <style is:global>
   /* Add keyframes for shine animation that can't be directly represented in Tailwind */

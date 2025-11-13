@@ -4,6 +4,7 @@ import Badge, {
   type BadgeVariant,
 } from "@/components/elements/Badge.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { getTagLinkTransition } from "@/utils/viewTransitionNames";
 
 export interface Props {
   /** Tag identifier */
@@ -61,7 +62,7 @@ const { variant: badgeVariant, shape, outlined } = getBadgeProps();
 <li class:list={["tag-item", className]}>
   <a
     href={`/tags/${tag}/`}
-    transition:name={`tag-link-${tag}`}
+    transition:name={getTagLinkTransition(tag)}
     class:list={["tag-link", variant === "minimal" ? "tag-link-minimal" : ""]}
     data-tag={tag}
     data-variant={variant}

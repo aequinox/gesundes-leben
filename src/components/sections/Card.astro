@@ -35,8 +35,12 @@
 import { Icon } from "astro-icon/components";
 import { Picture } from "astro:assets";
 
-import { getPostSlug, slugify } from "@/utils/slugs";
+import { getPostSlug } from "@/utils/slugs";
 import type { Post } from "@/utils/types";
+import {
+  getPostHeroImageTransition,
+  getPostTitleTransition,
+} from "@/utils/viewTransitionNames";
 
 import BadgeGroup from "../elements/BadgeGroup.astro";
 import ArticleMeta from "../partials/ArticleMeta.astro";
@@ -187,7 +191,7 @@ const readMoreClasses = `group mr-2 mt-${
                 class={`card-image w-full object-cover transition-transform duration-600 ease-out ${
                   isSmall ? "aspect-4/3" : "aspect-video"
                 }`}
-                transition:name={slugify(`${title}-heroImage`)}
+                transition:name={getPostHeroImageTransition(post)}
               />
             </a>
 
@@ -249,7 +253,7 @@ const readMoreClasses = `group mr-2 mt-${
             <h2
               id={`post-title-${getPostSlug(post)}`}
               class={titleClasses}
-              transition:name={slugify(title)}
+              transition:name={getPostTitleTransition(post)}
             >
               <span
                 class="card-title-text bg-linear-to-r from-accent to-accent/70 bg-size-[0%_2px] bg-bottom-left bg-no-repeat transition-all duration-300 ease-out"
