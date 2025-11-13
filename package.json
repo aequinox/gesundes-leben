@@ -89,7 +89,10 @@
     "deps:update": "bun update --latest",
     "deps:audit": "bun audit",
     "security:audit": "bun audit",
-    "security:fix": "bun audit --fix"
+    "security:fix": "bun audit --fix",
+    "images:optimize": "node scripts/optimize-images.js",
+    "images:backup": "find src/data/blog -name '*.backup' -exec rm {} \\;",
+    "images:restore": "find src/data/blog -name '*.backup' -exec bash -c 'mv \"$0\" \"${0%.backup}\"' {} \\;"
   },
   "sideEffects": [
     "**/*.css",
