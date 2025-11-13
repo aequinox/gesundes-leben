@@ -118,12 +118,10 @@
   from {
     opacity: 1;
     transform: scale(1);
-    filter: brightness(1);
   }
   to {
     opacity: 0;
     transform: scale(0.95);
-    filter: brightness(0.8);
   }
 }
 
@@ -131,12 +129,10 @@
   from {
     opacity: 0;
     transform: scale(1.05);
-    filter: brightness(1.2);
   }
   to {
     opacity: 1;
     transform: scale(1);
-    filter: brightness(1);
   }
 }
 
@@ -166,17 +162,14 @@
   from {
     opacity: 1;
     transform: scale(1) rotate(0deg);
-    filter: blur(0px);
   }
   50% {
     opacity: 0.8;
     transform: scale(0.95) rotate(-1deg);
-    filter: blur(1px);
   }
   to {
     opacity: 0;
     transform: scale(0.8) rotate(-2deg);
-    filter: blur(4px);
   }
 }
 
@@ -184,17 +177,14 @@
   from {
     opacity: 0;
     transform: scale(1.1) rotate(2deg);
-    filter: blur(4px);
   }
   50% {
     opacity: 0.8;
     transform: scale(1.05) rotate(1deg);
-    filter: blur(1px);
   }
   to {
     opacity: 1;
     transform: scale(1) rotate(0deg);
-    filter: blur(0px);
   }
 }
 
@@ -307,10 +297,13 @@
 
 /* Performance Optimizations */
 @layer utilities {
-  /* GPU acceleration for view transition elements */
+  /* GPU acceleration for view transition elements
+   * Note: will-change removed for better memory performance
+   * Let the browser manage GPU acceleration automatically
+   * Add will-change via JS only during active transitions if needed
+   */
   [style*="view-transition-name"] {
     transform: translateZ(0);
-    will-change: transform, opacity;
   }
 
   /* Optimize transitions for specific elements */

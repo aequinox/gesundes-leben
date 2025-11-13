@@ -1,3 +1,6 @@
+import fs from "node:fs/promises";
+import path from "node:path";
+
 import type { APIRoute } from "astro";
 
 import { SITE } from "@/config";
@@ -22,7 +25,7 @@ export async function getStaticPaths() {
   }));
 }
 
-export const GET: APIRoute = async ({ props }) => {
+export const GET: APIRoute = async ({ props, params }) => {
   if (!SITE.dynamicOgImage) {
     return new Response(null, {
       status: 404,
@@ -30,8 +33,27 @@ export const GET: APIRoute = async ({ props }) => {
     });
   }
 
-  const buffer = await generateOgImageForPost(props as Post);
-  return new Response(new Uint8Array(buffer), {
-    headers: { "Content-Type": "image/png" },
-  });
+  const slug = params.slug;
+
+  // Try to serve from cache first (public/og/)
+  const cachedPath = path.join(process.cwd(), "public", "og", `${slug}.png`);
+
+  try {
+    const cachedImage = await fs.readFile(cachedPath);
+    return new Response(cachedImage, {
+      headers: {
+        "Content-Type": "image/png",
+        "Cache-Control": "public, max-age=31536000, immutable",
+      },
+    });
+  } catch {
+    // Cache miss - generate dynamically (only in dev or first build)
+    const buffer = await generateOgImageForPost(props as Post);
+    return new Response(new Uint8Array(buffer), {
+      headers: {
+        "Content-Type": "image/png",
+        "Cache-Control": "public, max-age=31536000, immutable",
+      },
+    });
+  }
 };

@@ -52,8 +52,26 @@ export default defineConfig({
         multipass: true,
       },
       include: {
-        // Tabler icons collection
-        tabler: ["*"],
+        // Only include actually used icons (verified via codebase search)
+        tabler: [
+          "arrow-right",
+          "bulb",
+          "check",
+          "chevron-down",
+          "clock",
+          "cloud",
+          "filter",
+          "filter-off",
+          "hash",
+          "home",
+          "info-circle",
+          "moon",
+          "refresh",
+          "search-off",
+          "sun",
+          "user",
+          "x",
+        ],
       },
     }),
     // AstroPWA({
@@ -215,8 +233,12 @@ export default defineConfig({
     // on the image component. Requires a value for layout to be set.
     objectPosition: "center",
     breakpoints: [
-      640, 750, 828, 960, 1080, 1280, 1668, 1920, 2048, 2560, 3200, 3840, 4480,
-      5120, 6016,
+      640, // Mobile
+      768, // Tablet
+      1024, // Desktop
+      1280, // Large desktop
+      1920, // Full HD
+      2560, // 2K/4K
     ],
   },
   experimental: {
