@@ -115,6 +115,23 @@ function createReferenceFieldComparator(): (a: string, b: string) => number {
 }
 
 /**
+ * Sorts object keys according to reference field order
+ * @param data - Object to sort
+ * @returns New object with sorted keys
+ */
+function sortReferenceKeys(data: ReferenceData): ReferenceData {
+  const comparator = createReferenceFieldComparator();
+  const sortedKeys = Object.keys(data).sort(comparator);
+  const sortedData: Record<string, unknown> = {};
+
+  for (const key of sortedKeys) {
+    sortedData[key] = data[key as keyof ReferenceData];
+  }
+
+  return sortedData as unknown as ReferenceData;
+}
+
+/**
  * Fallback function to read references directly from YAML files
  */
 async function readReferencesFromFiles(): Promise<Reference[]> {
@@ -133,28 +150,26 @@ async function readReferencesFromFiles(): Promise<Reference[]> {
         file => file.endsWith(".yaml") || file.endsWith(".yml")
       );
 
-      const references: Reference[] = [];
+      const referencePromises = yamlFiles.map(async (file: string) => {
+        const filePath = join(referencesDir, file);
+        try {
+          const content = await readFile(filePath, "utf8");
+          const data = parse(content) as ReferenceData;
+          const id = file.replace(/\.(yaml|yml)$/, "");
 
-      for (const file of yamlFiles) {
-        await withAsyncErrorHandling(
-          async () => {
-            const filePath = join(referencesDir, file);
-            const content = await readFile(filePath, "utf8");
-            const data = parse(content) as ReferenceData;
-            const id = file.replace(/\.(yaml|yml)$/, "");
-
-            references.push({
-              id,
-              ...data,
-            });
-          },
-          `readReferencesFromFiles[${file}]`,
-          undefined,
-          { logError: false } // Don't log per-file errors, just warn
-        ).catch(error => {
+          return {
+            id,
+            ...data,
+          };
+        } catch (error) {
           logger.warn(`Failed to read reference file ${file}:`, error);
-        });
-      }
+          return null;
+        }
+      });
+
+      const references = (await Promise.all(referencePromises)).filter(
+        Boolean
+      ) as Reference[];
 
       return references;
     },
@@ -401,10 +416,9 @@ export async function createReference(
   // Ensure directory exists
   await mkdir(dirname(filePath), { recursive: true });
 
-  // Create YAML content
-  const yamlContent = stringify(data, {
-    sortKeys: createReferenceFieldComparator(),
-  });
+  // Sort keys and create YAML content
+  const sortedData = sortReferenceKeys(data);
+  const yamlContent = stringify(sortedData);
 
   await writeFile(filePath, yamlContent, "utf8");
   await invalidateReferenceCache();
@@ -431,10 +445,9 @@ export async function updateReference(
   // Merge data
   const updatedData = { ...existingData, ...data };
 
-  // Create YAML content
-  const yamlContent = stringify(updatedData, {
-    sortKeys: createReferenceFieldComparator(),
-  });
+  // Sort keys and create YAML content
+  const sortedData = sortReferenceKeys(updatedData);
+  const yamlContent = stringify(sortedData);
 
   await writeFile(filePath, yamlContent, "utf8");
   await invalidateReferenceCache();
