@@ -76,8 +76,10 @@ export const getAuthorDisplayName = async (
   // Try to get from content collection first
   const authorEntry = await getAuthorEntry(authorId);
 
-  if (authorEntry?.data?.name) {
-    return authorEntry.data.name;
+  // Explicitly handle nullish and empty string cases
+  const name = authorEntry?.data.name;
+  if (typeof name === "string" && name.trim().length > 0) {
+    return name;
   }
 
   // Fallback: Format the slug into a display name

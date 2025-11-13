@@ -16,7 +16,7 @@ const t = useTranslations(lang);
   <!-- Mobile Progress Bar -->
   <div
     id="progress-mobile"
-    class="fixed top-0 left-0 h-2 w-full bg-gradient-to-r from-accent/30 to-accent md:hidden"
+    class="fixed top-0 left-0 h-2 w-full bg-linear-to-r from-accent/30 to-accent md:hidden"
     role="progressbar"
     aria-label="Reading progress mobile"
     aria-valuemin="0"
@@ -30,7 +30,7 @@ const t = useTranslations(lang);
     <div class="mx-4 mb-2 h-px overflow-hidden">
       <div
         id="progress-aside"
-        class="h-full w-0 rounded-full bg-gradient-to-r from-accent/50 to-accent transition-all duration-300 ease-out"
+        class="h-full w-0 rounded-full bg-linear-to-r from-accent/50 to-accent transition-all duration-300 ease-out"
         role="progressbar"
         aria-label="Reading progress sidebar"
         aria-valuemin="0"
@@ -43,7 +43,7 @@ const t = useTranslations(lang);
     <!-- TOC Navigation -->
     <nav
       id="toc"
-      class="scrollbar mx-4 mt-4 h-full overflow-y-auto rounded-lg bg-gradient-to-b from-transparent via-card/5 to-card/10 px-4 py-4"
+      class="scrollbar mx-4 mt-4 h-full overflow-y-auto rounded-lg bg-linear-to-b from-transparent via-card/5 to-card/10 px-4 py-4"
       aria-label="Table of contents"
       style="height: calc(100vh - 180px); max-height: calc(100vh - 180px);"
     >
@@ -221,11 +221,13 @@ const t = useTranslations(lang);
 
     // Proper initial state handling
     const initializeProgress = () => {
+      if (!scrollProgressInstance) return;
+
       if (document.readyState === "complete") {
         scrollProgressInstance.update();
       } else {
         requestAnimationFrame(() => {
-          setTimeout(() => scrollProgressInstance.update(), 100);
+          setTimeout(() => scrollProgressInstance?.update(), 100);
         });
       }
     };
@@ -235,7 +237,7 @@ const t = useTranslations(lang);
     window.addEventListener(
       "scroll",
       () => {
-        scrollProgressInstance.update();
+        scrollProgressInstance?.update();
       },
       {
         passive: true,

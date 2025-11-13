@@ -15,7 +15,8 @@ RewriteRule ^(.*)$ $1/ [L,R=301]
 DirectoryIndex index.html
 
 # Custom 404 error page
-ErrorDocument 404 /404/index.html
+# Note: Astro builds 404.html at root, not as a directory
+ErrorDocument 404 /404.html
 
 # Compression
 <IfModule mod_deflate.c>

@@ -7,13 +7,11 @@
  * 2. Categories
  */
 
-import { getCollection } from "astro:content";
-
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
-import { getSortedPosts } from "@/utils/posts";
+import { allGroups, GROUP_TYPES, type GroupConfig } from "@/utils/filterConfig";
+import { getAllPosts, getSortedPosts } from "@/utils/posts";
 import { CATEGORIES } from "@/utils/types";
 import type { GroupType } from "@/utils/ui/BlogFilterEngine";
-import { allGroups, GROUP_TYPES, type GroupConfig } from "@/utils/filterConfig";
 
 import CategoryFilter from "./blog-filter/CategoryFilter.astro";
 import FilterResults from "./blog-filter/FilterResults.astro";
@@ -49,8 +47,8 @@ const groupConfig: Record<GroupType, GroupConfig> = {
 // Initialize categories with "All" as the default option
 const allCategories = ["Alle", ...CATEGORIES];
 
-// Fetch and prepare blog posts
-const posts = await getCollection("blog");
+// Fetch and prepare blog posts (getAllPosts handles conversion to Post[])
+const posts = await getAllPosts(true); // Include drafts in filter view
 const sortedPosts = getSortedPosts(posts);
 
 // Extract unique categories from posts
@@ -100,8 +98,10 @@ sortedPosts.forEach(post => {
       normalizedGroup = "pro";
     }
 
-    if (groupPostCounts[normalizedGroup] !== undefined) {
-      groupPostCounts[normalizedGroup]++;
+    // Safely increment the count with fallback to 0
+    const currentCount = groupPostCounts[normalizedGroup];
+    if (currentCount !== undefined) {
+      groupPostCounts[normalizedGroup] = currentCount + 1;
     }
   }
 });

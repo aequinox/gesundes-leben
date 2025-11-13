@@ -45,21 +45,26 @@ const {
   transition:animate="none"
 >
   <head>
-    <!-- Preload critical fonts for better FCP -->
-    <link
-      rel="preload"
-      href="/src/assets/fonts/Poppins-400.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="/src/assets/fonts/Poppins-600.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
+    <!-- Inline critical CSS for instant font rendering -->
+    <style is:inline>
+      :root {
+        --font-body:
+          "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+      }
+      html {
+        font-family: var(--font-body);
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        line-height: 1.6;
+      }
+    </style>
 
     <SEO
       title={title}
@@ -78,36 +83,42 @@ const {
       // Lazy load view transition CSS and enhancements on first navigation
       let viewTransitionsLoaded = false;
 
-      document.addEventListener('astro:before-preparation', async () => {
-        if (viewTransitionsLoaded) return;
-        viewTransitionsLoaded = true;
+      document.addEventListener(
+        "astro:before-preparation",
+        async () => {
+          if (viewTransitionsLoaded) return;
+          viewTransitionsLoaded = true;
 
-        // Load view transitions CSS
-        const { loadViewTransitions } = await import('@/utils/load-view-transitions');
-        await loadViewTransitions();
+          // Load view transitions CSS
+          const { loadViewTransitions } = await import(
+            "@/utils/load-view-transitions"
+          );
+          await loadViewTransitions();
 
-        // Load view transition enhancements when needed
-        if (
-          "startViewTransition" in document ||
-          window.matchMedia("(prefers-reduced-motion: no-preference)").matches
-        ) {
-          import("@/utils/viewTransitionEnhancements")
-            .then(_module => {
-              // Module is auto-initialized on import
-              // Use logger in development only
-              if (import.meta.env.DEV) {
-                import("@/utils/logger").then(({ logger }) => {
-                  logger.debug(
-                    "View transition enhancements loaded successfully"
-                  );
-                });
-              }
-            })
-            .catch(error => {
-              // Silently fail - view transitions are progressive enhancement
-            });
-        }
-      }, { once: true });
+          // Load view transition enhancements when needed
+          if (
+            "startViewTransition" in document ||
+            window.matchMedia("(prefers-reduced-motion: no-preference)").matches
+          ) {
+            import("@/utils/viewTransitionEnhancements")
+              .then(_module => {
+                // Module is auto-initialized on import
+                // Use logger in development only
+                if (import.meta.env.DEV) {
+                  import("@/utils/logger").then(({ logger }) => {
+                    logger.debug(
+                      "View transition enhancements loaded successfully"
+                    );
+                  });
+                }
+              })
+              .catch(error => {
+                // Silently fail - view transitions are progressive enhancement
+              });
+          }
+        },
+        { once: true }
+      );
     </script>
   </head>
   <body data-pagefind-body class="px-2 lg:px-12" data-astro-prefetch>
