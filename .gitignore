@@ -30,6 +30,12 @@ pnpm-debug.log*
 # pagefind
 public/pagefind
 
+# OG image cache manifest (but commit the images themselves!)
+public/og/.cache.json
+
+# Performance reports
+performance-report.json
+
 # improvements file
 @IMPROVEMENTS.md
 

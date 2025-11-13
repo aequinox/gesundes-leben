@@ -89,7 +89,7 @@ export const SITE: SiteConfig = {
   showSearch: true,
   showArchives: true,
   showBackButton: true,
-  dynamicOgImage: false, // Disabled for performance - saves 2-3GB build memory
+  dynamicOgImage: true, // Enabled with smart caching - images served from public/og/
   lang: "de",
   timezone: "Europe/Berlin",
 } as const;
