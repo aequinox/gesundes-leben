@@ -1,1 +1,30 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Check for large images in blog directory
+echo "🔍 Checking for large images..."
+
+large_images=$(find src/data/blog -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.webp" \) 2>/dev/null | while read file; do
+  # Get file size in bytes (works on both Linux and macOS)
+  size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
+
+  # Check if file is larger than 1MB (1048576 bytes)
+  if [ "$size" -gt 1048576 ]; then
+    size_mb=$(echo "scale=2; $size / 1024 / 1024" | bc)
+    echo "$file: ${size_mb}MB"
+  fi
+done)
+
+if [ -n "$large_images" ]; then
+  echo "❌ Large images detected (>1MB):"
+  echo "$large_images"
+  echo ""
+  echo "Please optimize images before committing:"
+  echo "  bun run images:optimize"
+  echo ""
+  exit 1
+fi
+
+echo "✅ Image size check passed"
+
 bunx lint-staged
