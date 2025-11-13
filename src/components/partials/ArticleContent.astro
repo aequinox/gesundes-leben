@@ -11,7 +11,7 @@ import H5 from "@/components/elements/H5.astro";
 import H6 from "@/components/elements/H6.astro";
 import Image from "@/components/elements/Image.astro";
 import Paragraph from "@/components/elements/Paragraph.astro";
-import { slugify } from "@/utils/slugs";
+import { getPostHeroImageTransition } from "@/utils/viewTransitionNames";
 
 export interface Props {
   post: CollectionEntry<"blog">;
@@ -19,13 +19,14 @@ export interface Props {
 
 const { post } = Astro.props;
 const {
-  data: { title, heroImage },
+  data: { heroImage },
 } = post;
 
 const { Content } = await render(post);
 
+// Use consistent transition name (matches Card component)
 const heroImageTransitionName = heroImage
-  ? `hero-image-${slugify(title)}-${post.id}`
+  ? getPostHeroImageTransition(post)
   : undefined;
 
 const components = {

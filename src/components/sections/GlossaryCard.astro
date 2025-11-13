@@ -19,6 +19,7 @@ import { render, type CollectionEntry } from "astro:content";
 
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { slugify } from "@/utils/slugs";
+import { getGlossaryTransition } from "@/utils/viewTransitionNames";
 
 import Modal from "./Modal.astro";
 
@@ -71,7 +72,7 @@ const excerptAriaLabel = t("glossary.excerpt");
       <h2
         id={`glossary-title-${slug}`}
         class="text-xl font-semibold text-foreground transition-all duration-300"
-        transition:name={slug}
+        transition:name={getGlossaryTransition(slug)}
       >
         {title}
       </h2>

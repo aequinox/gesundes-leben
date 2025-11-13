@@ -84,12 +84,14 @@ const {
   </head>
   <body data-pagefind-body class="px-2 lg:px-12" data-astro-prefetch>
     <!-- Skip Navigation Link for Accessibility (WCAG AAA) -->
-    <a href="#main-content" class="skip-link">
-      Zum Hauptinhalt springen
-    </a>
+    <a href="#main-content" class="skip-link"> Zum Hauptinhalt springen </a>
     <Header activeNav={activeNav} />
     {Astro.url.pathname !== "/" && <Breadcrumb />}
-    <main id="main-content" transition:animate="slide" transition:name="main-content">
+    <main
+      id="main-content"
+      transition:animate="slide"
+      transition:name="main-content"
+    >
       <slot />
     </main>
     {import.meta.env.DEV && <SizeIndicator />}
@@ -115,12 +117,20 @@ const {
         }
 
         private init(): void {
-          document.addEventListener('touchstart', this.handleTouchStart.bind(this), {
-            passive: true,
-          });
-          document.addEventListener('touchend', this.handleTouchEnd.bind(this), {
-            passive: true,
-          });
+          document.addEventListener(
+            "touchstart",
+            this.handleTouchStart.bind(this),
+            {
+              passive: true,
+            }
+          );
+          document.addEventListener(
+            "touchend",
+            this.handleTouchEnd.bind(this),
+            {
+              passive: true,
+            }
+          );
         }
 
         private handleTouchStart(event: TouchEvent): void {
@@ -145,9 +155,8 @@ const {
 
           // Swipe left - next article
           if (horizontalDiff < -this.SWIPE_THRESHOLD) {
-            const nextLink = document.querySelector<HTMLAnchorElement>(
-              'a[rel="next"]'
-            );
+            const nextLink =
+              document.querySelector<HTMLAnchorElement>('a[rel="next"]');
             if (nextLink) {
               nextLink.click();
             }
@@ -155,9 +164,8 @@ const {
 
           // Swipe right - previous article
           if (horizontalDiff > this.SWIPE_THRESHOLD) {
-            const prevLink = document.querySelector<HTMLAnchorElement>(
-              'a[rel="prev"]'
-            );
+            const prevLink =
+              document.querySelector<HTMLAnchorElement>('a[rel="prev"]');
             if (prevLink) {
               prevLink.click();
             }
@@ -166,9 +174,64 @@ const {
       }
 
       // Initialize on page load
-      document.addEventListener('astro:page-load', () => {
+      document.addEventListener("astro:page-load", () => {
         new SwipeNavigationController();
       });
     </script>
+
+    <style is:global>
+      /* View Transitions - Enhanced Animation Control */
+
+      /* Respect user's motion preferences */
+      @media (prefers-reduced-motion: reduce) {
+        ::view-transition-group(*),
+        ::view-transition-old(*),
+        ::view-transition-new(*) {
+          animation-duration: 0.01ms !important;
+          animation-delay: 0ms !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      /* Smooth transitions for supported browsers */
+      @media (prefers-reduced-motion: no-preference) {
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+          animation-duration: 300ms;
+          animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Hero image transitions */
+        ::view-transition-old(post-*-heroImage),
+        ::view-transition-new(post-*-heroImage) {
+          animation-duration: 400ms;
+          animation-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+          mix-blend-mode: normal;
+        }
+
+        /* Title transitions */
+        ::view-transition-old(post-*-title),
+        ::view-transition-new(post-*-title) {
+          animation-duration: 350ms;
+          animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Tag transitions */
+        ::view-transition-old(tag-*),
+        ::view-transition-new(tag-*) {
+          animation-duration: 250ms;
+          animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+      }
+
+      /* Fallback for browsers without view transition support */
+      @supports not (view-transition-name: none) {
+        [transition\:name] {
+          transition:
+            opacity 0.3s ease,
+            transform 0.3s ease;
+        }
+      }
+    </style>
   </body>
 </html>
