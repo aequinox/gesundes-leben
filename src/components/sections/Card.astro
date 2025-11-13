@@ -32,18 +32,12 @@
  * ```
  */
 
-import { Icon } from "astro-icon/components";
-import { Picture } from "astro:assets";
-
 import { getPostSlug } from "@/utils/slugs";
 import type { Post } from "@/utils/types";
-import {
-  getPostHeroImageTransition,
-  getPostTitleTransition,
-} from "@/utils/viewTransitionNames";
 
-import BadgeGroup from "../elements/BadgeGroup.astro";
-import ArticleMeta from "../partials/ArticleMeta.astro";
+import CardContent from "./card/CardContent.astro";
+import CardFooter from "./card/CardFooter.astro";
+import CardImage from "./card/CardImage.astro";
 
 export interface Props {
   /** The blog post entry to display */
@@ -95,7 +89,7 @@ const {
   animationDelay,
   animationType,
   animationAosDelay,
-}: Props = Astro.props;
+} = Astro.props;
 
 // Determine if we're using the small variant
 const isSmall = size === "small";
@@ -104,7 +98,7 @@ const isSmall = size === "small";
 const effectiveMaxCategories = maxCategories ?? (isSmall ? 2 : undefined);
 
 const {
-  data: { title, heroImage, description, categories, group: groupProp },
+  data: { title, categories, group: groupProp },
 } = post;
 
 // Generate the post URL using the centralized slug service
@@ -141,16 +135,6 @@ const cardClasses = `hover:-translate-y-1 hover:border-accent/20 hover:shadow-el
   isSmall ? "text-sm" : ""
 }`;
 // Note: transition timing is defined in the style section for better control
-
-// Title classes based on size
-const titleClasses = `text-foreground font-medium tracking-tight leading-tight font-feature-salt ${
-  isSmall ? "text-base" : "text-xl"
-}`;
-
-// Read more classes
-const readMoreClasses = `group mr-2 mt-${
-  isSmall ? "2" : "4"
-} text-sm font-bold uppercase tracking-wider relative overflow-hidden text-accent transition-colors duration-200`;
 ---
 
 <article
@@ -167,56 +151,14 @@ const readMoreClasses = `group mr-2 mt-${
   <div class="relative flex h-full flex-col">
     <div class="flex h-full flex-col">
       {
-        withHeroImage && heroImage && (
-          <div class="card-image-container relative cursor-pointer overflow-hidden">
-            <a
-              href={href}
-              aria-label={`Read more about ${title}`}
-              class="card-image-link relative block overflow-hidden"
-            >
-              <div class="card-image-overlay absolute inset-0 z-10 bg-linear-to-t from-black/50 via-black/20 to-transparent opacity-40" />
-
-              <div class="card-light-reflection absolute inset-0 z-20 bg-linear-to-tr from-white/0 via-white/8 to-white/0 opacity-0" />
-
-              <Picture
-                src={heroImage.src}
-                formats={["avif", "webp"]}
-                widths={[400, 600, 800, 1200]}
-                width={800}
-                height={isSmall ? 600 : 450}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1536px) 33vw, 400px"
-                alt={title}
-                loading={loading}
-                fetchpriority={loading === "eager" ? "high" : "auto"}
-                class={`card-image w-full object-cover transition-transform duration-600 ease-out ${
-                  isSmall ? "aspect-4/3" : "aspect-video"
-                }`}
-                transition:name={getPostHeroImageTransition(post)}
-              />
-            </a>
-
-            {groupConfig?.icon && groupConfig.icon.trim() !== "" && (
-              <div
-                class={`card-badge absolute z-30 rounded-full border border-white/15 bg-white text-white shadow-lg backdrop-blur-md transition-all duration-300 ${
-                  groupConfig?.gradient
-                } ${
-                  isSmall
-                    ? "right-2 bottom-2 px-2 py-1"
-                    : "right-3 bottom-3 px-2.5 py-2.5"
-                }`}
-                style="backdrop-filter: blur(12px) saturate(180%);"
-                aria-label={groupConfig?.label}
-              >
-                <Icon
-                  name={groupConfig.icon}
-                  class={`card-badge-icon transition-transform duration-300 ${
-                    isSmall ? "h-4 w-4" : "h-5 w-5"
-                  }`}
-                  aria-hidden="true"
-                />
-              </div>
-            )}
-          </div>
+        withHeroImage && (
+          <CardImage
+            post={post}
+            href={href}
+            isSmall={isSmall}
+            loading={loading}
+            groupConfig={groupConfig}
+          />
         )
       }
 
@@ -226,90 +168,19 @@ const readMoreClasses = `group mr-2 mt-${
         >
         </div>
 
-        <div
-          class={`flex flex-col grow ${isSmall ? "space-y-1" : "space-y-2"}`}
-        >
-          {
-            withCategories && categories && categories.length > 0 && (
-              <BadgeGroup
-                items={categories}
-                {...(effectiveMaxCategories !== undefined && {
-                  maxItems: effectiveMaxCategories,
-                })}
-                variant="primary"
-                size="xs"
-                shape="square"
-                outlined={true}
-                gap={isSmall ? "small" : "medium"}
-              />
-            )
-          }
-
-          <a
-            href={href}
-            aria-label={`Read more about ${title}`}
-            class="card-title-link block"
-          >
-            <h2
-              id={`post-title-${getPostSlug(post)}`}
-              class={titleClasses}
-              transition:name={getPostTitleTransition(post)}
-            >
-              <span
-                class="card-title-text bg-linear-to-r from-accent to-accent/70 bg-size-[0%_2px] bg-bottom-left bg-no-repeat transition-all duration-300 ease-out"
-              >
-                {title}
-              </span>
-            </h2>
-          </a>
-
-          {
-            withMeta && (
-              <div class="card-meta py-1.5">
-                <ArticleMeta post={post} />
-              </div>
-            )
-          }
-
-          {
-            withDescription && description && (
-              <div
-                class={`line-clamp-${isSmall ? "2" : "3"} ${isSmall ? "text-xs" : "text-sm"} card-description leading-relaxed tracking-wide text-foreground/80`}
-              >
-                {description}
-              </div>
-            )
-          }
-        </div>
+        <CardContent
+          post={post}
+          href={href}
+          isSmall={isSmall}
+          withCategories={withCategories}
+          withMeta={withMeta}
+          withDescription={withDescription}
+          effectiveMaxCategories={effectiveMaxCategories}
+        />
 
         {
           withReadMore && (
-            <div class={`mt-auto ${isSmall ? "pt-2" : "pt-6"} card-footer`}>
-              <a
-                href={href}
-                class={readMoreClasses}
-                aria-label={`Read more about ${title}`}
-              >
-                <span class="card-read-more relative inline-flex items-center gap-2">
-                  <span class="card-shine pointer-events-none absolute inset-0 -translate-x-full rotate-35 bg-linear-to-r from-transparent via-white/30 to-transparent opacity-0 transition-opacity duration-200" />
-                  <span class="card-read-more-text relative z-10 transition-transform duration-300 ease-out">
-                    Weiterlesen
-                  </span>
-                  <span class="card-read-more-icon-container relative z-10 inline-block overflow-hidden rounded-full bg-accent/10 p-1 transition-all duration-300 ease-out group-hover:translate-x-1">
-                    <Icon
-                      name="tabler:arrow-right"
-                      class="card-read-more-icon h-4 w-4 transition-all duration-300 ease-out group-active:hidden"
-                      aria-hidden="true"
-                    />
-                    <Icon
-                      name="tabler:loader-2"
-                      class="card-read-more-spinner hidden h-4 w-4 animate-spin group-active:inline-block"
-                      aria-hidden="true"
-                    />
-                  </span>
-                </span>
-              </a>
-            </div>
+            <CardFooter href={href} title={title} isSmall={isSmall} />
           )
         }
       </div>
@@ -318,160 +189,7 @@ const readMoreClasses = `group mr-2 mt-${
 </article>
 
 <style>
-  @reference "@/styles/global.css";
-
-  /* Base card transitions - Smooth bounce easing for premium feel */
-  article {
-    transition: all 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  /* Hover effects and animations - Refined for subtle, premium interactions */
-  article:hover {
-    @apply -translate-y-1 border-accent/20 shadow-elevation-medium;
-  }
-
-  .card-image-container:hover .card-image {
-    @apply scale-[1.03] brightness-[1.02] contrast-[1.02];
-    transition: transform 600ms cubic-bezier(0.19, 1, 0.22, 1);
-  }
-
-  .card-image-container:hover .card-image-overlay {
-    @apply opacity-70;
-  }
-
-  .card-image-container:hover .card-light-reflection {
-    @apply opacity-40;
-    animation: lightReflection 3s 1 cubic-bezier(0.19, 1, 0.22, 1);
-  }
-
-  .card-image-container:hover .card-badge {
-    @apply -translate-y-1 scale-105 shadow-xl;
-  }
-
-  .card-image-container:hover .card-badge-icon {
-    @apply rotate-12;
-  }
-
-  article:hover .card-glow {
-    @apply opacity-80;
-  }
-
-  a:hover .card-title-text {
-    @apply bg-size-[100%_2px];
-  }
-
-  a:hover .card-read-more-text {
-    @apply translate-x-1;
-  }
-
-  a:hover .card-read-more-icon-container {
-    @apply bg-accent/20;
-  }
-
-  a:hover .card-read-more-icon {
-    @apply translate-x-0.5 scale-110;
-  }
-
-  .card-read-more::after {
-    content: "";
-    @apply absolute bottom-0 left-0 h-px w-full origin-right scale-x-0 bg-accent/50 transition-transform duration-300 ease-out;
-  }
-
-  a:hover .card-read-more::after {
-    @apply origin-left scale-x-100;
-  }
-
-  a:hover .card-shine {
-    @apply opacity-100;
-    animation: shine 1.5s 1 cubic-bezier(0.19, 1, 0.22, 1);
-  }
-
-  /* Animation keyframes */
-  @keyframes shine {
-    0% {
-      transform: translateX(-100%) rotate(35deg);
-      opacity: 0;
-    }
-    10% {
-      opacity: 0.5;
-    }
-    50% {
-      opacity: 0.3;
-    }
-    100% {
-      transform: translateX(100%) rotate(35deg);
-      opacity: 0;
-    }
-  }
-
-  @keyframes lightReflection {
-    0% {
-      opacity: 0;
-      transform: translateY(5%) translateX(-5%);
-    }
-    30% {
-      opacity: 0.2;
-    }
-    70% {
-      opacity: 0.1;
-    }
-    100% {
-      opacity: 0;
-      transform: translateY(-5%) translateX(5%);
-    }
-  }
-
-  /* Focus styles */
-  article:focus-within {
-    @apply outline outline-offset-2 outline-accent;
-    box-shadow:
-      0 0 0 2px oklch(var(--color-accent)),
-      0 0 20px 5px oklch(var(--color-accent) / 0.15);
-  }
-
-  a:focus-visible {
-    @apply outline outline-offset-2 outline-accent outline-dashed;
-    box-shadow:
-      0 0 0 2px oklch(var(--color-accent)),
-      0 0 15px 2px oklch(var(--color-accent) / 0.2);
-  }
-
-  /* Touch device optimization - Disable hover animations, use tap feedback */
-  @media (hover: none) and (pointer: coarse) {
-    /* Disable hover animations on touch devices */
-    article:hover,
-    .card-image-container:hover .card-image {
-      transform: none !important;
-    }
-
-    /* Use tap feedback instead */
-    article:active {
-      @apply scale-[0.98] shadow-elevation-low;
-      transition: all 100ms ease-out;
-    }
-  }
-
-  /* Reduced motion accessibility */
-  @media (prefers-reduced-motion: reduce) {
-    article,
-    article:hover,
-    .card-image,
-    .card-image-container:hover .card-image,
-    .card-image-overlay,
-    .card-light-reflection,
-    .card-badge,
-    .card-image-container:hover .card-badge,
-    .card-badge-icon,
-    .card-image-container:hover .card-badge-icon,
-    .card-glow,
-    .card-title-text,
-    .card-read-more-text {
-      transform: none !important;
-      transition-duration: 0.01s !important;
-      animation-duration: 0.01s !important;
-      animation-iteration-count: 1 !important;
-    }
-  }
+  @import "./card/card-styles.css";
 </style>
 
 <script>
@@ -539,56 +257,3 @@ const readMoreClasses = `group mr-2 mt-${
     }
   });
 </script>
-
-<style is:global>
-  /* Initial state for animating cards */
-  article.card-animating {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  /* Visible state with smooth fade-in */
-  article.card-visible {
-    opacity: 1;
-    transform: translateY(0);
-    transition:
-      opacity 600ms cubic-bezier(0.19, 1, 0.22, 1),
-      transform 600ms cubic-bezier(0.19, 1, 0.22, 1);
-  }
-
-  /* Stagger animation for multiple cards */
-  article.card-visible:nth-child(1) {
-    transition-delay: 0ms;
-  }
-
-  article.card-visible:nth-child(2) {
-    transition-delay: 100ms;
-  }
-
-  article.card-visible:nth-child(3) {
-    transition-delay: 200ms;
-  }
-
-  article.card-visible:nth-child(4) {
-    transition-delay: 300ms;
-  }
-
-  article.card-visible:nth-child(5) {
-    transition-delay: 400ms;
-  }
-
-  article.card-visible:nth-child(6) {
-    transition-delay: 500ms;
-  }
-
-  /* Respect reduced motion preferences */
-  @media (prefers-reduced-motion: reduce) {
-    article.card-animating,
-    article.card-visible {
-      opacity: 1 !important;
-      transform: none !important;
-      transition-duration: 0.01ms !important;
-      transition-delay: 0ms !important;
-    }
-  }
-</style>

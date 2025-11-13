@@ -16,10 +16,14 @@
  * ```
  */
 
-import InternalLink from "@/components/elements/InternalLink.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { processAllPosts } from "@/utils/posts";
+import { CONTENT_SERIES, type SeriesId } from "@/utils/seriesConfig";
 import type { Post } from "@/utils/types";
+
+import SeriesItem from "./content-series/SeriesItem.astro";
+import SeriesNavigation from "./content-series/SeriesNavigation.astro";
+import SeriesProgress from "./content-series/SeriesProgress.astro";
 
 export interface Props {
   /** Current post in the series */
@@ -49,62 +53,12 @@ const t = useTranslations(lang);
 // Fetch all posts (with slug property)
 const sortedPosts = await processAllPosts({ includeDrafts: false });
 
-// Define known content series based on content analysis
-const CONTENT_SERIES = {
-  "antivirale-strategien": {
-    title: "Antivirale Strategien",
-    description:
-      "Umfassende Serie über natürliche und medizinische antivirale Ansätze",
-    posts: [
-      "2022-09-16-antivirale-strategien-teil-1",
-      "2022-09-23-antivirale-strategien-teil-2",
-    ],
-  },
-  mikronaehrstoffraeuber: {
-    title: "Mikronährstoffräuber",
-    description:
-      "Serie über Faktoren, die wichtige Nährstoffe im Körper reduzieren",
-    posts: [
-      "2022-03-11-mikronaehrstoffraeuber-die-pille",
-      "2022-07-02-mikronaehrstoffraeuber-medikamente",
-      "2023-01-30-vitaminraeuber-antibiotika",
-    ],
-  },
-  lesenswert: {
-    title: "Lesenswert - Buchempfehlungen",
-    description: "Kuratierte Sammlung wertvoller Gesundheitsbücher",
-    posts: [
-      "2022-04-02-lesenswert-cancer-and-the-new-biology-of-water",
-      "2022-05-14-lesenswert-warum-es-so-schwierig-ist-sich-zu-aendern",
-      "2022-08-02-lesenswert-wir-fressen-uns-zu-tode",
-      "2022-11-16-lesenswert-eselsweisheit-augentraining",
-      "2023-09-25-lesenswert-systemischer-ratgeber",
-      "2023-11-17-lesenswert-einfach-lieben",
-      "2024-01-16-lesenswert-der-kleine-eheretter",
-      "2024-04-19-lesenswert-die-1-methode-minimale-veraenderung-maximale-wirkung",
-      "2024-08-30-lesenswert-wuerde",
-      "2025-01-24-lesenswert-das-bleibt-in-der-familie",
-    ],
-  },
-  "top-listen": {
-    title: "Top-Listen für Gesundheit",
-    description: "Praktische Listen mit den besten Gesundheitstipps",
-    posts: [
-      "2023-08-01-top-5-darm-und-immunsystemstaerkung",
-      "2023-08-14-top-lebensmittel-fuers-immunsystems",
-      "2024-05-05-top-5-untersuchungen-und-laborwerte-fuer-deinen-gesundheits-tuev",
-      "2025-05-06-top-entzuendungshemmende-lebensmittel",
-    ],
-  },
-} as const;
-
 // Auto-detect series if not provided
-let detectedSeries: keyof typeof CONTENT_SERIES | null = null;
-let seriesInfo: (typeof CONTENT_SERIES)[keyof typeof CONTENT_SERIES] | null =
-  null;
+let detectedSeries: SeriesId | null = null;
+let seriesInfo: (typeof CONTENT_SERIES)[SeriesId] | null = null;
 
-if (seriesId && CONTENT_SERIES[seriesId as keyof typeof CONTENT_SERIES]) {
-  detectedSeries = seriesId as keyof typeof CONTENT_SERIES;
+if (seriesId && CONTENT_SERIES[seriesId as SeriesId]) {
+  detectedSeries = seriesId as SeriesId;
   seriesInfo = CONTENT_SERIES[detectedSeries];
 } else {
   // Auto-detect based on post slug patterns
@@ -118,7 +72,7 @@ if (seriesId && CONTENT_SERIES[seriesId as keyof typeof CONTENT_SERIES]) {
           series.posts.includes(currentSlug)
       )
     ) {
-      detectedSeries = id as keyof typeof CONTENT_SERIES;
+      detectedSeries = id as SeriesId;
       seriesInfo = series;
       break;
     }
@@ -172,98 +126,27 @@ const finalSeriesTitle = seriesTitle || seriesInfo.title;
 
       {
         showProgress && (
-          <div class="series-progress">
-            <div class="progress-visual">
-              <div class="progress-track">
-                <div
-                  class="progress-fill"
-                  style={`width: ${progressData.percentage}%`}
-                  aria-hidden="true"
-                />
-              </div>
-              <span class="progress-text">
-                {t("series.part")} {progressData.current} {t("series.of")}{" "}
-                {progressData.total}
-              </span>
-            </div>
-          </div>
+          <SeriesProgress
+            current={progressData.current}
+            total={progressData.total}
+            percentage={progressData.percentage}
+          />
         )
       }
 
-      {
-        showOverview && (
-          <p class="series-description">{seriesInfo.description}</p>
-        )
-      }
+      {showOverview && <p class="series-description">{seriesInfo.description}</p>}
     </div>
   </header>
 
   {/* Navigation Controls */}
-  <section class="content-series__navigation">
-    <div class="nav-controls">
-      {/* Previous Post */}
-      <div class="nav-item nav-item--previous">
-        {
-          previousPost ? (
-            <>
-              <InternalLink
-                to={`/posts/${previousPost.slug}`}
-                anchor={t("series.previousArticle")}
-                variant="button"
-                context="moderate"
-                placement="navigation"
-                title={`${t("series.previousArticle").replace("←", "").trim()}: ${previousPost.data.title}`}
-              />
-              <div class="nav-item__details">
-                <span class="nav-label">{t("series.before")}</span>
-                <span class="nav-title">{previousPost.data.title}</span>
-              </div>
-            </>
-          ) : (
-            <div class="nav-item--disabled">
-              <span class="nav-disabled">{t("series.firstArticle")}</span>
-            </div>
-          )
-        }
-      </div>
-
-      {/* Series Overview */}
-      <div class="nav-item nav-item--overview">
-        <div class="series-position">
-          <span class="position-indicator">
-            {progressData.current} / {progressData.total}
-          </span>
-          <span class="series-name">{finalSeriesTitle}</span>
-        </div>
-      </div>
-
-      {/* Next Post */}
-      <div class="nav-item nav-item--next">
-        {
-          nextPost ? (
-            <>
-              <InternalLink
-                to={`/posts/${nextPost.slug}`}
-                anchor={t("series.nextArticle")}
-                variant="button"
-                context="moderate"
-                placement="navigation"
-                title={`${t("series.nextArticle").replace("→", "").trim()}: ${nextPost.data.title}`}
-              />
-              <div class="nav-item__details">
-                <span class="nav-label">{t("series.next")}</span>
-                <span class="nav-title">{nextPost.data.title}</span>
-              </div>
-            </>
-          ) : (
-            <div class="nav-item--disabled">
-              <span class="nav-disabled">{t("series.lastArticle")}</span>
-            </div>
-          )
-        }
-      </div>
-    </div>
-  </section>
+  <SeriesNavigation
+    previousPost={previousPost}
+    nextPost={nextPost}
+    currentPost={currentPost}
+    progressCurrent={progressData.current}
+    progressTotal={progressData.total}
+    seriesTitle={finalSeriesTitle}
+  />
 
   {/* Complete Series Overview */}
   {
@@ -273,26 +156,11 @@ const finalSeriesTitle = seriesTitle || seriesInfo.title;
 
         <ol class="series-list">
           {seriesPosts.map((post, index) => (
-            <li
-              class={`series-item ${post.id === currentPost.id ? "series-item--current" : ""}`}
-            >
-              {post.id === currentPost.id ? (
-                <div class="series-item__current">
-                  <span class="current-indicator">📍</span>
-                  <span class="current-title">{post.data.title}</span>
-                  <span class="current-label">{t("series.youAreHere")}</span>
-                </div>
-              ) : (
-                <InternalLink
-                  to={`/posts/${post.slug}`}
-                  anchor={post.data.title}
-                  variant="inline"
-                  context="moderate"
-                  placement="navigation"
-                  title={`Teil ${index + 1}: ${post.data.title}`}
-                />
-              )}
-            </li>
+            <SeriesItem
+              post={post}
+              index={index}
+              isCurrent={post.id === currentPost.id}
+            />
           ))}
         </ol>
       </section>
@@ -310,229 +178,5 @@ const finalSeriesTitle = seriesTitle || seriesInfo.title;
 </nav>
 
 <style>
-  /* Base content series styles */
-  .content-series {
-    @apply my-8 rounded-xl border border-border/40 bg-gradient-to-br from-card/90 to-card/50 p-6 shadow-lg;
-    backdrop-filter: blur(12px);
-  }
-
-  /* Header styles */
-  .content-series__header {
-    @apply mb-6 border-b border-border/30 pb-4;
-  }
-
-  .series-info {
-    @apply space-y-4;
-  }
-
-  .series-title {
-    @apply flex items-center gap-3 text-xl font-bold text-gray-900 dark:text-gray-100;
-  }
-
-  .series-icon {
-    @apply text-2xl opacity-80;
-  }
-
-  .series-description {
-    @apply text-sm leading-relaxed text-gray-600 dark:text-gray-400;
-  }
-
-  /* Progress styles */
-  .series-progress {
-    @apply space-y-2;
-  }
-
-  .progress-visual {
-    @apply flex items-center gap-4;
-  }
-
-  .progress-track {
-    @apply h-2 flex-1 overflow-hidden rounded-full bg-border/30;
-  }
-
-  .progress-fill {
-    @apply to-accent-hover h-full bg-gradient-to-r from-accent transition-all duration-700 ease-out;
-  }
-
-  .progress-text {
-    @apply text-sm font-medium whitespace-nowrap text-gray-600 dark:text-gray-400;
-  }
-
-  /* Navigation controls */
-  .content-series__navigation {
-    @apply mb-6;
-  }
-
-  .nav-controls {
-    @apply grid grid-cols-1 items-center gap-4 md:grid-cols-3;
-  }
-
-  .nav-item {
-    @apply flex flex-col items-center text-center;
-  }
-
-  .nav-item--previous {
-    @apply md:items-start md:text-left;
-  }
-
-  .nav-item--next {
-    @apply md:items-end md:text-right;
-  }
-
-  .nav-item--overview {
-    @apply order-first md:order-none;
-  }
-
-  .nav-item__details {
-    @apply mt-2 space-y-1;
-  }
-
-  .nav-label {
-    @apply block text-xs font-medium tracking-wide text-gray-600 uppercase dark:text-gray-400;
-  }
-
-  .nav-title {
-    @apply block text-sm leading-tight font-medium text-gray-900 dark:text-gray-100;
-  }
-
-  .nav-item--disabled {
-    @apply opacity-50;
-  }
-
-  .nav-disabled {
-    @apply rounded-lg border border-border/30 bg-border/20 px-4 py-2 text-sm text-gray-600 dark:text-gray-400;
-  }
-
-  /* Series position indicator */
-  .series-position {
-    @apply flex flex-col items-center gap-2;
-  }
-
-  .position-indicator {
-    @apply text-2xl font-bold text-accent;
-  }
-
-  .series-name {
-    @apply text-sm font-medium text-gray-600 dark:text-gray-400;
-  }
-
-  /* Series overview */
-  .content-series__overview {
-    @apply mb-6 border-b border-border/30 pb-4;
-  }
-
-  .overview-title {
-    @apply mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100;
-  }
-
-  .series-list {
-    @apply m-0 list-none space-y-2 p-0;
-  }
-
-  .series-item {
-    @apply rounded-lg border border-border/20 bg-card/20 p-3;
-  }
-
-  .series-item--current {
-    @apply border-accent/30 bg-accent/10;
-  }
-
-  .series-item__current {
-    @apply flex items-center gap-3;
-  }
-
-  .current-indicator {
-    @apply text-lg;
-  }
-
-  .current-title {
-    @apply flex-1 font-medium text-gray-900 dark:text-gray-100;
-  }
-
-  .current-label {
-    @apply text-xs font-medium tracking-wide text-accent uppercase;
-  }
-
-  /* Footer / CTA */
-  .content-series__footer {
-    @apply border-t border-border/30 pt-4;
-  }
-
-  .series-cta {
-    @apply rounded-lg border border-accent/15 bg-accent/8 p-4;
-  }
-
-  .cta-text {
-    @apply m-0 text-sm leading-relaxed text-gray-900 dark:text-gray-100;
-  }
-
-  /* Responsive design */
-  @media (max-width: 768px) {
-    .content-series {
-      @apply p-4;
-    }
-
-    .nav-controls {
-      @apply grid-cols-1 gap-3;
-    }
-
-    .nav-item {
-      @apply items-center text-center;
-    }
-
-    .series-title {
-      @apply text-lg;
-    }
-
-    .position-indicator {
-      @apply text-xl;
-    }
-  }
-
-  /* High contrast mode */
-  @media (prefers-contrast: high) {
-    .content-series {
-      @apply border-2 border-accent;
-    }
-
-    .series-item {
-      @apply border-text-base border;
-    }
-
-    .series-item--current {
-      @apply border-2 border-accent bg-accent/20;
-    }
-  }
-
-  /* Dark mode optimizations */
-  @media (prefers-color-scheme: dark) {
-    .content-series {
-      @apply from-card/70 to-card/30;
-    }
-
-    .series-item {
-      @apply bg-card/10;
-    }
-
-    .series-cta {
-      @apply bg-accent/6;
-    }
-  }
-
-  /* Print styles */
-  @media print {
-    .content-series {
-      @apply border border-gray-300 bg-white shadow-none;
-    }
-
-    .series-icon,
-    .current-indicator,
-    .progress-visual {
-      display: none;
-    }
-
-    .series-title {
-      @apply text-black;
-    }
-  }
+  @import "./content-series/series-styles.css";
 </style>

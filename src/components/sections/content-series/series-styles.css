@@ -1,0 +1,229 @@
+/**
+ * Content Series Shared Styles
+ */
+
+/* Base content series styles */
+.content-series {
+  @apply my-8 rounded-xl border border-border/40 bg-gradient-to-br from-card/90 to-card/50 p-6 shadow-lg;
+  backdrop-filter: blur(12px);
+}
+
+/* Header styles */
+.content-series__header {
+  @apply mb-6 border-b border-border/30 pb-4;
+}
+
+.series-info {
+  @apply space-y-4;
+}
+
+.series-title {
+  @apply flex items-center gap-3 text-xl font-bold text-gray-900 dark:text-gray-100;
+}
+
+.series-icon {
+  @apply text-2xl opacity-80;
+}
+
+.series-description {
+  @apply text-sm leading-relaxed text-gray-600 dark:text-gray-400;
+}
+
+/* Progress styles */
+.series-progress {
+  @apply space-y-2;
+}
+
+.progress-visual {
+  @apply flex items-center gap-4;
+}
+
+.progress-track {
+  @apply h-2 flex-1 overflow-hidden rounded-full bg-border/30;
+}
+
+.progress-fill {
+  @apply to-accent-hover h-full bg-gradient-to-r from-accent transition-all duration-700 ease-out;
+}
+
+.progress-text {
+  @apply text-sm font-medium whitespace-nowrap text-gray-600 dark:text-gray-400;
+}
+
+/* Navigation controls */
+.content-series__navigation {
+  @apply mb-6;
+}
+
+.nav-controls {
+  @apply grid grid-cols-1 items-center gap-4 md:grid-cols-3;
+}
+
+.nav-item {
+  @apply flex flex-col items-center text-center;
+}
+
+.nav-item--previous {
+  @apply md:items-start md:text-left;
+}
+
+.nav-item--next {
+  @apply md:items-end md:text-right;
+}
+
+.nav-item--overview {
+  @apply order-first md:order-none;
+}
+
+.nav-item__details {
+  @apply mt-2 space-y-1;
+}
+
+.nav-label {
+  @apply block text-xs font-medium tracking-wide text-gray-600 uppercase dark:text-gray-400;
+}
+
+.nav-title {
+  @apply block text-sm leading-tight font-medium text-gray-900 dark:text-gray-100;
+}
+
+.nav-item--disabled {
+  @apply opacity-50;
+}
+
+.nav-disabled {
+  @apply rounded-lg border border-border/30 bg-border/20 px-4 py-2 text-sm text-gray-600 dark:text-gray-400;
+}
+
+/* Series position indicator */
+.series-position {
+  @apply flex flex-col items-center gap-2;
+}
+
+.position-indicator {
+  @apply text-2xl font-bold text-accent;
+}
+
+.series-name {
+  @apply text-sm font-medium text-gray-600 dark:text-gray-400;
+}
+
+/* Series overview */
+.content-series__overview {
+  @apply mb-6 border-b border-border/30 pb-4;
+}
+
+.overview-title {
+  @apply mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100;
+}
+
+.series-list {
+  @apply m-0 list-none space-y-2 p-0;
+}
+
+.series-item {
+  @apply rounded-lg border border-border/20 bg-card/20 p-3;
+}
+
+.series-item--current {
+  @apply border-accent/30 bg-accent/10;
+}
+
+.series-item__current {
+  @apply flex items-center gap-3;
+}
+
+.current-indicator {
+  @apply text-lg;
+}
+
+.current-title {
+  @apply flex-1 font-medium text-gray-900 dark:text-gray-100;
+}
+
+.current-label {
+  @apply text-xs font-medium tracking-wide text-accent uppercase;
+}
+
+/* Footer / CTA */
+.content-series__footer {
+  @apply border-t border-border/30 pt-4;
+}
+
+.series-cta {
+  @apply rounded-lg border border-accent/15 bg-accent/8 p-4;
+}
+
+.cta-text {
+  @apply m-0 text-sm leading-relaxed text-gray-900 dark:text-gray-100;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .content-series {
+    @apply p-4;
+  }
+
+  .nav-controls {
+    @apply grid-cols-1 gap-3;
+  }
+
+  .nav-item {
+    @apply items-center text-center;
+  }
+
+  .series-title {
+    @apply text-lg;
+  }
+
+  .position-indicator {
+    @apply text-xl;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .content-series {
+    @apply border-2 border-accent;
+  }
+
+  .series-item {
+    @apply border-text-base border;
+  }
+
+  .series-item--current {
+    @apply border-2 border-accent bg-accent/20;
+  }
+}
+
+/* Dark mode optimizations */
+@media (prefers-color-scheme: dark) {
+  .content-series {
+    @apply from-card/70 to-card/30;
+  }
+
+  .series-item {
+    @apply bg-card/10;
+  }
+
+  .series-cta {
+    @apply bg-accent/6;
+  }
+}
+
+/* Print styles */
+@media print {
+  .content-series {
+    @apply border border-gray-300 bg-white shadow-none;
+  }
+
+  .series-icon,
+  .current-indicator,
+  .progress-visual {
+    display: none;
+  }
+
+  .series-title {
+    @apply text-black;
+  }
+}

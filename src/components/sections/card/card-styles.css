@@ -1,0 +1,210 @@
+/**
+ * Shared Card Component Styles
+ * Animations, hover effects, and accessibility styles for card components
+ */
+
+@reference "@/styles/global.css";
+
+/* Base card transitions - Smooth bounce easing for premium feel */
+article {
+  transition: all 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Hover effects and animations - Refined for subtle, premium interactions */
+article:hover {
+  @apply -translate-y-1 border-accent/20 shadow-elevation-medium;
+}
+
+.card-image-container:hover .card-image {
+  @apply scale-[1.03] brightness-[1.02] contrast-[1.02];
+  transition: transform 600ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.card-image-container:hover .card-image-overlay {
+  @apply opacity-70;
+}
+
+.card-image-container:hover .card-light-reflection {
+  @apply opacity-40;
+  animation: lightReflection 3s 1 cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.card-image-container:hover .card-badge {
+  @apply -translate-y-1 scale-105 shadow-xl;
+}
+
+.card-image-container:hover .card-badge-icon {
+  @apply rotate-12;
+}
+
+article:hover .card-glow {
+  @apply opacity-80;
+}
+
+a:hover .card-title-text {
+  @apply bg-size-[100%_2px];
+}
+
+a:hover .card-read-more-text {
+  @apply translate-x-1;
+}
+
+a:hover .card-read-more-icon-container {
+  @apply bg-accent/20;
+}
+
+a:hover .card-read-more-icon {
+  @apply translate-x-0.5 scale-110;
+}
+
+.card-read-more::after {
+  content: "";
+  @apply absolute bottom-0 left-0 h-px w-full origin-right scale-x-0 bg-accent/50 transition-transform duration-300 ease-out;
+}
+
+a:hover .card-read-more::after {
+  @apply origin-left scale-x-100;
+}
+
+a:hover .card-shine {
+  @apply opacity-100;
+  animation: shine 1.5s 1 cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Animation keyframes */
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) rotate(35deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateX(100%) rotate(35deg);
+    opacity: 0;
+  }
+}
+
+@keyframes lightReflection {
+  0% {
+    opacity: 0;
+    transform: translateY(5%) translateX(-5%);
+  }
+  30% {
+    opacity: 0.2;
+  }
+  70% {
+    opacity: 0.1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-5%) translateX(5%);
+  }
+}
+
+/* Focus styles */
+article:focus-within {
+  @apply outline outline-offset-2 outline-accent;
+  box-shadow:
+    0 0 0 2px oklch(var(--color-accent)),
+    0 0 20px 5px oklch(var(--color-accent) / 0.15);
+}
+
+a:focus-visible {
+  @apply outline outline-offset-2 outline-accent outline-dashed;
+  box-shadow:
+    0 0 0 2px oklch(var(--color-accent)),
+    0 0 15px 2px oklch(var(--color-accent) / 0.2);
+}
+
+/* Touch device optimization - Disable hover animations, use tap feedback */
+@media (hover: none) and (pointer: coarse) {
+  /* Disable hover animations on touch devices */
+  article:hover,
+  .card-image-container:hover .card-image {
+    transform: none !important;
+  }
+
+  /* Use tap feedback instead */
+  article:active {
+    @apply scale-[0.98] shadow-elevation-low;
+    transition: all 100ms ease-out;
+  }
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  article,
+  article:hover,
+  .card-image,
+  .card-image-container:hover .card-image,
+  .card-image-overlay,
+  .card-light-reflection,
+  .card-badge,
+  .card-image-container:hover .card-badge,
+  .card-badge-icon,
+  .card-image-container:hover .card-badge-icon,
+  .card-glow,
+  .card-title-text,
+  .card-read-more-text {
+    transform: none !important;
+    transition-duration: 0.01s !important;
+    animation-duration: 0.01s !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* Initial state for animating cards */
+article.card-animating {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Visible state with smooth fade-in */
+article.card-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 600ms cubic-bezier(0.19, 1, 0.22, 1),
+    transform 600ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Stagger animation for multiple cards */
+article.card-visible:nth-child(1) {
+  transition-delay: 0ms;
+}
+
+article.card-visible:nth-child(2) {
+  transition-delay: 100ms;
+}
+
+article.card-visible:nth-child(3) {
+  transition-delay: 200ms;
+}
+
+article.card-visible:nth-child(4) {
+  transition-delay: 300ms;
+}
+
+article.card-visible:nth-child(5) {
+  transition-delay: 400ms;
+}
+
+article.card-visible:nth-child(6) {
+  transition-delay: 500ms;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  article.card-animating,
+  article.card-visible {
+    opacity: 1 !important;
+    transform: none !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}

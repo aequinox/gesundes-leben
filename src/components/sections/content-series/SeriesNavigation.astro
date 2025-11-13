@@ -1,0 +1,96 @@
+---
+/**
+ * SeriesNavigation Component
+ * Previous/Next navigation for content series
+ */
+
+import InternalLink from "@/components/elements/InternalLink.astro";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import type { Post } from "@/utils/types";
+
+export interface Props {
+  previousPost: Post | null;
+  nextPost: Post | null;
+  currentPost: Post;
+  progressCurrent: number;
+  progressTotal: number;
+  seriesTitle: string;
+}
+
+const {
+  previousPost,
+  nextPost,
+  progressCurrent,
+  progressTotal,
+  seriesTitle,
+} = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section class="content-series__navigation">
+  <div class="nav-controls">
+    {/* Previous Post */}
+    <div class="nav-item nav-item--previous">
+      {
+        previousPost ? (
+          <>
+            <InternalLink
+              to={`/posts/${previousPost.slug}`}
+              anchor={t("series.previousArticle")}
+              variant="button"
+              context="moderate"
+              placement="navigation"
+              title={`${t("series.previousArticle").replace("←", "").trim()}: ${previousPost.data.title}`}
+            />
+            <div class="nav-item__details">
+              <span class="nav-label">{t("series.before")}</span>
+              <span class="nav-title">{previousPost.data.title}</span>
+            </div>
+          </>
+        ) : (
+          <div class="nav-item--disabled">
+            <span class="nav-disabled">{t("series.firstArticle")}</span>
+          </div>
+        )
+      }
+    </div>
+
+    {/* Series Overview */}
+    <div class="nav-item nav-item--overview">
+      <div class="series-position">
+        <span class="position-indicator">
+          {progressCurrent} / {progressTotal}
+        </span>
+        <span class="series-name">{seriesTitle}</span>
+      </div>
+    </div>
+
+    {/* Next Post */}
+    <div class="nav-item nav-item--next">
+      {
+        nextPost ? (
+          <>
+            <InternalLink
+              to={`/posts/${nextPost.slug}`}
+              anchor={t("series.nextArticle")}
+              variant="button"
+              context="moderate"
+              placement="navigation"
+              title={`${t("series.nextArticle").replace("→", "").trim()}: ${nextPost.data.title}`}
+            />
+            <div class="nav-item__details">
+              <span class="nav-label">{t("series.next")}</span>
+              <span class="nav-title">{nextPost.data.title}</span>
+            </div>
+          </>
+        ) : (
+          <div class="nav-item--disabled">
+            <span class="nav-disabled">{t("series.lastArticle")}</span>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</section>
