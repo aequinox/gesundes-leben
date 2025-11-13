@@ -32,7 +32,7 @@ When a file exceeds limits:
 3. Move configuration to separate files
 4. Create composition patterns
 
-Example refactoring:
+Example refactorings:
 ```typescript
 // Before: Image.astro (634 lines)
 // After:
@@ -40,7 +40,38 @@ Example refactoring:
 //   - utils/image/validation.ts (50 lines)
 //   - utils/image/transforms.ts (80 lines)
 //   - utils/image/constants.ts (30 lines)
+
+// Before: Card.astro (594 lines)
+// After:
+//   - Card.astro (259 lines) - Main orchestration
+//   - sections/card/CardImage.astro (84 lines)
+//   - sections/card/CardContent.astro (96 lines)
+//   - sections/card/CardFooter.astro (51 lines)
+//   - sections/card/card-styles.css (210 lines)
+
+// Before: ContentSeries.astro (538 lines)
+// After:
+//   - ContentSeries.astro (182 lines) - Main component
+//   - sections/content-series/SeriesItem.astro (42 lines)
+//   - sections/content-series/SeriesNavigation.astro (96 lines)
+//   - sections/content-series/SeriesProgress.astro (35 lines)
+//   - utils/seriesConfig.ts (60 lines) - Configuration data
+
+// Before: BlogFilter.astro (508 lines)
+// After:
+//   - BlogFilter.astro (249 lines) - Main component
+//   - filter/blog-filter/GroupSelector.astro (111 lines)
+//   - filter/blog-filter/CategoryFilter.astro (73 lines)
+//   - filter/blog-filter/FilterResults.astro (58 lines)
+//   - utils/filterConfig.ts (27 lines) - Constants and types
 ```
+
+**Refactoring Strategy**:
+1. Create a subdirectory for complex components (e.g., `sections/card/`)
+2. Extract sub-components for distinct UI sections or responsibilities
+3. Move configuration and constants to `src/utils/` (e.g., `seriesConfig.ts`, `filterConfig.ts`)
+4. Create shared CSS files for component families (e.g., `card-styles.css`)
+5. Keep main component as orchestrator, delegating to sub-components
 
 ## TypeScript Best Practices
 
@@ -90,6 +121,54 @@ The blog uses enhanced Astro components for improved performance, accessibility,
 - ✅ Use Blockquote for "Therapeuten Tipp" sections
 - ✅ Use Accordion for warnings and collapsible content
 
+## Performance Optimization Guidelines
+
+### Lazy Loading Patterns
+- **View Transitions CSS**: Lazy loaded on first navigation via `src/utils/load-view-transitions.ts`
+  - Reduces initial bundle by ~8KB
+  - Loaded via 'astro:before-preparation' event
+- **Images**: Use native lazy loading with `loading="lazy"` attribute
+- **Components**: Consider dynamic imports for below-the-fold components
+
+### Font Optimization
+- **Custom @font-face declarations** in `src/styles/fonts.css`
+  - Use `font-display: swap` to prevent FOIT (Flash of Invisible Text)
+  - Improves First Contentful Paint (FCP) metrics
+- **Preload critical fonts** in Layout.astro:
+  ```html
+  <link rel="preload" href="/src/assets/fonts/Poppins-400.woff2" as="font" type="font/woff2" crossorigin />
+  ```
+- **Disable experimental Astro fonts** - Use custom loading for better control
+
+### Image Guidelines
+- **Maximum file size**: 1MB (enforced by pre-commit hook)
+- **Optimization command**: `bun run images:optimize`
+- **Format preference**: WebP for modern browsers, JPEG fallback
+- **Placement**: Store in post-specific folders under `images/`
+
+## Internationalization (i18n)
+
+The project uses a modular translation file structure:
+
+**File Organization**:
+- `src/i18n/ui.ts` - Type definitions and language registry (275 lines)
+- `src/i18n/languages/en.ts` - English translations (279 lines)
+- `src/i18n/languages/de.ts` - German translations (280 lines)
+
+**Adding New Languages**:
+1. Create `src/i18n/languages/[lang].ts` with all required translation keys
+2. Import and add to `ui` object in `src/i18n/ui.ts`
+3. Update `languages` and `defaultLang` constants if needed
+
+**Translation Key Structure**:
+```typescript
+export const de: UITranslations = {
+  "nav.skipToContent": "Zum Inhalt springen",
+  "nav.about": "Über uns",
+  // ... more keys
+};
+```
+
 ## Development Tips
 
 1. Always run type checking before commits (`bun run build`)
@@ -98,10 +177,18 @@ The blog uses enhanced Astro components for improved performance, accessibility,
 4. Use enhanced component system for all content (see component docs)
 5. German language conventions apply throughout the codebase
 6. Add new scientific references as individual YAML files in `src/data/references/` for reuse across articles
+7. Optimize images before committing - pre-commit hook will enforce 1MB limit
 
 ## Git Workflow
 
 **Commit Strategy**: Commit to git repository (Gitea) after every major step or feature completion. Use detailed, descriptive commit messages that explain the what, why, and impact of changes.
+
+**Pre-commit Hooks**: The repository uses Husky for pre-commit validation:
+- **Image Size Check**: Prevents committing images larger than 1MB
+  - Scans: `.jpg`, `.jpeg`, `.png`, `.webp` files in `src/data/blog`
+  - Error message includes file names, sizes, and optimization command
+  - Configure in: `.husky/pre-commit`
+- **Lint Staged**: Runs linters on staged files (via `lint-staged`)
 
 ## References System Implementation
 
