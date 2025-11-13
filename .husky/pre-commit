@@ -1,6 +1,3 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
 # Check for large images in blog directory
 echo "🔍 Checking for large images..."
 
