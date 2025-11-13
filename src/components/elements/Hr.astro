@@ -1,4 +1,27 @@
 ---
+/**
+ * Horizontal Rule Component
+ *
+ * Visual content divider with multiple style variants.
+ * Creates visual separation between content sections with decorative options.
+ *
+ * Features:
+ * - 4 style variants (default, gradient, dots, wave)
+ * - Optional padding control
+ * - Accessible with aria-hidden support
+ * - Fade-in animation on scroll
+ * - Dark mode support
+ *
+ * Usage:
+ * ```astro
+ * <Hr />
+ * <Hr variant="gradient" />
+ * <Hr variant="dots" noPadding />
+ * <Hr variant="wave" class="my-12" />
+ * ```
+ *
+ * @component
+ */
 export interface Props {
   /** Remove horizontal padding */
   noPadding?: boolean;

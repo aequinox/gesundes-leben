@@ -1,4 +1,34 @@
 ---
+/**
+ * Icon Component
+ *
+ * Standardized icon component using Tabler Icons via astro-icon.
+ * Provides consistent sizing, states, and styling across the application.
+ *
+ * Features:
+ * - 20+ pre-mapped icon names for common UI needs
+ * - 5 size variants (xs, sm, md, lg, xl)
+ * - Active state styling
+ * - Optional animation on hover
+ * - Automatic theme handling (moon/sun icons)
+ * - Status icon color coding (info, warning, error, success)
+ * - Accessible with aria-hidden
+ *
+ * Icon Categories:
+ * - Navigation: archive, search, moon, sun, home, settings, user, calendar, menu, close
+ * - Actions: notification, bookmark, heart, share
+ * - Status: check, info, warning, error, success
+ *
+ * Usage:
+ * ```astro
+ * <Icon name="search" size="md" />
+ * <Icon name="heart" active animated />
+ * <Icon name="success" size="lg" />
+ * <Icon name="menu" id="mobile-menu" />
+ * ```
+ *
+ * @component
+ */
 import { Icon as AstroIcon } from "astro-icon/components";
 
 export interface Props {

@@ -1,4 +1,28 @@
 ---
+/**
+ * Paragraph Component
+ *
+ * Styled paragraph component with multiple variants and formatting options.
+ * Provides consistent typography and spacing for body text.
+ *
+ * Features:
+ * - 4 style variants (default, lead, subtle, accent)
+ * - 4 animation options (none, fade, slide, zoom)
+ * - Text alignment control
+ * - Optional hyphenation
+ * - Responsive font sizing
+ * - Dark mode support
+ *
+ * Usage:
+ * ```astro
+ * <Paragraph>Standard paragraph text</Paragraph>
+ * <Paragraph variant="lead">Introductory paragraph</Paragraph>
+ * <Paragraph variant="accent">Highlighted text</Paragraph>
+ * <Paragraph align="center" animation="fade">Centered animated text</Paragraph>
+ * ```
+ *
+ * @component
+ */
 export interface Props {
   /** Visual style variant */
   variant?: "default" | "lead" | "subtle" | "accent";
