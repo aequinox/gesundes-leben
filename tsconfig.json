@@ -20,7 +20,8 @@
     "dist",
     "public/pagefind",
     "src/scripts/wp-to-mdx/**",
-    "scripts/**"
+    "scripts/**",
+    "tests/e2e/**"
   ],
   /**
    * Configure TypeScript compiler options
