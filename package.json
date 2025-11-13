@@ -3,11 +3,11 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "check": "NODE_OPTIONS='--max-old-space-size=8192' astro check",
+    "check": "NODE_OPTIONS='--max-old-space-size=4096' astro check",
     "dev": "astro dev",
-    "build": "NODE_OPTIONS='--max-old-space-size=8192' astro build",
-    "build:check": "NODE_OPTIONS='--max-old-space-size=16384' astro check && NODE_OPTIONS='--max-old-space-size=8192' astro build",
-    "type-check": "NODE_OPTIONS='--max-old-space-size=16384' tsc --noEmit",
+    "build": "NODE_OPTIONS='--max-old-space-size=4096' astro build",
+    "build:check": "NODE_OPTIONS='--max-old-space-size=4096' astro check && NODE_OPTIONS='--max-old-space-size=4096' astro build",
+    "type-check": "NODE_OPTIONS='--max-old-space-size=4096' tsc --noEmit",
     "postbuild": "pagefind --site dist --exclude-selectors 'details, #toc, #inhaltsverzeichnis' --output-path ./public/pagefind",
     "preview": "astro preview",
     "sync": "astro sync",
@@ -89,7 +89,15 @@
     "deps:update": "bun update --latest",
     "deps:audit": "bun audit",
     "security:audit": "bun audit",
-    "security:fix": "bun audit --fix"
+    "security:fix": "bun audit --fix",
+    "images:optimize": "node scripts/optimize-images.js",
+    "images:backup": "find src/data/blog -name '*.backup' -exec rm {} \\;",
+    "images:restore": "find src/data/blog -name '*.backup' -exec bash -c 'mv \"$0\" \"${0%.backup}\"' {} \\;",
+    "og:generate": "node scripts/generate-og-images.js",
+    "og:clear": "rm -rf public/og",
+    "og:rebuild": "bun run og:clear && bun run og:generate",
+    "perf:measure": "node scripts/performance-baseline.js",
+    "perf:full": "bun run build && bun run perf:measure"
   },
   "sideEffects": [
     "**/*.css",
