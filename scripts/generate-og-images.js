@@ -160,6 +160,8 @@ async function processOgImages() {
         pubDatetime: extractField(frontmatterMatch[1], 'pubDatetime'),
         author: extractField(frontmatterMatch[1], 'author') || 'kai-renner',
         category: extractField(frontmatterMatch[1], 'category') || 'Gesundheit',
+        group: extractField(frontmatterMatch[1], 'group') || '',
+        categories: extractArrayField(frontmatterMatch[1], 'categories'),
       },
     };
 
@@ -207,6 +209,27 @@ async function processOgImages() {
 function extractField(frontmatter, field) {
   const match = frontmatter.match(new RegExp(`${field}:\\s*["']?([^"'\\n]+)["']?`));
   return match ? match[1].trim() : null;
+}
+
+/**
+ * Extract array field from YAML frontmatter
+ */
+function extractArrayField(frontmatter, field) {
+  const arrayRegex = new RegExp(`${field}:\\s*\\n((?:\\s+-\\s+.+\\n?)+)`, 'm');
+  const match = frontmatter.match(arrayRegex);
+
+  if (!match) {
+    return [];
+  }
+
+  // Extract array items (lines starting with "  - ")
+  const items = match[1]
+    .split('\n')
+    .filter(line => line.trim().startsWith('-'))
+    .map(line => line.replace(/^\s*-\s*/, '').trim())
+    .filter(Boolean);
+
+  return items;
 }
 
 // Run the script
