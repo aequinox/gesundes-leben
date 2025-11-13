@@ -1,6 +1,7 @@
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
+import compress from "@playform/compress";
 import icon from "astro-icon";
 import pagefind from "astro-pagefind";
 import robotsTxt from "astro-robots-txt";
@@ -32,6 +33,13 @@ export default defineConfig({
   },
   // Compression
   compressHTML: true,
+  // Prefetch configuration for faster page transitions
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: "viewport",
+  },
+  // Optimize script loading
+  scopedStyleStrategy: "where",
   integrations: [
     robotsTxt({
       sitemap: seoConfig.sitemap.baseUrls,
@@ -139,6 +147,26 @@ export default defineConfig({
         ],
       },
     }),
+    compress({
+      CSS: true,
+      HTML: {
+        "html-minifier-terser": {
+          removeAttributeQuotes: false,
+          removeComments: true,
+          removeRedundantAttributes: true,
+          removeScriptTypeAttributes: true,
+          removeStyleLinkTypeAttributes: true,
+          minifyCSS: true,
+          minifyJS: true,
+          collapseWhitespace: true,
+          conservativeCollapse: true,
+          keepClosingSlash: true,
+        },
+      },
+      Image: false, // Astro's built-in image optimization handles this
+      JavaScript: true,
+      SVG: true,
+    }),
     // AstroPWA({
     //   registerType: "autoUpdate",
     //   includeAssets: ["favicon.svg", "fonts/*.woff2"],
@@ -245,11 +273,42 @@ export default defineConfig({
       rollupOptions: {
         output: {
           // Separate vendor chunks for better caching
-          manualChunks: {
-            vendor: ["astro"],
-            utils: ["lodash.kebabcase", "slugify", "dayjs"],
-            ui: ["@astrojs/mdx", "astro-icon"],
+          manualChunks: id => {
+            // Core framework
+            if (id.includes("node_modules/astro")) {
+              return "vendor-astro";
+            }
+            // UI libraries
+            if (id.includes("@astrojs/mdx") || id.includes("astro-icon")) {
+              return "vendor-ui";
+            }
+            // Utilities
+            if (
+              id.includes("lodash.kebabcase") ||
+              id.includes("slugify") ||
+              id.includes("dayjs")
+            ) {
+              return "vendor-utils";
+            }
+            // Content processing
+            if (
+              id.includes("remark-") ||
+              id.includes("rehype-") ||
+              id.includes("mdast-") ||
+              id.includes("hast-")
+            ) {
+              return "vendor-markdown";
+            }
+            // All other node_modules
+            if (id.includes("node_modules")) {
+              return "vendor-other";
+            }
+            return undefined;
           },
+          // Optimize output filenames for better caching
+          entryFileNames: "chunks/[name].[hash].js",
+          chunkFileNames: "chunks/[name].[hash].js",
+          assetFileNames: "assets/[name].[hash][extname]",
         },
       },
       // Enable CSS code splitting
@@ -260,10 +319,23 @@ export default defineConfig({
       modulePreload: {
         polyfill: true,
       },
-      // Enable minification
+      // Enable minification with optimizations
       minify: "esbuild",
       // Enable tree shaking
       target: "es2022",
+      // Additional optimizations
+      reportCompressedSize: false, // Faster builds
+      sourcemap: false, // Smaller output in production
+    },
+    // Performance optimizations
+    server: {
+      warmup: {
+        clientFiles: [
+          "./src/components/**/*.astro",
+          "./src/layouts/**/*.astro",
+          "./src/pages/**/*.astro",
+        ],
+      },
     },
   },
   image: {

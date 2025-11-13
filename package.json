@@ -155,6 +155,7 @@
   "devDependencies": {
     "@astrojs/check": "0.9.5",
     "@pagefind/default-ui": "^1.4.0",
+    "@playform/compress": "^0.2.0",
     "@playwright/test": "^1.56.1",
     "@tailwindcss/typography": "^0.5.19",
     "@testing-library/jest-dom": "^6.9.1",
