@@ -307,48 +307,9 @@ export default defineConfig({
     ],
   },
   experimental: {
-    fonts: [
-      // {
-      //   name: "Roboto",
-      //   provider: fontProviders.bunny(),
-      //   cssVariable: "--font-roboto",
-      //   weights: [400, 900],
-      //   styles: ["normal"],
-      //   subsets: ["latin"],
-      //   fallbacks: ["sans-serif"],
-      // },
-      {
-        name: "Poppins",
-        provider: "local",
-        cssVariable: "--font-body",
-        variants: [
-          {
-            src: [
-              "./src/assets/fonts/Poppins-400.woff2",
-              "./src/assets/fonts/Poppins-400.woff",
-            ],
-            weight: "400",
-            style: "normal",
-          },
-          {
-            src: [
-              "./src/assets/fonts/Poppins-600.woff2",
-              "./src/assets/fonts/Poppins-600.woff",
-            ],
-            weight: "600",
-            style: "normal",
-          },
-          {
-            src: [
-              "./src/assets/fonts/Poppins-800.woff2",
-              "./src/assets/fonts/Poppins-800.woff",
-            ],
-            weight: "800",
-            style: "normal",
-          },
-        ],
-      },
-    ],
+    // Fonts are now handled via custom @font-face declarations in src/styles/fonts.css
+    // This allows us to use font-display: swap for better FCP performance
+    // fonts: [], // Disabled in favor of custom font loading
     preserveScriptOrder: true,
   },
 });

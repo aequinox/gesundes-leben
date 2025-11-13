@@ -1,8 +1,9 @@
 @import "tailwindcss";
 @import "./typography.css";
+@import "./fonts.css";
 
 @import "./color-system.css";
-@import "./view-transitions.css";
+/* view-transitions.css is lazy loaded - see src/utils/load-view-transitions.ts */
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 

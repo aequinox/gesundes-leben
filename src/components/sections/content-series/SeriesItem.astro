@@ -1,0 +1,42 @@
+---
+/**
+ * SeriesItem Component
+ * Individual item in a content series list
+ */
+
+import InternalLink from "@/components/elements/InternalLink.astro";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import type { Post } from "@/utils/types";
+
+export interface Props {
+  post: Post;
+  index: number;
+  isCurrent: boolean;
+}
+
+const { post, index, isCurrent } = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<li class={`series-item ${isCurrent ? "series-item--current" : ""}`}>
+  {
+    isCurrent ? (
+      <div class="series-item__current">
+        <span class="current-indicator">📍</span>
+        <span class="current-title">{post.data.title}</span>
+        <span class="current-label">{t("series.youAreHere")}</span>
+      </div>
+    ) : (
+      <InternalLink
+        to={`/posts/${post.slug}`}
+        anchor={post.data.title}
+        variant="inline"
+        context="moderate"
+        placement="navigation"
+        title={`Teil ${index + 1}: ${post.data.title}`}
+      />
+    )
+  }
+</li>

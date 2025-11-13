@@ -1,0 +1,33 @@
+---
+/**
+ * NoResults Component
+ * Displays when no posts match the current filter criteria
+ */
+
+import { Icon } from "astro-icon/components";
+
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<div
+  id="no-results"
+  class="no-results-container hidden animate-[fadeIn_0.6s_cubic-bezier(0.22,1,0.36,1)_forwards] flex-col items-center justify-center py-16 text-center"
+>
+  <div class="mb-4 rounded-full bg-accent/10 p-4">
+    <Icon name="tabler:search-off" class="h-10 w-10 text-accent/70" />
+  </div>
+  <h3 class="mb-2 text-xl font-medium">{t("filter.noResults")}</h3>
+  <p class="max-w-md">
+    {t("filter.noResultsHelp")}
+  </p>
+  <button
+    id="clear-filters"
+    class="relative mt-6 inline-flex items-center gap-2 overflow-hidden rounded-full bg-accent/10 px-6 py-2.5 font-medium text-accent transition-all duration-300 after:absolute after:inset-0 after:animate-[shimmer_3s_infinite] after:bg-gradient-to-r after:from-accent/10 after:via-accent/20 after:to-accent/50 after:bg-[length:200%_100%] after:opacity-0 after:transition-opacity after:duration-300 after:content-[''] hover:bg-accent/20 hover:shadow-[var(--shadow-glow-accent)] hover:after:opacity-100 active:shadow-[var(--shadow-inner)]"
+  >
+    <Icon name="tabler:filter-off" class="h-5 w-5" />
+    {t("filter.clearFilters")}
+  </button>
+</div>

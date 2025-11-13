@@ -1,0 +1,96 @@
+---
+/**
+ * CardContent Component
+ * Displays the card's main content: categories, title, meta, and description
+ */
+
+import { getPostSlug } from "@/utils/slugs";
+import type { Post } from "@/utils/types";
+import { getPostTitleTransition } from "@/utils/viewTransitionNames";
+
+import BadgeGroup from "../../elements/BadgeGroup.astro";
+import ArticleMeta from "../../partials/ArticleMeta.astro";
+
+export interface Props {
+  post: Post;
+  href: string;
+  isSmall: boolean;
+  withCategories?: boolean;
+  withMeta?: boolean;
+  withDescription?: boolean;
+  effectiveMaxCategories?: number;
+}
+
+const {
+  post,
+  href,
+  isSmall,
+  withCategories = true,
+  withMeta = true,
+  withDescription = true,
+  effectiveMaxCategories,
+} = Astro.props;
+
+const {
+  data: { title, description, categories },
+} = post;
+
+// Title classes based on size
+const titleClasses = `text-foreground font-medium tracking-tight leading-tight font-feature-salt ${
+  isSmall ? "text-base" : "text-xl"
+}`;
+---
+
+<div class={`flex flex-col grow ${isSmall ? "space-y-1" : "space-y-2"}`}>
+  {
+    withCategories && categories && categories.length > 0 && (
+      <BadgeGroup
+        items={categories}
+        {...(effectiveMaxCategories !== undefined && {
+          maxItems: effectiveMaxCategories,
+        })}
+        variant="primary"
+        size="xs"
+        shape="square"
+        outlined={true}
+        gap={isSmall ? "small" : "medium"}
+      />
+    )
+  }
+
+  <a
+    href={href}
+    aria-label={`Read more about ${title}`}
+    class="card-title-link block"
+  >
+    <h2
+      id={`post-title-${getPostSlug(post)}`}
+      class={titleClasses}
+      transition:name={getPostTitleTransition(post)}
+    >
+      <span
+        class="card-title-text bg-linear-to-r from-accent to-accent/70 bg-size-[0%_2px] bg-bottom-left bg-no-repeat transition-all duration-300 ease-out"
+      >
+        {title}
+      </span>
+    </h2>
+  </a>
+
+  {
+    withMeta && (
+      <div class="card-meta py-1.5">
+        <ArticleMeta post={post} />
+      </div>
+    )
+  }
+
+  {
+    withDescription && description && (
+      <div
+        class={`line-clamp-${isSmall ? "2" : "3"} ${isSmall ? "text-xs" : "text-sm"} card-description leading-relaxed tracking-wide text-foreground/80`}
+      >
+        {description}
+      </div>
+    )
+  }
+</div>

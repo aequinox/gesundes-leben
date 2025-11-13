@@ -1,0 +1,35 @@
+---
+/**
+ * SeriesProgress Component
+ * Progress bar and indicator for content series
+ */
+
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+export interface Props {
+  current: number;
+  total: number;
+  percentage: number;
+}
+
+const { current, total, percentage } = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<div class="series-progress">
+  <div class="progress-visual">
+    <div class="progress-track">
+      <div
+        class="progress-fill"
+        style={`width: ${percentage}%`}
+        aria-hidden="true"
+      >
+      </div>
+    </div>
+    <span class="progress-text">
+      {t("series.part")} {current} {t("series.of")} {total}
+    </span>
+  </div>
+</div>
