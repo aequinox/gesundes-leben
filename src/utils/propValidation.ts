@@ -51,7 +51,13 @@ export type PropValue =
 /**
  * Type name for runtime validation
  */
-export type PropTypeName = "string" | "number" | "boolean" | "object" | "array" | "function";
+export type PropTypeName =
+  | "string"
+  | "number"
+  | "boolean"
+  | "object"
+  | "array"
+  | "function";
 
 /**
  * Generic validation rule configuration for a single property
@@ -152,7 +158,7 @@ export function validateProp<T extends PropValue>(
   }
 
   // Enum validation
-  if (rule.oneOf && typeof value === 'string' && !rule.oneOf.includes(value)) {
+  if (rule.oneOf && typeof value === "string" && !rule.oneOf.includes(value)) {
     errors.push(`${propName} must be one of: ${rule.oneOf.join(", ")}`);
   }
 
@@ -198,7 +204,11 @@ export function validateProps<T extends Record<string, PropValue>>(
       validatedProps[propName as keyof T] = rule.defaultValue as T[keyof T];
     }
 
-    const validation = validateProp(validatedProps[propName as keyof T], rule, propName);
+    const validation = validateProp(
+      validatedProps[propName as keyof T],
+      rule,
+      propName
+    );
 
     allErrors.push(...validation.errors);
     if (validation.warnings) {
@@ -374,7 +384,9 @@ interface AccessibleProps extends Record<string, PropValue> {
 /**
  * Accessible name validation (for interactive elements)
  */
-export const accessibleNameValidator = (props: AccessibleProps): boolean | string => {
+export const accessibleNameValidator = (
+  props: AccessibleProps
+): boolean | string => {
   const hasAriaLabel = isNonEmptyString(props["aria-label"]);
   const hasAriaLabelledBy = isNonEmptyString(props["aria-labelledby"]);
   const hasTitle = isNonEmptyString(props.title);

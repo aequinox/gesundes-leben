@@ -121,6 +121,7 @@ references:
 Scientific references stored as individual YAML files in `src/data/references/`:
 
 Example `2023-smith-nutrition-health.yaml`:
+
 ```yaml
 type: journal
 title: "Nutrition and Gut Health Review"
@@ -166,6 +167,7 @@ Advanced markdown processing with custom plugins:
 ### Enhanced Components
 
 For content creation, see:
+
 - 📖 Full guide: `docs/component-style-guide.md`
 - 🔖 Quick reference: `docs/component-quick-reference.md`
 

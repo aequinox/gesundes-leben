@@ -231,7 +231,10 @@ export function getCategoryCounts(elements: Elements): Map<string, number> {
         const postCategories = parseCategories(article.dataset.categories);
         postCategories.forEach(category => {
           if (category) {
-            categoryCounts.set(category, (categoryCounts.get(category) || 0) + 1);
+            categoryCounts.set(
+              category,
+              (categoryCounts.get(category) || 0) + 1
+            );
           }
         });
       }

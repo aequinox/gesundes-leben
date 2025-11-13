@@ -6,7 +6,12 @@
  */
 
 import type { Elements, GroupType } from "./FilterState";
-import { getAvailableCategories, getCategoryCounts, getOptions, getState } from "./FilterState";
+import {
+  getAvailableCategories,
+  getCategoryCounts,
+  getOptions,
+  getState,
+} from "./FilterState";
 
 /**
  * Updates group selection UI

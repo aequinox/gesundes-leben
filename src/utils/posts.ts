@@ -3,7 +3,10 @@ import type { CollectionEntry } from "astro:content";
 
 import { SITE } from "@/config";
 
-import { withAsyncErrorHandling, withErrorHandling } from "./error-handling/shared";
+import {
+  withAsyncErrorHandling,
+  withErrorHandling,
+} from "./error-handling/shared";
 import { logger } from "./logger";
 import { slugify, getPostSlug } from "./slugs";
 import type { Category, Post, Tag } from "./types";

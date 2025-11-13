@@ -56,14 +56,14 @@ const pageDescription = t("categories.description");
 
 // Category icon mapping
 const categoryIcons: Record<string, string> = {
-  "Ernährung": "tabler:apple",
-  "Immunsystem": "tabler:shield-check",
-  "Lesenswertes": "tabler:book",
+  Ernährung: "tabler:apple",
+  Immunsystem: "tabler:shield-check",
+  Lesenswertes: "tabler:book",
   "Lifestyle & Psyche": "tabler:heart",
-  "Mikronährstoffe": "tabler:pill",
-  "Organsysteme": "tabler:heartbeat",
-  "Wissenschaftliches": "tabler:flask",
-  "Wissenswertes": "tabler:bulb",
+  Mikronährstoffe: "tabler:pill",
+  Organsysteme: "tabler:heartbeat",
+  Wissenschaftliches: "tabler:flask",
+  Wissenswertes: "tabler:bulb",
 };
 
 // Helper function to get category description from i18n
@@ -108,9 +108,8 @@ const getCategoryDescription = (category: string): string => {
           data-aos-duration="600"
         >
           <p class="text-lg leading-relaxed opacity-90">
-            Entdecke unsere Artikel nach Themengebieten sortiert. Jede
-            Kategorie bietet dir fundiertes Wissen zu spezifischen
-            Gesundheitsthemen.
+            Entdecke unsere Artikel nach Themengebieten sortiert. Jede Kategorie
+            bietet dir fundiertes Wissen zu spezifischen Gesundheitsthemen.
           </p>
         </div>
 
@@ -233,9 +232,9 @@ const getCategoryDescription = (category: string): string => {
                     >
                       <Card
                         post={post}
-                        loading={categoryIndex === 0 && index < 3
-                          ? "eager"
-                          : "lazy"}
+                        loading={
+                          categoryIndex === 0 && index < 3 ? "eager" : "lazy"
+                        }
                         withCategories={false}
                         withMeta={true}
                         withHeroImage={true}

@@ -16,7 +16,12 @@
  */
 
 // Re-export types and main API
-export type { GroupType, FilterState, FilterOptions, Elements } from "./filter/FilterState";
+export type {
+  GroupType,
+  FilterState,
+  FilterOptions,
+  Elements,
+} from "./filter/FilterState";
 export { DEFAULT_OPTIONS } from "./filter/FilterState";
 export { initBlogFilter } from "./filter/FilterUI";
 

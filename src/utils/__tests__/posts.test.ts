@@ -69,7 +69,9 @@ describe("Posts utilities", () => {
     interface MockedAstroContent {
       getCollection: ReturnType<typeof vi.fn>;
     }
-    const astroContent = (await vi.importMock("astro:content")) as unknown as MockedAstroContent;
+    const astroContent = (await vi.importMock(
+      "astro:content"
+    )) as unknown as MockedAstroContent;
     vi.mocked(astroContent.getCollection).mockResolvedValue(mockPosts);
   });
 
@@ -78,9 +80,11 @@ describe("Posts utilities", () => {
       const posts = await getAllPosts(true);
       expect(posts).toHaveLength(3);
       interface MockedAstroContent {
-      getCollection: ReturnType<typeof vi.fn>;
-    }
-    const astroContent = (await vi.importMock("astro:content")) as unknown as MockedAstroContent;
+        getCollection: ReturnType<typeof vi.fn>;
+      }
+      const astroContent = (await vi.importMock(
+        "astro:content"
+      )) as unknown as MockedAstroContent;
       expect(astroContent.getCollection).toHaveBeenCalledWith("blog");
     });
 

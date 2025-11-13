@@ -516,7 +516,7 @@ export function t(
     }
   }
 
-  let translatedText = typeof value === "string" ? value : fallback ?? key;
+  let translatedText = typeof value === "string" ? value : (fallback ?? key);
 
   // Handle pluralization
   if (pluralization) {

@@ -70,7 +70,8 @@ describe("Tags Utilities", () => {
             draft: false,
           }),
           data: {
-            ...createMockPost({ title: "Post without date", draft: false }).data,
+            ...createMockPost({ title: "Post without date", draft: false })
+              .data,
             pubDatetime: undefined as unknown as Date,
           },
         },
@@ -80,7 +81,8 @@ describe("Tags Utilities", () => {
             draft: false,
           }),
           data: {
-            ...createMockPost({ title: "Post with invalid date", draft: false }).data,
+            ...createMockPost({ title: "Post with invalid date", draft: false })
+              .data,
             pubDatetime: "invalid-date" as unknown as Date,
           },
         },

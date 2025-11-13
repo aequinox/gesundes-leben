@@ -26,7 +26,10 @@ const i18n = getI18nStrings("de");
 ---
 
 <BasePage title={`${i18n.search.pageTitle} | ${SITE.title}`} activeNav="search">
-  <Main pageTitle={i18n.search.pageTitle} pageDesc={i18n.search.pageDescription}>
+  <Main
+    pageTitle={i18n.search.pageTitle}
+    pageDesc={i18n.search.pageDescription}
+  >
     <SearchLoadingSkeleton />
     <SearchContainer />
     <SearchKeyboardShortcuts />
@@ -35,10 +38,7 @@ const i18n = getI18nStrings("de");
 
 <script>
   import { logger, LogLevelName, type LoggerConfig } from "@/utils/logger";
-  import {
-    PAGEFIND_CONFIG,
-    SEARCH_STRINGS,
-  } from "@/utils/search/searchConfig";
+  import { PAGEFIND_CONFIG, SEARCH_STRINGS } from "@/utils/search/searchConfig";
 
   // Configure logger for search component
   logger.configure({
@@ -153,7 +153,7 @@ const i18n = getI18nStrings("de");
     announceToScreenReader(SEARCH_STRINGS.accessibility.loading);
 
     const params = new URLSearchParams(window.location.search);
-    const onIdle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1));
+    const onIdle = window.requestIdleCallback || (cb => setTimeout(cb, 1));
 
     onIdle(async () => {
       try {
@@ -230,7 +230,7 @@ const i18n = getI18nStrings("de");
           ".pagefind-ui__search-clear"
         );
 
-        searchInput?.addEventListener("input", (e) => {
+        searchInput?.addEventListener("input", e => {
           resetSearchParam(e);
           const value = (e.target as HTMLInputElement).value;
           if (value.length > 2) {
@@ -240,7 +240,7 @@ const i18n = getI18nStrings("de");
           }
         });
 
-        clearButton?.addEventListener("click", (e) => {
+        clearButton?.addEventListener("click", e => {
           resetSearchParam(e);
           announceToScreenReader(SEARCH_STRINGS.accessibility.cleared);
         });

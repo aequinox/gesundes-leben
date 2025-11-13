@@ -100,13 +100,13 @@ export class NavigationController {
 
     // Handle mobile menu links
     const mobileLinks = this.mobileMenu?.querySelectorAll("a");
-    mobileLinks?.forEach((link) => {
+    mobileLinks?.forEach(link => {
       link.addEventListener("click", this.closeMobileMenu);
     });
 
     // Handle mega menu links
     const megaMenuLinks = this.megaMenu?.querySelectorAll("a");
-    megaMenuLinks?.forEach((link) => {
+    megaMenuLinks?.forEach(link => {
       link.addEventListener("click", this.closeMegaMenu);
     });
 

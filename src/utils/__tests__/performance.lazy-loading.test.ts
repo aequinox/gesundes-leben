@@ -136,7 +136,10 @@ describe("createLazyObserver", () => {
     // Simulate intersection callback
     const observerCallback = vi.mocked(window.IntersectionObserver).mock
       .calls[0][0];
-    observerCallback([mockEntry] as unknown as IntersectionObserverEntry[], {} as IntersectionObserver);
+    observerCallback(
+      [mockEntry] as unknown as IntersectionObserverEntry[],
+      {} as IntersectionObserver
+    );
 
     expect(callback).toHaveBeenCalledWith(mockEntry);
   });

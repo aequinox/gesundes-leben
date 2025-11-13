@@ -66,9 +66,9 @@ const {
   {modDatetime}
   {scrollSmooth}
   {activeNav}
-  {...(keywords && { keywords })}
-  {...(tags && { tags })}
-  {...(categories && { categories })}
+  {...keywords && { keywords }}
+  {...tags && { tags }}
+  {...categories && { categories }}
 >
   <Header {activeNav} />
   <slot />

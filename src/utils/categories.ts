@@ -85,8 +85,8 @@ export function filterPostsByCategory(posts: Post[], category: string): Post[] {
   const slugifiedCategory = slugify(category);
 
   return posts.filter(post =>
-    post.data.categories?.some((postCategory: string) =>
-      slugify(postCategory) === slugifiedCategory
+    post.data.categories?.some(
+      (postCategory: string) => slugify(postCategory) === slugifiedCategory
     )
   );
 }

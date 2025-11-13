@@ -20,7 +20,7 @@ export async function getAuthorEntry(
       "Failed to fetch author with identifier:",
       typeof author === "string" ? author : author.id,
       "Error:",
-      err instanceof Error ? err.stack ?? err.message : String(err)
+      err instanceof Error ? (err.stack ?? err.message) : String(err)
     );
     return null;
   }
@@ -41,7 +41,7 @@ export async function getAllAuthors(): Promise<Author[]> {
   } catch (err) {
     logger.error(
       "Failed to fetch authors collection Error:",
-      err instanceof Error ? err.stack ?? err.message : String(err)
+      err instanceof Error ? (err.stack ?? err.message) : String(err)
     );
     return [];
   }

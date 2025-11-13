@@ -6,7 +6,11 @@
     /* Base font sizes with fluid scaling - Health-optimized for 50+ demographic */
     --font-size-xs: clamp(0.75rem, 0.7rem + 0.2vw, 0.8125rem);
     --font-size-sm: clamp(0.875rem, 0.8rem + 0.3vw, 0.9375rem);
-    --font-size-base: clamp(1.0625rem, 1rem + 0.5vw, 1.125rem); /* 17px → 18px for better readability */
+    --font-size-base: clamp(
+      1.0625rem,
+      1rem + 0.5vw,
+      1.125rem
+    ); /* 17px → 18px for better readability */
     --font-size-lg: clamp(1.1875rem, 1.1rem + 0.6vw, 1.25rem);
     --font-size-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
     --font-size-2xl: clamp(1.5rem, 1.3rem + 1vw, 1.875rem);
@@ -26,7 +30,10 @@
     --letter-spacing-wider: 0.05em;
 
     /* Content width for optimal reading - Health content optimized */
-    --content-width: min(72ch, 90vw); /* Wider for infographics and medical diagrams */
+    --content-width: min(
+      72ch,
+      90vw
+    ); /* Wider for infographics and medical diagrams */
     --content-width-article: min(75ch, 92vw); /* For blog posts */
     --content-width-narrow: min(60ch, 85vw); /* For quotes/sidebars */
     --content-width-wide: min(75ch, 95vw);
