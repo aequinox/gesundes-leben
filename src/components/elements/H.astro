@@ -1,4 +1,25 @@
 ---
+/**
+ * Heading Component (Base)
+ *
+ * Flexible, accessible heading component that supports all HTML heading levels (h1-h6).
+ * Provides consistent styling, variants, and accessibility features across all headings.
+ *
+ * Features:
+ * - Supports all heading levels (1-6)
+ * - Responsive typography with mobile/desktop breakpoints
+ * - Three style variants (default, accent, subtle)
+ * - Automatic accessibility validation in development
+ * - Consistent spacing and visual hierarchy
+ *
+ * Usage:
+ * ```astro
+ * <H level={2} variant="accent">Section Title</H>
+ * <H level={3} id="overview" ariaLabel="Content Overview">Overview</H>
+ * ```
+ *
+ * @component
+ */
 export interface Props {
   /** Heading level (1-6) */
   level: 1 | 2 | 3 | 4 | 5 | 6;

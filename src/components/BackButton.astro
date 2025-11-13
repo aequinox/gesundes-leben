@@ -1,4 +1,18 @@
 ---
+/**
+ * Back Button Component
+ *
+ * Displays a back navigation button that intelligently returns users
+ * to their previous page using sessionStorage state management.
+ *
+ * Features:
+ * - Restores previous URL from sessionStorage
+ * - Falls back to home page if no previous URL exists
+ * - Supports Astro view transitions
+ * - Conditionally rendered based on SITE.showBackButton config
+ *
+ * @component
+ */
 import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
 import { SITE } from "@/config";
 
@@ -21,7 +35,13 @@ import LinkButton from "./elements/LinkButton.astro";
 }
 
 <script>
-  /* Update Search Praam */
+  /**
+   * Updates the back button URL from sessionStorage
+   *
+   * Retrieves the previous page URL stored in sessionStorage
+   * and updates the back button's href attribute accordingly.
+   * Falls back to default href (home page) if no URL is stored.
+   */
   function updateGoBackUrl() {
     const backButton: HTMLAnchorElement | null =
       document.querySelector("#back-button");

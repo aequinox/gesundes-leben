@@ -1,4 +1,18 @@
 ---
+/**
+ * H4 Component
+ *
+ * Semantic h4 heading component for minor subsections.
+ * Wrapper around the base H component with level fixed to 4.
+ *
+ * Usage:
+ * ```astro
+ * <H4>Minor Subsection</H4>
+ * <H4 class="custom-class">Detail Section</H4>
+ * ```
+ *
+ * @component
+ */
 import H, { type Props as HProps } from "./H.astro";
 
 type Props = Omit<HProps, "level">;

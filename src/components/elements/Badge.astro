@@ -1,4 +1,31 @@
 ---
+/**
+ * Badge Component
+ *
+ * Flexible badge component for labels, status indicators, and categorical markers.
+ * Supports multiple variants, sizes, shapes, and optional icons.
+ *
+ * Features:
+ * - 7 color variants (default, primary, success, warning, error, info, neutral)
+ * - 4 size options (xs, sm, md, lg)
+ * - 3 shape styles (square, rounded, pill)
+ * - Optional outlined style
+ * - Icon support via astro-icon
+ * - Dot indicator for status badges
+ * - Interactive state for clickable badges
+ * - Dark mode support
+ *
+ * Usage:
+ * ```astro
+ * <Badge text="New" variant="primary" />
+ * <Badge text="Warning" variant="warning" outlined />
+ * <Badge text="Status" variant="success" dot />
+ * <Badge icon="tabler:check" variant="success" size="md" />
+ * <Badge variant="info" interactive>Click me</Badge>
+ * ```
+ *
+ * @component
+ */
 import { Icon } from "astro-icon/components";
 
 // prettier-ignore

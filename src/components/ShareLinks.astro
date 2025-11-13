@@ -1,4 +1,30 @@
 ---
+/**
+ * Share Links Component
+ *
+ * Displays social media sharing buttons for the current page/post.
+ * Automatically generates share URLs for configured social platforms.
+ *
+ * Features:
+ * - Pre-configured social media platforms from SHARE_LINKS config
+ * - Automatic URL generation for current page
+ * - Internationalized "Share" label
+ * - Accessible with screen reader text
+ * - Icon support via astro-icon
+ * - Responsive layout (column on mobile, horizontal on desktop)
+ * - Hover animations
+ *
+ * Configured Platforms (from @/socials):
+ * - Social networks with sharing functionality
+ * - Each platform auto-populates current page URL
+ *
+ * Usage:
+ * ```astro
+ * <ShareLinks />
+ * ```
+ *
+ * @component
+ */
 import { Icon } from "astro-icon/components";
 
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
