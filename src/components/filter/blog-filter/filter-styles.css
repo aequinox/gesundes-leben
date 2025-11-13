@@ -1,0 +1,24 @@
+/**
+ * Blog Filter Shared Styles
+ */
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .category-button,
+  .article-wrapper,
+  .group-selector,
+  .reset-button,
+  .show,
+  .hide {
+    @apply transform-none animate-none transition-none;
+  }
+
+  .category-button::before,
+  .category-button::after {
+    @apply hidden;
+  }
+
+  .category-button[data-active="true"] {
+    @apply animate-none;
+  }
+}

@@ -1,0 +1,111 @@
+---
+/**
+ * GroupSelector Component
+ * Displays group filter buttons (pro, contra, question-time)
+ */
+
+import { Icon } from "astro-icon/components";
+
+import { LOCALE } from "@/config";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import type { GroupConfig } from "@/utils/filterConfig";
+import type { GroupType } from "@/utils/ui/BlogFilterEngine";
+
+export interface Props {
+  groups: GroupType[];
+  groupConfig: Record<GroupType, GroupConfig>;
+  groupPostCounts: Record<string, number>;
+}
+
+const { groups, groupConfig, groupPostCounts } = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<div
+  id="group-selectors"
+  class="group-selector-container vt-stagger-children mx-auto mb-8 grid max-w-content grid-cols-1 gap-4 p-4 sm:grid-cols-3 sm:gap-6"
+  role="tablist"
+  aria-label="Content group filters"
+>
+  {
+    groups.map((group, index) => {
+      const { icon, title, slogan } = groupConfig[group];
+      const ariaLabel = t("group.select").replace("{type}", title);
+
+      return (
+        <button
+          class={`group-selector group relative mb-16 transition-all duration-500 ease-out hover:-translate-y-0.5 hover:scale-[1.02] md:mb-0`}
+          style={`--stagger-index: ${index}`}
+          id={`${group}-group`}
+          aria-label={ariaLabel}
+          type="button"
+          data-group={group}
+        >
+          <div
+            class={`border-opacity-30 h-full rounded-xl border border-solid p-8 text-center backdrop-blur-md backdrop-saturate-200 transition duration-500 ease-out ${
+              group === "pro"
+                ? "bg-gradient-to-br from-pro/20 via-pro/10 to-transparent shadow-[var(--shadow-pro)] hover:shadow-[var(--shadow-pro),0_10px_25px_-5px_oklch(var(--color-pro)/0.3)] dark:from-pro/30 dark:via-pro/15 dark:to-transparent/10"
+                : group === "contra"
+                  ? "bg-gradient-to-br from-contra/20 via-contra/10 to-transparent shadow-[var(--shadow-contra)] hover:shadow-[var(--shadow-contra),0_10px_25px_-5px_oklch(var(--color-contra)/0.3)] dark:from-contra/30 dark:via-contra/15 dark:to-transparent/10"
+                  : "bg-gradient-to-br from-question-time/20 via-question-time/10 to-transparent shadow-[var(--shadow-question-time)] hover:shadow-[var(--shadow-question-time),0_10px_25px_-5px_oklch(var(--color-question-time)/0.3)] dark:from-question-time/30 dark:via-question-time/15 dark:to-transparent/10"
+            }`}
+          >
+            <div class="group-type-icon -mt-20 mb-6 transform cursor-pointer leading-none transition-all duration-500 group-hover:-translate-y-2 group-hover:scale-110 md:block">
+              <div
+                class={`bg-fill/80 inline-flex items-center justify-center rounded-2xl border-2 border-solid p-4 backdrop-blur-md transition-all duration-300 ${
+                  group === "pro"
+                    ? "border-pro/40 bg-background group-hover:border-pro group-hover:shadow-[var(--shadow-glow-accent),0_0_15px_5px_oklch(var(--color-pro)/0.15)]"
+                    : group === "contra"
+                      ? "border-contra/40 bg-background group-hover:border-contra group-hover:shadow-[var(--shadow-glow-accent),0_0_15px_5px_oklch(var(--color-contra)/0.15)]"
+                      : "border-question-time/40 bg-background group-hover:border-question-time group-hover:shadow-[var(--shadow-glow-accent),0_0_15px_5px_oklch(var(--color-question-time)/0.15)]"
+                }`}
+                data-selected-class="${selected-group === group}}"
+              >
+                {icon && icon.trim() !== "" && (
+                  <Icon
+                    name={icon}
+                    class:list={[
+                      "h-12 w-12 transition-transform duration-500",
+                      group === "pro"
+                        ? "text-pro drop-shadow-md dark:text-pro dark:drop-shadow-pro/50"
+                        : group === "contra"
+                          ? "text-contra drop-shadow-md dark:text-contra dark:drop-shadow-contra/50"
+                          : "text-question-time drop-shadow-md dark:text-question-time dark:drop-shadow-question-time/50",
+                    ]}
+                    aria-hidden="true"
+                  />
+                )}
+              </div>
+            </div>
+            <div class="cursor-pointer">
+              <h2
+                class={`mt-2 mb-4 text-5xl leading-tight font-bold tracking-tight capitalize transition-colors duration-300 sm:text-2xl md:text-3xl lg:text-4xl ${
+                  group === "pro"
+                    ? "group-hover:text-pro"
+                    : group === "contra"
+                      ? "group-hover:text-contra"
+                      : "group-hover:text-question-time"
+                }`}
+              >
+                {title}
+              </h2>
+              <p
+                class="text-base leading-relaxed hyphens-auto opacity-95 transition-colors duration-300 group-hover:opacity-100 sm:text-sm md:text-base lg:text-lg"
+                lang={LOCALE.lang}
+              >
+                {slogan}
+              </p>
+            </div>
+          </div>
+          <div class="mt-4 hidden justify-center md:flex">
+            <span class="post-count-badge ease-cubic-bezier-[0.22,1,0.36,1] inline-flex items-center rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium backdrop-blur-sm transition-all duration-300">
+              {groupPostCounts[group]} {t("filter.posts")}
+            </span>
+          </div>
+        </button>
+      );
+    })
+  }
+</div>

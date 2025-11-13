@@ -1,0 +1,73 @@
+---
+/**
+ * CategoryFilter Component
+ * Category filter buttons with reset functionality
+ */
+
+import { Icon } from "astro-icon/components";
+
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+export interface Props {
+  categories: string[];
+  usedCategories: string[];
+  categoryPostCounts: Record<string, number>;
+}
+
+const { categories, usedCategories, categoryPostCounts } = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<div
+  class="category-filter-container bg-fill/5 relative mx-auto mb-10 max-w-3xl rounded-2xl border border-accent/10 p-4 shadow-[var(--shadow-surface)] backdrop-blur-lg"
+  id="category-buttons"
+  role="toolbar"
+  aria-label="Category filters"
+>
+  <div
+    class="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br from-accent/5 to-transparent opacity-30"
+  >
+  </div>
+
+  {/* Filter Label */}
+  <div class="mb-3 flex items-center justify-between">
+    <h3 class="text-sm font-medium tracking-wider uppercase">
+      {t("filter.categories")}
+    </h3>
+    <button
+      id="reset-filters"
+      class="reset-button bg-fill/40 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium opacity-80 transition-all duration-300 hover:scale-105 hover:bg-accent/20 hover:text-accent hover:opacity-100 hover:shadow-[var(--shadow-elevation-low)] focus:ring-2 focus:ring-accent/30 focus:outline-none active:shadow-[var(--shadow-inner)]"
+      aria-label={t("filter.reset")}
+    >
+      <Icon name="tabler:refresh" class="h-3.5 w-3.5" />
+      {t("filter.reset")}
+    </button>
+  </div>
+
+  {/* Category Buttons */}
+  <div class="flex flex-wrap justify-center gap-3">
+    {
+      categories.map(category => (
+        <button
+          disabled={!usedCategories.includes(category)}
+          class="category-button group bg-fill/40 hover:bg-fill/60 focus:ring-offset-fill disabled:hover:bg-fill/40 will-change-opacity will-change-shadow relative translate-z-0 transform overflow-hidden rounded-sm border border-accent/20 px-4 py-2 text-sm font-medium backdrop-blur-md transition-all duration-500 will-change-transform hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-[var(--shadow-elevation-medium)] focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:outline-none active:translate-y-0.5 active:shadow-[var(--shadow-inner)] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-accent/20 disabled:hover:shadow-none data-[active=true]:animate-[pulseGlow_2s_infinite] data-[active=true]:border-accent/60 data-[active=true]:bg-accent/10 data-[active=true]:shadow-[var(--shadow-glow-accent)]"
+          data-category={category}
+          aria-pressed={category === "Alle"}
+          aria-label={`Filter by ${category} category`}
+        >
+          <span class="relative z-10 flex items-center gap-2">
+            {category}
+            {categoryPostCounts[category] > 0 && (
+              <span class="count-badge ease-cubic-bezier-[0.22,1,0.36,1] ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-accent/20 px-1.5 text-xs font-medium transition-all duration-300 group-hover:bg-accent/30 group-data-[active=true]:bg-accent/40">
+                {categoryPostCounts[category]}
+              </span>
+            )}
+          </span>
+          <span class="absolute inset-0 -z-10 bg-gradient-to-r from-accent/0 via-accent/10 to-accent/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-data-[active=true]:opacity-100" />
+        </button>
+      ))
+    }
+  </div>
+</div>

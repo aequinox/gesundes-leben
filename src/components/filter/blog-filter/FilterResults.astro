@@ -1,0 +1,58 @@
+---
+/**
+ * FilterResults Component
+ * Displays filtered blog posts with load more functionality
+ */
+
+import { Icon } from "astro-icon/components";
+
+import Card from "@/components/sections/Card.astro";
+import type { Post } from "@/utils/types";
+
+export interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+<div
+  class="article-grid-container relative min-h-[200px] p-4"
+  id="article-grid"
+  role="feed"
+  aria-live="polite"
+>
+  <div
+    class="card-list grid-layout grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 [&:has(.article-card:hover)_.article-card:not(:hover)]:brightness-[0.8] [&:has(.article-card:hover)_.article-card:not(:hover)]:grayscale-[90%]"
+    data-posts-per-page="12"
+  >
+    {
+      posts.map((post, index) => (
+        <Card post={post} loading={index < 6 ? "eager" : "lazy"} />
+      ))
+    }
+  </div>
+
+  {/* Load More Button */}
+  {
+    posts.length > 12 && (
+      <div id="load-more-container" class="mt-8 flex justify-center">
+        <button
+          id="load-more-btn"
+          type="button"
+          class="relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-accent/10 px-8 py-3 font-medium text-accent transition-all duration-300 after:absolute after:inset-0 after:animate-[shimmer_3s_infinite] after:bg-gradient-to-r after:from-accent/10 after:via-accent/20 after:to-accent/50 after:bg-[length:200%_100%] after:opacity-0 after:transition-opacity after:duration-300 after:content-[''] hover:bg-accent/20 hover:shadow-[var(--shadow-glow-accent)] hover:after:opacity-100 active:shadow-[var(--shadow-inner)]"
+          aria-label="Load more posts"
+        >
+          <Icon name="tabler:chevron-down" class="h-5 w-5" />
+          <span>Mehr laden</span>
+          <span
+            id="remaining-count"
+            class="ml-1 rounded-full bg-accent/20 px-2 py-0.5 text-xs font-bold"
+          >
+            {posts.length - 12}
+          </span>
+        </button>
+      </div>
+    )
+  }
+</div>
