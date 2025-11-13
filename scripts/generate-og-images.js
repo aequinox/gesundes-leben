@@ -136,8 +136,11 @@ async function processOgImages() {
 
   for (const postFile of postFiles) {
     // Extract slug from file path
+    // Blog posts are in format: src/data/blog/YYYY-MM-DD-slug/index.mdx
+    // We need to extract the directory name (slug)
     const relativePath = postFile.replace('src/data/blog/', '').replace(/\.(md|mdx)$/, '');
-    const slug = relativePath.split('/').pop();
+    const pathParts = relativePath.split('/');
+    const slug = pathParts.length > 1 ? pathParts[0] : relativePath;
 
     // Read post frontmatter (simplified - in real scenario use proper parser)
     const content = await fs.readFile(postFile, 'utf-8');
