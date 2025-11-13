@@ -1,6 +1,8 @@
 import fs from 'fs/promises';
-import { glob } from 'glob';
+import globPkg from 'glob';
 import path from 'path';
+
+const { glob } = globPkg;
 
 async function measurePerformance() {
   console.log('📊 Measuring build performance...\n');
