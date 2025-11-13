@@ -137,10 +137,14 @@ async function processOgImages() {
   for (const postFile of postFiles) {
     // Extract slug from file path
     // Blog posts are in format: src/data/blog/YYYY-MM-DD-slug/index.mdx
-    // We need to extract the directory name (slug)
+    // We need to extract the directory name and strip the date prefix
+    // to match Astro's getPostSlug() behavior
     const relativePath = postFile.replace('src/data/blog/', '').replace(/\.(md|mdx)$/, '');
     const pathParts = relativePath.split('/');
-    const slug = pathParts.length > 1 ? pathParts[0] : relativePath;
+    const dirName = pathParts.length > 1 ? pathParts[0] : relativePath;
+
+    // Strip date prefix (YYYY-MM-DD-) to match getPostSlug()
+    const slug = dirName.replace(/^\d{4}-\d{2}-\d{2}-/, '');
 
     // Read post frontmatter (simplified - in real scenario use proper parser)
     const content = await fs.readFile(postFile, 'utf-8');
