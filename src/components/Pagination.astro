@@ -1,4 +1,32 @@
 ---
+/**
+ * Pagination Component (Basic)
+ *
+ * Simple pagination navigation for blog post lists.
+ * Displays previous/next buttons with current page indicator.
+ *
+ * Features:
+ * - Previous/Next navigation buttons
+ * - Current page / total pages indicator
+ * - Disabled state for unavailable directions
+ * - SEO-friendly prev/next link tags
+ * - Prefetch on hover for better UX
+ * - Accessible navigation with ARIA labels
+ * - Auto-hidden when only one page exists
+ *
+ * Usage:
+ * ```astro
+ * ---
+ * const page = await getCollection('blog', postFilter).paginate(posts, { pageSize: 10 });
+ * ---
+ * <Pagination page={page} />
+ * ```
+ *
+ * Note: For more advanced pagination with glassmorphism styling,
+ * see src/components/sections/Pagination.astro
+ *
+ * @component
+ */
 import type { Page } from "astro";
 
 import IconArrowLeft from "@/assets/icons/IconArrowLeft.svg";
@@ -8,6 +36,7 @@ import type { Post } from "@/utils/types";
 import LinkButton from "./elements/LinkButton.astro";
 
 export interface Props {
+  /** Astro pagination page object containing posts and pagination metadata */
   page: Page<Post>;
 }
 

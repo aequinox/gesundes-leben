@@ -1,4 +1,18 @@
 ---
+/**
+ * H5 Component
+ *
+ * Semantic h5 heading component for detailed subsections.
+ * Wrapper around the base H component with level fixed to 5.
+ *
+ * Usage:
+ * ```astro
+ * <H5>Detail Heading</H5>
+ * <H5 variant="subtle">Supporting Content</H5>
+ * ```
+ *
+ * @component
+ */
 import H, { type Props as HProps } from "./H.astro";
 
 type Props = Omit<HProps, "level">;

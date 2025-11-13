@@ -1,4 +1,18 @@
 ---
+/**
+ * H3 Component
+ *
+ * Semantic h3 heading component for subsection titles.
+ * Wrapper around the base H component with level fixed to 3.
+ *
+ * Usage:
+ * ```astro
+ * <H3>Subsection Title</H3>
+ * <H3 variant="subtle">Minor Section</H3>
+ * ```
+ *
+ * @component
+ */
 import H, { type Props as HProps } from "./H.astro";
 
 type Props = Omit<HProps, "level">;

@@ -1,4 +1,18 @@
 ---
+/**
+ * H2 Component
+ *
+ * Semantic h2 heading component for section titles and major subsections.
+ * Wrapper around the base H component with level fixed to 2.
+ *
+ * Usage:
+ * ```astro
+ * <H2>Section Title</H2>
+ * <H2 id="overview">Overview</H2>
+ * ```
+ *
+ * @component
+ */
 import H, { type Props as HProps } from "./H.astro";
 
 type Props = Omit<HProps, "level">;

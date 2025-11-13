@@ -1,4 +1,18 @@
 ---
+/**
+ * H1 Component
+ *
+ * Semantic h1 heading component for page titles and main headings.
+ * Wrapper around the base H component with level fixed to 1.
+ *
+ * Usage:
+ * ```astro
+ * <H1>Page Title</H1>
+ * <H1 variant="accent">Featured Article</H1>
+ * ```
+ *
+ * @component
+ */
 import H, { type Props as HProps } from "./H.astro";
 
 type Props = Omit<HProps, "level">;

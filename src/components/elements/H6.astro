@@ -1,4 +1,18 @@
 ---
+/**
+ * H6 Component
+ *
+ * Semantic h6 heading component for the lowest level headings.
+ * Wrapper around the base H component with level fixed to 6.
+ *
+ * Usage:
+ * ```astro
+ * <H6>Fine Detail Heading</H6>
+ * <H6 class="custom-style">Metadata Section</H6>
+ * ```
+ *
+ * @component
+ */
 import H, { type Props as HProps } from "./H.astro";
 
 type Props = Omit<HProps, "level">;
