@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs/promises';
 
 const MAX_WIDTH = 2400; // Max width for any image
-const QUALITY = 85; // JPEG/WebP quality
+const QUALITY = 70; // JPEG/WebP quality (lower = smaller files)
 
 async function findImages(dir) {
   const files = [];
