@@ -36,7 +36,8 @@ copyright = "© 2025 Gesundes Leben. All rights reserved."
 # Output formats
 [outputs]
   home = ["HTML", "RSS", "JSON"]
-  section = ["HTML", "RSS"]
+  section = ["HTML", "RSS", "JSON"]
+  page = ["HTML"]
 
 # Sitemap configuration
 [sitemap]

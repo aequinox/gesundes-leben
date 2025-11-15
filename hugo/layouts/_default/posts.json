@@ -1,0 +1,29 @@
+{{- /*
+  JSON Output for Blog Posts
+  Generates a JSON feed of all blog posts for client-side filtering
+
+  URL: /posts.json or /index.json (depending on output config)
+*/ -}}
+{{- $posts := where .Site.RegularPages "Section" "blog" -}}
+{{- $data := slice -}}
+
+{{- range $posts -}}
+  {{- $item := dict
+    "title" .Title
+    "permalink" .RelPermalink
+    "date" (.Date.Format "2006-01-02")
+    "lastmod" (.Lastmod.Format "2006-01-02")
+    "description" .Description
+    "author" .Params.author
+    "categories" .Params.categories
+    "tags" .Params.tags
+    "group" (.Params.params.group | default "basic")
+    "featured" (.Params.featured | default false)
+    "draft" .Draft
+    "heroImage" (.Params.params.heroImage | default "")
+    "heroImageAlt" (.Params.params.heroImageAlt | default "")
+  -}}
+  {{- $data = $data | append $item -}}
+{{- end -}}
+
+{{- $data | jsonify -}}

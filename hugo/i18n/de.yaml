@@ -267,3 +267,46 @@
 
 - id: date_format_month_year
   translation: "January 2006"
+
+# Blog Filter
+- id: filter_by_group
+  translation: "Nach Gruppe filtern"
+
+- id: filter_by_category
+  translation: "Nach Kategorie filtern"
+
+- id: filter.all
+  translation: "Alle"
+
+- id: filter.all_posts
+  translation: "Alle Beiträge anzeigen"
+
+- id: group.pro.title
+  translation: "Pro"
+
+- id: group.pro.slogan
+  translation: "Positive Gesundheitsthemen"
+
+- id: group.questionTime.title
+  translation: "Fragezeiten"
+
+- id: group.questionTime.slogan
+  translation: "Häufige Fragen beantwortet"
+
+- id: group.contra.title
+  translation: "Kontra"
+
+- id: group.contra.slogan
+  translation: "Kritische Betrachtungen"
+
+- id: active_filters
+  translation: "Aktive Filter"
+
+- id: reset_filters
+  translation: "Alle Filter zurücksetzen"
+
+- id: no_results_message
+  translation: "Versuche es mit anderen Filtern"
+
+- id: loading
+  translation: "Laden..."
