@@ -1,0 +1,232 @@
+{{ define "main" }}
+<div class="error-404">
+  <div class="error-container">
+    <div class="error-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+      </svg>
+    </div>
+
+    <h1 class="error-title">404</h1>
+    <h2 class="error-subtitle">{{ i18n "not_found" | default "Seite nicht gefunden" }}</h2>
+    <p class="error-message">
+      {{ i18n "not_found_message" | default "Die angeforderte Seite konnte nicht gefunden werden." }}
+    </p>
+
+    <div class="error-actions">
+      <a href="{{ "/" | relLangURL }}" class="btn-home">
+        {{ i18n "go_home" | default "Zur Startseite" }}
+      </a>
+
+      <a href="{{ "/blog/" | relLangURL }}" class="btn-blog">
+        {{ i18n "nav_blog" | default "Zum Blog" }}
+      </a>
+
+      <a href="{{ "/search/" | relLangURL }}" class="btn-search">
+        {{ i18n "search" | default "Suche" }}
+      </a>
+    </div>
+
+    <div class="error-suggestions">
+      <h3>{{ i18n "recent_posts" | default "Neueste Beiträge" }}</h3>
+      <ul class="recent-posts-list">
+        {{ range first 5 (where .Site.RegularPages "Section" "blog") }}
+          <li>
+            <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+          </li>
+        {{ end }}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<style>
+  .error-404 {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .error-container {
+    max-width: 600px;
+    text-align: center;
+  }
+
+  .error-icon {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 2rem;
+    color: #ef4444;
+  }
+
+  .error-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .error-title {
+    font-size: 6rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1;
+  }
+
+  .error-subtitle {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #475569;
+    margin: 1rem 0;
+  }
+
+  .error-message {
+    font-size: 1.125rem;
+    color: #64748b;
+    margin: 1.5rem 0 2.5rem;
+    line-height: 1.7;
+  }
+
+  .error-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+  }
+
+  .error-actions a {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .btn-home {
+    background: #16a34a;
+    color: white;
+  }
+
+  .btn-home:hover {
+    background: #15803d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-blog {
+    background: #3b82f6;
+    color: white;
+  }
+
+  .btn-blog:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-search {
+    background: #f1f5f9;
+    color: #1e293b;
+  }
+
+  .btn-search:hover {
+    background: #e2e8f0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .error-suggestions {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .error-suggestions h3 {
+    font-size: 1.25rem;
+    color: #1e293b;
+    margin-bottom: 1rem;
+  }
+
+  .recent-posts-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .recent-posts-list li {
+    margin: 0.75rem 0;
+  }
+
+  .recent-posts-list a {
+    color: #3b82f6;
+    text-decoration: none;
+    font-size: 1rem;
+  }
+
+  .recent-posts-list a:hover {
+    text-decoration: underline;
+  }
+
+  /* Dark mode */
+  @media (prefers-color-scheme: dark) {
+    .error-title {
+      color: #f1f5f9;
+    }
+
+    .error-subtitle {
+      color: #cbd5e1;
+    }
+
+    .error-message {
+      color: #94a3b8;
+    }
+
+    .btn-search {
+      background: #1e293b;
+      color: #f1f5f9;
+    }
+
+    .btn-search:hover {
+      background: #334155;
+    }
+
+    .error-suggestions {
+      border-top-color: #334155;
+    }
+
+    .error-suggestions h3 {
+      color: #f1f5f9;
+    }
+
+    .recent-posts-list a {
+      color: #60a5fa;
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .error-title {
+      font-size: 4rem;
+    }
+
+    .error-subtitle {
+      font-size: 1.5rem;
+    }
+
+    .error-icon {
+      width: 80px;
+      height: 80px;
+    }
+
+    .error-actions {
+      flex-direction: column;
+    }
+
+    .error-actions a {
+      width: 100%;
+    }
+  }
+</style>
+{{ end }}

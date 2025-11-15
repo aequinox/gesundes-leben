@@ -1,0 +1,389 @@
+{{ define "main" }}
+  <article class="blog-post">
+    <header class="article-header">
+      <h1 class="article-title">{{ .Title }}</h1>
+
+      <div class="article-meta">
+        {{ if .Params.author }}
+          <span class="author">
+            {{ i18n "by_author" (dict "Author" .Params.author) | default (printf "von %s" .Params.author) }}
+          </span>
+        {{ end }}
+
+        {{ if .Date }}
+          <time datetime="{{ .Date.Format "2006-01-02" }}">
+            {{ .Date.Format "2. January 2006" }}
+          </time>
+        {{ end }}
+
+        {{ if .ReadingTime }}
+          <span class="reading-time">
+            {{ i18n "reading_time" (dict "Count" .ReadingTime) | default (printf "%d Min. Lesezeit" .ReadingTime) }}
+          </span>
+        {{ end }}
+      </div>
+
+      {{ if .Params.params.heroImage }}
+        <figure class="hero-image">
+          {{ $heroImage := .Resources.GetMatch .Params.params.heroImage }}
+          {{ if $heroImage }}
+            {{ $resized := $heroImage.Resize "1200x" }}
+            <img src="{{ $resized.RelPermalink }}"
+                 alt="{{ .Params.params.heroImageAlt | default .Title }}"
+                 loading="eager">
+          {{ else }}
+            <img src="{{ .Params.params.heroImage | relURL }}"
+                 alt="{{ .Params.params.heroImageAlt | default .Title }}"
+                 loading="eager">
+          {{ end }}
+        </figure>
+      {{ end }}
+    </header>
+
+    {{ if .Params.description }}
+      <p class="article-description">{{ .Params.description }}</p>
+    {{ end }}
+
+    {{ if .Params.showTableOfContents | default true }}
+      {{ if .TableOfContents }}
+        <nav class="table-of-contents">
+          <h2>{{ i18n "table_of_contents" | default "Inhaltsverzeichnis" }}</h2>
+          {{ .TableOfContents }}
+        </nav>
+      {{ end }}
+    {{ end }}
+
+    <div class="article-content">
+      {{ .Content }}
+    </div>
+
+    {{ if .Params.tags }}
+      <div class="article-tags">
+        <strong>{{ i18n "tags" | default "Schlagwörter" }}:</strong>
+        {{ range .Params.tags }}
+          <a href="{{ "/tags/" | relLangURL }}{{ . | urlize }}" class="tag">{{ . }}</a>
+        {{ end }}
+      </div>
+    {{ end }}
+
+    {{ if .Params.categories }}
+      <div class="article-categories">
+        <strong>{{ i18n "categories" | default "Kategorien" }}:</strong>
+        {{ range .Params.categories }}
+          <a href="{{ "/categories/" | relLangURL }}{{ . | urlize }}" class="category">{{ . }}</a>
+        {{ end }}
+      </div>
+    {{ end }}
+
+    {{/* Include references partial if references exist */}}
+    {{ partial "references.html" . }}
+
+    {{ if .Params.showDateUpdated | default true }}
+      {{ if .Lastmod }}
+        <footer class="article-footer">
+          <p class="last-updated">
+            {{ i18n "last_updated" | default "Zuletzt aktualisiert" }}:
+            <time datetime="{{ .Lastmod.Format "2006-01-02" }}">
+              {{ .Lastmod.Format "2. January 2006" }}
+            </time>
+          </p>
+        </footer>
+      {{ end }}
+    {{ end }}
+  </article>
+
+  {{/* Related Posts */}}
+  {{ $related := .Site.RegularPages.Related . | first 3 }}
+  {{ with $related }}
+    <aside class="related-posts">
+      <h2>{{ i18n "related_posts" | default "Verwandte Beiträge" }}</h2>
+      <div class="related-posts-grid">
+        {{ range . }}
+          <article class="related-post-card">
+            <a href="{{ .RelPermalink }}">
+              <h3>{{ .Title }}</h3>
+              {{ if .Params.description }}
+                <p>{{ .Params.description }}</p>
+              {{ end }}
+            </a>
+          </article>
+        {{ end }}
+      </div>
+    </aside>
+  {{ end }}
+
+<style>
+  .blog-post {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .article-header {
+    margin-bottom: 3rem;
+  }
+
+  .article-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    color: #1e293b;
+  }
+
+  .article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 2rem;
+  }
+
+  .article-meta > * {
+    display: flex;
+    align-items: center;
+  }
+
+  .hero-image {
+    margin: 2rem 0;
+  }
+
+  .hero-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 0.75rem;
+  }
+
+  .article-description {
+    font-size: 1.25rem;
+    color: #475569;
+    margin-bottom: 2rem;
+    line-height: 1.7;
+  }
+
+  .table-of-contents {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin: 2rem 0;
+    border-left: 4px solid #3b82f6;
+  }
+
+  .table-of-contents h2 {
+    margin-top: 0;
+    font-size: 1.25rem;
+    color: #1e293b;
+  }
+
+  .table-of-contents ul {
+    list-style: none;
+    padding-left: 1rem;
+  }
+
+  .table-of-contents li {
+    margin: 0.5rem 0;
+  }
+
+  .table-of-contents a {
+    color: #3b82f6;
+    text-decoration: none;
+  }
+
+  .table-of-contents a:hover {
+    text-decoration: underline;
+  }
+
+  .article-content {
+    line-height: 1.8;
+    font-size: 1.1rem;
+    color: #334155;
+  }
+
+  .article-content h2 {
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    font-size: 1.875rem;
+    color: #1e293b;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0.5rem;
+  }
+
+  .article-content h3 {
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.5rem;
+    color: #1e293b;
+  }
+
+  .article-content p {
+    margin: 1.5rem 0;
+  }
+
+  .article-content a {
+    color: #3b82f6;
+    text-decoration: none;
+    border-bottom: 1px solid #93c5fd;
+  }
+
+  .article-content a:hover {
+    border-bottom-color: #3b82f6;
+  }
+
+  .article-tags,
+  .article-categories {
+    margin: 2rem 0;
+  }
+
+  .tag,
+  .category {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    margin: 0.25rem;
+    background: #eff6ff;
+    color: #1e40af;
+    border-radius: 0.25rem;
+    text-decoration: none;
+    font-size: 0.875rem;
+  }
+
+  .tag:hover,
+  .category:hover {
+    background: #dbeafe;
+  }
+
+  .article-footer {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .last-updated {
+    color: #64748b;
+    font-size: 0.9rem;
+  }
+
+  .related-posts {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e2e8f0;
+  }
+
+  .related-posts h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #1e293b;
+  }
+
+  .related-posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .related-post-card {
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-radius: 0.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .related-post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .related-post-card a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .related-post-card h3 {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+    color: #1e293b;
+  }
+
+  .related-post-card p {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin: 0;
+  }
+
+  /* Dark mode */
+  @media (prefers-color-scheme: dark) {
+    .article-title {
+      color: #f1f5f9;
+    }
+
+    .article-description {
+      color: #cbd5e1;
+    }
+
+    .article-content {
+      color: #cbd5e1;
+    }
+
+    .article-content h2,
+    .article-content h3 {
+      color: #f1f5f9;
+      border-bottom-color: #334155;
+    }
+
+    .table-of-contents {
+      background: #1e293b;
+      border-left-color: #60a5fa;
+    }
+
+    .table-of-contents h2 {
+      color: #f1f5f9;
+    }
+
+    .tag,
+    .category {
+      background: #1e3a8a;
+      color: #93c5fd;
+    }
+
+    .tag:hover,
+    .category:hover {
+      background: #1e40af;
+    }
+
+    .article-footer {
+      border-top-color: #334155;
+    }
+
+    .related-posts {
+      border-top-color: #334155;
+    }
+
+    .related-posts h2 {
+      color: #f1f5f9;
+    }
+
+    .related-post-card {
+      background: #1e293b;
+    }
+
+    .related-post-card h3 {
+      color: #f1f5f9;
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .article-title {
+      font-size: 2rem;
+    }
+
+    .article-content {
+      font-size: 1rem;
+    }
+
+    .related-posts-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{{ end }}

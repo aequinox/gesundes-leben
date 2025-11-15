@@ -48,19 +48,33 @@
       {{- $resized = $image.Resize "1200x" -}}
     {{- end -}}
 
-    {{/* Generate WebP version for modern browsers */}}
-    {{- $webp := $resized.Resize (printf "%dx%d webp q85" $resized.Width $resized.Height) -}}
+    {{/* Generate WebP version for modern browsers (with error handling) */}}
+    {{- $webp := "" -}}
+    {{- $imgFormat := $image.MediaType.SubType -}}
+    {{/* Only convert to WebP if source is a raster format (not GIF or SVG) */}}
+    {{- if and (ne $imgFormat "gif") (ne $imgFormat "svg+xml") -}}
+      {{- $webp = $resized.Resize (printf "%dx%d webp q85" $resized.Width $resized.Height) -}}
+    {{- end -}}
 
-    <picture>
-      <source srcset="{{ $webp.RelPermalink }}" type="image/webp">
+    {{- if $webp -}}
+      <picture>
+        <source srcset="{{ $webp.RelPermalink }}" type="image/webp">
+        <img src="{{ $resized.RelPermalink }}"
+             alt="{{ $alt }}"
+             loading="{{ $loading }}"
+             width="{{ $resized.Width }}"
+             height="{{ $resized.Height }}"
+             decoding="async">
+      </picture>
+    {{- else -}}
+      {{/* No WebP conversion, just use original/resized */}}
       <img src="{{ $resized.RelPermalink }}"
            alt="{{ $alt }}"
            loading="{{ $loading }}"
-           {{ with $width }}width="{{ . }}"{{ end }}
-           {{ with $resized.Width }}width="{{ . }}"{{ end }}
-           {{ with $resized.Height }}height="{{ . }}"{{ end }}
+           width="{{ $resized.Width }}"
+           height="{{ $resized.Height }}"
            decoding="async">
-    </picture>
+    {{- end -}}
   {{- else -}}
     {{/* Fallback for static images */}}
     <img src="{{ $resourcePath | relURL }}"

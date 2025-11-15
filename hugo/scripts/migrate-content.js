@@ -194,7 +194,7 @@ function generateHugoMarkdown(frontmatter, content) {
   const yamlFrontmatter = yaml.dump(frontmatter, {
     lineWidth: -1,  // Don't wrap lines
     quotingType: '"',  // Use double quotes
-    forceQuotes: true  // Always quote strings
+    noRefs: true  // Don't use YAML references
   });
 
   return `---\n${yamlFrontmatter}---\n\n${content}`;
