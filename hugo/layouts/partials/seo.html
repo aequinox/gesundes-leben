@@ -1,0 +1,121 @@
+{{/*
+  SEO Partial
+  Open Graph and Twitter Cards meta tags for social sharing
+*/}}
+
+{{/* Calculate optimal description */}}
+{{- $description := .Description | default .Summary | default .Site.Params.description -}}
+{{- if gt (len $description) 200 -}}
+  {{- $description = slicestr $description 0 197 | printf "%s..." -}}
+{{- end -}}
+
+{{/* Determine page type */}}
+{{- $pageType := "website" -}}
+{{- if eq .Section "blog" -}}
+  {{- $pageType = "article" -}}
+{{- end -}}
+
+{{/* Get hero image or fallback */}}
+{{- $image := "" -}}
+{{- $imageAlt := .Title -}}
+
+{{/* Check for hero image in params */}}
+{{- if .Params.heroImage -}}
+  {{- $heroPath := .Params.heroImage -}}
+
+  {{/* Try to get image resource */}}
+  {{- $imgResource := "" -}}
+  {{- if .Resources -}}
+    {{- $imgResource = .Resources.GetMatch $heroPath -}}
+  {{- end -}}
+
+  {{- if $imgResource -}}
+    {{/* Resize for social sharing (1200x630 recommended) */}}
+    {{- $socialImg := $imgResource.Resize "1200x630 q85" -}}
+    {{- $image = $socialImg.Permalink -}}
+  {{- else -}}
+    {{/* Use as-is if not a resource (absolute URL) */}}
+    {{- $image = $heroPath | absURL -}}
+  {{- end -}}
+{{- else if .Params.image -}}
+  {{/* Fallback to generic image param */}}
+  {{- $image = .Params.image | absURL -}}
+{{- else -}}
+  {{/* Site default social image */}}
+  {{- if .Site.Params.socialImage -}}
+    {{- $image = .Site.Params.socialImage | absURL -}}
+  {{- end -}}
+{{- end -}}
+
+{{/* Open Graph / Facebook */}}
+<meta property="og:title" content="{{ .Title }}">
+<meta property="og:description" content="{{ $description }}">
+<meta property="og:type" content="{{ $pageType }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:site_name" content="{{ .Site.Title }}">
+<meta property="og:locale" content="{{ .Site.Language.Lang }}_{{ upper .Site.Language.Lang }}">
+
+{{- if $image -}}
+<meta property="og:image" content="{{ $image }}">
+<meta property="og:image:alt" content="{{ $imageAlt }}">
+{{- end -}}
+
+{{/* Article-specific Open Graph tags */}}
+{{- if eq .Section "blog" -}}
+<meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
+{{- if .Lastmod -}}
+<meta property="article:modified_time" content="{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">
+{{- end -}}
+
+{{/* Article author */}}
+{{- if .Params.author -}}
+  {{- $authorPage := .Site.GetPage (printf "/authors/%s" (.Params.author | urlize)) -}}
+  {{- if $authorPage -}}
+<meta property="article:author" content="{{ $authorPage.Permalink }}">
+  {{- end -}}
+{{- end -}}
+
+{{/* Article categories */}}
+{{- range .Params.categories -}}
+<meta property="article:section" content="{{ . }}">
+{{- end -}}
+
+{{/* Article tags */}}
+{{- range .Params.tags -}}
+<meta property="article:tag" content="{{ . }}">
+{{- end -}}
+{{- end -}}
+
+{{/* Alternate language versions */}}
+{{- range .Translations -}}
+<meta property="og:locale:alternate" content="{{ .Language.Lang }}_{{ upper .Language.Lang }}">
+{{- end -}}
+
+{{/* Twitter Cards */}}
+{{- $twitterCard := "summary" -}}
+{{- if $image -}}
+  {{- $twitterCard = "summary_large_image" -}}
+{{- end -}}
+
+<meta name="twitter:card" content="{{ $twitterCard }}">
+<meta name="twitter:title" content="{{ .Title }}">
+<meta name="twitter:description" content="{{ $description }}">
+
+{{- if $image -}}
+<meta name="twitter:image" content="{{ $image }}">
+<meta name="twitter:image:alt" content="{{ $imageAlt }}">
+{{- end -}}
+
+{{/* Twitter handle if configured */}}
+{{- with .Site.Params.social.twitter -}}
+<meta name="twitter:site" content="@{{ . }}">
+<meta name="twitter:creator" content="@{{ . }}">
+{{- end -}}
+
+{{/* Additional meta for specific content */}}
+{{- if .Params.author -}}
+  {{- $authorPage := .Site.GetPage (printf "/authors/%s" (.Params.author | urlize)) -}}
+  {{- if and $authorPage $authorPage.Params.social.twitter -}}
+<meta name="twitter:creator" content="@{{ $authorPage.Params.social.twitter }}">
+  {{- end -}}
+{{- end -}}

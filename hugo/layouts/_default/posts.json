@@ -5,6 +5,9 @@
   URL: /posts.json or /index.json (depending on output config)
 */ -}}
 {{- $posts := where .Site.RegularPages "Section" "blog" -}}
+{{- if hugo.IsProduction -}}
+  {{- $posts = where $posts "Draft" false -}}
+{{- end -}}
 {{- $data := slice -}}
 
 {{- range $posts -}}

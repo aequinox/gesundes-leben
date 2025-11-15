@@ -1,0 +1,486 @@
+{{ define "main" }}
+<div class="author-page">
+  <header class="author-header">
+    <div class="author-profile">
+      {{ if .Params.avatar }}
+        <div class="author-avatar">
+          <img
+            src="{{ .Params.avatar | absURL }}"
+            alt="{{ .Title }}"
+            width="120"
+            height="120"
+            loading="eager"
+          >
+        </div>
+      {{ end }}
+
+      <div class="author-info">
+        <h1 class="author-name">{{ .Title }}</h1>
+
+        {{ if .Params.jobTitle }}
+          <p class="author-job-title">{{ .Params.jobTitle }}</p>
+        {{ end }}
+
+        {{ if .Description }}
+          <p class="author-bio">{{ .Description }}</p>
+        {{ else if .Summary }}
+          <div class="author-bio">{{ .Summary }}</div>
+        {{ end }}
+
+        {{ if .Params.social }}
+          <div class="author-social">
+            {{ with .Params.social.email }}
+              <a href="mailto:{{ . }}" class="social-link" title="Email" aria-label="Email">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3 4L10 11L17 4M3 4H17M3 4V16H17V4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            {{ end }}
+
+            {{ with .Params.social.website }}
+              <a href="{{ . }}" class="social-link" title="Website" aria-label="Website" target="_blank" rel="noopener noreferrer">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18Z" stroke="currentColor" stroke-width="2"/>
+                  <path d="M2 10H18M10 2C12 4 13 7 13 10C13 13 12 16 10 18M10 2C8 4 7 7 7 10C7 13 8 16 10 18" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </a>
+            {{ end }}
+
+            {{ with .Params.social.twitter }}
+              <a href="https://twitter.com/{{ . }}" class="social-link" title="Twitter" aria-label="Twitter" target="_blank" rel="noopener noreferrer">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84"/>
+                </svg>
+              </a>
+            {{ end }}
+
+            {{ with .Params.social.linkedin }}
+              <a href="{{ . }}" class="social-link" title="LinkedIn" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18.5 0h-17A1.5 1.5 0 000 1.5v17A1.5 1.5 0 001.5 20h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0018.5 0zM6 17H3V8h3v9zM4.5 6.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3zM17 17h-3v-4.5c0-1.12-.02-2.56-1.56-2.56-1.56 0-1.8 1.22-1.8 2.48V17H8V8h2.88v1.24h.04c.4-.76 1.38-1.56 2.84-1.56 3.04 0 3.6 2 3.6 4.6V17z"/>
+                </svg>
+              </a>
+            {{ end }}
+
+            {{ with .Params.social.github }}
+              <a href="https://github.com/{{ . }}" class="social-link" title="GitHub" aria-label="GitHub" target="_blank" rel="noopener noreferrer">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 0C4.477 0 0 4.477 0 10c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0110 4.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C17.137 18.165 20 14.418 20 10c0-5.523-4.477-10-10-10z"/>
+                </svg>
+              </a>
+            {{ end }}
+          </div>
+        {{ end }}
+      </div>
+    </div>
+  </header>
+
+  {{ if .Content }}
+    <div class="author-content">
+      {{ .Content }}
+    </div>
+  {{ end }}
+
+  {{ $authorSlug := path.Base .File.Path }}
+  {{ $authorPosts := where .Site.RegularPages "Params.author" $authorSlug }}
+  {{ if hugo.IsProduction }}
+    {{ $authorPosts = where $authorPosts "Draft" false }}
+  {{ end }}
+
+  {{ if gt (len $authorPosts) 0 }}
+    <section class="author-posts">
+      <h2 class="section-title">
+        {{ i18n "posts_by_author" }} {{ .Title }}
+        <span class="post-count-badge">{{ len $authorPosts }}</span>
+      </h2>
+
+      <div class="posts-grid">
+        {{ range $authorPosts.ByPublishDate.Reverse }}
+          <article class="post-card">
+            <a href="{{ .RelPermalink }}" class="post-card-link">
+              {{ if .Params.heroImage }}
+                <div class="post-card-image">
+                  {{ $heroPath := .Params.heroImage }}
+                  {{ $imgResource := "" }}
+                  {{ if .Resources }}
+                    {{ $imgResource = .Resources.GetMatch $heroPath }}
+                  {{ end }}
+
+                  {{ if $imgResource }}
+                    {{ $resized := $imgResource.Resize "400x225 q85" }}
+                    <img
+                      src="{{ $resized.RelPermalink }}"
+                      alt="{{ .Params.heroImageAlt | default .Title }}"
+                      width="{{ $resized.Width }}"
+                      height="{{ $resized.Height }}"
+                      loading="lazy"
+                    >
+                  {{ else }}
+                    <img
+                      src="{{ $heroPath }}"
+                      alt="{{ .Params.heroImageAlt | default .Title }}"
+                      loading="lazy"
+                    >
+                  {{ end }}
+                </div>
+              {{ end }}
+
+              <div class="post-card-content">
+                <div class="post-card-meta">
+                  <time datetime="{{ .Date.Format "2006-01-02" }}">
+                    {{ .Date.Format (.Site.Params.dateFormat | default "2. January 2006") }}
+                  </time>
+
+                  {{ if .Params.params.group }}
+                    <span class="post-group group-{{ .Params.params.group }}">
+                      {{ if eq .Params.params.group "pro" }}
+                        {{ i18n "group.pro.title" }}
+                      {{ else if eq .Params.params.group "question-time" }}
+                        {{ i18n "group.question-time.title" }}
+                      {{ else if eq .Params.params.group "kontra" }}
+                        {{ i18n "group.kontra.title" }}
+                      {{ else }}
+                        {{ .Params.params.group | humanize }}
+                      {{ end }}
+                    </span>
+                  {{ end }}
+                </div>
+
+                <h3 class="post-card-title">{{ .Title }}</h3>
+
+                {{ with .Description }}
+                  <p class="post-card-description">{{ . }}</p>
+                {{ else if .Summary }}
+                  <p class="post-card-description">{{ .Summary | truncate 150 }}</p>
+                {{ end }}
+
+                {{ with .Params.categories }}
+                  <div class="post-card-categories">
+                    {{ range . }}
+                      <span class="category-badge">{{ . }}</span>
+                    {{ end }}
+                  </div>
+                {{ end }}
+              </div>
+            </a>
+          </article>
+        {{ end }}
+      </div>
+    </section>
+  {{ else }}
+    <div class="no-posts">
+      <p>{{ i18n "author_no_posts" }}</p>
+    </div>
+  {{ end }}
+</div>
+
+<style>
+.author-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.author-header {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.author-profile {
+  display: flex;
+  gap: 2rem;
+  align-items: start;
+}
+
+.author-avatar {
+  flex-shrink: 0;
+}
+
+.author-avatar img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #e2e8f0;
+}
+
+.author-info {
+  flex: 1;
+}
+
+.author-name {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem;
+}
+
+.author-job-title {
+  font-size: 1.125rem;
+  color: #64748b;
+  font-weight: 500;
+  margin: 0 0 1rem;
+}
+
+.author-bio {
+  font-size: 1rem;
+  color: #475569;
+  line-height: 1.7;
+  margin: 0 0 1.5rem;
+  max-width: 700px;
+}
+
+.author-social {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #f1f5f9;
+  color: #64748b;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.social-link:hover {
+  background: #3b82f6;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.author-content {
+  margin-bottom: 3rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #475569;
+}
+
+.author-posts {
+  margin-top: 3rem;
+}
+
+.section-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.post-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.5rem;
+  background: #3b82f6;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 999px;
+}
+
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 2rem;
+}
+
+.post-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.post-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e1;
+}
+
+.post-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.post-card-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: #f1f5f9;
+}
+
+.post-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.post-card-content {
+  padding: 1.5rem;
+}
+
+.post-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.post-group {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.post-group.group-pro {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.post-group.group-question-time {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.post-group.group-kontra {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.post-group.group-basic {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.post-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.5rem;
+  line-height: 1.4;
+}
+
+.post-card-description {
+  color: #475569;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin: 0 0 1rem;
+}
+
+.post-card-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.category-badge {
+  padding: 0.25rem 0.5rem;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.75rem;
+  border-radius: 0.25rem;
+}
+
+.no-posts {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #64748b;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .author-header {
+    border-color: #334155;
+  }
+
+  .author-avatar img {
+    border-color: #334155;
+  }
+
+  .author-name,
+  .section-title {
+    color: #f1f5f9;
+  }
+
+  .author-job-title,
+  .author-bio {
+    color: #94a3b8;
+  }
+
+  .social-link {
+    background: #334155;
+    color: #cbd5e1;
+  }
+
+  .social-link:hover {
+    background: #3b82f6;
+    color: white;
+  }
+
+  .post-card {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  .post-card-title {
+    color: #f1f5f9;
+  }
+
+  .post-card-description {
+    color: #cbd5e1;
+  }
+
+  .category-badge {
+    background: #334155;
+    color: #cbd5e1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .author-profile {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .author-bio {
+    max-width: 100%;
+  }
+
+  .author-social {
+    justify-content: center;
+  }
+
+  .posts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .author-name {
+    font-size: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+}
+</style>
+{{ end }}

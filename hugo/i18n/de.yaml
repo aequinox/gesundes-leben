@@ -107,6 +107,9 @@
 - id: page
   translation: "Seite"
 
+- id: of
+  translation: "von"
+
 # Taxonomies
 - id: category
   translation: "Kategorie"
@@ -198,7 +201,7 @@
 
 # Author page
 - id: posts_by_author
-  translation: "Beiträge von {{ .Author }}"
+  translation: "Beiträge von"
 
 - id: about_author
   translation: "Über den Autor"
@@ -310,3 +313,33 @@
 
 - id: loading
   translation: "Laden..."
+
+# Taxonomy pages
+- id: taxonomy_count_singular
+  translation: "1 Beitrag"
+
+- id: taxonomy_count_plural
+  translation: "{{ . }} Beiträge"
+
+- id: no_posts_in_taxonomy
+  translation: "Keine Beiträge in dieser Kategorie gefunden."
+
+- id: post
+  translation: "Beitrag"
+
+- id: posts
+  translation: "Beiträge"
+
+- id: no_categories
+  translation: "Keine Kategorien gefunden."
+
+- id: no_tags
+  translation: "Keine Schlagwörter gefunden."
+
+# Author page
+- id: author_no_posts
+  translation: "Dieser Autor hat noch keine Beiträge veröffentlicht."
+
+# Group names (for templates)
+- id: group.question-time.title
+  translation: "Fragezeiten"
