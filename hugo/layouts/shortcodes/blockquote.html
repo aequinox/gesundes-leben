@@ -1,0 +1,148 @@
+{{/*
+  Blockquote Shortcode
+
+  Creates styled blockquotes, especially for "Therapeuten Tipp" sections
+
+  Usage:
+  {{< blockquote author="Dr. Kai Renner" type="tip" >}}
+  Important advice or quote goes here...
+  {{< /blockquote >}}
+
+  Parameters:
+  - author: Name of the person quoted (optional)
+  - type: tip, warning, note, quote (default: quote)
+  - icon: Custom icon/emoji (optional)
+*/}}
+
+{{- $author := .Get "author" | default "" -}}
+{{- $type := .Get "type" | default "quote" -}}
+{{- $icon := .Get "icon" | default "" -}}
+
+{{/* Set default icons based on type */}}
+{{- if not $icon -}}
+  {{- if eq $type "tip" -}}
+    {{- $icon = "💡" -}}
+  {{- else if eq $type "warning" -}}
+    {{- $icon = "⚠️" -}}
+  {{- else if eq $type "note" -}}
+    {{- $icon = "📝" -}}
+  {{- else -}}
+    {{- $icon = "💬" -}}
+  {{- end -}}
+{{- end -}}
+
+<blockquote class="custom-blockquote blockquote-{{ $type }}">
+  <div class="blockquote-icon">{{ $icon }}</div>
+  <div class="blockquote-content">
+    {{ .Inner | markdownify }}
+    {{- with $author -}}
+      <cite class="blockquote-author">— {{ . }}</cite>
+    {{- end -}}
+  </div>
+</blockquote>
+
+<style>
+  .custom-blockquote {
+    position: relative;
+    margin: 2rem 0;
+    padding: 1.5rem 1.5rem 1.5rem 4rem;
+    border-left: 4px solid;
+    border-radius: 0.5rem;
+    background: #f8fafc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .blockquote-icon {
+    position: absolute;
+    left: 1rem;
+    top: 1.5rem;
+    font-size: 1.75rem;
+    line-height: 1;
+  }
+
+  .blockquote-content {
+    margin: 0;
+  }
+
+  .blockquote-content p:first-child {
+    margin-top: 0;
+  }
+
+  .blockquote-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  .blockquote-author {
+    display: block;
+    margin-top: 1rem;
+    font-style: italic;
+    font-size: 0.9rem;
+    color: #64748b;
+  }
+
+  /* Type-specific styling */
+  .blockquote-tip {
+    border-left-color: #22c55e;
+    background: #f0fdf4;
+  }
+
+  .blockquote-warning {
+    border-left-color: #f59e0b;
+    background: #fffbeb;
+  }
+
+  .blockquote-note {
+    border-left-color: #3b82f6;
+    background: #eff6ff;
+  }
+
+  .blockquote-quote {
+    border-left-color: #8b5cf6;
+    background: #f5f3ff;
+  }
+
+  /* Dark mode */
+  @media (prefers-color-scheme: dark) {
+    .custom-blockquote {
+      background: #1e293b;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .blockquote-tip {
+      background: #064e3b;
+      border-left-color: #34d399;
+    }
+
+    .blockquote-warning {
+      background: #451a03;
+      border-left-color: #fbbf24;
+    }
+
+    .blockquote-note {
+      background: #1e3a8a;
+      border-left-color: #60a5fa;
+    }
+
+    .blockquote-quote {
+      background: #4c1d95;
+      border-left-color: #a78bfa;
+    }
+
+    .blockquote-author {
+      color: #94a3b8;
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .custom-blockquote {
+      padding: 1rem 1rem 1rem 3.5rem;
+    }
+
+    .blockquote-icon {
+      left: 0.75rem;
+      top: 1rem;
+      font-size: 1.5rem;
+    }
+  }
+</style>

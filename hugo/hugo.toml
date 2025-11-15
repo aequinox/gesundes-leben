@@ -1,0 +1,90 @@
+baseURL = "https://gesundes-leben.vision/"
+title = "Gesundes Leben"
+languageCode = "de-DE"
+defaultContentLanguage = "de"
+theme = "blowfish"
+enableRobotsTXT = true
+paginate = 12
+enableGitInfo = false
+copyright = "© 2025 Gesundes Leben. All rights reserved."
+
+# Taxonomies
+[taxonomies]
+  category = "categories"
+  tag = "tags"
+  group = "groups"
+
+# Build configuration
+[build]
+  writeStats = true
+
+# Minification
+[minify]
+  disableHTML = false
+  disableCSS = false
+  disableJS = false
+  disableJSON = false
+  disableSVG = false
+  minifyOutput = true
+
+# Image processing
+[imaging]
+  quality = 85
+  resampleFilter = "lanczos"
+  anchor = "Smart"
+
+# Output formats
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+  section = ["HTML", "RSS"]
+
+# Sitemap configuration
+[sitemap]
+  changefreq = "weekly"
+  filename = "sitemap.xml"
+  priority = 0.5
+
+# Caching
+[caches]
+  [caches.getjson]
+    maxAge = "1h"
+  [caches.images]
+    maxAge = "24h"
+  [caches.assets]
+    maxAge = "12h"
+
+# Markup configuration
+[markup]
+  [markup.highlight]
+    style = "monokai"
+    lineNos = true
+  [markup.tableOfContents]
+    endLevel = 4
+    ordered = false
+    startLevel = 2
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
+# Privacy settings
+[privacy]
+  [privacy.googleAnalytics]
+    anonymizeIP = true
+    respectDoNotTrack = true
+  [privacy.youtube]
+    privacyEnhanced = true
+
+# Related content
+[related]
+  threshold = 80
+  includeNewer = true
+  toLower = false
+  [[related.indices]]
+    name = "categories"
+    weight = 100
+  [[related.indices]]
+    name = "tags"
+    weight = 80
+  [[related.indices]]
+    name = "date"
+    weight = 10

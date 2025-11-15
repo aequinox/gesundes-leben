@@ -1,0 +1,32 @@
+{
+  "name": "gesundes-leben-hugo",
+  "version": "1.0.0",
+  "description": "Hugo migration for Gesundes Leben blog",
+  "scripts": {
+    "migrate": "node scripts/migrate-content.js",
+    "migrate:dry-run": "node scripts/migrate-content.js --dry-run",
+    "migrate:verbose": "node scripts/migrate-content.js --verbose",
+    "migrate:single": "node scripts/migrate-content.js --single",
+    "migrate:authors": "node scripts/migrate-authors.js",
+    "migrate:references": "node scripts/migrate-references.js",
+    "migrate:all": "npm run migrate:references && npm run migrate:authors && npm run migrate",
+    "validate": "node scripts/validate-migration.js",
+    "hugo:server": "hugo server -D",
+    "hugo:build": "hugo --minify",
+    "search:build": "npx pagefind --site public --language de"
+  },
+  "keywords": [
+    "hugo",
+    "static-site",
+    "health-blog",
+    "migration"
+  ],
+  "author": "Kai Renner",
+  "license": "MIT",
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "pagefind": "^1.0.0"
+  }
+}

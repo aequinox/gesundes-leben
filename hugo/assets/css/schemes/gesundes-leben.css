@@ -1,0 +1,209 @@
+/**
+ * Gesundes Leben Custom Color Scheme for Blowfish Theme
+ *
+ * This color scheme is designed for the health and wellness blog
+ * with calming greens and blues that evoke nature and wellbeing.
+ */
+
+/* Light Mode Colors */
+:root {
+  /* Neutral colors */
+  --color-neutral: 255, 255, 255;
+  --color-neutral-50: 250, 250, 250;
+  --color-neutral-100: 244, 244, 245;
+  --color-neutral-200: 228, 228, 231;
+  --color-neutral-300: 212, 212, 216;
+  --color-neutral-400: 161, 161, 170;
+  --color-neutral-500: 113, 113, 122;
+  --color-neutral-600: 82, 82, 91;
+  --color-neutral-700: 63, 63, 70;
+  --color-neutral-800: 39, 39, 42;
+  --color-neutral-900: 24, 24, 27;
+
+  /* Primary color - Forest Green for health/nature theme */
+  --color-primary-50: 236, 253, 245;
+  --color-primary-100: 209, 250, 229;
+  --color-primary-200: 167, 243, 208;
+  --color-primary-300: 110, 231, 183;
+  --color-primary-400: 52, 211, 153;
+  --color-primary-500: 16, 185, 129;
+  --color-primary-600: 5, 150, 105;
+  --color-primary-700: 4, 120, 87;
+  --color-primary-800: 6, 95, 70;
+  --color-primary-900: 6, 78, 59;
+
+  /* Secondary color - Wellness Blue */
+  --color-secondary-50: 239, 246, 255;
+  --color-secondary-100: 219, 234, 254;
+  --color-secondary-200: 191, 219, 254;
+  --color-secondary-300: 147, 197, 253;
+  --color-secondary-400: 96, 165, 250;
+  --color-secondary-500: 59, 130, 246;
+  --color-secondary-600: 37, 99, 235;
+  --color-secondary-700: 29, 78, 216;
+  --color-secondary-800: 30, 64, 175;
+  --color-secondary-900: 30, 58, 138;
+
+  /* Success color - Positive health */
+  --color-success-50: 240, 253, 244;
+  --color-success-100: 220, 252, 231;
+  --color-success-200: 187, 247, 208;
+  --color-success-300: 134, 239, 172;
+  --color-success-400: 74, 222, 128;
+  --color-success-500: 34, 197, 94;
+  --color-success-600: 22, 163, 74;
+  --color-success-700: 21, 128, 61;
+  --color-success-800: 22, 101, 52;
+  --color-success-900: 20, 83, 45;
+
+  /* Warning color */
+  --color-warning-50: 255, 251, 235;
+  --color-warning-100: 254, 243, 199;
+  --color-warning-200: 253, 230, 138;
+  --color-warning-300: 252, 211, 77;
+  --color-warning-400: 251, 191, 36;
+  --color-warning-500: 245, 158, 11;
+  --color-warning-600: 217, 119, 6;
+  --color-warning-700: 180, 83, 9;
+  --color-warning-800: 146, 64, 14;
+  --color-warning-900: 120, 53, 15;
+
+  /* Error color */
+  --color-error-50: 254, 242, 242;
+  --color-error-100: 254, 226, 226;
+  --color-error-200: 254, 202, 202;
+  --color-error-300: 252, 165, 165;
+  --color-error-400: 248, 113, 113;
+  --color-error-500: 239, 68, 68;
+  --color-error-600: 220, 38, 38;
+  --color-error-700: 185, 28, 28;
+  --color-error-800: 153, 27, 27;
+  --color-error-900: 127, 29, 29;
+}
+
+/* Dark Mode Colors */
+.dark {
+  /* Neutral colors for dark mode */
+  --color-neutral: 24, 24, 27;
+  --color-neutral-50: 39, 39, 42;
+  --color-neutral-100: 63, 63, 70;
+  --color-neutral-200: 82, 82, 91;
+  --color-neutral-300: 113, 113, 122;
+  --color-neutral-400: 161, 161, 170;
+  --color-neutral-500: 212, 212, 216;
+  --color-neutral-600: 228, 228, 231;
+  --color-neutral-700: 244, 244, 245;
+  --color-neutral-800: 250, 250, 250;
+  --color-neutral-900: 255, 255, 255;
+
+  /* Primary color - Lighter green for dark mode */
+  --color-primary-400: 74, 222, 128;
+  --color-primary-500: 34, 197, 94;
+  --color-primary-600: 22, 163, 74;
+
+  /* Secondary color - Lighter blue for dark mode */
+  --color-secondary-400: 96, 165, 250;
+  --color-secondary-500: 59, 130, 246;
+  --color-secondary-600: 37, 99, 235;
+}
+
+/* Custom component styles */
+.gesundes-leben-gradient {
+  background: linear-gradient(135deg, rgb(var(--color-primary-500)) 0%, rgb(var(--color-secondary-500)) 100%);
+}
+
+.health-card {
+  border-left: 4px solid rgb(var(--color-primary-600));
+  background: rgb(var(--color-primary-50));
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+}
+
+.dark .health-card {
+  background: rgb(var(--color-neutral-800));
+  border-left-color: rgb(var(--color-primary-400));
+}
+
+/* Link colors */
+a {
+  color: rgb(var(--color-primary-600));
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: rgb(var(--color-primary-700));
+}
+
+.dark a {
+  color: rgb(var(--color-primary-400));
+}
+
+.dark a:hover {
+  color: rgb(var(--color-primary-300));
+}
+
+/* Button styles */
+.btn-primary {
+  background: rgb(var(--color-primary-600));
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: rgb(var(--color-primary-700));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dark .btn-primary {
+  background: rgb(var(--color-primary-500));
+}
+
+.dark .btn-primary:hover {
+  background: rgb(var(--color-primary-600));
+}
+
+/* Code blocks */
+pre {
+  background: rgb(var(--color-neutral-100));
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.dark pre {
+  background: rgb(var(--color-neutral-800));
+}
+
+/* Headings with accent */
+h1, h2, h3 {
+  color: rgb(var(--color-neutral-900));
+}
+
+.dark h1,
+.dark h2,
+.dark h3 {
+  color: rgb(var(--color-neutral-100));
+}
+
+h2 {
+  border-bottom: 2px solid rgb(var(--color-primary-200));
+  padding-bottom: 0.5rem;
+}
+
+.dark h2 {
+  border-bottom-color: rgb(var(--color-primary-700));
+}
+
+/* Focus states for accessibility */
+*:focus-visible {
+  outline: 2px solid rgb(var(--color-primary-600));
+  outline-offset: 2px;
+}
+
+.dark *:focus-visible {
+  outline-color: rgb(var(--color-primary-400));
+}
