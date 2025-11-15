@@ -1,0 +1,233 @@
+{{/*
+  Pagination Partial
+  Flexible pagination for list pages with numbered pages and prev/next
+*/}}
+
+{{- if gt .Paginator.TotalPages 1 -}}
+<nav class="pagination" role="navigation" aria-label="Pagination">
+  <div class="pagination-container">
+    {{/* Previous Page */}}
+    {{- if .Paginator.HasPrev -}}
+      <a href="{{ .Paginator.Prev.URL }}" class="pagination-link pagination-prev" rel="prev" aria-label="{{ i18n "previous" }}">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>{{ i18n "previous" }}</span>
+      </a>
+    {{- else -}}
+      <span class="pagination-link pagination-prev pagination-disabled" aria-disabled="true">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>{{ i18n "previous" }}</span>
+      </span>
+    {{- end -}}
+
+    {{/* Page Numbers */}}
+    <div class="pagination-numbers">
+      {{- $paginator := .Paginator -}}
+      {{- $currentPage := $paginator.PageNumber -}}
+      {{- $totalPages := $paginator.TotalPages -}}
+
+      {{/* Always show first page */}}
+      {{- if ne $currentPage 1 -}}
+        <a href="{{ $paginator.First.URL }}" class="pagination-number" aria-label="{{ i18n "page" }} 1">1</a>
+      {{- else -}}
+        <span class="pagination-number pagination-current" aria-current="page" aria-label="{{ i18n "page" }} 1">1</span>
+      {{- end -}}
+
+      {{/* Show ellipsis if needed before current range */}}
+      {{- if gt $currentPage 4 -}}
+        <span class="pagination-ellipsis">…</span>
+      {{- end -}}
+
+      {{/* Show pages around current page */}}
+      {{- range $paginator.Pagers -}}
+        {{- $pageNum := .PageNumber -}}
+        {{- if and (gt $pageNum 1) (lt $pageNum $totalPages) -}}
+          {{- if and (ge $pageNum (sub $currentPage 2)) (le $pageNum (add $currentPage 2)) -}}
+            {{- if eq $pageNum $currentPage -}}
+              <span class="pagination-number pagination-current" aria-current="page" aria-label="{{ i18n "page" }} {{ $pageNum }}">{{ $pageNum }}</span>
+            {{- else -}}
+              <a href="{{ .URL }}" class="pagination-number" aria-label="{{ i18n "page" }} {{ $pageNum }}">{{ $pageNum }}</a>
+            {{- end -}}
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+
+      {{/* Show ellipsis if needed after current range */}}
+      {{- if lt $currentPage (sub $totalPages 3) -}}
+        <span class="pagination-ellipsis">…</span>
+      {{- end -}}
+
+      {{/* Always show last page if more than 1 page */}}
+      {{- if gt $totalPages 1 -}}
+        {{- if ne $currentPage $totalPages -}}
+          <a href="{{ $paginator.Last.URL }}" class="pagination-number" aria-label="{{ i18n "page" }} {{ $totalPages }}">{{ $totalPages }}</a>
+        {{- else -}}
+          <span class="pagination-number pagination-current" aria-current="page" aria-label="{{ i18n "page" }} {{ $totalPages }}">{{ $totalPages }}</span>
+        {{- end -}}
+      {{- end -}}
+    </div>
+
+    {{/* Next Page */}}
+    {{- if .Paginator.HasNext -}}
+      <a href="{{ .Paginator.Next.URL }}" class="pagination-link pagination-next" rel="next" aria-label="{{ i18n "next" }}">
+        <span>{{ i18n "next" }}</span>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    {{- else -}}
+      <span class="pagination-link pagination-next pagination-disabled" aria-disabled="true">
+        <span>{{ i18n "next" }}</span>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    {{- end -}}
+  </div>
+
+  {{/* Page info for screen readers */}}
+  <div class="pagination-info sr-only" aria-live="polite">
+    {{ i18n "page" }} {{ .Paginator.PageNumber }} {{ i18n "of" }} {{ .Paginator.TotalPages }}
+  </div>
+</nav>
+
+<style>
+.pagination {
+  margin: 3rem 0;
+}
+
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pagination-link,
+.pagination-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: white;
+  color: #475569;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.pagination-link:hover:not(.pagination-disabled),
+.pagination-number:hover {
+  border-color: #3b82f6;
+  background: #f8fafc;
+  color: #3b82f6;
+}
+
+.pagination-current {
+  border-color: #3b82f6;
+  background: #3b82f6;
+  color: white;
+  cursor: default;
+}
+
+.pagination-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  color: #94a3b8;
+  font-weight: 600;
+  user-select: none;
+}
+
+.pagination-numbers {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pagination-info {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+/* Screen Reader Only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .pagination-link,
+  .pagination-number {
+    background: #1e293b;
+    border-color: #334155;
+    color: #cbd5e1;
+  }
+
+  .pagination-link:hover:not(.pagination-disabled),
+  .pagination-number:hover {
+    border-color: #3b82f6;
+    background: #334155;
+  }
+
+  .pagination-current {
+    border-color: #3b82f6;
+    background: #3b82f6;
+    color: white;
+  }
+
+  .pagination-ellipsis {
+    color: #64748b;
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .pagination-link span {
+    display: none;
+  }
+
+  .pagination-link {
+    min-width: 2.5rem;
+    padding: 0;
+  }
+
+  .pagination-numbers {
+    order: -1;
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+  }
+}
+</style>
+{{- end -}}

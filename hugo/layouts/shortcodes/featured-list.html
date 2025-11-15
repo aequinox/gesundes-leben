@@ -1,0 +1,109 @@
+{{/*
+  Featured List Shortcode
+
+  Creates a visually enhanced list with checkmarks or custom icons
+
+  Usage:
+  {{< featured-list >}}
+  - Item 1
+  - Item 2
+  - Item 3
+  {{< /featured-list >}}
+
+  Or with custom icon:
+  {{< featured-list icon="✓" >}}
+  - Item 1
+  - Item 2
+  {{< /featured-list >}}
+*/}}
+
+{{- $icon := .Get "icon" | default "✓" -}}
+{{- $style := .Get "style" | default "check" -}}
+
+<div class="featured-list featured-list-{{ $style }}">
+  {{ .Inner | markdownify }}
+</div>
+
+<style>
+  .featured-list {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .featured-list {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  .featured-list ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+
+  .featured-list li {
+    position: relative;
+    padding-left: 2rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.05rem;
+    line-height: 1.6;
+  }
+
+  .featured-list li:last-child {
+    margin-bottom: 0;
+  }
+
+  .featured-list-check li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #22c55e;
+    font-weight: bold;
+    font-size: 1.25rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .featured-list-check li::before {
+      background: #1f2937;
+      color: #34d399;
+    }
+  }
+
+  .featured-list li strong {
+    color: #1e40af;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .featured-list li strong {
+      color: #60a5fa;
+    }
+  }
+
+  .featured-list p {
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .featured-list {
+      padding: 1rem;
+    }
+
+    .featured-list li {
+      font-size: 1rem;
+    }
+  }
+</style>

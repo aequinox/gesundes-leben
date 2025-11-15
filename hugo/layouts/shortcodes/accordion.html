@@ -1,0 +1,162 @@
+{{/*
+  Accordion Shortcode
+
+  Creates collapsible/expandable sections
+
+  Usage:
+  {{< accordion title="Click to expand" open="false" >}}
+  Content that can be collapsed or expanded...
+  {{< /accordion >}}
+
+  Parameters:
+  - title: The title/header shown in the accordion (required)
+  - open: "true" or "false" - Whether accordion is open by default (default: false)
+  - icon: Custom icon (optional)
+*/}}
+
+{{- $title := .Get "title" | default "Details" -}}
+{{- $open := .Get "open" | default "false" -}}
+{{- $icon := .Get "icon" | default "▶" -}}
+
+<details class="custom-accordion"{{ if eq $open "true" }} open{{ end }}>
+  <summary class="accordion-title">
+    <span class="accordion-icon">{{ $icon }}</span>
+    <span class="accordion-title-text">{{ $title }}</span>
+  </summary>
+  <div class="accordion-content">
+    {{ .Inner | markdownify }}
+  </div>
+</details>
+
+<style>
+  .custom-accordion {
+    margin: 1.5rem 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    background: #ffffff;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .accordion-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: #1e293b;
+    background: #f8fafc;
+    transition: background-color 0.2s ease;
+    list-style: none;
+  }
+
+  .accordion-title::-webkit-details-marker {
+    display: none;
+  }
+
+  .accordion-title:hover {
+    background: #f1f5f9;
+  }
+
+  .accordion-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    font-size: 0.75rem;
+    transition: transform 0.3s ease;
+    color: #3b82f6;
+  }
+
+  .custom-accordion[open] .accordion-icon {
+    transform: rotate(90deg);
+  }
+
+  .accordion-title-text {
+    flex: 1;
+  }
+
+  .accordion-content {
+    padding: 1.25rem;
+    color: #334155;
+    line-height: 1.7;
+    animation: accordion-slide-down 0.3s ease;
+  }
+
+  @keyframes accordion-slide-down {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .accordion-content > *:first-child {
+    margin-top: 0;
+  }
+
+  .accordion-content > *:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Dark mode */
+  @media (prefers-color-scheme: dark) {
+    .custom-accordion {
+      background: #1e293b;
+      border-color: #334155;
+    }
+
+    .accordion-title {
+      background: #0f172a;
+      color: #f1f5f9;
+    }
+
+    .accordion-title:hover {
+      background: #1e293b;
+    }
+
+    .accordion-icon {
+      color: #60a5fa;
+    }
+
+    .accordion-content {
+      color: #cbd5e1;
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .accordion-title {
+      padding: 0.875rem 1rem;
+      font-size: 1rem;
+    }
+
+    .accordion-content {
+      padding: 1rem;
+    }
+  }
+
+  /* Nested accordions support */
+  .accordion-content .custom-accordion {
+    margin: 1rem 0;
+  }
+
+  /* Focus styles for accessibility */
+  .accordion-title:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .accordion-title:focus {
+      outline-color: #60a5fa;
+    }
+  }
+</style>

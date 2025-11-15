@@ -1,0 +1,80 @@
+{{/*
+  Head Partial
+  Complete HTML head with SEO, meta tags, and resource hints
+*/}}
+
+{{/* Title */}}
+<title>{{ if .IsHome }}{{ .Site.Title }} - {{ .Site.Params.description }}{{ else if .Title }}{{ .Title }} | {{ .Site.Title }}{{ else }}{{ .Site.Title }}{{ end }}</title>
+
+{{/* Meta Description */}}
+{{ $description := .Description | default .Summary | default .Site.Params.description }}
+<meta name="description" content="{{ $description }}">
+
+{{/* Keywords */}}
+{{ with .Params.keywords }}
+<meta name="keywords" content="{{ delimit . ", " }}">
+{{ end }}
+
+{{/* Author */}}
+<meta name="author" content="{{ .Params.author | default .Site.Params.author }}">
+
+{{/* Canonical URL */}}
+<link rel="canonical" href="{{ .Permalink }}">
+
+{{/* Alternate language links */}}
+{{ range .Translations }}
+<link rel="alternate" hreflang="{{ .Language.Lang }}" href="{{ .Permalink }}" title="{{ .Language.LanguageName }}">
+{{ end }}
+
+{{/* RSS Feed */}}
+{{ with .OutputFormats.Get "rss" }}
+<link rel="alternate" type="application/rss+xml" title="{{ $.Site.Title }}" href="{{ .Permalink }}">
+{{ end }}
+
+{{/* Favicon */}}
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+{{/* Robots */}}
+{{ $robots := .Params.robots | default "index, follow" }}
+{{ if not hugo.IsProduction }}
+  {{ $robots = "noindex, nofollow" }}
+{{ end }}
+<meta name="robots" content="{{ $robots }}">
+
+{{/* Open Graph / Facebook */}}
+{{ partial "seo.html" . }}
+
+{{/* Resource Hints */}}
+{{ if hugo.IsProduction }}
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+{{ end }}
+
+{{/* Generator */}}
+<meta name="generator" content="Hugo {{ hugo.Version }}">
+
+{{/* Sitemap */}}
+<link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
+
+{{/* Theme Color */}}
+<meta name="theme-color" content="#16a34a">
+<meta name="msapplication-TileColor" content="#16a34a">
+
+{{/* CSS - Using Hugo Pipes if available, fallback to inline */}}
+{{ if fileExists "assets/css/main.css" }}
+  {{ $css := resources.Get "assets/css/main.css" | minify | fingerprint }}
+  <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+{{ end }}
+
+{{/* Preload critical fonts if they exist */}}
+{{ $fonts := slice "Poppins-400.woff2" "Poppins-600.woff2" "Poppins-700.woff2" }}
+{{ range $fonts }}
+  {{ $fontPath := printf "/fonts/%s" . }}
+  {{ if fileExists (printf "static%s" $fontPath) }}
+  <link rel="preload" href="{{ $fontPath }}" as="font" type="font/woff2" crossorigin>
+  {{ end }}
+{{ end }}
+
+{{/* Schema.org structured data */}}
+{{/* Handled in separate partial for organization */}}

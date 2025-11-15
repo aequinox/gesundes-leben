@@ -1,0 +1,153 @@
+{{/*
+  Image Shortcode for Hugo
+
+  Usage:
+  {{< image src="images/example.jpg" alt="Description" position="center" title="Optional caption" invert="false" >}}
+
+  Parameters:
+  - src: Image path (required)
+  - alt: Alt text for accessibility (required)
+  - position: left, center, right, full (default: center)
+  - title: Optional caption displayed below image
+  - invert: true/false - Invert image colors in dark mode (default: false)
+  - loading: lazy, eager (default: lazy)
+  - width: Optional width constraint
+*/}}
+
+{{- $src := .Get "src" -}}
+{{- $alt := .Get "alt" | default "" -}}
+{{- $position := .Get "position" | default "center" -}}
+{{- $title := .Get "title" | default "" -}}
+{{- $invert := .Get "invert" | default "false" -}}
+{{- $loading := .Get "loading" | default "lazy" -}}
+{{- $width := .Get "width" | default "" -}}
+
+{{- $image := "" -}}
+{{- $resourcePath := "" -}}
+
+{{/* Try to get image as page resource first */}}
+{{- with $.Page.Resources.GetMatch $src -}}
+  {{- $image = . -}}
+{{- else -}}
+  {{/* Try to get from assets directory */}}
+  {{- with resources.Get $src -}}
+    {{- $image = . -}}
+  {{- else -}}
+    {{/* Fallback to static path */}}
+    {{- $resourcePath = $src -}}
+  {{- end -}}
+{{- end -}}
+
+<figure class="image-{{ $position }}{{ if eq $invert "true" }} invert-on-dark{{ end }}">
+  {{- if $image -}}
+    {{/* Process image with Hugo's image processing */}}
+    {{- $resized := $image -}}
+
+    {{/* Resize image if it's too large */}}
+    {{- if gt $image.Width 1200 -}}
+      {{- $resized = $image.Resize "1200x" -}}
+    {{- end -}}
+
+    {{/* Generate WebP version for modern browsers (with error handling) */}}
+    {{- $webp := "" -}}
+    {{- $imgFormat := $image.MediaType.SubType -}}
+    {{/* Only convert to WebP if source is a raster format (not GIF or SVG) */}}
+    {{- if and (ne $imgFormat "gif") (ne $imgFormat "svg+xml") -}}
+      {{- $webp = $resized.Resize (printf "%dx%d webp q85" $resized.Width $resized.Height) -}}
+    {{- end -}}
+
+    {{- if $webp -}}
+      <picture>
+        <source srcset="{{ $webp.RelPermalink }}" type="image/webp">
+        <img src="{{ $resized.RelPermalink }}"
+             alt="{{ $alt }}"
+             loading="{{ $loading }}"
+             width="{{ $resized.Width }}"
+             height="{{ $resized.Height }}"
+             decoding="async">
+      </picture>
+    {{- else -}}
+      {{/* No WebP conversion, just use original/resized */}}
+      <img src="{{ $resized.RelPermalink }}"
+           alt="{{ $alt }}"
+           loading="{{ $loading }}"
+           width="{{ $resized.Width }}"
+           height="{{ $resized.Height }}"
+           decoding="async">
+    {{- end -}}
+  {{- else -}}
+    {{/* Fallback for static images */}}
+    <img src="{{ $resourcePath | relURL }}"
+         alt="{{ $alt }}"
+         loading="{{ $loading }}"
+         {{ with $width }}width="{{ . }}"{{ end }}
+         decoding="async">
+  {{- end -}}
+
+  {{- with $title -}}
+    <figcaption>{{ . | markdownify }}</figcaption>
+  {{- end -}}
+</figure>
+
+<style>
+  figure.image-left {
+    float: left;
+    margin: 0 1.5rem 1rem 0;
+    max-width: 50%;
+  }
+
+  figure.image-right {
+    float: right;
+    margin: 0 0 1rem 1.5rem;
+    max-width: 50%;
+  }
+
+  figure.image-center {
+    margin: 2rem auto;
+    text-align: center;
+  }
+
+  figure.image-full {
+    margin: 2rem 0;
+    width: 100%;
+  }
+
+  figure img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+  }
+
+  figure.invert-on-dark img {
+    transition: filter 0.3s ease;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    figure.invert-on-dark img {
+      filter: invert(1) hue-rotate(180deg);
+    }
+  }
+
+  figure figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    font-style: italic;
+    color: #666;
+    text-align: center;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    figure figcaption {
+      color: #aaa;
+    }
+  }
+
+  @media (max-width: 768px) {
+    figure.image-left,
+    figure.image-right {
+      float: none;
+      max-width: 100%;
+      margin: 1rem 0;
+    }
+  }
+</style>

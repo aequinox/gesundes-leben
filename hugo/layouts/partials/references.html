@@ -1,0 +1,224 @@
+{{/*
+  References Partial
+
+  Displays scientific references for blog posts
+
+  Usage in template:
+  {{ partial "references.html" . }}
+
+  Requires .Params.references to be an array of reference IDs
+*/}}
+
+{{- if .Params.references -}}
+  {{- if gt (len .Params.references) 0 -}}
+    <section class="references-section">
+      <h2 class="references-title">{{ i18n "scientific_references" | default "Wissenschaftliche Quellen" }}</h2>
+
+      <ol class="references-list">
+        {{- range $index, $refId := .Params.references -}}
+          {{- $refData := index $.Site.Data.references $refId -}}
+
+          {{- if $refData -}}
+            <li class="reference-item" id="ref-{{ $index | add 1 }}">
+              {{/* Authors */}}
+              {{- if $refData.authors -}}
+                <span class="reference-authors">
+                  {{- range $i, $author := $refData.authors -}}
+                    {{- $author -}}
+                    {{- if lt $i (sub (len $refData.authors) 1) -}}, {{ end -}}
+                  {{- end -}}
+                </span>
+              {{- end -}}
+
+              {{/* Year */}}
+              {{- if $refData.year -}}
+                <span class="reference-year">({{ $refData.year }})</span>.
+              {{- end -}}
+
+              {{/* Title */}}
+              {{- if $refData.title -}}
+                <span class="reference-title">{{ $refData.title }}</span>.
+              {{- end -}}
+
+              {{/* Journal (for journal articles) */}}
+              {{- if eq $refData.type "journal" -}}
+                {{- if $refData.journal -}}
+                  <em class="reference-journal">{{ $refData.journal }}</em>
+                  {{- if $refData.volume -}}
+                    , <span class="reference-volume">{{ $refData.volume }}</span>
+                    {{- if $refData.issue -}}
+                      ({{ $refData.issue }})
+                    {{- end -}}
+                  {{- end -}}
+                  {{- if $refData.pages -}}
+                    , {{ $refData.pages }}
+                  {{- end -}}
+                  .
+                {{- end -}}
+              {{- end -}}
+
+              {{/* Publisher (for books) */}}
+              {{- if eq $refData.type "book" -}}
+                {{- if $refData.publisher -}}
+                  <span class="reference-publisher">{{ $refData.publisher }}</span>
+                  {{- if $refData.location -}}
+                    , {{ $refData.location }}
+                  {{- end -}}
+                  .
+                {{- end -}}
+              {{- end -}}
+
+              {{/* DOI */}}
+              {{- if $refData.doi -}}
+                <a href="https://doi.org/{{ $refData.doi }}"
+                   class="reference-doi"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                  DOI: {{ $refData.doi }}
+                </a>
+              {{- end -}}
+
+              {{/* URL */}}
+              {{- if $refData.url -}}
+                {{- if not $refData.doi -}}
+                  <a href="{{ $refData.url }}"
+                     class="reference-url"
+                     target="_blank"
+                     rel="noopener noreferrer">
+                    {{ $refData.url }}
+                  </a>
+                {{- end -}}
+              {{- end -}}
+
+              {{/* PubMed ID */}}
+              {{- if $refData.pmid -}}
+                <a href="https://pubmed.ncbi.nlm.nih.gov/{{ $refData.pmid }}/"
+                   class="reference-pmid"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                  PMID: {{ $refData.pmid }}
+                </a>
+              {{- end -}}
+            </li>
+          {{- else -}}
+            <li class="reference-item reference-missing">
+              <span class="reference-error">Reference not found: {{ $refId }}</span>
+            </li>
+          {{- end -}}
+        {{- end -}}
+      </ol>
+    </section>
+
+    <style>
+      .references-section {
+        margin: 3rem 0 2rem 0;
+        padding: 2rem;
+        background: #f8fafc;
+        border-radius: 0.75rem;
+        border-left: 4px solid #3b82f6;
+      }
+
+      .references-title {
+        margin: 0 0 1.5rem 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+      }
+
+      .references-list {
+        list-style: decimal;
+        padding-left: 1.5rem;
+        margin: 0;
+      }
+
+      .reference-item {
+        margin-bottom: 1rem;
+        line-height: 1.7;
+        font-size: 0.95rem;
+        color: #334155;
+      }
+
+      .reference-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .reference-authors {
+        font-weight: 500;
+      }
+
+      .reference-year {
+        font-weight: 500;
+      }
+
+      .reference-title {
+        font-style: normal;
+      }
+
+      .reference-journal {
+        color: #475569;
+      }
+
+      .reference-doi,
+      .reference-url,
+      .reference-pmid {
+        color: #3b82f6;
+        text-decoration: none;
+        margin-left: 0.5rem;
+      }
+
+      .reference-doi:hover,
+      .reference-url:hover,
+      .reference-pmid:hover {
+        text-decoration: underline;
+      }
+
+      .reference-missing {
+        color: #dc2626;
+        font-style: italic;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .references-section {
+          background: #1e293b;
+          border-left-color: #60a5fa;
+        }
+
+        .references-title {
+          color: #f1f5f9;
+        }
+
+        .reference-item {
+          color: #cbd5e1;
+        }
+
+        .reference-journal {
+          color: #94a3b8;
+        }
+
+        .reference-doi,
+        .reference-url,
+        .reference-pmid {
+          color: #60a5fa;
+        }
+
+        .reference-missing {
+          color: #f87171;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .references-section {
+          padding: 1.5rem;
+        }
+
+        .references-title {
+          font-size: 1.25rem;
+        }
+
+        .reference-item {
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+  {{- end -}}
+{{- end -}}

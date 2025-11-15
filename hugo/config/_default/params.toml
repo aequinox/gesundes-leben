@@ -1,0 +1,113 @@
+# Blowfish Theme Configuration
+# See: https://blowfish.page/docs/configuration/
+
+# Basic parameters
+colorScheme = "gesundes-leben"
+defaultAppearance = "light"
+autoSwitchAppearance = true
+enableSearch = true
+enableCodeCopy = true
+enableImageLazyLoading = true
+enableImageWebp = true
+
+# Site info
+description = "Dein vertrauenswürdiger Ratgeber für Gesundheit, Ernährung und Wellness."
+author = "Kai Renner"
+timezone = "Europe/Berlin"
+
+# Robots
+robots = "index, follow"
+
+# Favicon
+# favicon = "favicon.ico"
+# faviconDarkMode = "favicon-dark.ico"
+
+# Header configuration
+[header]
+  layout = "basic"
+  logo = ""
+  logoDarkMode = ""
+  showTitle = true
+
+# Footer configuration
+[footer]
+  showCopyright = true
+  showThemeAttribution = false
+  showAppearanceSwitcher = true
+  showScrollToTop = true
+
+# Homepage configuration
+[homepage]
+  layout = "profile"
+  showRecent = true
+  recentLimit = 6
+  cardView = true
+  cardViewScreenWidth = false
+
+# Article configuration
+[article]
+  showDate = true
+  showDateUpdated = true
+  showAuthor = true
+  showBreadcrumbs = true
+  showDraftLabel = true
+  showEdit = false
+  showHeadingAnchors = true
+  showPagination = true
+  invertPagination = false
+  showReadingTime = true
+  showTableOfContents = true
+  showTaxonomies = true
+  showWordCount = false
+  showComments = false
+  sharingLinks = ["facebook", "twitter", "linkedin", "whatsapp", "email"]
+
+# List configuration
+[list]
+  showBreadcrumbs = true
+  showSummary = true
+  showTableOfContents = false
+  showTaxonomies = true
+  groupByYear = true
+  cardView = true
+  cardViewScreenWidth = false
+
+# Taxonomy configuration
+[taxonomy]
+  showTermCount = true
+
+# Term configuration
+[term]
+  showBreadcrumbs = true
+  showTableOfContents = false
+  groupByYear = false
+  cardView = true
+  cardViewScreenWidth = false
+
+# Firebase integration (optional)
+# [firebase]
+#   apiKey = ""
+#   authDomain = ""
+#   projectId = ""
+#   storageBucket = ""
+#   messagingSenderId = ""
+#   appId = ""
+#   measurementId = ""
+
+# Fathom Analytics (optional)
+# [fathomAnalytics]
+#   site = ""
+#   domain = ""
+
+# Plausible Analytics (optional)
+# [plausibleAnalytics]
+#   domain = ""
+#   event = ""
+#   script = ""
+
+# Verification (optional)
+# [verification]
+#   google = ""
+#   bing = ""
+#   pinterest = ""
+#   yandex = ""

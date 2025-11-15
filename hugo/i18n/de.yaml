@@ -1,0 +1,345 @@
+# German UI Translations
+
+# Navigation
+- id: skip_to_content
+  translation: "Zum Inhalt springen"
+
+- id: nav_home
+  translation: "Startseite"
+
+- id: nav_blog
+  translation: "Blog"
+
+- id: nav_about
+  translation: "Über uns"
+
+- id: nav_glossary
+  translation: "Glossar"
+
+- id: nav_authors
+  translation: "Autoren"
+
+- id: nav_search
+  translation: "Suche"
+
+# Article metadata
+- id: published_on
+  translation: "Veröffentlicht am"
+
+- id: last_updated
+  translation: "Zuletzt aktualisiert"
+
+- id: reading_time
+  translation: "{{ .Count }} Min. Lesezeit"
+
+- id: reading_time_one
+  translation: "1 Min. Lesezeit"
+
+- id: words
+  translation: "Wörter"
+
+- id: author
+  translation: "Autor"
+
+- id: authors
+  translation: "Autoren"
+
+- id: by_author
+  translation: "von {{ .Author }}"
+
+# Content sections
+- id: table_of_contents
+  translation: "Inhaltsverzeichnis"
+
+- id: related_posts
+  translation: "Verwandte Beiträge"
+
+- id: recent_posts
+  translation: "Neueste Beiträge"
+
+- id: featured_posts
+  translation: "Empfohlene Beiträge"
+
+- id: all_posts
+  translation: "Alle Beiträge"
+
+- id: categories
+  translation: "Kategorien"
+
+- id: tags
+  translation: "Schlagwörter"
+
+- id: references
+  translation: "Quellenangaben"
+
+# Actions
+- id: read_more
+  translation: "Weiterlesen"
+
+- id: share
+  translation: "Teilen"
+
+- id: search
+  translation: "Suchen"
+
+- id: search_placeholder
+  translation: "Suche nach Artikeln..."
+
+- id: show_more
+  translation: "Mehr anzeigen"
+
+- id: show_less
+  translation: "Weniger anzeigen"
+
+# Pagination
+- id: newer
+  translation: "Neuer"
+
+- id: older
+  translation: "Älter"
+
+- id: next
+  translation: "Weiter"
+
+- id: previous
+  translation: "Zurück"
+
+- id: page
+  translation: "Seite"
+
+- id: of
+  translation: "von"
+
+# Taxonomies
+- id: category
+  translation: "Kategorie"
+
+- id: tag
+  translation: "Schlagwort"
+
+- id: group
+  translation: "Gruppe"
+
+- id: all_categories
+  translation: "Alle Kategorien"
+
+- id: all_tags
+  translation: "Alle Schlagwörter"
+
+- id: posts_in_category
+  translation: "Beiträge in {{ .Category }}"
+
+- id: posts_tagged
+  translation: "Beiträge mit {{ .Tag }}"
+
+# Footer
+- id: copyright
+  translation: "© {{ .Year }} {{ .Site }}. Alle Rechte vorbehalten."
+
+- id: powered_by
+  translation: "Erstellt mit"
+
+- id: theme_by
+  translation: "Theme von"
+
+# Misc
+- id: draft
+  translation: "Entwurf"
+
+- id: not_found
+  translation: "Seite nicht gefunden"
+
+- id: not_found_message
+  translation: "Die angeforderte Seite konnte nicht gefunden werden."
+
+- id: go_home
+  translation: "Zur Startseite"
+
+- id: edit_page
+  translation: "Seite bearbeiten"
+
+- id: scroll_to_top
+  translation: "Nach oben scrollen"
+
+- id: expand
+  translation: "Erweitern"
+
+- id: collapse
+  translation: "Einklappen"
+
+- id: minute
+  translation: "Minute"
+
+- id: minutes
+  translation: "Minuten"
+
+# Accessibility
+- id: aria_menu
+  translation: "Menü"
+
+- id: aria_toggle_menu
+  translation: "Menü umschalten"
+
+- id: aria_toggle_theme
+  translation: "Theme umschalten"
+
+- id: aria_close
+  translation: "Schließen"
+
+- id: aria_open
+  translation: "Öffnen"
+
+# Search
+- id: search_results
+  translation: "Suchergebnisse"
+
+- id: no_results
+  translation: "Keine Ergebnisse gefunden"
+
+- id: search_results_for
+  translation: "Suchergebnisse für: {{ .Query }}"
+
+# Author page
+- id: posts_by_author
+  translation: "Beiträge von"
+
+- id: about_author
+  translation: "Über den Autor"
+
+# Social sharing
+- id: share_on
+  translation: "Teilen auf {{ .Platform }}"
+
+- id: copy_link
+  translation: "Link kopieren"
+
+- id: link_copied
+  translation: "Link kopiert!"
+
+# References
+- id: scientific_references
+  translation: "Wissenschaftliche Quellen"
+
+- id: reference
+  translation: "Quelle"
+
+- id: volume
+  translation: "Band"
+
+- id: issue
+  translation: "Ausgabe"
+
+- id: pages
+  translation: "Seiten"
+
+- id: published
+  translation: "Veröffentlicht"
+
+- id: accessed
+  translation: "Abgerufen"
+
+# Glossary
+- id: glossary_term
+  translation: "Glossarbegriff"
+
+- id: definition
+  translation: "Definition"
+
+- id: see_also
+  translation: "Siehe auch"
+
+# Content warnings
+- id: warning
+  translation: "Warnung"
+
+- id: note
+  translation: "Hinweis"
+
+- id: tip
+  translation: "Tipp"
+
+- id: therapist_tip
+  translation: "Therapeuten Tipp"
+
+# Date formats
+- id: date_format_long
+  translation: "2. January 2006"
+
+- id: date_format_short
+  translation: "02.01.2006"
+
+- id: date_format_month_year
+  translation: "January 2006"
+
+# Blog Filter
+- id: filter_by_group
+  translation: "Nach Gruppe filtern"
+
+- id: filter_by_category
+  translation: "Nach Kategorie filtern"
+
+- id: filter.all
+  translation: "Alle"
+
+- id: filter.all_posts
+  translation: "Alle Beiträge anzeigen"
+
+- id: group.pro.title
+  translation: "Pro"
+
+- id: group.pro.slogan
+  translation: "Positive Gesundheitsthemen"
+
+- id: group.questionTime.title
+  translation: "Fragezeiten"
+
+- id: group.questionTime.slogan
+  translation: "Häufige Fragen beantwortet"
+
+- id: group.contra.title
+  translation: "Kontra"
+
+- id: group.contra.slogan
+  translation: "Kritische Betrachtungen"
+
+- id: active_filters
+  translation: "Aktive Filter"
+
+- id: reset_filters
+  translation: "Alle Filter zurücksetzen"
+
+- id: no_results_message
+  translation: "Versuche es mit anderen Filtern"
+
+- id: loading
+  translation: "Laden..."
+
+# Taxonomy pages
+- id: taxonomy_count_singular
+  translation: "1 Beitrag"
+
+- id: taxonomy_count_plural
+  translation: "{{ . }} Beiträge"
+
+- id: no_posts_in_taxonomy
+  translation: "Keine Beiträge in dieser Kategorie gefunden."
+
+- id: post
+  translation: "Beitrag"
+
+- id: posts
+  translation: "Beiträge"
+
+- id: no_categories
+  translation: "Keine Kategorien gefunden."
+
+- id: no_tags
+  translation: "Keine Schlagwörter gefunden."
+
+# Author page
+- id: author_no_posts
+  translation: "Dieser Autor hat noch keine Beiträge veröffentlicht."
+
+# Group names (for templates)
+- id: group.question-time.title
+  translation: "Fragezeiten"

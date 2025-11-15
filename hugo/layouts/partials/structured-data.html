@@ -1,0 +1,257 @@
+{{/*
+  Structured Data Partial
+  Schema.org JSON-LD for SEO and rich snippets
+*/}}
+
+{{- $structuredData := slice -}}
+
+{{/* Organization/Website Schema - Always include on home page */}}
+{{- if .IsHome -}}
+  {{- $org := dict
+    "@context" "https://schema.org"
+    "@type" "Organization"
+    "name" .Site.Title
+    "url" .Site.BaseURL
+    "logo" (dict
+      "@type" "ImageObject"
+      "url" (.Site.Params.logo | default "/images/logo.png" | absURL)
+    )
+  -}}
+
+  {{- if .Site.Params.description -}}
+    {{- $org = merge $org (dict "description" .Site.Params.description) -}}
+  {{- end -}}
+
+  {{- if .Site.Params.social -}}
+    {{- $sameAs := slice -}}
+    {{- with .Site.Params.social.twitter -}}
+      {{- $sameAs = $sameAs | append (printf "https://twitter.com/%s" .) -}}
+    {{- end -}}
+    {{- with .Site.Params.social.facebook -}}
+      {{- $sameAs = $sameAs | append . -}}
+    {{- end -}}
+    {{- with .Site.Params.social.linkedin -}}
+      {{- $sameAs = $sameAs | append . -}}
+    {{- end -}}
+    {{- with .Site.Params.social.youtube -}}
+      {{- $sameAs = $sameAs | append . -}}
+    {{- end -}}
+    {{- if gt (len $sameAs) 0 -}}
+      {{- $org = merge $org (dict "sameAs" $sameAs) -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- $structuredData = $structuredData | append $org -}}
+
+  {{/* Website Schema */}}
+  {{- $website := dict
+    "@context" "https://schema.org"
+    "@type" "WebSite"
+    "name" .Site.Title
+    "url" .Site.BaseURL
+  -}}
+
+  {{- if .Site.Params.description -}}
+    {{- $website = merge $website (dict "description" .Site.Params.description) -}}
+  {{- end -}}
+
+  {{/* Search action for search functionality */}}
+  {{- if .Site.Params.enableSearch -}}
+    {{- $searchAction := dict
+      "@type" "SearchAction"
+      "target" (dict
+        "@type" "EntryPoint"
+        "urlTemplate" (printf "%s/search?q={search_term_string}" .Site.BaseURL)
+      )
+      "query-input" "required name=search_term_string"
+    -}}
+    {{- $website = merge $website (dict "potentialAction" $searchAction) -}}
+  {{- end -}}
+
+  {{- $structuredData = $structuredData | append $website -}}
+{{- end -}}
+
+{{/* Blog Post Article Schema */}}
+{{- if eq .Section "blog" -}}
+  {{- $description := .Description | default .Summary | default .Site.Params.description -}}
+
+  {{- $article := dict
+    "@context" "https://schema.org"
+    "@type" "BlogPosting"
+    "headline" .Title
+    "description" $description
+    "datePublished" (.Date.Format "2006-01-02T15:04:05Z07:00")
+    "dateModified" ((.Lastmod | default .Date).Format "2006-01-02T15:04:05Z07:00")
+    "mainEntityOfPage" (dict
+      "@type" "WebPage"
+      "@id" .Permalink
+    )
+    "publisher" (dict
+      "@type" "Organization"
+      "name" .Site.Title
+      "logo" (dict
+        "@type" "ImageObject"
+        "url" (.Site.Params.logo | default "/images/logo.png" | absURL)
+      )
+    )
+  -}}
+
+  {{/* Article URL */}}
+  {{- $article = merge $article (dict "url" .Permalink) -}}
+
+  {{/* Author information */}}
+  {{- if .Params.author -}}
+    {{- $authorPage := .Site.GetPage (printf "/authors/%s" (.Params.author | urlize)) -}}
+    {{- if $authorPage -}}
+      {{- $author := dict
+        "@type" "Person"
+        "name" ($authorPage.Title | default .Params.author)
+        "url" $authorPage.Permalink
+      -}}
+
+      {{- if $authorPage.Params.description -}}
+        {{- $author = merge $author (dict "description" $authorPage.Params.description) -}}
+      {{- end -}}
+
+      {{- if $authorPage.Params.avatar -}}
+        {{- $author = merge $author (dict "image" ($authorPage.Params.avatar | absURL)) -}}
+      {{- end -}}
+
+      {{- $article = merge $article (dict "author" $author) -}}
+    {{- else -}}
+      {{/* Fallback to string author */}}
+      {{- $article = merge $article (dict "author" (dict "@type" "Person" "name" .Params.author)) -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{/* Featured image */}}
+  {{- if .Params.heroImage -}}
+    {{- $heroPath := .Params.heroImage -}}
+    {{- $imgResource := "" -}}
+    {{- if .Resources -}}
+      {{- $imgResource = .Resources.GetMatch $heroPath -}}
+    {{- end -}}
+
+    {{- if $imgResource -}}
+      {{- $socialImg := $imgResource.Resize "1200x630 q85" -}}
+      {{- $article = merge $article (dict "image" (slice $socialImg.Permalink)) -}}
+    {{- else -}}
+      {{- $article = merge $article (dict "image" (slice ($heroPath | absURL))) -}}
+    {{- end -}}
+  {{- else if .Params.image -}}
+    {{- $article = merge $article (dict "image" (slice (.Params.image | absURL))) -}}
+  {{- end -}}
+
+  {{/* Article section (categories) */}}
+  {{- with .Params.categories -}}
+    {{- $article = merge $article (dict "articleSection" .) -}}
+  {{- end -}}
+
+  {{/* Keywords (tags) */}}
+  {{- with .Params.tags -}}
+    {{- $article = merge $article (dict "keywords" (delimit . ", ")) -}}
+  {{- end -}}
+
+  {{/* Word count */}}
+  {{- $article = merge $article (dict "wordCount" .WordCount) -}}
+
+  {{/* In language */}}
+  {{- $article = merge $article (dict "inLanguage" .Site.Language.Lang) -}}
+
+  {{- $structuredData = $structuredData | append $article -}}
+{{- end -}}
+
+{{/* Author/Person Schema */}}
+{{- if eq .Section "authors" -}}
+  {{- $person := dict
+    "@context" "https://schema.org"
+    "@type" "Person"
+    "name" .Title
+    "url" .Permalink
+  -}}
+
+  {{- if .Description -}}
+    {{- $person = merge $person (dict "description" .Description) -}}
+  {{- end -}}
+
+  {{- if .Params.avatar -}}
+    {{- $person = merge $person (dict "image" (.Params.avatar | absURL)) -}}
+  {{- end -}}
+
+  {{- if .Params.jobTitle -}}
+    {{- $person = merge $person (dict "jobTitle" .Params.jobTitle) -}}
+  {{- end -}}
+
+  {{- if .Params.social -}}
+    {{- $sameAs := slice -}}
+    {{- with .Params.social.twitter -}}
+      {{- $sameAs = $sameAs | append (printf "https://twitter.com/%s" .) -}}
+    {{- end -}}
+    {{- with .Params.social.linkedin -}}
+      {{- $sameAs = $sameAs | append . -}}
+    {{- end -}}
+    {{- with .Params.social.website -}}
+      {{- $sameAs = $sameAs | append . -}}
+    {{- end -}}
+    {{- if gt (len $sameAs) 0 -}}
+      {{- $person = merge $person (dict "sameAs" $sameAs) -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- $structuredData = $structuredData | append $person -}}
+{{- end -}}
+
+{{/* Breadcrumb Schema */}}
+{{- if not .IsHome -}}
+  {{- $breadcrumbList := slice -}}
+  {{- $position := 1 -}}
+
+  {{/* Home item */}}
+  {{- $homeItem := dict
+    "@type" "ListItem"
+    "position" $position
+    "name" "Home"
+    "item" .Site.BaseURL
+  -}}
+  {{- $breadcrumbList = $breadcrumbList | append $homeItem -}}
+  {{- $position = add $position 1 -}}
+
+  {{/* Section item */}}
+  {{- if .Section -}}
+    {{- $sectionPage := .Site.GetPage (printf "/%s" .Section) -}}
+    {{- if $sectionPage -}}
+      {{- $sectionItem := dict
+        "@type" "ListItem"
+        "position" $position
+        "name" $sectionPage.Title
+        "item" $sectionPage.Permalink
+      -}}
+      {{- $breadcrumbList = $breadcrumbList | append $sectionItem -}}
+      {{- $position = add $position 1 -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{/* Current page item */}}
+  {{- $currentItem := dict
+    "@type" "ListItem"
+    "position" $position
+    "name" .Title
+    "item" .Permalink
+  -}}
+  {{- $breadcrumbList = $breadcrumbList | append $currentItem -}}
+
+  {{- $breadcrumb := dict
+    "@context" "https://schema.org"
+    "@type" "BreadcrumbList"
+    "itemListElement" $breadcrumbList
+  -}}
+
+  {{- $structuredData = $structuredData | append $breadcrumb -}}
+{{- end -}}
+
+{{/* Output all structured data */}}
+{{- if gt (len $structuredData) 0 -}}
+<script type="application/ld+json">
+{{- $structuredData | jsonify (dict "indent" "  ") | safeJS -}}
+</script>
+{{- end -}}

@@ -1,0 +1,28 @@
+# Language Configuration
+
+[de]
+  languageName = "Deutsch"
+  languageCode = "de-DE"
+  weight = 1
+  title = "Gesundes Leben"
+
+  [de.params]
+    displayName = "DE"
+    isoCode = "de"
+    rtl = false
+    dateFormat = "2. January 2006"
+    description = "Dein vertrauenswürdiger Ratgeber für Gesundheit, Ernährung und Wellness."
+
+# English (future expansion)
+# [en]
+#   languageName = "English"
+#   languageCode = "en"
+#   weight = 2
+#   title = "Healthy Living"
+#
+#   [en.params]
+#     displayName = "EN"
+#     isoCode = "en"
+#     rtl = false
+#     dateFormat = "2 January 2006"
+#     description = "Your trusted guide for health, nutrition, and wellness."
