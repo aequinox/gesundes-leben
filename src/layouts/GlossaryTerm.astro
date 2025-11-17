@@ -1,0 +1,280 @@
+---
+/**
+ * GlossaryTerm Layout Component
+ *
+ * Displays individual glossary term pages with:
+ * - SEO optimization and structured data
+ * - Beautiful visual design with category-based styling
+ * - Related terms section
+ * - Breadcrumb navigation
+ * - Social sharing
+ */
+
+import type { CollectionEntry } from "astro:content";
+
+import Breadcrumbs from "@/components/elements/Breadcrumbs.astro";
+import Hr from "@/components/elements/Hr.astro";
+import InternalLink from "@/components/elements/InternalLink.astro";
+import Footer from "@/components/sections/Footer.astro";
+import Header from "@/components/sections/Header.astro";
+import { SITE } from "@/config";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+import Layout from "./Layout.astro";
+
+export interface Props {
+  entry: CollectionEntry<"glossary">;
+  relatedEntries: CollectionEntry<"glossary">[];
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const { entry, relatedEntries } = Astro.props;
+const { data } = entry;
+
+const title = `${data.title} | Glossar | ${SITE.title}`;
+const description = data.description || `Definition und Erklärung: ${data.title}`;
+const canonicalURL = new URL(`glossary/${entry.id}`, Astro.site).href;
+
+// Category styling configuration
+const categoryConfig = {
+  medical: {
+    color: "text-red-600",
+    bgLight: "bg-red-50",
+    bgDark: "dark:bg-red-950/30",
+    border: "border-red-200 dark:border-red-800",
+    icon: "🏥",
+    label: "Medizin",
+  },
+  nutrition: {
+    color: "text-green-600",
+    bgLight: "bg-green-50",
+    bgDark: "dark:bg-green-950/30",
+    border: "border-green-200 dark:border-green-800",
+    icon: "🥗",
+    label: "Ernährung",
+  },
+  wellness: {
+    color: "text-blue-600",
+    bgLight: "bg-blue-50",
+    bgDark: "dark:bg-blue-950/30",
+    border: "border-blue-200 dark:border-blue-800",
+    icon: "🧘",
+    label: "Wellness",
+  },
+  psychology: {
+    color: "text-purple-600",
+    bgLight: "bg-purple-50",
+    bgDark: "dark:bg-purple-950/30",
+    border: "border-purple-200 dark:border-purple-800",
+    icon: "🧠",
+    label: "Psychologie",
+  },
+  anatomy: {
+    color: "text-orange-600",
+    bgLight: "bg-orange-50",
+    bgDark: "dark:bg-orange-950/30",
+    border: "border-orange-200 dark:border-orange-800",
+    icon: "🫀",
+    label: "Anatomie",
+  },
+  general: {
+    color: "text-gray-600",
+    bgLight: "bg-gray-50",
+    bgDark: "dark:bg-gray-950/30",
+    border: "border-gray-200 dark:border-gray-800",
+    icon: "📚",
+    label: "Allgemein",
+  },
+};
+
+const categoryStyle = categoryConfig[data.category || "general"];
+
+// Difficulty badge styling
+const difficultyConfig = {
+  beginner: { label: "Einsteiger", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" },
+  intermediate: { label: "Fortgeschritten", color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300" },
+  advanced: { label: "Expert", color: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" },
+};
+
+const difficultyStyle = difficultyConfig[data.difficulty || "beginner"];
+
+// Structured data for SEO
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "DefinedTerm",
+  name: data.title,
+  description: description,
+  inDefinedTermSet: {
+    "@type": "DefinedTermSet",
+    name: "Gesundes Leben Glossar",
+    publisher: {
+      "@type": "Organization",
+      name: SITE.title,
+      url: SITE.website,
+    },
+  },
+  url: canonicalURL,
+  ...(data.synonyms && data.synonyms.length > 0 && {
+    alternateName: data.synonyms,
+  }),
+};
+
+// Breadcrumb items
+const breadcrumbItems = [
+  { href: "/", label: "Home" },
+  { href: "/glossary/", label: "Glossar" },
+  { href: "", label: data.title },
+];
+---
+
+<Layout title={title} description={description} canonicalURL={canonicalURL}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+  </Fragment>
+
+  <Header activeNav="glossary" />
+
+  <main id="main-content" class="mx-auto w-full max-w-content px-4 pb-12">
+    <!-- Breadcrumbs -->
+    <div class="py-6" data-pagefind-ignore>
+      <Breadcrumbs items={breadcrumbItems} />
+    </div>
+
+    <!-- Term Header -->
+    <article class="prose prose-lg dark:prose-invert mx-auto max-w-4xl">
+      <!-- Category Badge -->
+      <div class="mb-4 flex flex-wrap items-center gap-3">
+        <span class={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${categoryStyle.bgLight} ${categoryStyle.bgDark} ${categoryStyle.border} ${categoryStyle.color} border`}>
+          <span class="text-lg">{categoryStyle.icon}</span>
+          {categoryStyle.label}
+        </span>
+
+        <span class={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${difficultyStyle.color}`}>
+          {difficultyStyle.label}
+        </span>
+      </div>
+
+      <!-- Title -->
+      <h1 class="mb-4 text-4xl font-bold leading-tight tracking-tight lg:text-5xl">
+        {data.title}
+      </h1>
+
+      <!-- Synonyms -->
+      {data.synonyms && data.synonyms.length > 0 && (
+        <div class="mb-6 text-sm italic text-gray-600 dark:text-gray-400">
+          <span class="font-semibold">Auch bekannt als:</span> {data.synonyms.join(", ")}
+        </div>
+      )}
+
+      <!-- Description -->
+      {data.description && (
+        <p class="lead mb-8 text-xl text-gray-700 dark:text-gray-300">
+          {data.description}
+        </p>
+      )}
+
+      <Hr />
+
+      <!-- Content -->
+      <div class="glossary-content my-8">
+        <slot />
+      </div>
+
+      <!-- Keywords -->
+      {data.keywords && data.keywords.length > 0 && (
+        <div class="mt-10">
+          <h3 class="mb-3 text-lg font-semibold text-gray-700 dark:text-gray-300">
+            Schlüsselbegriffe
+          </h3>
+          <div class="flex flex-wrap gap-2">
+            {data.keywords.map(keyword => (
+              <span class="inline-block rounded-full bg-gray-100 dark:bg-gray-800 px-3 py-1 text-sm text-gray-700 dark:text-gray-300">
+                {keyword}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </article>
+
+    <!-- Related Terms Section -->
+    {relatedEntries && relatedEntries.length > 0 && (
+      <section class="mx-auto mt-16 max-w-4xl">
+        <Hr />
+        <h2 class="mb-6 text-2xl font-bold text-foreground">
+          Verwandte Begriffe
+        </h2>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {relatedEntries.map(relatedEntry => {
+            const relatedCategory = categoryConfig[relatedEntry.data.category || "general"];
+            return (
+              <InternalLink
+                href={`/glossary/${relatedEntry.id}/`}
+                class={`group block rounded-lg border-2 ${relatedCategory.border} ${relatedCategory.bgLight} ${relatedCategory.bgDark} p-4 transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
+              >
+                <div class="flex items-start gap-3">
+                  <span class="text-2xl">{relatedCategory.icon}</span>
+                  <div class="flex-1">
+                    <h3 class={`font-semibold ${relatedCategory.color} group-hover:underline`}>
+                      {relatedEntry.data.title}
+                    </h3>
+                    {relatedEntry.data.description && (
+                      <p class="mt-1 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                        {relatedEntry.data.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </InternalLink>
+            );
+          })}
+        </div>
+
+        <!-- Back to Glossary -->
+        <div class="mt-8 text-center">
+          <InternalLink
+            href="/glossary/"
+            class="inline-flex items-center gap-2 rounded-lg bg-accent px-6 py-3 font-semibold text-white transition-all duration-300 hover:bg-accent/90 hover:shadow-lg"
+          >
+            ← Zurück zum Glossar
+          </InternalLink>
+        </div>
+      </section>
+    )}
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .glossary-content {
+    @apply text-base leading-relaxed;
+  }
+
+  .glossary-content :global(p) {
+    @apply mb-4;
+  }
+
+  .glossary-content :global(ul),
+  .glossary-content :global(ol) {
+    @apply mb-4 ml-6;
+  }
+
+  .glossary-content :global(li) {
+    @apply mb-2;
+  }
+
+  .glossary-content :global(strong) {
+    @apply font-semibold text-foreground;
+  }
+
+  .glossary-content :global(em) {
+    @apply italic;
+  }
+
+  .glossary-content :global(a) {
+    @apply text-accent underline hover:text-accent/80;
+  }
+</style>

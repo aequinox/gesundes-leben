@@ -1,0 +1,194 @@
+---
+/**
+ * GlossaryTooltip Component
+ *
+ * Displays an inline glossary term with a tooltip/popover showing
+ * a brief definition. On click, navigates to the full glossary page.
+ *
+ * Usage:
+ * <GlossaryTooltip term="mikrobiom" termId="2023-03-31-mikrobiom">
+ *   Mikrobiom
+ * </GlossaryTooltip>
+ */
+
+import { getEntry } from "astro:content";
+
+import InternalLink from "./InternalLink.astro";
+
+export interface Props {
+  /** The glossary term ID (file name without extension) */
+  termId: string;
+  /** Optional display text (defaults to term title) */
+  term?: string;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const { termId, term: displayTerm, class: className = "" } = Astro.props;
+
+// Fetch glossary entry
+let glossaryEntry;
+try {
+  glossaryEntry = await getEntry("glossary", termId);
+} catch (error) {
+  console.warn(`Glossary term not found: ${termId}`);
+}
+
+// If no entry found, render as plain text
+if (!glossaryEntry) {
+  return <slot />;
+}
+
+const { data } = glossaryEntry;
+const termText = displayTerm || data.title;
+const description = data.description || "";
+const category = data.category || "general";
+
+// Category colors for tooltip
+const categoryColors = {
+  medical: "border-red-500 bg-red-50 dark:bg-red-950/90",
+  nutrition: "border-green-500 bg-green-50 dark:bg-green-950/90",
+  wellness: "border-blue-500 bg-blue-50 dark:bg-blue-950/90",
+  psychology: "border-purple-500 bg-purple-50 dark:bg-purple-950/90",
+  anatomy: "border-orange-500 bg-orange-50 dark:bg-orange-950/90",
+  general: "border-gray-500 bg-gray-50 dark:bg-gray-950/90",
+};
+
+const categoryColor = categoryColors[category as keyof typeof categoryColors] || categoryColors.general;
+---
+
+<span class="glossary-tooltip-wrapper inline-block relative">
+  <InternalLink
+    href={`/glossary/${termId}/`}
+    class={`glossary-term inline-flex items-center gap-1 text-accent border-b-2 border-dotted border-accent hover:border-solid hover:text-accent/80 transition-all duration-200 ${className}`}
+    aria-describedby={`tooltip-${termId}`}
+  >
+    <slot>{termText}</slot>
+    <svg
+      class="h-3 w-3 inline-block opacity-60"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+  </InternalLink>
+
+  <!-- Tooltip/Popover -->
+  <span
+    id={`tooltip-${termId}`}
+    class={`glossary-tooltip absolute bottom-full left-1/2 z-50 mb-2 hidden w-72 -translate-x-1/2 rounded-lg border-2 ${categoryColor} p-4 shadow-xl`}
+    role="tooltip"
+  >
+    <!-- Arrow -->
+    <span
+      class={`absolute top-full left-1/2 -translate-x-1/2 -mt-[2px] h-3 w-3 rotate-45 border-r-2 border-b-2 ${categoryColor}`}
+    ></span>
+
+    <!-- Content -->
+    <div class="relative z-10">
+      <div class="mb-2 flex items-start justify-between gap-2">
+        <h4 class="font-bold text-sm text-foreground">{data.title}</h4>
+        {data.difficulty && (
+          <span class="shrink-0 text-xs font-medium text-gray-600 dark:text-gray-400">
+            {data.difficulty === "beginner" && "★"}
+            {data.difficulty === "intermediate" && "★★"}
+            {data.difficulty === "advanced" && "★★★"}
+          </span>
+        )}
+      </div>
+
+      {description && (
+        <p class="text-xs leading-relaxed text-foreground/80 mb-2">
+          {description}
+        </p>
+      )}
+
+      <div class="flex items-center gap-1 text-xs text-accent font-semibold">
+        Mehr erfahren
+        <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </div>
+    </div>
+  </span>
+</span>
+
+<style>
+  .glossary-tooltip-wrapper:hover .glossary-tooltip,
+  .glossary-tooltip-wrapper:focus-within .glossary-tooltip {
+    display: block;
+    animation: tooltipFadeIn 0.2s ease-out;
+  }
+
+  @keyframes tooltipFadeIn {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+
+  /* Mobile: Position tooltip above or below based on space */
+  @media (max-width: 640px) {
+    .glossary-tooltip {
+      width: 90vw;
+      max-width: 300px;
+    }
+  }
+
+  /* Ensure tooltip stays on screen */
+  .glossary-tooltip-wrapper:first-child .glossary-tooltip,
+  .glossary-tooltip-wrapper:nth-child(2) .glossary-tooltip {
+    left: 0;
+    transform: translateX(0);
+  }
+
+  .glossary-tooltip-wrapper:last-child .glossary-tooltip,
+  .glossary-tooltip-wrapper:nth-last-child(2) .glossary-tooltip {
+    left: auto;
+    right: 0;
+    transform: translateX(0);
+  }
+</style>
+
+<script>
+  // Enhance tooltip behavior for touch devices
+  if ("ontouchstart" in window) {
+    document.querySelectorAll(".glossary-term").forEach(term => {
+      term.addEventListener("touchstart", (e) => {
+        // On touch, show tooltip without navigating
+        e.preventDefault();
+        const wrapper = term.closest(".glossary-tooltip-wrapper");
+        const tooltip = wrapper?.querySelector(".glossary-tooltip");
+
+        if (tooltip) {
+          // Toggle tooltip visibility
+          tooltip.classList.toggle("hidden");
+
+          // Close tooltip when tapping elsewhere
+          const closeTooltip = (event: Event) => {
+            if (!wrapper?.contains(event.target as Node)) {
+              tooltip.classList.add("hidden");
+              document.removeEventListener("touchstart", closeTooltip);
+            }
+          };
+
+          if (!tooltip.classList.contains("hidden")) {
+            setTimeout(() => {
+              document.addEventListener("touchstart", closeTooltip);
+            }, 100);
+          }
+        }
+      }, { passive: false });
+    });
+  }
+</script>
