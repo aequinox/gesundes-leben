@@ -3,10 +3,11 @@
  * Glossary Layout Component - 2025 Modern Design
  *
  * Displays glossary entries in a visually appealing grid layout
- * with modern design elements and interactive features.
+ * with modern design elements, A-Z navigation, search, and category filters.
  */
 
 import type { CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
 
 import Hr from "@/components/elements/Hr.astro";
 import Footer from "@/components/sections/Footer.astro";
@@ -39,6 +40,35 @@ const title = propTitle
   ? `${propTitle} | ${SITE.title}`
   : `t("glossary.title") | ${SITE.title}`;
 const pageTitle = propTitle ? propTitle : t("glossary.all");
+
+// Get all glossary entries for client-side filtering
+const allGlossaryEntries = await getCollection("glossary");
+const sortedAllEntries = [...allGlossaryEntries].sort((a, b) =>
+  a.data.title.localeCompare(b.data.title)
+);
+
+// Get unique categories and count
+const categoryStats = sortedAllEntries.reduce((acc, entry) => {
+  const cat = entry.data.category || "general";
+  acc[cat] = (acc[cat] || 0) + 1;
+  return acc;
+}, {} as Record<string, number>);
+
+// Generate alphabet letters that have entries
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+const lettersWithEntries = alphabet.filter(letter =>
+  sortedAllEntries.some(entry => entry.data.title.toUpperCase().startsWith(letter))
+);
+
+// Category configuration
+const categoryConfig = {
+  medical: { icon: "🏥", label: "Medizin", color: "red" },
+  nutrition: { icon: "🥗", label: "Ernährung", color: "green" },
+  wellness: { icon: "🧘", label: "Wellness", color: "blue" },
+  psychology: { icon: "🧠", label: "Psychologie", color: "purple" },
+  anatomy: { icon: "🫀", label: "Anatomie", color: "orange" },
+  general: { icon: "📚", label: "Allgemein", color: "gray" },
+};
 ---
 
 <Layout title={title}>
@@ -46,7 +76,7 @@ const pageTitle = propTitle ? propTitle : t("glossary.all");
 
   <main
     id="main-content"
-    class="mx-auto w-full max-w-content"
+    class="mx-auto w-full max-w-content px-4"
     data-pagefind-body
     data-pagefind-meta="type:glossary,contentType:definition,language:de,difficulty:beginner,medicalRelevance:reference"
     data-pagefind-weight="8"
@@ -57,29 +87,140 @@ const pageTitle = propTitle ? propTitle : t("glossary.all");
       <Hr />
     </div>
 
-    <!-- Glossary Grid Section -->
-    <section class="py-12">
+    <!-- Glossary Controls Section -->
+    <section class="py-8" data-pagefind-ignore>
       <div class="mx-auto max-w-content">
-        <p
-          class="mb-10 text-center text-lg text-foreground italic opacity-80"
-          data-pagefind-ignore
-        >
-          Entdecke unser Glossar mit wichtigen Begriffen und Definitionen.
-          Klicke auf einen Eintrag, um mehr zu erfahren.
-        </p>
+        <!-- Statistics Bar -->
+        <div class="mb-8 rounded-lg bg-gradient-to-r from-accent/10 to-accent/5 p-6 text-center">
+          <p class="text-lg font-semibold text-foreground">
+            <span class="text-3xl font-bold text-accent">{sortedAllEntries.length}</span>
+            {" "}Begriffe im Glossar
+          </p>
+          <p class="mt-2 text-sm text-foreground/70">
+            Durchsuche unsere Sammlung medizinischer Fachbegriffe
+          </p>
+        </div>
 
+        <!-- Search Bar -->
+        <div class="mb-6">
+          <div class="relative">
+            <input
+              type="search"
+              id="glossary-search"
+              placeholder="Begriff suchen..."
+              class="w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3 pl-12 text-foreground placeholder-gray-400 transition-all duration-300 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+            />
+            <svg
+              class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="mb-6">
+          <h3 class="mb-3 text-sm font-semibold text-foreground">Kategorien:</h3>
+          <div class="flex flex-wrap gap-2">
+            <button
+              class="category-filter active rounded-full border-2 border-accent bg-accent px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:bg-accent/90"
+              data-category="all"
+            >
+              Alle ({sortedAllEntries.length})
+            </button>
+            {Object.entries(categoryConfig).map(([key, config]) => {
+              const count = categoryStats[key] || 0;
+              if (count === 0) return null;
+              return (
+                <button
+                  class={`category-filter rounded-full border-2 border-${config.color}-200 dark:border-${config.color}-800 bg-white dark:bg-gray-900 px-4 py-2 text-sm font-semibold text-${config.color}-600 dark:text-${config.color}-400 transition-all duration-300 hover:bg-${config.color}-50 dark:hover:bg-${config.color}-950/30`}
+                  data-category={key}
+                >
+                  <span class="mr-1">{config.icon}</span>
+                  {config.label} ({count})
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <!-- A-Z Navigation -->
+        <div class="mb-8">
+          <h3 class="mb-3 text-sm font-semibold text-foreground">Schnellnavigation:</h3>
+          <div class="flex flex-wrap gap-1">
+            <button
+              class="letter-filter active h-10 w-10 rounded-lg border-2 border-accent bg-accent font-bold text-white transition-all duration-200 hover:scale-110"
+              data-letter="all"
+            >
+              #
+            </button>
+            {alphabet.map(letter => {
+              const hasEntries = lettersWithEntries.includes(letter);
+              return (
+                <button
+                  class={`letter-filter h-10 w-10 rounded-lg border-2 font-bold transition-all duration-200 ${
+                    hasEntries
+                      ? "border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-foreground hover:border-accent hover:scale-110"
+                      : "border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-800/50 text-gray-400 cursor-not-allowed opacity-50"
+                  }`}
+                  data-letter={letter}
+                  disabled={!hasEntries}
+                >
+                  {letter}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Glossary Grid Section -->
+    <section class="pb-12">
+      <div class="mx-auto max-w-content">
+        <!-- Results Info -->
+        <div id="results-info" class="mb-6 text-center text-sm text-foreground/70">
+          Zeige <span id="results-count">{paginatedPosts.length}</span> von {sortedAllEntries.length} Begriffen
+        </div>
+
+        <!-- Glossary Grid -->
         <div
+          id="glossary-grid"
           class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
           data-pagefind-weight="12"
         >
           {
             paginatedPosts.map(post => (
-              <GlossaryCard
-                {post}
-                data-pagefind-meta={`term:${post.data.title},type:glossary`}
-              />
+              <div
+                class="glossary-item"
+                data-title={post.data.title}
+                data-category={post.data.category || "general"}
+                data-keywords={post.data.keywords?.join(" ") || ""}
+                data-description={post.data.description || ""}
+              >
+                <GlossaryCard
+                  {post}
+                  data-pagefind-meta={`term:${post.data.title},type:glossary`}
+                />
+              </div>
             ))
           }
+        </div>
+
+        <!-- No Results Message -->
+        <div id="no-results" class="hidden py-12 text-center">
+          <div class="mx-auto max-w-md">
+            <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="mt-4 text-xl font-semibold text-foreground">Keine Begriffe gefunden</h3>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">
+              Versuche einen anderen Suchbegriff oder Filter
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -96,3 +237,141 @@ const pageTitle = propTitle ? propTitle : t("glossary.all");
 
   <Footer noMarginTop={totalPages > 1} />
 </Layout>
+
+<script>
+  // Glossary filtering and search functionality
+  document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("glossary-search") as HTMLInputElement;
+    const glossaryItems = document.querySelectorAll(".glossary-item") as NodeListOf<HTMLElement>;
+    const categoryFilters = document.querySelectorAll(".category-filter") as NodeListOf<HTMLButtonElement>;
+    const letterFilters = document.querySelectorAll(".letter-filter") as NodeListOf<HTMLButtonElement>;
+    const resultsCount = document.getElementById("results-count");
+    const noResults = document.getElementById("no-results");
+    const glossaryGrid = document.getElementById("glossary-grid");
+
+    let activeCategory = "all";
+    let activeLetter = "all";
+    let searchQuery = "";
+
+    // Filter glossary items
+    function filterGlossary() {
+      let visibleCount = 0;
+
+      glossaryItems.forEach(item => {
+        const title = item.dataset.title?.toLowerCase() || "";
+        const category = item.dataset.category || "general";
+        const keywords = item.dataset.keywords?.toLowerCase() || "";
+        const description = item.dataset.description?.toLowerCase() || "";
+        const firstLetter = title.charAt(0).toUpperCase();
+
+        // Check category filter
+        const categoryMatch = activeCategory === "all" || category === activeCategory;
+
+        // Check letter filter
+        const letterMatch = activeLetter === "all" || firstLetter === activeLetter;
+
+        // Check search query
+        const searchMatch =
+          searchQuery === "" ||
+          title.includes(searchQuery) ||
+          keywords.includes(searchQuery) ||
+          description.includes(searchQuery);
+
+        // Show/hide item
+        if (categoryMatch && letterMatch && searchMatch) {
+          item.style.display = "block";
+          visibleCount++;
+        } else {
+          item.style.display = "none";
+        }
+      });
+
+      // Update results count
+      if (resultsCount) {
+        resultsCount.textContent = visibleCount.toString();
+      }
+
+      // Show/hide no results message
+      if (noResults && glossaryGrid) {
+        if (visibleCount === 0) {
+          glossaryGrid.style.display = "none";
+          noResults.classList.remove("hidden");
+        } else {
+          glossaryGrid.style.display = "grid";
+          noResults.classList.add("hidden");
+        }
+      }
+    }
+
+    // Search input handler
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => {
+        searchQuery = (e.target as HTMLInputElement).value.toLowerCase();
+        filterGlossary();
+      });
+    }
+
+    // Category filter handler
+    categoryFilters.forEach(button => {
+      button.addEventListener("click", () => {
+        // Remove active class from all category buttons
+        categoryFilters.forEach(btn => {
+          btn.classList.remove("active");
+          btn.classList.remove("bg-accent", "text-white", "border-accent");
+        });
+
+        // Add active class to clicked button
+        button.classList.add("active", "bg-accent", "text-white", "border-accent");
+
+        // Update active category
+        activeCategory = button.dataset.category || "all";
+        filterGlossary();
+      });
+    });
+
+    // Letter filter handler
+    letterFilters.forEach(button => {
+      button.addEventListener("click", () => {
+        if (button.disabled) return;
+
+        // Remove active class from all letter buttons
+        letterFilters.forEach(btn => {
+          btn.classList.remove("active");
+          btn.classList.remove("bg-accent", "text-white", "border-accent");
+          btn.classList.add("border-gray-300", "dark:border-gray-700", "bg-white", "dark:bg-gray-900");
+        });
+
+        // Add active class to clicked button
+        button.classList.add("active", "bg-accent", "text-white", "border-accent");
+        button.classList.remove("border-gray-300", "dark:border-gray-700", "bg-white", "dark:bg-gray-900");
+
+        // Update active letter
+        activeLetter = button.dataset.letter || "all";
+        filterGlossary();
+
+        // Scroll to glossary grid
+        glossaryGrid?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+
+    // Initial filter (in case there are URL parameters or other initial state)
+    filterGlossary();
+  });
+</script>
+
+<style>
+  /* Additional styling for filter buttons */
+  .category-filter.active,
+  .letter-filter.active {
+    @apply bg-accent text-white border-accent;
+  }
+
+  .glossary-item {
+    transition: display 0.3s ease;
+  }
+
+  /* Smooth transitions for showing/hiding */
+  #glossary-grid {
+    transition: display 0.3s ease;
+  }
+</style>

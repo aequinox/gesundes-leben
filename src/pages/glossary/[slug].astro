@@ -1,0 +1,36 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
+
+import GlossaryTerm from "@/layouts/GlossaryTerm.astro";
+
+export interface Props {
+  entry: CollectionEntry<"glossary">;
+  relatedEntries: CollectionEntry<"glossary">[];
+}
+
+export async function getStaticPaths() {
+  const glossaryEntries = await getCollection("glossary");
+
+  return glossaryEntries.map(entry => {
+    // Get related terms based on relatedTerms field
+    const relatedEntries = glossaryEntries.filter(e =>
+      entry.data.relatedTerms?.includes(e.id) ||
+      e.data.relatedTerms?.includes(entry.id) ||
+      (e.data.category === entry.data.category && e.id !== entry.id)
+    ).slice(0, 3);
+
+    return {
+      params: { slug: entry.id },
+      props: { entry, relatedEntries },
+    };
+  });
+}
+
+const { entry, relatedEntries } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<GlossaryTerm entry={entry} relatedEntries={relatedEntries}>
+  <Content />
+</GlossaryTerm>

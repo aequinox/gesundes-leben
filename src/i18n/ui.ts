@@ -169,6 +169,33 @@ export interface UITranslations {
   "glossary.readMore": string;
   "glossary.readMoreLabel": string;
   "glossary.description": string;
+  "glossary.title": string;
+  "glossary.searchPlaceholder": string;
+  "glossary.categories": string;
+  "glossary.quickNav": string;
+  "glossary.allCategories": string;
+  "glossary.showing": string;
+  "glossary.of": string;
+  "glossary.terms": string;
+  "glossary.noResults": string;
+  "glossary.tryDifferent": string;
+  "glossary.relatedTerms": string;
+  "glossary.backToGlossary": string;
+  "glossary.synonyms": string;
+  "glossary.keywords": string;
+  "glossary.quickView": string;
+  "glossary.learnMore": string;
+  "glossary.inGlossary": string;
+  "glossary.browseCollection": string;
+  "glossary.category.medical": string;
+  "glossary.category.nutrition": string;
+  "glossary.category.wellness": string;
+  "glossary.category.psychology": string;
+  "glossary.category.anatomy": string;
+  "glossary.category.general": string;
+  "glossary.difficulty.beginner": string;
+  "glossary.difficulty.intermediate": string;
+  "glossary.difficulty.advanced": string;
 
   // Groups
   "group.select": string;

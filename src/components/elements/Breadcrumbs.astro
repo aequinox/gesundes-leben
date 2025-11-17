@@ -1,0 +1,54 @@
+---
+/**
+ * Breadcrumbs Component
+ *
+ * Displays breadcrumb navigation for SEO and user navigation.
+ */
+
+export interface Props {
+  items: {
+    href: string;
+    label: string;
+  }[];
+}
+
+const { items } = Astro.props;
+
+// Structured data for breadcrumbs
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: items.map((item, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: item.label,
+    ...(item.href && { item: new URL(item.href, Astro.site).href }),
+  })),
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+
+<nav aria-label="Breadcrumb" class="breadcrumbs">
+  <ol class="flex flex-wrap items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+    {items.map((item, index) => (
+      <li class="flex items-center gap-2">
+        {item.href ? (
+          <a
+            href={item.href}
+            class="hover:text-accent hover:underline transition-colors duration-200"
+          >
+            {item.label}
+          </a>
+        ) : (
+          <span class="font-semibold text-foreground" aria-current="page">
+            {item.label}
+          </span>
+        )}
+        {index < items.length - 1 && (
+          <span class="text-gray-400" aria-hidden="true">/</span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>

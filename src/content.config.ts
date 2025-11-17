@@ -69,6 +69,17 @@ const glossary = defineCollection({
     author: z.union([z.string(), reference("authors")]).default(SITE.author),
     pubDatetime: z.coerce.date(),
     modDatetime: z.coerce.date().optional(),
+    description: z
+      .string()
+      .min(10, "Description must be at least 10 characters")
+      .optional(),
+    category: z
+      .enum(["medical", "nutrition", "wellness", "psychology", "anatomy", "general"])
+      .default("general"),
+    relatedTerms: z.array(z.string()).default([]),
+    synonyms: z.array(z.string()).default([]),
+    difficulty: z.enum(["beginner", "intermediate", "advanced"]).default("beginner"),
+    keywords: z.array(z.string()).default([]),
   }),
 });
 

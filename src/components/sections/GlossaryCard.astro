@@ -3,7 +3,8 @@
  * GlossaryCard Component - 2025 Modern Design
  *
  * A card component for displaying glossary entries with title, content,
- * and navigation. Features modern design elements with interactive hover effects.
+ * category-based styling, and navigation. Features modern design elements
+ * with interactive hover effects and visual category indicators.
  *
  * @component
  * @example
@@ -17,6 +18,7 @@
 import { Icon } from "astro-icon/components";
 import { render, type CollectionEntry } from "astro:content";
 
+import InternalLink from "@/components/elements/InternalLink.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { slugify } from "@/utils/slugs";
 import { getGlossaryTransition } from "@/utils/viewTransitionNames";
@@ -35,7 +37,7 @@ export interface Props {
 const { post }: Props = Astro.props;
 
 const {
-  data: { title },
+  data: { title, category, difficulty, description, synonyms },
 } = post;
 
 const lang = getLangFromUrl(Astro.url);
@@ -52,55 +54,191 @@ const { Content } = await render(post);
 const readMoreLabel = t("glossary.readMoreLabel");
 const readMoreAriaLabel = t("glossary.readMore").replace("{title}", title);
 const excerptAriaLabel = t("glossary.excerpt");
+
+// Category styling configuration
+const categoryConfig = {
+  medical: {
+    gradient: "from-red-500/10 to-red-600/5",
+    border: "border-red-200 dark:border-red-800",
+    iconBg: "bg-red-100 dark:bg-red-900/30",
+    iconColor: "text-red-600 dark:text-red-400",
+    textColor: "text-red-600 dark:text-red-400",
+    hoverShadow: "hover:shadow-red-200/50 dark:hover:shadow-red-900/30",
+    icon: "🏥",
+    label: "Medizin",
+  },
+  nutrition: {
+    gradient: "from-green-500/10 to-green-600/5",
+    border: "border-green-200 dark:border-green-800",
+    iconBg: "bg-green-100 dark:bg-green-900/30",
+    iconColor: "text-green-600 dark:text-green-400",
+    textColor: "text-green-600 dark:text-green-400",
+    hoverShadow: "hover:shadow-green-200/50 dark:hover:shadow-green-900/30",
+    icon: "🥗",
+    label: "Ernährung",
+  },
+  wellness: {
+    gradient: "from-blue-500/10 to-blue-600/5",
+    border: "border-blue-200 dark:border-blue-800",
+    iconBg: "bg-blue-100 dark:bg-blue-900/30",
+    iconColor: "text-blue-600 dark:text-blue-400",
+    textColor: "text-blue-600 dark:text-blue-400",
+    hoverShadow: "hover:shadow-blue-200/50 dark:hover:shadow-blue-900/30",
+    icon: "🧘",
+    label: "Wellness",
+  },
+  psychology: {
+    gradient: "from-purple-500/10 to-purple-600/5",
+    border: "border-purple-200 dark:border-purple-800",
+    iconBg: "bg-purple-100 dark:bg-purple-900/30",
+    iconColor: "text-purple-600 dark:text-purple-400",
+    textColor: "text-purple-600 dark:text-purple-400",
+    hoverShadow: "hover:shadow-purple-200/50 dark:hover:shadow-purple-900/30",
+    icon: "🧠",
+    label: "Psychologie",
+  },
+  anatomy: {
+    gradient: "from-orange-500/10 to-orange-600/5",
+    border: "border-orange-200 dark:border-orange-800",
+    iconBg: "bg-orange-100 dark:bg-orange-900/30",
+    iconColor: "text-orange-600 dark:text-orange-400",
+    textColor: "text-orange-600 dark:text-orange-400",
+    hoverShadow: "hover:shadow-orange-200/50 dark:hover:shadow-orange-900/30",
+    icon: "🫀",
+    label: "Anatomie",
+  },
+  general: {
+    gradient: "from-gray-500/10 to-gray-600/5",
+    border: "border-gray-200 dark:border-gray-800",
+    iconBg: "bg-gray-100 dark:bg-gray-900/30",
+    iconColor: "text-gray-600 dark:text-gray-400",
+    textColor: "text-gray-600 dark:text-gray-400",
+    hoverShadow: "hover:shadow-gray-200/50 dark:hover:shadow-gray-900/30",
+    icon: "📚",
+    label: "Allgemein",
+  },
+};
+
+const categoryStyle = categoryConfig[category || "general"];
+
+// Difficulty badge configuration
+const difficultyConfig = {
+  beginner: {
+    label: "★",
+    tooltip: "Einsteiger",
+    color: "text-green-600 dark:text-green-400",
+  },
+  intermediate: {
+    label: "★★",
+    tooltip: "Fortgeschritten",
+    color: "text-yellow-600 dark:text-yellow-400",
+  },
+  advanced: {
+    label: "★★★",
+    tooltip: "Expert",
+    color: "text-red-600 dark:text-red-400",
+  },
+};
+
+const difficultyStyle = difficultyConfig[difficulty || "beginner"];
 ---
 
 <article
-  class="group overflow-hidden rounded-xl bg-card shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+  class={`group relative overflow-hidden rounded-xl border-2 bg-gradient-to-br ${categoryStyle.gradient} ${categoryStyle.border} ${categoryStyle.hoverShadow} bg-card shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl`}
   aria-labelledby={`glossary-title-${slug}`}
 >
-  <div class="flex h-full flex-col p-6">
-    <div class="mb-4 flex items-center gap-4">
+  <!-- Gradient Accent Bar -->
+  <div class={`absolute top-0 left-0 h-1 w-full bg-gradient-to-r ${categoryStyle.gradient}`}></div>
+
+  <InternalLink
+    href={`/glossary/${post.id}/`}
+    class="block h-full no-underline"
+    aria-label={`${title} - ${categoryStyle.label}`}
+  >
+    <div class="flex h-full flex-col p-6">
+      <!-- Header with Category Icon and Difficulty -->
+      <div class="mb-4 flex items-start justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div
+            class={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl ${categoryStyle.iconBg} transition-all duration-300 group-hover:scale-110`}
+          >
+            <span class="text-2xl" aria-hidden="true">{categoryStyle.icon}</span>
+          </div>
+          <div class="flex-1">
+            <h2
+              id={`glossary-title-${slug}`}
+              class={`text-xl font-bold leading-tight ${categoryStyle.textColor} transition-all duration-300 group-hover:underline`}
+              transition:name={getGlossaryTransition(slug)}
+            >
+              {title}
+            </h2>
+            <p class="mt-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+              {categoryStyle.label}
+            </p>
+          </div>
+        </div>
+
+        <!-- Difficulty Badge -->
+        <div
+          class={`shrink-0 text-lg font-bold ${difficultyStyle.color}`}
+          title={difficultyStyle.tooltip}
+          aria-label={difficultyStyle.tooltip}
+        >
+          {difficultyStyle.label}
+        </div>
+      </div>
+
+      <!-- Synonyms -->
+      {synonyms && synonyms.length > 0 && (
+        <div class="mb-3 flex flex-wrap gap-1">
+          {synonyms.slice(0, 2).map(synonym => (
+            <span class="inline-block rounded-full bg-gray-100 dark:bg-gray-800 px-2 py-0.5 text-xs text-gray-600 dark:text-gray-400">
+              {synonym}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <!-- Description or Content Preview -->
       <div
-        class="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 transition-all duration-300 group-hover:bg-accent"
+        class="mb-4 line-clamp-3 text-sm leading-relaxed text-foreground/80"
+        aria-label={excerptAriaLabel}
       >
+        {description ? (
+          <p>{description}</p>
+        ) : (
+          <Content />
+        )}
+      </div>
+
+      <!-- Read More Footer -->
+      <div class="mt-auto flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
+        <span class={`text-sm font-semibold ${categoryStyle.textColor} transition-all duration-300`}>
+          {readMoreLabel}
+        </span>
         <Icon
-          name="tabler:book"
-          class="h-6 w-6 fill-accent transition-all duration-300"
+          name="tabler:arrow-right"
+          class={`h-5 w-5 ${categoryStyle.iconColor} transition-all duration-300 group-hover:translate-x-2`}
           aria-hidden="true"
         />
       </div>
-      <h2
-        id={`glossary-title-${slug}`}
-        class="text-xl font-semibold text-foreground transition-all duration-300"
-        transition:name={getGlossaryTransition(slug)}
-      >
-        {title}
-      </h2>
     </div>
+  </InternalLink>
 
-    <div
-      class="mb-3 line-clamp-3 text-sm leading-relaxed text-foreground/80"
-      aria-label={excerptAriaLabel}
-    >
-      <Content />
-    </div>
-
-    <div class="mt-auto pt-4">
-      <button
-        type="button"
-        class="inline-flex cursor-pointer items-center gap-2 font-medium text-accent no-underline transition-all duration-300 hover:text-accent/80"
-        aria-label={readMoreAriaLabel}
-        data-modal-target={modalId}
-      >
-        <span>{readMoreLabel}</span>
-        <Icon
-          name="tabler:arrow-right"
-          class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
-          aria-hidden="true"
-        />
-      </button>
-    </div>
-  </div>
+  <!-- Quick View Button (Optional Modal) -->
+  <button
+    type="button"
+    class={`absolute top-4 right-4 rounded-full ${categoryStyle.iconBg} p-2 opacity-0 transition-all duration-300 hover:scale-110 group-hover:opacity-100`}
+    aria-label={`Schnellansicht: ${title}`}
+    data-modal-target={modalId}
+    title="Schnellansicht"
+  >
+    <Icon
+      name="tabler:eye"
+      class={`h-4 w-4 ${categoryStyle.iconColor}`}
+      aria-hidden="true"
+    />
+  </button>
 </article>
 
 <!-- Modal for full glossary content -->
